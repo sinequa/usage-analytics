@@ -1,0 +1,29 @@
+.panorama {
+    width: 360px;
+    z-index: 100;
+    padding: 10px;
+    height: 500px;
+    overflow-y: auto;
+    right: 1%;
+
+    button {
+        min-height: 100px;
+        min-width: 100px;
+        max-width: 100px;
+        max-height: 100px;
+        outline: none;
+        overflow: hidden;
+
+        & i {
+            font-size: x-large;
+        }
+        
+        .button-text {
+            padding: .5rem;
+            font-size: .6rem;
+            line-height: .6rem;
+        }
+    }
+}
+
+

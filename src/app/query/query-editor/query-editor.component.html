@@ -1,0 +1,81 @@
+<form [formGroup]="queryForm" (ngSubmit)="onSubmit(queryForm.value)" *ngIf="appService.app">
+
+    <div class="form-group row">
+        <label for="query-name" class="col-sm-3 col-form-label">Query Web Service</label>
+        <div class="col-sm-9">
+            <select class="custom-select" formControlName="queryName" id="query-name">
+                <option *ngFor="let query of appService.app.queries | keyvalue" [value]="query.key">                  
+                    {{query.key}}
+                </option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <label for="tab" class="col-sm-3 col-form-label">Tab</label>
+        <div class="col-sm-9">
+            <select class="custom-select" formControlName="tab" id="tab">
+                <option [value]="''"></option>
+                <option *ngFor="let tab of appService.ccquery?.tabSearch.tabs" [value]="tab.name">
+                    {{tab.name}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="scope" class="col-sm-3 col-form-label">Scope</label>
+        <div class="col-sm-9">
+            <select class="custom-select" formControlName="scope" id="scope">
+                <option [value]="''"></option>
+                <option *ngFor="let scope of appService.ccquery?.scopes" [value]="scope.name">
+                    {{scope.name}}
+                </option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <label for="page" class="col-sm-3 col-form-label">Page</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="page" placeholder="Page" formControlName="page" [sqValidation]="queryForm" spellcheck="false" autocomplete="off">
+        </div>
+        <label for="pageSize" class="col-sm-3 col-form-label">Page Size</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="pageSize" placeholder="Page size" formControlName="pageSize" [sqValidation]="queryForm" spellcheck="false" autocomplete="off">
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="sort" class="col-sm-3 col-form-label">Sort by</label>
+        <div class="col-sm-9">
+            <select class="custom-select" formControlName="sort" id="sort">
+                <option [value]="''"></option>
+                <option *ngFor="let sort of appService.ccquery?.sortingChoices" [value]="sort.name">
+                    {{sort.name}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="select" class="col-sm-3 col-form-label">Selects</label>
+        <div class="col-sm-9">
+            <input #selectInput type="text" class="form-control" id="select" placeholder='Expression (eg. "person: Bill Gates")' formControlName="select" [sqValidation]="{form: queryForm, errorMessages: {error: 'msg#queryEditor.invalidExpression'}}" spellcheck="false" autocomplete="off">
+            
+            <div *ngFor="let select of searchService.query.select" class="d-flex align-items-center my-1 select">
+                <span class="flex-grow-1 monospace">{{select.expression}}</span>
+                <button type="button" class="btn btn-primary btn-sm ml-2" title="Edit this select" (click)="editSelect(select)">
+                    <i class="fas fa-fw fa-pen"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm ml-2" title="Remove this select" (click)="removeSelect(select)">
+                    <i class="fas fa-fw fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Update Query</button>
+    <button class="btn btn-secondary ml-2" type="button" (click)="clearQuery()">Clear Query</button>
+
+</form>

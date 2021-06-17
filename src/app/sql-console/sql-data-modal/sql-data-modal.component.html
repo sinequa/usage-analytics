@@ -1,0 +1,10 @@
+<sq-modal [title]="model.column" [buttons]="buttons">
+    <pre class="mb-0">{{model.cell}}</pre>
+    <div footer class="btn-group"
+        [sq-action-buttons]="{
+            items: [copyAction],
+            rightAligned: true,
+            style: 'primary'
+        }">
+    </div>
+</sq-modal>

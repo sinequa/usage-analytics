@@ -1,0 +1,127 @@
+
+<div *ngIf="data !== undefined && data !== null">
+    <div class="small">
+        <span class="text-muted">{{size | sqMemorySize}}</span>&nbsp;&bull;&nbsp;
+        <ng-container *ngIf="pretty">
+            <a href="#" (click)="setPretty(false)">raw</a>&nbsp;&bull;&nbsp;
+            <span class="text-muted">pretty</span>
+        </ng-container>
+        <ng-container *ngIf="!pretty">
+            <span class="text-muted">raw</span>&nbsp;&bull;&nbsp;
+            <a href="#" (click)="setPretty(true)">pretty</a>
+        </ng-container>
+    </div>
+    
+    <div class="data">
+        <div *ngIf="pretty" class="pretty">
+            <ng-container *ngTemplateOutlet="jsonTpl; context: {$implicit: data, path: name, depth: 0}"></ng-container>
+        </div>
+        <pre *ngIf="!pretty" class="small">{{ data | json }}</pre>
+    </div>
+</div>
+
+<pre *ngIf="data === undefined" class="small text-muted">undefined</pre>
+<pre *ngIf="data === null" class="small text-muted">null</pre>
+
+<ng-template #jsonTpl let-data let-path="path" let-depth="depth" let-short="short">
+    <ng-container *ngIf="isObject(data) && !isArray(data)">
+        <ng-container *ngTemplateOutlet="objectTpl; context: {$implicit: data, path: path, depth: depth, short: short}"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="isArray(data)">
+        <ng-container *ngTemplateOutlet="arrayTpl; context: {$implicit: data, path: path, depth: depth, short: short}"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="isString(data)">
+        <ng-container *ngTemplateOutlet="stringTpl; context: {$implicit: data, path: path, depth: depth}"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="isNumber(data)">
+        <ng-container *ngTemplateOutlet="numberTpl; context: {$implicit: data, path: path, depth: depth}"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="isBoolean(data)">
+        <ng-container *ngTemplateOutlet="booleanTpl; context: {$implicit: data, path: path, depth: depth}"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="isNull(data)">
+        <ng-container *ngTemplateOutlet="nullTpl; context: {$implicit: data, path: path, depth: depth}"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="isUndefined(data)">
+        <ng-container *ngTemplateOutlet="undefinedTpl; context: {$implicit: data, path: path, depth: depth}"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="isOther(data)">
+        <ng-container *ngTemplateOutlet="otherTpl; context: {$implicit: data, path: path, depth: depth}"></ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #objectTpl let-data let-path="path" let-depth="depth" let-short="short">
+    <ng-container *ngIf="!short && (depth === 0 || isExpanded(path))">
+        <div *ngFor="let item of data | keyvalue" [ngClass]="{'ml-3': depth > 0? 1 : 0, 'text-truncate': isObject(item.value) && !isExpanded(path+'.'+item.key)}">
+            <a href="#" (click)="toggleExpanded(path+'.'+item.key)" *ngIf="isObject(item.value)">
+                <i class="fas fa-fw small text-muted" [ngClass]="{'fa-chevron-right': !isExpanded(path+'.'+item.key), 'fa-chevron-down': isExpanded(path+'.'+item.key)}"></i>
+            </a>
+            <i class="fas fa-fw small" *ngIf="!isObject(item.value)"></i>
+            <span class="key" (click)="keyClicked(path+'.'+item.key)">{{item.key}}</span>:
+            <ng-container *ngTemplateOutlet="jsonTpl; context: {$implicit: item.value, path: path+'.'+item.key, depth: depth+1}"></ng-container>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="!short && (depth > 0 && !isExpanded(path))">
+        <span>{{ '{' }}</span>
+        <ng-container *ngFor="let item of data | keyvalue | slice:0:5; let i=index">
+            <span class="key" (click)="keyClicked(path+'.'+item.key)">{{item.key}}</span>:
+            <ng-container *ngTemplateOutlet="jsonTpl; context: {$implicit: item.value, path: path+'.'+item.key, depth: depth+1, short: true}"></ng-container>
+            <span *ngIf="i < nChildren(data)-1">, </span>
+        </ng-container>
+        <span *ngIf="nChildren(data) > 5">…</span>
+        <span>{{ '}' }}</span>
+    </ng-container>
+    <ng-container *ngIf="short">
+        <span>{{ '{…}' }}</span>
+    </ng-container>
+</ng-template>
+
+<ng-template #arrayTpl let-data let-path="path" let-depth="depth" let-short="short">
+    <ng-container *ngIf="!short && (depth === 0 || isExpanded(path))">
+        <span>Array({{data.length}})</span>
+        <div *ngFor="let item of data; let i=index" [ngClass]="{'ml-3': depth > 0? 1 : 0, 'text-truncate': isObject(item) && !isExpanded(path+'['+i+']')}">
+            <a href="#" (click)="toggleExpanded(path+'['+i+']')" *ngIf="isObject(item)">
+                <i class="fas fa-fw small text-muted" [ngClass]="{'fa-chevron-right': !isExpanded(path+'['+i+']'), 'fa-chevron-down': isExpanded(path+'['+i+']')}"></i>
+            </a>
+            <i class="fas fa-fw small" *ngIf="!isObject(item)"></i>
+            <span (click)="keyClicked(path+'['+i+']')">{{i}}: </span>
+            <ng-container *ngTemplateOutlet="jsonTpl; context: {$implicit: item, path: path+'['+i+']', depth: depth+1}"></ng-container>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="!short && (depth > 0 && !isExpanded(path))">
+        <span>{{ '[' }}</span>
+        <span *ngFor="let item of data | slice:0:5; let i=index">
+            <ng-container *ngTemplateOutlet="jsonTpl; context: {$implicit: item, path: path+'['+i+']', depth: depth+1, short: true}"></ng-container>
+            <span *ngIf="i < data.length-1">, </span>
+        </span>
+        <span *ngIf="data.length > 5">…</span>
+        <span>{{ ']' }}</span>
+    </ng-container>
+    <ng-container *ngIf="short">
+        <span>Array({{data.length}})</span>
+    </ng-container>
+</ng-template>
+
+<ng-template #stringTpl let-data let-path="path" let-depth="depth">
+    <span class="string" (click)="valueClicked(data)">"{{data}}"</span>
+</ng-template>
+
+<ng-template #numberTpl let-data let-path="path" let-depth="depth">
+    <span class="number" (click)="valueClicked(data)">{{data}}</span>
+</ng-template>
+
+<ng-template #booleanTpl let-data let-path="path" let-depth="depth">
+    <span class="boolean" (click)="valueClicked(data)">{{data}}</span>
+</ng-template>
+
+<ng-template #nullTpl let-data let-path="path" let-depth="depth">
+    null
+</ng-template>
+
+<ng-template #undefinedTpl let-data let-path="path" let-depth="depth">
+    undefined
+</ng-template>
+
+<ng-template #otherTpl let-data let-path="path" let-depth="depth">
+    other
+</ng-template>

@@ -1,0 +1,36 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  outline: none !important;
+  cursor: pointer;
+}
+
+.side-menu {
+  min-height: calc(100vh - 73px);
+  overflow-y: auto;
+  width: 280px;
+
+  margin-left: 0px;
+  transition: margin-left .5s;
+
+  &--hidden {
+      margin-left: -280px;
+      overflow-y: hidden;
+  }
+}
+
+.main-container {
+  width: calc(100% - 280px);
+
+  &--expanded {
+      width: 100% !important;
+  }
+}
+
+
+.full-width {
+  flex-basis: 100%;
+}

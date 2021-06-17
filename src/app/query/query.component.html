@@ -1,0 +1,71 @@
+<div class="row">
+    <h3 class="col-12">
+        Query Web Service
+        <span class="fas fa-info-circle small text-muted" sqTooltip="The query web service returns search results given a query object containing all search criteria"></span>
+        <span class="small text-muted monospace">&nbsp;/api/v1/query</span>
+    </h3>
+
+    <div class="col-12">
+        <h4>searchService.query</h4>
+    </div>
+    
+    <div class="col-9">
+        <sq-query-editor></sq-query-editor>
+    </div>
+
+    <div class="col-3">
+        <h5 class="mt-2">Query</h5>
+        <sq-explorer [data]="searchService.query" [name]="'searchService.query'"></sq-explorer>
+
+        <h5 class="mt-2">Intent data <span sqTooltip="Sent with the query (based on the previous query)" class="fas fa-info-circle small text-muted"></span></h5>
+        <sq-explorer [data]="intentData" [name]="'intentData'"></sq-explorer>
+
+        <ng-container *ngIf="searchService.results?.queryAnalysis">
+            <h5 class="mt-2">Query analysis <span sqTooltip="Received in the results" class="fas fa-info-circle small text-muted"></span></h5>
+            <sq-explorer [data]="searchService.results?.queryAnalysis" [name]="'results.queryAnalysis'"></sq-explorer>
+        </ng-container>
+
+        <ng-container *ngIf="searchService.results?.queryIntents">
+            <h5 class="mt-2">Query intents <span sqTooltip="Received in the results" class="fas fa-info-circle small text-muted"></span></h5>
+            <sq-explorer [data]="searchService.results?.queryIntents" [name]="'results.queryIntents'"></sq-explorer>
+        </ng-container>
+    </div>
+
+    <div class="col-12 mt-3">
+        <h4>
+            SQL statements
+        </h4>
+
+        <ng-container>
+            <ul class="nav nav-pills mb-1">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" [ngClass]="{active: sqlRaw}" (click)="sqlRaw = true; false">Raw</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" [ngClass]="{active: !sqlRaw}" (click)="sqlRaw = false; false">Parsed</a>
+                </li>
+            </ul>
+            <ng-container *ngIf="sqlRaw">
+                <pre *ngFor="let code of searchService.results?.statements"><code [highlight]="code"></code></pre>
+            </ng-container>
+
+            <ng-container *ngIf="!sqlRaw">
+                <sq-sql-explorer *ngFor="let code of searchService.results?.statements" [statement]="code"></sq-sql-explorer>
+            </ng-container>
+        </ng-container>
+
+    </div>
+
+    <div class="col-4">
+        <h4>results</h4>
+        <sq-explorer [data]="searchService.results" [name]="'results'"></sq-explorer>
+    </div>
+    <div class="col-3">
+        <h4>results.aggregations</h4>
+        <sq-list-explorer [data]="searchService.results?.aggregations" [titleField]="'name'" [name]="'results.aggregations'"></sq-list-explorer>
+    </div>
+    <div class="col-5">
+        <h4>results.records</h4>
+        <sq-list-explorer [data]="searchService.results?.records" [titleField]="'title'" [name]="'results.records'"></sq-list-explorer>
+    </div>
+</div>

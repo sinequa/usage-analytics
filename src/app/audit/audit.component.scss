@@ -1,0 +1,95 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+    flex-grow: 1;
+    gap: 1rem;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+// hide buttons from facet card
+// display them only on hover
+::ng-deep .btn-group {
+    display: none;
+}
+::ng-deep .card .card-header:hover .btn-group {
+    display: flex;
+}
+
+.main-content {
+    overflow-y: hidden;
+}
+
+.unsaved {
+    color: indianred !important;
+}
+
+a.nav-link {
+    cursor: pointer;
+    user-select: none;
+    .btn-focus {
+        visibility: hidden
+    }
+}
+
+a.nav-link.active, a.nav-link:hover {
+    .btn-focus {
+        visibility: visible
+    }
+}
+
+$facet-width: 260px;
+
+.audit-filters {
+    gap: 1rem;
+    
+    sq-facet-card {
+        min-width: $facet-width;
+    }
+    
+    sq-facet-multi {
+        z-index: 100;
+        width: $facet-width;
+        overflow: auto;
+    }
+}
+
+
+// Dashboard (Gridster)
+
+gridster {
+    background: transparent !important;
+    z-index: 1;
+    padding: 0px !important;
+}
+
+// Active when resizing or dragging items: prevents a glitch when the mouse pointer hovers the preview's iframe
+gridster.display-grid {
+    ::ng-deep iframe {
+        pointer-events: none !important;
+    }
+
+    ::ng-deep iframe {
+        pointer-events: none !important;
+    }
+}
+
+gridster-item {
+    border-radius: 0.25em;
+    overflow: initial;
+}
+
+gridster-item.gridster-item-moving {
+    z-index: 100 !important;
+}
+
+gridster-item.gridster-item-resizing {
+    overflow: hidden;
+}
+
+.new-dashboard:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}

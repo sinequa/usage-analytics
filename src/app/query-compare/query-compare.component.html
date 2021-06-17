@@ -1,0 +1,35 @@
+<div class="row" *ngIf="appService.app">
+
+    <div class="col-6">
+        <h3>Primary Web Service</h3>
+        <div class="form-group row">
+            <label for="query-name-1" class="col-sm-3 col-form-label">Web Service</label>
+            <div class="col-sm-9">
+                <select class="custom-select" id="query-name-1" disabled>
+                    <option>
+                        {{appService.ccquery!.name}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <ses-result-item *ngFor="let record of searchService.results?.records" [record]="record"></ses-result-item>
+    </div>
+
+    <div class="col-6 border-left">
+        <h3>Secondary Web Service</h3>
+        <div class="form-group row">
+            <label for="query-name-2" class="col-sm-3 col-form-label">Web Service</label>
+            <div class="col-sm-9">
+                <select class="custom-select" [(ngModel)]="secQueryName" (ngModelChange)="secQueryChanged()" id="query-name-2">
+                    <option *ngFor="let query of appService.app.queries | keyvalue" [value]="query.key">                  
+                        {{query.key}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <ses-result-item *ngFor="let record of secResults?.records" [record]="record"></ses-result-item>
+    </div>
+
+</div>

@@ -1,0 +1,5 @@
+/* adjust checkbox height in a -sm row */
+.custom-control-label::before, 
+.custom-control-label::after {
+    top: .43rem;
+}
