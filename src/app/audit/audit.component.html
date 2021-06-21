@@ -49,7 +49,7 @@
 </ul>
 
 <div class="flex-grow-1" style="overflow-y: auto">
-    <gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete && dashboardService.state === 'loaded'">
+    <gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete">
         <gridster-item [item]="item" *ngFor="let item of dashboardService.dashboard.items; index as i">
             <sq-dashboard-item
                 [config]="item"
