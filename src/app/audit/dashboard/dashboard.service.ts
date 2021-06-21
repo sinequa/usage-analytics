@@ -18,7 +18,6 @@ import { IntlService } from '@sinequa/core/intl';
 import { AggregationTimeSeries, RecordsTimeSeries } from './providers/timeline-provider';
 import { STANDARD_DASHBOARDS } from '../config';
 import { ChartData } from './providers/chart-provider';
-import {startWith} from 'rxjs/operators';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -159,17 +158,6 @@ export class DashboardService {
         public clipboard: Clipboard,
         public intlService: IntlService
     ) {
-
-        // subscribe to user settings service state
-        // when settings are loaded, the value is "loaded" otherwise is undefined
-        // we send "undefined" as a start value to ensures dashboard item will not
-        // rendered while user settings are not really loaded.
-        this.userSettingsService.state$.pipe(
-            startWith(undefined)
-        ).subscribe(value => {
-            this.state = value;
-        });
-
         // Default options of the Gridster dashboard
         this.options = {
             swap: true,
@@ -281,18 +269,14 @@ export class DashboardService {
      * Using this service creates the list of dashboards if it does not already exist.
      */
     public get dashboards() : Dashboard[] {
-        if(this.userSettingsService.state === "loaded") {
-            if(!this.userSettingsService.userSettings)
-                this.userSettingsService.userSettings = {};
-            if(!this.userSettingsService.userSettings["dashboards"]) {
-                this.userSettingsService.userSettings["dashboards"] = STANDARD_DASHBOARDS.map(
-                    (sd) => this.createDashboard(sd.name, sd.items)
-                ) as Dashboard[];
-            }
-            return this.userSettingsService.userSettings["dashboards"];
-        } else {
-            return STANDARD_DASHBOARDS.map(sd => this.createDashboard(sd.name, sd.items));
+        if(!this.userSettingsService.userSettings)
+            this.userSettingsService.userSettings = {};
+        if(!this.userSettingsService.userSettings["dashboards"]) {
+            this.userSettingsService.userSettings["dashboards"] = STANDARD_DASHBOARDS.map(
+                (sd) => this.createDashboard(sd.name, sd.items)
+            ) as Dashboard[];
         }
+        return this.userSettingsService.userSettings["dashboards"];
     }
 
     public get allDashboards(): Dashboard[] {
