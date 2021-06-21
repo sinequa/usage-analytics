@@ -121,11 +121,9 @@ export class AuditService {
 
     private getAuditData(filters: string, start: string, end: string): Observable<{[key: string]: Results | DatasetError;}> {
         const params = {
-            parameters: {
-                select: filters,
-                start: start,
-                end: end
-            },
+            select: filters,
+            start: start,
+            end: end
         };
         if (this.webServiceName) {
             return this.datasetWebService.getAll(this.webServiceName, params);
