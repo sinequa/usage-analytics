@@ -70,7 +70,6 @@ export class AuditService {
          * This will bring the use of all searchService functionalities in a dataset web service context,
          * without the nightmare of rewriting a dedicated service for this purpose
         */
-        this.searchService.ensureQueryFromUrl();
         if (!this.searchService.query.findSelect("audit_timestamp")) {
             this.updateRangeFilter(RelativeTimeRanges.Last30Days);
         }
@@ -146,7 +145,7 @@ export class AuditService {
         this.searchService.query.removeSelect("audit_timestamp");
         this.searchService.query.addSelect(expr, "audit_timestamp");
         if (search) {
-            this.searchService.search({skipSearch: true});
+            this.searchService.search();
         }
     }
 

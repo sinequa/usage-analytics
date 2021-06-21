@@ -26,7 +26,7 @@ import { BsPreviewModule } from "@sinequa/components/preview";
 import { ResultModule } from "@sinequa/components/result";
 import { BsUserSettingsModule } from "@sinequa/components/user-settings";
 import { BsFeedbackModule } from "@sinequa/components/feedback";
-import { BsFacetModule, NAVIGATION_OPTIONS_FACETS } from "@sinequa/components/facet";
+import { BsFacetModule } from "@sinequa/components/facet";
 import { BsAdvancedModule } from "@sinequa/components/advanced";
 import { BsModalModule } from "@sinequa/components/modal";
 import { BsActionModule } from "@sinequa/components/action";
@@ -90,8 +90,8 @@ export const routes: Routes = [
 
 // Search options (search service)
 const searchOptions: SearchOptions = {
-    routes: ["login", "query", "preview", "sponsored", "suggests", "query-compare", "sql-console"],
-    hiddenRoutes: ["audit"],
+    routes: ["login", "query", "preview", "sponsored", "suggests", "query-compare", "sql-console", "audit"],
+    skipSearchRoutes: ["audit"],
     homeRoute: "audit"
 };
 
@@ -183,7 +183,6 @@ const selectionOptions: SelectionOptions = {
                 }
             }
         },
-        {provide: NAVIGATION_OPTIONS_FACETS, useValue: {skipSearch: true}},
         {provide: SELECTION_OPTIONS, useValue: selectionOptions}
     ],
     bootstrap: [
