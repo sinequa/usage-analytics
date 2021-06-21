@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Sinequa>
-    <ZipFile>sba-sinequa-analytics</ZipFile>
+    <ZipFile>sinequa-analytics</ZipFile>
     <Title>Default Sinequa Analytics Workspace</Title>
     <Description>This is the default SBA workspace for Sinequa Analytics.</Description>
+	<AlphaBetaOnly>Beta</AlphaBetaOnly>
 </Sinequa>
