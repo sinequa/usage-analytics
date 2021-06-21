@@ -37,12 +37,12 @@ a {
 }
 
 // Validation
-sq-validation-message {
-    @extend .invalid-feedback;
-    .form-group > .is-invalid ~ & {
-        display: block;
-    }
-}
+// sq-validation-message {
+//     @extend .invalid-feedback;
+//     .form-group > .is-invalid ~ & {
+//         display: block;
+//     }
+// }
 
 sq-feedback-menu {
   button.btn{

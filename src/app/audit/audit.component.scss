@@ -11,10 +11,10 @@
 
 // hide buttons from facet card
 // display them only on hover
-::ng-deep .btn-group {
+::ng-deep  gridster .card .card-header .btn-group {
     display: none;
 }
-::ng-deep .card .card-header:hover .btn-group {
+::ng-deep gridster .card .card-header:hover .btn-group {
     display: flex;
 }
 

@@ -6,15 +6,15 @@ import { LocationStrategy, HashLocationStrategy } from "@angular/common";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
-import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
-import { AgGridModule } from 'ag-grid-angular';
+// import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
+// import { AgGridModule } from 'ag-grid-angular';
 
 // @sinequa/core library
 import { WebServicesModule, StartConfigWebService, StartConfig } from "@sinequa/core/web-services";
 import { LoginModule, LoginInterceptor } from "@sinequa/core/login";
 import { IntlModule, Locale } from "@sinequa/core/intl";
 import { ModalModule } from "@sinequa/core/modal";
-import { ValidationModule } from "@sinequa/core/validation";
+// import { ValidationModule } from "@sinequa/core/validation";
 import { NotificationsInterceptor } from "@sinequa/core/notification";
 import { AuditInterceptor } from "@sinequa/core/app-utils";
 
@@ -22,8 +22,8 @@ import { AuditInterceptor } from "@sinequa/core/app-utils";
 import { BsSearchModule, SearchOptions, SEARCH_OPTIONS } from "@sinequa/components/search";
 import { BsNotificationModule } from '@sinequa/components/notification';
 import { UtilsModule } from '@sinequa/components/utils';
-import { BsPreviewModule } from "@sinequa/components/preview";
-import { ResultModule } from "@sinequa/components/result";
+// import { BsPreviewModule } from "@sinequa/components/preview";
+// import { ResultModule } from "@sinequa/components/result";
 import { BsUserSettingsModule } from "@sinequa/components/user-settings";
 import { BsFeedbackModule } from "@sinequa/components/feedback";
 import { BsFacetModule } from "@sinequa/components/facet";
@@ -34,17 +34,17 @@ import {SelectionOptions, SELECTION_OPTIONS} from "@sinequa/components/selection
 
 // Components
 import { AppComponent } from "./app.component";
-import { SponsoredComponent } from './sponsored/sponsored.component';
-import { QueryComponent } from './query/query.component';
-import { LoginComponent } from './login/login.component';
-import { SuggestsComponent } from './suggests/suggests.component';
-import { PreviewComponent } from './preview/preview.component';
-import { ExplorerComponent } from './explorer/explorer.component';
-import { ListExplorerComponent } from './list-explorer/list-explorer.component';
-import { QueryEditorComponent } from './query/query-editor/query-editor.component';
-import { SQLExplorerComponent } from './query/sql-explorer/sql-explorer.component';
-import { QueryCompareComponent } from "./query-compare/query-compare.component";
-import { ResultItemComponent } from "./query-compare/result-item";
+// import { SponsoredComponent } from './sponsored/sponsored.component';
+// import { QueryComponent } from './query/query.component';
+// import { LoginComponent } from './login/login.component';
+// import { SuggestsComponent } from './suggests/suggests.component';
+// import { PreviewComponent } from './preview/preview.component';
+// import { ExplorerComponent } from './explorer/explorer.component';
+// import { ListExplorerComponent } from './list-explorer/list-explorer.component';
+// import { QueryEditorComponent } from './query/query-editor/query-editor.component';
+// import { SQLExplorerComponent } from './query/sql-explorer/sql-explorer.component';
+// import { QueryCompareComponent } from "./query-compare/query-compare.component";
+// import { ResultItemComponent } from "./query-compare/result-item";
 
 // Environment
 import { environment } from "../environments/environment";
@@ -76,13 +76,13 @@ export function StartConfigInitializer(startConfigWebService: StartConfigWebServ
 
 // Application routes (see https://angular.io/guide/router)
 export const routes: Routes = [
-    {path: "login", component: LoginComponent},
-    {path: "query", component: QueryComponent},
-    {path: "preview", component: PreviewComponent},
-    {path: "suggests", component: SuggestsComponent},
-    {path: "sponsored", component: SponsoredComponent},
-    {path: "sql-console", loadChildren: () => import('./sql-console/sql-console.module').then(m => m.SQLConsoleModule)},
-    {path: "query-compare", component: QueryCompareComponent},
+    // {path: "login", component: LoginComponent},
+    // {path: "query", component: QueryComponent},
+    // {path: "preview", component: PreviewComponent},
+    // {path: "suggests", component: SuggestsComponent},
+    // {path: "sponsored", component: SponsoredComponent},
+    // {path: "sql-console", loadChildren: () => import('./sql-console/sql-console.module').then(m => m.SQLConsoleModule)},
+    // {path: "query-compare", component: QueryCompareComponent},
     {path: "audit", loadChildren: () => import('./audit/audit.module').then(m => m.AuditModule)},
     {path: "**", redirectTo: "audit"}
 ];
@@ -90,7 +90,7 @@ export const routes: Routes = [
 
 // Search options (search service)
 const searchOptions: SearchOptions = {
-    routes: ["login", "query", "preview", "sponsored", "suggests", "query-compare", "sql-console", "audit"],
+    routes: ["audit"],
     skipSearchRoutes: ["audit"],
     homeRoute: "audit"
 };
@@ -114,8 +114,8 @@ const selectionOptions: SelectionOptions = {
         FormsModule,
         ReactiveFormsModule,
 
-        HighlightModule,
-        AgGridModule.withComponents([]),
+        // HighlightModule,
+        // AgGridModule.withComponents([]),
 
         WebServicesModule.forRoot(startConfig),
         IntlModule.forRoot(SesameLocalesConfig),
@@ -124,9 +124,9 @@ const selectionOptions: SelectionOptions = {
         BsSearchModule.forRoot(searchOptions),
         BsNotificationModule,
         UtilsModule,
-        ValidationModule,
-        BsPreviewModule,
-        ResultModule,
+        // ValidationModule,
+        // BsPreviewModule,
+        // ResultModule,
         BsUserSettingsModule,
         BsFeedbackModule,
         BsFacetModule,
@@ -136,17 +136,17 @@ const selectionOptions: SelectionOptions = {
     ],
     declarations: [
         AppComponent,
-        LoginComponent,
-        QueryComponent,
-        SuggestsComponent,
-        PreviewComponent,
-        SponsoredComponent,
-        ExplorerComponent,
-        ListExplorerComponent,
-        QueryEditorComponent,
-        SQLExplorerComponent,
-        QueryCompareComponent,
-        ResultItemComponent,
+        // LoginComponent,
+        // QueryComponent,
+        // SuggestsComponent,
+        // PreviewComponent,
+        // SponsoredComponent,
+        // ExplorerComponent,
+        // ListExplorerComponent,
+        // QueryEditorComponent,
+        // SQLExplorerComponent,
+        // QueryCompareComponent,
+        // ResultItemComponent,
     ],
     providers: [
         // Provides an APP_INITIALIZER which will fetch application configuration information from the Sinequa
@@ -174,15 +174,15 @@ const selectionOptions: SelectionOptions = {
 
         {provide: SEARCH_OPTIONS, useValue: searchOptions},
 
-        {
-            provide: HIGHLIGHT_OPTIONS,
-            useValue: {
-                coreLibraryLoader: () => import('highlight.js/lib/core'),
-                languages: {
-                    sql: () => import('highlight.js/lib/languages/sql')
-                }
-            }
-        },
+        // {
+        //     provide: HIGHLIGHT_OPTIONS,
+        //     useValue: {
+        //         coreLibraryLoader: () => import('highlight.js/lib/core'),
+        //         languages: {
+        //             sql: () => import('highlight.js/lib/languages/sql')
+        //         }
+        //     }
+        // },
         {provide: SELECTION_OPTIONS, useValue: selectionOptions}
     ],
     bootstrap: [
