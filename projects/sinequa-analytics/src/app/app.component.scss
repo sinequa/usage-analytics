@@ -7,6 +7,6 @@
   cursor: pointer;
 }
 
-.full-width {
-  flex-basis: 100%;
+.full-height {
+  height: calc(100vh - 100px);
 }

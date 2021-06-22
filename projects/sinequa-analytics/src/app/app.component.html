@@ -17,8 +17,8 @@
     </div>
 </nav>
 
-<div class="min-h-100 h-100 px-3 py-2 d-flex flex-column" *ngIf="loginService.complete">
-    <sq-audit></sq-audit>
+<div class="full-height px-3 py-2 d-flex flex-column" *ngIf="loginService.complete">
+    <router-outlet></router-outlet>
 </div>
 
 <sq-notifications></sq-notifications>
