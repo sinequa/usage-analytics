@@ -809,26 +809,44 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
         name: "User adoption",
         items: [
             QUERY_COUNT_TOTAL_TIMELINE,
+            QUERY_COUNT_TOTAL,
+            NEW_USERS,
+            REGULAR_USERS,
+            USER_COUNT_TOTAL,
+            SEARCH_BY_SESSION,          
             USER_COUNT_TOTAL_TIMELINE,
+            VIEWED_DOC_PER_SEARCH,
+            SESSIONS_BY_USER,
+            SESSION_COUNT_TOTAL,           
             SESSION_COUNT_TOTAL_TIMELINE
-
         ]
     },
     {
         name: "Relevancy",
         items: [
-            TOP_SOURCES,
             TOP_QUERIES,
             TOP_NO_RESULTS_QUERIES,
+            CLICK_FIRST_DOCS,
+            QUERY_BOUNCE_RATE,
+            SEARCH_EXIT_RATE,
+            SEARCH_EXIT,
+            ZERO_SEARCH,
+            REFINEMENT,
+            TOP_SOURCES,
+            RESULT_TYPES,
+            SEARCH_WITH_CLICKS,
+            SEARCH_WITH_CLICKS_RATE,
+            MRR,
+            FIRST_CLICK,
             TOP_FACETS
         ]
     },
     {
         name: "Performance",
         items: [
-            RESPONSE_TIME_TIMELINE,
             AVG_RESPONSE_TIME_TIMELINE,
-            AVG_ENGINE_RESPONSE_TIMELINE,
+            RESPONSE_TIME_TIMELINE,
+            AVG_ENGINE_RESPONSE_TIMELINE
         ]
     },
 ]
