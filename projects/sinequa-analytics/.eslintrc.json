@@ -1,7 +1,7 @@
 {
-  "root": true,
+  "extends": "../../.eslintrc.json",
   "ignorePatterns": [
-    "projects/**/*"
+    "!**/*"
   ],
   "overrides": [
     {
@@ -10,23 +10,33 @@
       ],
       "parserOptions": {
         "project": [
-          "tsconfig.json",
-          "e2e/tsconfig.json"
+          "projects/sinequa-analytics/tsconfig.json",
+          "projects/sinequa-analytics/tsconfig.spec.json",
+          "projects/sinequa-analytics/e2e/tsconfig.json"
         ],
         "createDefaultProgram": true
       },
-      "extends": [
-        "plugin:@angular-eslint/ng-cli-compat",
-        "plugin:@angular-eslint/ng-cli-compat--formatting-add-on",
-        "plugin:@angular-eslint/template/process-inline-templates"
-      ],
       "rules": {
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": ["app", "sq"],
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/directive-class-suffix": "off",
         "@angular-eslint/no-input-rename": "off",
         "@angular-eslint/no-output-native": "off",
         "@angular-eslint/no-output-rename": "off",
-        "@angular-eslint/no-output-on-prefix": "off",
-        "@angular-eslint/no-conflicting-lifecycle": "warn",
-        "@angular-eslint/no-host-metadata-property": "warn",
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/consistent-type-assertions": "off",
         "@typescript-eslint/dot-notation": "off",
@@ -43,45 +53,11 @@
         "@typescript-eslint/prefer-for-of": "off",
         "@typescript-eslint/prefer-namespace-keyword": "off",
         "@typescript-eslint/type-annotation-spacing": "off",
-        "@typescript-eslint/quotes": "off",
-        "@typescript-eslint/naming-convention": "off",
-        "@typescript-eslint/member-delimiter-style": [
-          "error",
-          {
-            "multiline": {
-              "delimiter": "comma",
-              "requireLast": false
-            },
-            "singleline": {
-              "delimiter": "comma",
-              "requireLast": false
-            },
-            "overrides": {
-              "interface": {
-                "multiline": {
-                  "delimiter": "semi",
-                  "requireLast": true
-                }
-              }
-            }
-          }
-        ],
-        "@typescript-eslint/semi": "off",
-        "@typescript-eslint/no-empty-interface": "off",
-        "no-underscore-dangle": "off",
         "arrow-parens": [
           "off",
           "always"
         ],
-        "brace-style": [
-          "error",
-          "1tbs",
-          {
-            "allowSingleLine": true
-          }
-        ],
-        "arrow-body-style": "warn",
-        "no-trailing-spaces": "off",
+        "brace-style": "off",
         "curly": "off",
         "eol-last": "off",
         "guard-for-in": "off",
@@ -116,9 +92,6 @@
     {
       "files": [
         "*.html"
-      ],
-      "extends": [
-        "plugin:@angular-eslint/template/recommended"
       ],
       "rules": {}
     }

@@ -1,0 +1,24 @@
+<nav class="navbar navbar-expand navbar-light bg-light pb-0">
+    <div class="container-fluid pb-2 px-0">
+
+        <div class="d-flex">
+            <span class="d-flex text-muted brand">
+                <img width="45px" height="45px" src="assets/sinequa-logo-light-sm.png">
+                <h1 class="ml-2">Sinequa Analytics</h1>
+            </span>
+        </div>
+
+        <ul class="navbar-nav navbar-right align-items-baseline">
+            <sq-user-menu></sq-user-menu>
+            <sq-feedback-menu [style]="'primary'" [rightAligned]="true" class="ml-1" *ngIf="loginService.complete">
+            </sq-feedback-menu>
+        </ul>
+
+    </div>
+</nav>
+
+<div class="full-height px-3 py-2 d-flex flex-column" *ngIf="loginService.complete">
+    <router-outlet></router-outlet>
+</div>
+
+<sq-notifications></sq-notifications>
