@@ -527,20 +527,51 @@ export const REGULAR_USERS: DashboardItemOption = {
     }
 };
 
-// export const REGULAR_NEW_USERS: DashboardItemOption = {
-//     type: "stat",
-//     query: "newUsers",
-//     icon: "fas fa-balance-scale",
-//     text: "Regular/New Users",
-//     unique: true,
-//     parameters: {
-//         valueLocation: "totalrecordcount",
-//         relatedQuery: "regularUsers",
-//         relatedValueLocation: "totalrecordcount",
-//         computation: "merge",
-//         statLayout: 'chart'
-//     }
-// };
+export const ADOPTION_RATE: DashboardItemOption = {
+    type: "stat",
+    query: "newUsers",
+    icon: "fas fa-balance-scale",
+    text: "Adoption Rate",
+    unique: true,
+    parameters: {
+        statLayout: 'standard',
+        valueLocation: "totalrecordcount",
+        relatedQuery: "totalUsers",
+        relatedValueLocation: "totalrecordcount",
+        computation: "division",
+        asc: true
+    }
+};
+
+export const REGULAR_USER_RATE: DashboardItemOption = {
+    type: "stat",
+    query: "regularUsers",
+    icon: "fas fa-balance-scale",
+    text: "Regular User Rate",
+    unique: true,
+    parameters: {
+        statLayout: 'standard',
+        valueLocation: "totalrecordcount",
+        relatedQuery: "totalUsers",
+        relatedValueLocation: "totalrecordcount",
+        computation: "division",
+        asc: true
+    }
+};
+
+export const REGULAR_NEW_USERS: DashboardItemOption = {
+    type: "chart",
+    query: "",
+    icon: "fas fa-chart-pie",
+    text: "Regular/New Users",
+    unique: true,
+    parameters: {
+        chartData: {
+            aggregation: "regular-new-user"
+        } as ChartData,
+        chartType: "Pie3D"
+    }
+};
 
 export const FIRST_CLICK: DashboardItemOption = {
     type: "stat",
@@ -837,7 +868,8 @@ export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
             TOP_QUERIES,
             TOP_FACETS,
             TOP_NO_RESULTS_QUERIES,
-            RESULT_TYPES
+            RESULT_TYPES,
+            REGULAR_NEW_USERS
         ]
     },
     {
@@ -853,6 +885,8 @@ export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
             SESSION_DURATION,
             NEW_USERS,
             REGULAR_USERS,
+            ADOPTION_RATE,
+            REGULAR_USER_RATE,
             FIRST_CLICK,
             MRR,
             REFINEMENT,

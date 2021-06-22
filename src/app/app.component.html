@@ -1,90 +1,24 @@
 <nav class="navbar navbar-expand navbar-light bg-light flex-column pb-0">
-  <div class="container-fluid pb-2 px-0">
+    <div class="container-fluid pb-2 px-0">
 
-      <div class="d-flex">
-        <button class="btn btn-lg btn-light mr-3" title="'Menu'"
-            (click)="showMenu = !showMenu">
-            <i class="fas fa-bars text-muted"></i>
-        </button>
-        <span [routerLink]="['/login']" class="d-flex text-muted brand">
-            <img width="45px" height="45px" src="assets/sinequa-logo-light-sm.png">
-            <h1 class="ml-2">Sinequa Analytics</h1>
-        </span>
-      </div>
+        <div class="d-flex">
+            <span class="d-flex text-muted brand">
+                <img width="45px" height="45px" src="assets/sinequa-logo-light-sm.png">
+                <h1 class="ml-2">Sinequa Analytics</h1>
+            </span>
+        </div>
 
-      <ul class="navbar-nav navbar-right align-items-baseline">
-          <sq-user-menu></sq-user-menu>
-          <sq-feedback-menu [style]="'primary'" [rightAligned]="true" class="ml-1" *ngIf="loginService.complete">
-          </sq-feedback-menu>
-      </ul>
+        <ul class="navbar-nav navbar-right align-items-baseline">
+            <sq-user-menu></sq-user-menu>
+            <sq-feedback-menu [style]="'primary'" [rightAligned]="true" class="ml-1" *ngIf="loginService.complete">
+            </sq-feedback-menu>
+        </ul>
 
-  </div>
+    </div>
 </nav>
 
-<ng-container *ngIf="loginService.complete">
-  <div class="container-fluid">
+<div class="px-3 py-2" *ngIf="loginService.complete">
+    <router-outlet></router-outlet>
+</div>
 
-      <div class="row flex-nowrap">
-
-          <!-- Menu -->
-          <div class="side-menu py-3 px-3 bg-light"
-              [ngClass]="{'side-menu--hidden': !showMenu}">
-
-              <ul class="nav nav-pills flex-column">
-                <!-- <li class="nav-item">
-                    <a class="nav-link" routerLink="/login" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/query" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">Query/Results</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/sponsored" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">Sponsored Links</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/suggests" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">Autocomplete</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/preview" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">Preview</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/query-compare" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">Query A/B testing</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/sql-console" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">SQL Console</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/audit" routerLinkActive="active" queryParamsHandling="merge" [state]="skipSearch">Audit</a>
-                </li>
-            </ul>
-
-          </div>
-
-          <!-- Main interface -->
-          <div class="px-3 py-2 main-container" [ngClass]="{'main-container--expanded': !showMenu}">
-
-            <!-- <nav class="navbar navbar-expand-lg navbar-light px-0 mb-2" *ngIf="showSearchForm">
-                <form novalidate [formGroup]="form" class="flex-grow-1">
-                    <div class="input-group align-items-center">
-                        <input #inputText type="text" placeholder="Enter search terms..." formControlName="search" spellcheck="false" autocomplete="off" [attr.disabled]="!loginService.complete? '' : null" class="form-control">
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-primary" (click)="search()" [attr.disabled]="!loginService.complete? '' : null">Search</button>
-                            <button *ngIf="searchService.resultsStream | async" type="button" class="btn btn-light" (click)="clear()">Clear</button>
-                        </div>
-                        <div class="custom-control custom-checkbox ml-3">
-                            <input class="custom-control-input" type="checkbox" formControlName="clearOnSearch" id="clear-on-search">
-                            <label class="custom-control-label" for="clear-on-search" sqTooltip="When searching for new text, remove other active criteria (tab, scope, selects, page number, etc.)">
-                                Clear on search
-                            </label>
-                        </div>
-                    </div>
-                </form>
-            </nav> -->
-
-            <router-outlet></router-outlet>
-          </div>
-
-      </div>
-
-  </div>
-</ng-container>
 <sq-notifications></sq-notifications>

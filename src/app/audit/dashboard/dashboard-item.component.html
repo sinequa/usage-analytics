@@ -17,46 +17,12 @@
         (selectionChange)="updateAuditRange($event)">
     </sq-timeline>
 
+    <!-- Statistic view -->
     <sq-audit-stat *ngSwitchCase="'stat'"
         [config]="config"
         [dataset]="dataset"
         [previousDataSet]="previousDataSet">
     </sq-audit-stat>
-
-    <!-- Map view-->
-    <!-- <sq-googlemaps *ngSwitchCase="'map'"
-        #facet
-        [results]="results"
-        [height]="innerheight"
-        [style]="buttonsStyle"
-        (recordClicked)="onRecordClicked($event)">
-    </sq-googlemaps> -->
-
-    <!-- Timeline view-->
-    <!-- <sq-facet-timeline *ngSwitchCase="'timeline'"
-        #facet
-        [results]="results"
-        [width]="innerwidth"
-        [height]="innerheight"
-        (eventClicked)="onRecordClicked($event.record)">
-    </sq-facet-timeline> -->
-
-    <!-- Network view -->
-    <sq-network *ngSwitchCase="'network'"
-        #facet
-        [results]="results"
-        [providers]="networkProviders"
-        [options]="networkOptions">
-        <!-- Info cards -->
-        <ng-template #nodeTpl let-node>
-            <sq-node-info-card [node]="node"></sq-node-info-card>
-        </ng-template>
-
-        <ng-template #edgeTpl let-edge>
-            <sq-edge-info-card [edge]="edge"></sq-edge-info-card>
-        </ng-template>
-
-    </sq-network>
 
     <!-- Chart view -->
     <div class="overflow-hidden" *ngSwitchCase="'chart'">
@@ -85,22 +51,5 @@
         [height]="innerheight"
         [allowResizeOption]="false">
     </sq-facet-heatmap>
-
-    <!-- Preview -->
-    <ng-container *ngSwitchCase="'preview'">
-        <sq-facet-preview-2 *ngIf="record"
-            #facet
-            [record]="record"
-            [query]="query"
-            [scalingFactor]="0.8"
-            [expandModal]="false"
-            [closable]="false"
-            [height]="innerheight"
-            (recordClosed)="close()">
-        </sq-facet-preview-2>
-        <div *ngIf="error" class="text-white bg-warning">
-            Could not retrieve document preview for {{config.recordId}}
-        </div>
-    </ng-container>
 
 </sq-facet-card>

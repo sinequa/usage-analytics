@@ -2,17 +2,14 @@ import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges} from 
 import { GridsterItemComponent } from 'angular-gridster2';
 
 import { Results, Record, DatasetError, Aggregation } from '@sinequa/core/web-services';
-import { Utils } from '@sinequa/core/base';
-import { ExprBuilder, Query } from '@sinequa/core/app-utils'
+import { ExprBuilder } from '@sinequa/core/app-utils'
 
 import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
-
-import { NetworkProvider, ProviderFactory, /*oOTBConfig,*/ defaultOptions } from "@sinequa/analytics/network";
+import { TimelineSeries } from '@sinequa/analytics/timeline';
 import { defaultChart } from '@sinequa/analytics/fusioncharts';
 
 import { DashboardItem, DashboardService } from './dashboard.service';
-import { TimelineSeries } from '@sinequa/analytics/timeline';
 import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
@@ -69,29 +66,24 @@ export class DashboardItemComponent implements OnChanges {
     innerwidth = 500;
     innerheight = 200;
 
-    // Network
-    networkProviders: NetworkProvider[] = [];
-    networkOptions = defaultOptions;
-
     // Fusion charts
     chart = defaultChart;
     chartObj?: any;
     chartResults: Results = {
             records: [] as Record[],
-            aggregations: [] as Aggregation[]
+            aggregations: [
+                {
+                    name: "regular-new-user",
+                    column: ""
+                }
+            ] as Aggregation[]
         } as  Results;
-
-    // Preview
-    record?: Record;
-    query?: Query;
-    error = false;
 
     // Timeline
     timeSeries: TimelineSeries[] = [];
 
     constructor(
         public gridsterItemComponent: GridsterItemComponent,
-        public providerFactory: ProviderFactory,
         public searchService: SearchService,
         public dashboardService: DashboardService,
         public exprBuilder: ExprBuilder,
@@ -123,46 +115,16 @@ export class DashboardItemComponent implements OnChanges {
             action: (action) => {
                 this.toggleMaximizedView();
                 action.icon = this.gridsterItemComponent.el.classList.contains('widget-maximized-view')
-                              ? "fas fa-compress-alt"
-                              : "fas fa-expand-alt";
+                            ? "fas fa-compress-alt"
+                            : "fas fa-expand-alt";
                 action.title = this.gridsterItemComponent.el.classList.contains('widget-maximized-view')
-                              ? "msg#dashboard.minimizeTitle"
-                              : "msg#dashboard.maximizeTitle";
+                            ? "msg#dashboard.minimizeTitle"
+                            : "msg#dashboard.maximizeTitle";
             }
         });
     }
 
     ngOnChanges(changes: SimpleChanges) {
-
-        // Set up the configuration for the NETWORK widget.
-        // The test "this.networkProviders.length === 0" ensures the configuration is done only once
-        // if(this.config.type === "network" && this.results && this.networkProviders.length === 0) {
-        //     this.networkProviders = oOTBConfig(this.providerFactory);
-        // }
-
-        // If this widget displays a doc preview, a record object is needed. It may come from the list of results
-        // or from a additional query via the Search Service.
-        // if(this.config.type === "preview" && !this.record && this.config.recordId && this.config.queryStr) {
-        //     // Rebuild the query that allowed to obtain this record
-        //     this.query = this.searchService.makeQuery().fromJson(this.config.queryStr);
-        //     if(this.results) {
-        //         // Try to retrieve the record from the results list
-        //         this.record = this.results.records.find(r => r.id === this.config.recordId)
-        //     }
-        //     if(!this.record) {
-        //         // Try to retrieve the record from a dedicated query
-        //         this.query.addSelect(this.exprBuilder.makeExpr('id', this.config.recordId));
-        //         this.searchService.getResults(this.query, undefined, {searchInactive: true}).subscribe(
-        //             results => {
-        //                 this.record = results.records[0];
-        //             },
-        //             err => {
-        //                 console.error(err);
-        //                 this.error = true;
-        //             }
-        //         );
-        //     }
-        // }
 
         if(this.config.type === "chart") {
             this.chart.theme = this.buttonsStyle === "dark"? "candy" : "fusion";
@@ -171,11 +133,6 @@ export class DashboardItemComponent implements OnChanges {
         // Manage width and height changes. Some components need additional treatment
         if(changes["height"] && this.height) {
             this.innerheight = this.height - 43;
-            // Update network
-            if(this.config.type === "network") {
-                this.networkOptions = Utils.copy(defaultOptions);
-                this.networkOptions.height = this.innerheight + "px";
-            }
             // Update chart
             if(this.chartObj) {
                 this.chartObj.resizeTo(this.width, this.innerheight)
@@ -203,7 +160,24 @@ export class DashboardItemComponent implements OnChanges {
                     break;
                 case "chart":
                     if (this.config.chartData) {
-                        this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
+                        if (this.config.title === 'Regular/New Users') {
+                            this.chartResults = {
+                                records: [] as Record[],
+                                aggregations: [
+                                    {
+                                        name: "regular-new-user",
+                                        column: "",
+                                        items: [
+                                            {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
+                                            {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
+                                        ]
+                                    }
+                                ] as Aggregation[]
+                            } as  Results;
+                        } else {
+                            this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
+                        }
+                        // this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
                     }
                     break;
                 default:
@@ -292,11 +266,6 @@ export class DashboardItemComponent implements OnChanges {
         this.chartObj = chartObj;
         this.chartObj.resizeTo(this.width, this.innerheight);
     }
-
-    // onChartAggregationChange(aggregation: string) {
-    //     this.config.aggregation = aggregation;
-    //     this.dashboardService.notifyItemChange(this.config);
-    // }
 
     onChartTypeChange(type: string) {
         this.config.chartType = type;

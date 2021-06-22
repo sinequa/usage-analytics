@@ -231,7 +231,6 @@ export class DashboardService {
         });
     }
 
-
     /**
      * Handle URL changes. Retrieve a dashboard name or configuration if any, depending on
      * the params contained in the URL.
@@ -259,8 +258,6 @@ export class DashboardService {
                 console.error("Could not import this dashboard:", dashboardShared);
             }
         }
-        // Update the state of the setDefault action after an Open, Save, New
-        // this.updateSetDefaultAction();
     }
 
     /**
@@ -359,7 +356,6 @@ export class DashboardService {
      * @param item
      */
     public notifyItemChange(item: DashboardItem) {
-        console.log("notify item change")
         this.dashboardChanged.next(this.dashboard);
     }
 
@@ -546,7 +542,6 @@ export class DashboardService {
         const _blank = this.createDashboard("New dashboard " + (this.draftDashboards.length+1), []);
         this.draftDashboards.push(_blank);
         this.dashboard = Utils.copy(_blank);
-        // this.updateOpenAction();
         delete this.searchService.queryStringParams.dashboard;
         this.searchService.navigate({skipSearch: true});
     }
@@ -589,8 +584,6 @@ export class DashboardService {
                 } else {
                     this.newDashboard();
                 }
-
-                // this.updateOpenAction();
             }
         });
     }

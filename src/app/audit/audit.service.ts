@@ -5,6 +5,7 @@ import { Utils } from "@sinequa/core/base";
 import {
     DatasetError,
     DatasetWebService,
+    PrincipalWebService,
     Results,
 } from "@sinequa/core/web-services";
 import { forkJoin, Observable, of, ReplaySubject, Subject } from "rxjs";
@@ -34,10 +35,9 @@ export interface AuditDatasetFilters {
 }
 
 @Injectable({
-    providedIn: "root",
+    providedIn: "root"
 })
 export class AuditService {
-    //private readonly webServiceName = "insight_audit";
 
     public auditRange$ = new Subject<string | Date[]>();
     public data$ = new ReplaySubject<{ [key: string]: Results | DatasetError }>(1);
@@ -47,7 +47,8 @@ export class AuditService {
         public datasetWebService: DatasetWebService,
         public searchService: SearchService,
         public exprBuilder: ExprBuilder,
-        public appService: AppService
+        public appService: AppService,
+        public principalService: PrincipalWebService
     ) {
         this.auditRange$.subscribe((range) => {
             this.updateRangeFilter(range);
@@ -92,15 +93,16 @@ export class AuditService {
         /** Update the audit dashboard data (previous and current period) */
         const dataSources = [
             this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end),
-            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start)
+            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start),
+            this.principalService.list()
         ] as Observable<{[key: string]: Results | DatasetError;}>[];
 
 
         forkJoin(...dataSources).subscribe(
             (data) => {
-                console.log(data);
-                this.data$.next(data[0]);
-                this.previousPeriodData$.next(data[1]);
+                this.data$.next({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
+                this.previousPeriodData$.next({...data[1], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
+                console.log({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
             }
         )
     }
