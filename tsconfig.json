@@ -28,21 +28,6 @@
             "dom"
         ],
     },
-    "files": [
-        "src/main.ts",
-        "src/polyfills.ts"
-    ],
-    "include": [
-        "./src/**/*.ts",
-        "./src/locales/*.ts",
-        "./src/environments/environment.ts"
-    ],
-    "exclude": [
-        "./test.ts",
-        "./e2e/**/*",
-        "./src/environments/*",
-        "./**/*.spec.ts"
-    ],
     "angularCompilerOptions": {
         "fullTemplateTypeCheck": true,
         "strictInjectionParameters": true

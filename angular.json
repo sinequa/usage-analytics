@@ -11,32 +11,27 @@
         }
       },
       "root": "",
-      "sourceRoot": "src",
+      "sourceRoot": "projects/sinequa-analytics/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/audit",
-            "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.json",
+            "index": "projects/sinequa-analytics/src/index.html",
+            "main": "projects/sinequa-analytics/src/main.ts",
+            "polyfills": "projects/sinequa-analytics/src/polyfills.ts",
+            "tsConfig": "projects/sinequa-analytics/tsconfig.json",
             "aot": true,
             "preserveSymlinks": true,
             "assets": [
-              "src/assests/favicon.ico",
-              "src/assets"
+              "projects/sinequa-analytics/src/assests/favicon.ico",
+              "projects/sinequa-analytics/src/assets"
             ],
             "styles": [
               {
-                "input": "src/styles/app.scss",
+                "input": "projects/sinequa-analytics/src/styles/app.scss",
                 "bundleName": "app"
-              },
-              {
-                "input": "src/styles/preview.scss",
-                "bundleName": "preview",
-                "inject": false
               }
             ],
             "scripts": [],
@@ -60,8 +55,8 @@
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "replace": "projects/sinequa-analytics/src/environments/environment.ts",
+                  "with": "projects/sinequa-analytics/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -106,16 +101,16 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
+            "main": "projects/sinequa-analytics/src/test.ts",
+            "polyfills": "projects/sinequa-analytics/src/polyfills.ts",
+            "tsConfig": "projects/sinequa-analytics/tsconfig.spec.json",
+            "karmaConfig": "projects/sinequa-analytics/karma.conf.js",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              "projects/sinequa-analytics/src/favicon.ico",
+              "projects/sinequa-analytics/src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "projects/sinequa-analytics/src/styles/app.scss"
             ],
             "scripts": []
           }
@@ -124,9 +119,9 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "tsconfig.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
+              "projects/sinequa-analytics/tsconfig.json",
+              "projects/sinequa-analytics/tsconfig.spec.json",
+              "projects/sinequa-analytics/e2e/tsconfig.json"
             ],
             "exclude": [
               "**/node_modules/**"

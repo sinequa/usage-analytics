@@ -48,7 +48,7 @@
     <sq-widget-panorama class="ml-auto"></sq-widget-panorama>
 </ul>
 
-<div class="flex-grow-1" style="overflow-y: auto; height: 1000px;">
+<div class="flex-grow-1" style="overflow-y: auto">
     <gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete">
         <gridster-item [item]="item" *ngFor="let item of dashboardService.dashboard.items; index as i">
             <sq-dashboard-item
