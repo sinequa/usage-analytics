@@ -538,7 +538,7 @@ export const ADOPTION_RATE: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "totalUsers",
         relatedValueLocation: "totalrecordcount",
-        computation: "division",
+        computation: "percentage",
         asc: true
     }
 };
@@ -554,7 +554,7 @@ export const REGULAR_USER_RATE: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "totalUsers",
         relatedValueLocation: "totalrecordcount",
-        computation: "division",
+        computation: "percentage",
         asc: true
     }
 };
@@ -584,7 +584,7 @@ export const FIRST_CLICK: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "clickTotal",
         relatedValueLocation: "records",
-        computation: "division",
+        computation: "percentage",
         asc: true
     }
 };
@@ -625,7 +625,7 @@ export const REFINEMENT_RATE: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
         relatedValueLocation: "records",
-        computation: "division",
+        computation: "percentage",
         statLayout: 'standard',
         asc: true
     }
@@ -654,7 +654,7 @@ export const SEARCH_WITH_CLICKS_RATE: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
         relatedValueLocation: "records",
-        computation: "division",
+        computation: "percentage",
         statLayout: 'standard',
         asc: true
     }
@@ -683,7 +683,7 @@ export const ZERO_SEARCH_RATE: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
         relatedValueLocation: "records",
-        computation: "division",
+        computation: "percentage",
         statLayout: 'standard',
         asc: false
     }
@@ -712,7 +712,7 @@ export const SEARCH_EXIT_RATE: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
         relatedValueLocation: "records",
-        computation: "division",
+        computation: "percentage",
         statLayout: 'standard',
         asc: false
     }
@@ -728,7 +728,7 @@ export const CLICK_FIRST_DOCS: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
         relatedValueLocation: "records",
-        computation: "division",
+        computation: "percentage",
         statLayout: 'standard',
         asc: true
     }
@@ -757,7 +757,7 @@ export const QUERY_BOUNCE_RATE: DashboardItemOption = {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
         relatedValueLocation: "records",
-        computation: "division",
+        computation: "percentage",
         statLayout: 'standard',
         asc: true
     }
@@ -893,6 +893,7 @@ export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
             SEARCH_WITH_CLICKS,
             SEARCH_WITH_CLICKS_RATE,
             ZERO_SEARCH,
+            ZERO_SEARCH_RATE,
             SEARCH_EXIT,
             SEARCH_EXIT_RATE,
             CLICK_FIRST_DOCS,

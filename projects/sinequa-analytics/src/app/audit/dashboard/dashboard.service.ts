@@ -63,7 +63,7 @@ export interface Dashboard {
 
 export type StatValueLocation = "aggregations" | "records" | "totalrecordcount";
 export type StatLayout = "standard" | "chart";
-export type StatOperation = "avg" | "merge" | "division";
+export type StatOperation = "avg" | "percentage" | "division";
 
 /**
  * An interface to define a type of widget that can be added to the dashboard. This basic information
