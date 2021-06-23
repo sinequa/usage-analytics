@@ -10,14 +10,14 @@
           "style": "scss"
         }
       },
-      "root": "",
+      "root": "projects/sinequa-analytics",
       "sourceRoot": "projects/sinequa-analytics/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/audit",
+            "outputPath": "dist/sinequa-analytics",
             "index": "projects/sinequa-analytics/src/index.html",
             "main": "projects/sinequa-analytics/src/main.ts",
             "polyfills": "projects/sinequa-analytics/src/polyfills.ts",
