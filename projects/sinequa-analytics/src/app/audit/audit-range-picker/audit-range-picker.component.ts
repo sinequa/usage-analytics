@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from "@angular/core";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
-import { NavigationEnd, Router } from "@angular/router";
+import { SearchService } from "@sinequa/components/search";
 import { Utils } from "@sinequa/core/base";
 import moment from "moment";
 import { Subscription } from "rxjs";
@@ -33,12 +33,12 @@ export class AuditRangePickerComponent implements OnDestroy {
     showDateRangeOptions = false;
     displayedRange: string;
 
-    private routerSubscription: Subscription;
+    private _querySubscription: Subscription;
 
     constructor(
         private formBuilder: FormBuilder,
-        public auditService: AuditService,
-        protected router: Router
+        private auditService: AuditService,
+        private searchService: SearchService
     ) {
         this.dateRangeControl = new FormControl([undefined, undefined]);
         this.form = this.formBuilder.group({
@@ -50,31 +50,27 @@ export class AuditRangePickerComponent implements OnDestroy {
             this.showDateRangeOptions = false;
         });
 
-        this.routerSubscription = this.router.events.subscribe({
-            next: (event) => {
-                if (event instanceof NavigationEnd) {
-                    const value = this.auditService.getAuditTimestampFromUrl();
-                    if (value) {
-                        if (Utils.isString(value)) {
-                            this.displayedRange = value;
-                        } else {
-                            this.displayedRange =
-                                moment(value[0]).format(
-                                    moment.localeData().longDateFormat("L")
-                                ) +
-                                " - " +
-                                moment(value[1]).format(
-                                    moment.localeData().longDateFormat("L")
-                                );
-                        }
-                    }
+        this._querySubscription = this.searchService.queryStream.subscribe(() => {
+            const value = this.auditService.getAuditTimestampFromUrl();
+            if (value) {
+                if (Utils.isString(value)) {
+                    this.displayedRange = value;
+                } else {
+                    this.displayedRange =
+                        moment(value[0]).format(
+                            moment.localeData().longDateFormat("L")
+                        ) +
+                        " - " +
+                        moment(value[1]).format(
+                            moment.localeData().longDateFormat("L")
+                        );
                 }
-            },
+            }
         });
     }
 
     ngOnDestroy() {
-        this.routerSubscription.unsubscribe();
+        this._querySubscription?.unsubscribe();
     }
 
     toggleDateRangeOptions() {
