@@ -57,6 +57,7 @@
                 [previousDataSet]="auditService.previousPeriodData$ | async"
                 [width]="item.width"
                 [height]="item.height"
+                [tooltipInfo]="!!item.info"
                 [buttonsStyle]="isDark()? 'dark' : 'light'">
             </sq-dashboard-item>
         </gridster-item>

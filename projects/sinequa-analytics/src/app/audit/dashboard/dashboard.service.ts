@@ -32,6 +32,7 @@ export interface DashboardItem extends GridsterItem {
     icon: string;
     title: string;
     query: string;
+    info?: string;
     width?: number;
     height?: number;
 
@@ -75,6 +76,7 @@ export interface DashboardItemOption {
     icon: string;
     text: string;
     unique: boolean;
+    info?: string;
     parameters?: {
         // For type === 'timeline'
         aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
@@ -387,7 +389,8 @@ export class DashboardService {
             query: option.query,
             icon: option.icon,
             title: option.text,
-            closable: closable
+            closable: closable,
+            info: option.info
         };
         if (option.parameters) {
             item = {...item, ...option.parameters}
