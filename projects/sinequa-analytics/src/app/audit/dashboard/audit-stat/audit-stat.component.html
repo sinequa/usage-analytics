@@ -1,7 +1,7 @@
 <div class="stat p-1" *ngIf="value;else noData">
     <div class="stat-title h-30" [sqTooltip]="config?.title">{{config?.title}}</div>
     <div class="stat-wrapper">
-        <span class="stat-value">{{value}} {{config?.computation === 'percentage' ? ' %' : ''}}</span>
+        <span class="stat-value">{{value}} {{config?.computation === 'percentage' ? '%' : ''}}</span>
     </div>
     <div class="d-flex h-30 align-items-end">
         <div>
