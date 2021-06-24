@@ -10,7 +10,7 @@ import { GridsterModule } from "angular-gridster2";
 // @sinequa/core library
 import { WebServicesModule, StartConfigWebService, StartConfig } from "@sinequa/core/web-services";
 import { LoginModule, LoginInterceptor } from "@sinequa/core/login";
-import { IntlModule, Locale } from "@sinequa/core/intl";
+import { IntlModule } from "@sinequa/core/intl";
 import { ModalModule } from "@sinequa/core/modal";
 import { NotificationsInterceptor } from "@sinequa/core/notification";
 import { AuditInterceptor } from "@sinequa/core/app-utils";
@@ -45,7 +45,10 @@ import { IconComponent } from "./audit/icon/icon.component";
 import { environment } from "../environments/environment";
 
 // Locales
+import {LocalesConfig, Locale} from "@sinequa/core/intl";
 import enLocale from "../locales/en";
+import frLocale from "../locales/fr";
+import deLocale from "../locales/de";
 
 // Initialization of @sinequa/core
 // export const startConfig: StartConfig = {
@@ -84,8 +87,17 @@ const searchOptions: SearchOptions = {
 };
 
 
-export class SesameLocalesConfig {
-    defaultLocale: Locale = { name: "en", display: "msg#locale.en", data: enLocale};
+export class SesameLocalesConfig implements LocalesConfig {
+    defaultLocale: Locale;
+    locales?: Locale[];
+    constructor(){
+        this.locales = [
+            { name: "en", display: "msg#locale.en", data: enLocale},
+            { name: "fr", display: "msg#locale.fr", data: frLocale},
+            { name: "de", display: "msg#locale.de", data: deLocale},
+        ];
+        this.defaultLocale = this.locales[0];
+    }
 }
 
 const selectionOptions: SelectionOptions = {
