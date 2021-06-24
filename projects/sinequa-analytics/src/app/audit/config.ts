@@ -349,7 +349,7 @@ export const TOP_QUERIES: DashboardItemOption = {
         chartData: {
             aggregation: "query"
         } as ChartData,
-        chartType: "Pie3D"
+        chartType: "Bar2D"
     }
 };
 
@@ -363,7 +363,7 @@ export const TOP_NO_RESULTS_QUERIES: DashboardItemOption = {
         chartData: {
             aggregation: "query"
         } as ChartData,
-        chartType: "Pie3D"
+        chartType: "Bar2D"
     }
 };
 
