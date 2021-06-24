@@ -59,6 +59,7 @@
                   "with": "projects/sinequa-analytics/src/environments/environment.prod.ts"
                 }
               ],
+              "outputPath": "dist/sinequa-analytics",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
