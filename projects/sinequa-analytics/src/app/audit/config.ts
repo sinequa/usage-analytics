@@ -38,9 +38,9 @@ export const FACETS: FacetConfig[] = [
 export const QUERY_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "queryTotalTimeLine",
-    text: "Queries Over Time",
+    text: "msg#widgets.queryTotalTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.queryTotalTimeLine",
+    info: "msg#widgets.queryTotalTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -54,9 +54,9 @@ export const QUERY_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
 export const USER_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "userCountTotalTimeLine",
-    text: "Users Over Time",
+    text: "msg#widgets.userTotalTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.userTotalTimeLine",
+    info: "msg#widgets.userTotalTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -70,9 +70,9 @@ export const USER_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
 export const SESSION_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "sessionTotalTimeLine",
-    text: "Sessions Over Time",
+    text: "msg#widgets.sessionTotalTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.sessionTotalTimeLine",
+    info: "msg#widgets.sessionTotalTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -86,9 +86,9 @@ export const SESSION_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
 export const CLICK_BY_SEARCH_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "avgClicksByQueryTimeLine",
-    text: "Average Click By Search Over Time",
+    text: "msg#widgets.avgClicksByQueryTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.avgClicksByQueryTimeLine",
+    info: "msg#widgets.avgClicksByQueryTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -102,9 +102,9 @@ export const CLICK_BY_SEARCH_TIMELINE: DashboardItemOption = {
 export const AVG_ENGINE_RESPONSE_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "avgEngineResponseTimeTimeLine",
-    text: "Average Engine Response Over Time",
+    text: "msg#widgets.avgEngineResponseTimeTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.avgEngineResponseTimeTimeLine",
+    info: "msg#widgets.avgEngineResponseTimeTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -118,9 +118,9 @@ export const AVG_ENGINE_RESPONSE_TIMELINE: DashboardItemOption = {
 export const MRR_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "avgMRRTimeLine",
-    text: "Average MRR Over Time",
+    text: "msg#widgets.avgMRRTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.avgMRRTimeLine",
+    info: "msg#widgets.avgMRRTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -134,9 +134,9 @@ export const MRR_TIMELINE: DashboardItemOption = {
 export const SEARCH_BY_SESSION_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "avgQueriesBySessionTimeLine",
-    text: "Average Search By Session Over Time",
+    text: "msg#widgets.avgQueriesBySessionTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.avgQueriesBySessionTimeLine",
+    info: "msg#widgets.avgQueriesBySessionTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -150,9 +150,9 @@ export const SEARCH_BY_SESSION_TIMELINE: DashboardItemOption = {
 export const AVG_RESPONSE_TIME_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "avgResponseTimeTimeLine",
-    text: "Average Response Time Over Time",
+    text: "msg#widgets.avgResponseTimeTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.avgResponseTimeTimeLine",
+    info: "msg#widgets.avgResponseTimeTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -166,9 +166,9 @@ export const AVG_RESPONSE_TIME_TIMELINE: DashboardItemOption = {
 export const RESPONSE_TIME_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "responseTimeTimeLine",
-    text: "Response Time Over Time",
+    text: "msg#widgets.responseTimeTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.responseTimeTimeLine",
+    info: "msg#widgets.responseTimeTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -186,9 +186,9 @@ export const RESPONSE_TIME_TIMELINE: DashboardItemOption = {
 export const SESSION_DURATION_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "avgSessionDurationTimeLine",
-    text: "Average Session Duration Over Time",
+    text: "msg#widgets.avgSessionDurationTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.avgSessionDurationTimeLine",
+    info: "msg#widgets.avgSessionDurationTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -202,9 +202,9 @@ export const SESSION_DURATION_TIMELINE: DashboardItemOption = {
 export const FIRST_CLICK_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "clickRank1TotalTimeLine",
-    text: "First Click Over Time",
+    text: "msg#widgets.clickRank1TotalTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.clickRank1TotalTimeLine",
+    info: "msg#widgets.clickRank1TotalTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -218,9 +218,9 @@ export const FIRST_CLICK_TIMELINE: DashboardItemOption = {
 export const CLICK_FIRST_DOCS_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "clickRank3TimeLine",
-    text: "Click On First 3 Documents Over Time",
+    text: "msg#widgets.clickRank3TimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.clickRank3TimeLine",
+    info: "msg#widgets.clickRank3TimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -234,9 +234,9 @@ export const CLICK_FIRST_DOCS_TIMELINE: DashboardItemOption = {
 export const CLICK_TOTAL_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "clickTotalTimeLine",
-    text: "Click Total Over Time",
+    text: "msg#widgets.clickTotalTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.clickTotalTimeLine",
+    info: "msg#widgets.clickTotalTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -250,9 +250,9 @@ export const CLICK_TOTAL_TIMELINE: DashboardItemOption = {
 export const NEW_USERS_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "newUsersTimeLine",
-    text: "New Users Over Time",
+    text: "msg#widgets.newUsersTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.newUsersTimeLine",
+    info: "msg#widgets.newUsersTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -266,9 +266,9 @@ export const NEW_USERS_TIMELINE: DashboardItemOption = {
 export const QUERY_BOUNCE_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "queryBounceTimeLine",
-    text: "Query Bounce Over Time",
+    text: "msg#widgets.queryBounceTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.queryBounceTimeLine",
+    info: "msg#widgets.queryBounceTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -282,9 +282,9 @@ export const QUERY_BOUNCE_TIMELINE: DashboardItemOption = {
 export const SEARCH_WITH_CLICKS_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "queryClickTimeLine",
-    text: "Search With Clicks Over Time",
+    text: "msg#widgets.queryClickTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.queryClickTimeLine",
+    info: "msg#widgets.queryClickTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -298,9 +298,9 @@ export const SEARCH_WITH_CLICKS_TIMELINE: DashboardItemOption = {
 export const REFINEMENT_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "queryRefineTimeLine",
-    text: "Refinement Over Time",
+    text: "msg#widgets.queryRefineTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.queryRefineTimeLine",
+    info: "msg#widgets.queryRefineTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -314,9 +314,9 @@ export const REFINEMENT_TIMELINE: DashboardItemOption = {
 export const ZERO_SEARCH_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "queryZeroTimeLine",
-    text: "Zero Search Over Time",
+    text: "msg#widgets.queryZeroTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.queryZeroTimeLine",
+    info: "msg#widgets.queryZeroTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -330,9 +330,9 @@ export const ZERO_SEARCH_TIMELINE: DashboardItemOption = {
 export const REGULAR_USERS_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "regularUsersTimeLine",
-    text: "Regular Users Over Time",
+    text: "msg#widgets.regularUsersTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.regularUsersTimeLine",
+    info: "msg#widgets.regularUsersTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -346,9 +346,9 @@ export const REGULAR_USERS_TIMELINE: DashboardItemOption = {
 export const SEARCH_EXIT_TIMELINE: DashboardItemOption = {
     type: "timeline",
     query: "searchExitTimeLine",
-    text: "Search Exit Over Time",
+    text: "msg#widgets.searchExitTimeLine.text",
     icon: "fas fa-chart-line",
-    info: "msg#widgets.searchExitTimeLine",
+    info: "msg#widgets.searchExitTimeLine.info",
     unique: true,
     parameters: {
         aggregationsTimeSeries: {
@@ -363,8 +363,8 @@ export const TOP_QUERIES: DashboardItemOption = {
     type: "chart",
     query: "topQueries",
     icon: "fas fa-chart-pie",
-    text: "Top Queries",
-    info: "msg#widgets.topQueries",
+    text: "msg#widgets.topQueries.text",
+    info: "msg#widgets.topQueries.info",
     unique: true,
     parameters: {
         chartData: {
@@ -378,8 +378,8 @@ export const TOP_NO_RESULTS_QUERIES: DashboardItemOption = {
     type: "chart",
     query: "topNoResultQueries",
     icon: "fas fa-chart-pie",
-    text: "Top No Results Queries",
-    info: "msg#widgets.topNoResultQueries",
+    text: "msg#widgets.topNoResultQueries.text",
+    info: "msg#widgets.topNoResultQueries.info",
     unique: true,
     parameters: {
         chartData: {
@@ -393,8 +393,8 @@ export const TOP_SOURCES: DashboardItemOption = {
     type: "chart",
     query: "topSources",
     icon: "fas fa-chart-pie",
-    text: "Top Sources",
-    info: "msg#widgets.topSources",
+    text: "msg#widgets.topSources.text",
+    info: "msg#widgets.topSources.info",
     unique: true,
     parameters: {
         chartData: {
@@ -408,8 +408,8 @@ export const TOP_FACETS: DashboardItemOption = {
     type: "chart",
     query: "topFacets",
     icon: "fas fa-chart-pie",
-    text: "Most Used Filters",
-    info: "msg#widgets.topFacets",
+    text: "msg#widgets.topFacets.text",
+    info: "msg#widgets.topFacets.info",
     unique: true,
     parameters: {
         chartData: {
@@ -423,8 +423,8 @@ export const USER_COUNT_TOTAL: DashboardItemOption = {
     type: "stat",
     query: "userCountTotal",
     icon: "fas fa-balance-scale",
-    text: "Users",
-    info: "msg#widgets.userCountTotal",
+    text: "msg#widgets.userCountTotal.text",
+    info: "msg#widgets.userCountTotal.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -437,8 +437,8 @@ export const SESSION_COUNT_TOTAL: DashboardItemOption = {
     type: "stat",
     query: "sessionTotal",
     icon: "fas fa-balance-scale",
-    text: "Sessions",
-    info: "msg#widgets.sessionTotal",
+    text: "msg#widgets.sessionTotal.text",
+    info: "msg#widgets.sessionTotal.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -451,8 +451,8 @@ export const QUERY_COUNT_TOTAL: DashboardItemOption = {
     type: "stat",
     query: "queryTotal",
     icon: "fas fa-balance-scale",
-    text: "Queries",
-    info: "msg#widgets.queryTotal",
+    text: "msg#widgets.queryTotal.text",
+    info: "msg#widgets.queryTotal.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -465,8 +465,8 @@ export const SESSIONS_BY_USER: DashboardItemOption = {
     type: "stat",
     query: "sessionsByUser",
     icon: "fas fa-balance-scale",
-    text: "Average Sessions By User",
-    info: "msg#widgets.sessionsByUser",
+    text: "msg#widgets.sessionsByUser.text",
+    info: "msg#widgets.sessionsByUser.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -480,8 +480,8 @@ export const SEARCH_BY_SESSION: DashboardItemOption = {
     type: "stat",
     query: "avgQueriesBySession",
     icon: "fas fa-balance-scale",
-    text: "Average Search By Session",
-    info: "msg#widgets.avgQueriesBySession",
+    text: "msg#widgets.avgQueriesBySession.text",
+    info: "msg#widgets.avgQueriesBySession.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -494,8 +494,8 @@ export const CLICK_BY_SEARCH: DashboardItemOption = {
     type: "stat",
     query: "avgClicksByQuery",
     icon: "fas fa-balance-scale",
-    text: "Average Click By Search",
-    info: "msg#widgets.avgClicksByQuery",
+    text: "msg#widgets.avgClicksByQuery.text",
+    info: "msg#widgets.avgClicksByQuery.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -508,8 +508,8 @@ export const VIEWED_DOC_PER_SEARCH: DashboardItemOption = {
     type: "stat",
     query: "docViewsBySession",
     icon: "fas fa-balance-scale",
-    text: "Average Viewed Documents Per Search",
-    info: "msg#widgets.docViewsBySession",
+    text: "msg#widgets.docViewsBySession.text",
+    info: "msg#widgets.docViewsBySession.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -523,8 +523,8 @@ export const SESSION_DURATION: DashboardItemOption = {
     type: "stat",
     query: "avgSessionDuration",
     icon: "fas fa-balance-scale",
-    text: "Average Session By Duration",
-    info: "msg#widgets.avgSessionDuration",
+    text: "msg#widgets.avgSessionDuration.text",
+    info: "msg#widgets.avgSessionDuration.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -537,8 +537,8 @@ export const NEW_USERS: DashboardItemOption = {
     type: "stat",
     query: "newUsers",
     icon: "fas fa-balance-scale",
-    text: "New Users",
-    info: "msg#widgets.newUsers",
+    text: "msg#widgets.newUsers.text",
+    info: "msg#widgets.newUsers.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -551,8 +551,8 @@ export const REGULAR_USERS: DashboardItemOption = {
     type: "stat",
     query: "regularUsers",
     icon: "fas fa-balance-scale",
-    text: "Regular Users",
-    info: "msg#widgets.regularUsers",
+    text: "msg#widgets.regularUsers.text",
+    info: "msg#widgets.regularUsers.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -565,8 +565,8 @@ export const ADOPTION_RATE: DashboardItemOption = {
     type: "stat",
     query: "newUsers",
     icon: "fas fa-balance-scale",
-    text: "Adoption Rate",
-    info: "msg#widgets.adoptionRate",
+    text: "msg#widgets.adoptionRate.text",
+    info: "msg#widgets.adoptionRate.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -582,8 +582,8 @@ export const REGULAR_USER_RATE: DashboardItemOption = {
     type: "stat",
     query: "regularUsers",
     icon: "fas fa-balance-scale",
-    text: "Regular User Rate",
-    info: "msg#widgets.regularUsersRate",
+    text: "msg#widgets.regularUsersRate.text",
+    info: "msg#widgets.regularUsersRate.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -599,8 +599,8 @@ export const REGULAR_NEW_USERS: DashboardItemOption = {
     type: "chart",
     query: "",
     icon: "fas fa-chart-pie",
-    text: "Regular/New Users",
-    info: "msg#widgets.regular_newUsers",
+    text: "msg#widgets.regular_newUsers.text",
+    info: "msg#widgets.regular_newUsers.info",
     unique: true,
     parameters: {
         chartData: {
@@ -614,8 +614,8 @@ export const FIRST_CLICK: DashboardItemOption = {
     type: "stat",
     query: "clickRank1Total",
     icon: "fas fa-balance-scale",
-    text: "First Click",
-    info: "msg#widgets.clickRank1TotalRate",
+    text: "msg#widgets.clickRank1TotalRate.text",
+    info: "msg#widgets.clickRank1TotalRate.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -631,8 +631,8 @@ export const MRR: DashboardItemOption = {
     type: "stat",
     query: "avgMRR",
     icon: "fas fa-balance-scale",
-    text: "MRR",
-    info: "msg#widgets.avgMRR",
+    text: "msg#widgets.avgMRR.text",
+    info: "msg#widgets.avgMRR.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -645,8 +645,8 @@ export const REFINEMENT: DashboardItemOption = {
     type: "stat",
     query: "queryRefine",
     icon: "fas fa-balance-scale",
-    text: "Refinement",
-    info: "msg#widgets.queryRefine",
+    text: "msg#widgets.queryRefine.text",
+    info: "msg#widgets.queryRefine.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -659,8 +659,8 @@ export const REFINEMENT_RATE: DashboardItemOption = {
     type: "stat",
     query: "queryRefine",
     icon: "fas fa-balance-scale",
-    text: "Refinement Rate",
-    info: "msg#widgets.queryRefineRate",
+    text: "msg#widgets.queryRefineRate.text",
+    info: "msg#widgets.queryRefineRate.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -676,8 +676,8 @@ export const SEARCH_WITH_CLICKS: DashboardItemOption = {
     type: "stat",
     query: "queryClick",
     icon: "fas fa-balance-scale",
-    text: "Search With Clicks",
-    info: "msg#widgets.queryClick",
+    text: "msg#widgets.queryClick.text",
+    info: "msg#widgets.queryClick.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -690,8 +690,8 @@ export const SEARCH_WITH_CLICKS_RATE: DashboardItemOption = {
     type: "stat",
     query: "queryClick",
     icon: "fas fa-balance-scale",
-    text: "Search With Clicks Rate",
-    info: "msg#widgets.queryClickRate",
+    text: "msg#widgets.queryClickRate.text",
+    info: "msg#widgets.queryClickRate.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -707,8 +707,8 @@ export const ZERO_SEARCH: DashboardItemOption = {
     type: "stat",
     query: "queryZero",
     icon: "fas fa-balance-scale",
-    text: "Zero Search",
-    info: "msg#widgets.queryZero",
+    text: "msg#widgets.queryZero.text",
+    info: "msg#widgets.queryZero.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -721,8 +721,8 @@ export const ZERO_SEARCH_RATE: DashboardItemOption = {
     type: "stat",
     query: "queryZero",
     icon: "fas fa-balance-scale",
-    text: "Zero Search Rate",
-    info: "msg#widgets.queryZeroRate",
+    text: "msg#widgets.queryZeroRate.text",
+    info: "msg#widgets.queryZeroRate.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -738,8 +738,8 @@ export const SEARCH_EXIT: DashboardItemOption = {
     type: "stat",
     query: "searchExit",
     icon: "fas fa-balance-scale",
-    text: "Search Exit",
-    info: "msg#widgets.searchExit",
+    text: "msg#widgets.searchExit.text",
+    info: "msg#widgets.searchExit.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -752,8 +752,8 @@ export const SEARCH_EXIT_RATE: DashboardItemOption = {
     type: "stat",
     query: "searchExit",
     icon: "fas fa-balance-scale",
-    text: "Search Exit Rate",
-    info: "msg#widgets.searchExitRate",
+    text: "msg#widgets.searchExitRate.text",
+    info: "msg#widgets.searchExitRate.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -769,8 +769,8 @@ export const CLICK_FIRST_DOCS: DashboardItemOption = {
     type: "stat",
     query: "clickRank3",
     icon: "fas fa-balance-scale",
-    text: "Click On First 3 Documents",
-    info: "msg#widgets.clickRank3",
+    text: "msg#widgets.clickRank3.text",
+    info: "msg#widgets.clickRank3.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -786,8 +786,8 @@ export const QUERY_BOUNCE: DashboardItemOption = {
     type: "stat",
     query: "queryBounce",
     icon: "fas fa-balance-scale",
-    text: "Bounce",
-    info: "msg#widgets.queryBounce",
+    text: "msg#widgets.queryBounce.text",
+    info: "msg#widgets.queryBounce.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -800,8 +800,8 @@ export const QUERY_BOUNCE_RATE: DashboardItemOption = {
     type: "stat",
     query: "queryBounce",
     icon: "fas fa-balance-scale",
-    text: "Bounce Rate",
-    info: "msg#widgets.queryBounceRate",
+    text: "msg#widgets.queryBounceRate.text",
+    info: "msg#widgets.queryBounceRate.info",
     unique: true,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -817,8 +817,8 @@ export const RESULT_TYPES: DashboardItemOption = {
     type: "chart",
     query: "queryByResult",
     icon: "fas fa-chart-pie",
-    text: "Result Types",
-    info: "msg#widgets.queryByResult",
+    text: "msg#widgets.queryByResult.text",
+    info: "msg#widgets.queryByResult.info",
     unique: true,
     parameters: {
         chartData: {
@@ -832,8 +832,8 @@ export const AVG_RESPONSE_TIME: DashboardItemOption = {
     type: "stat",
     query: "avgResponseTime",
     icon: "fas fa-balance-scale",
-    text: "Average Response Time",
-    info: "msg#widgets.avgResponseTime",
+    text: "msg#widgets.avgResponseTime.text",
+    info: "msg#widgets.avgResponseTime.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -846,8 +846,8 @@ export const AVG_ENGINE_RESPONSE_TIME: DashboardItemOption = {
     type: "stat",
     query: "avgEngineResponseTime",
     icon: "fas fa-balance-scale",
-    text: "Average Engine Response Time",
-    info: "msg#widgets.avgEngineResponseTime",
+    text: "msg#widgets.avgEngineResponseTime.text",
+    info: "msg#widgets.avgEngineResponseTime.info",
     unique: true,
     parameters: {
         statLayout: 'standard',
@@ -859,7 +859,7 @@ export const AVG_ENGINE_RESPONSE_TIME: DashboardItemOption = {
 /** Dashboards */
 export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[] = [
     {
-        name: "User adoption",
+        name: "msg#dashboards.userAdoption",
         items: [
             QUERY_COUNT_TOTAL_TIMELINE,
             USER_COUNT_TOTAL_TIMELINE,
@@ -868,7 +868,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
         ]
     },
     {
-        name: "Relevancy",
+        name: "msg#dashboards.relevancy",
         items: [
             TOP_SOURCES,
             TOP_QUERIES,
@@ -877,7 +877,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
         ]
     },
     {
-        name: "Performance",
+        name: "msg#dashboards.performance",
         items: [
             RESPONSE_TIME_TIMELINE,
             AVG_RESPONSE_TIME_TIMELINE,
@@ -889,7 +889,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
 /** Panorama */
 export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
     {
-        name: "Timeline",
+        name: "msg#panorama.timeline",
         items: [
             QUERY_COUNT_TOTAL_TIMELINE,
             USER_COUNT_TOTAL_TIMELINE,
@@ -915,7 +915,7 @@ export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
         ]
     },
     {
-        name: "Chart",
+        name: "msg#panorama.chart",
         items: [
             TOP_SOURCES,
             TOP_QUERIES,
@@ -926,7 +926,7 @@ export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
         ]
     },
     {
-        name: "Statistics",
+        name: "msg#panorama.statistic",
         items: [
             QUERY_COUNT_TOTAL,
             USER_COUNT_TOTAL,

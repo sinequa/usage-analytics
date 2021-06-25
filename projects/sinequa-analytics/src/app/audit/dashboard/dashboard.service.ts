@@ -77,6 +77,8 @@ export interface DashboardItemOption {
     text: string;
     unique: boolean;
     info?: string;
+    x?: number;
+    y?: number;
     parameters?: {
         // For type === 'timeline'
         aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
@@ -102,24 +104,10 @@ export interface DashboardItemOption {
 // Name of the "default dashboard" (displayed prior to any user customization)
 export const defaultDashboardName = "New dashboard";
 
-// List of widgets supported in this dashboard. They can be used:
-// - to define the "default dashboard" (by calling setDefaultDashboard())
-// - to create the "dashboard actions" (which include the possibility of adding new widgets to the dashboard)
-// export const MAP_WIDGET: DashboardItemOption = {type: 'map', icon: 'fas fa-globe-americas fa-fw', text: 'msg#dashboard.map', unique: true};
-// export const TIMELINE_WIDGET: DashboardItemOption = {type: 'timeline', icon: 'fas fa-chart-line fa-fw', text: 'msg#dashboard.timeline', unique: true};
-// export const NETWORK_WIDGET: DashboardItemOption = {type: 'network', icon: 'fas fa-project-diagram fa-fw', text: 'msg#dashboard.network', unique: true};
-// export const CHART_WIDGET: DashboardItemOption = {type: 'chart', icon: 'fas fa-chart-bar fa-fw', text: 'msg#dashboard.chart', unique: false};
-// export const HEATMAP_WIDGET: DashboardItemOption = {type: 'heatmap', icon: 'fas fa-th fa-fw', text: 'msg#dashboard.heatmap', unique: false};
-// export const PREVIEW_WIDGET: DashboardItemOption = {type: 'preview', icon: 'far fa-file-alt', text: '', unique: false}
-
-
 @Injectable({
     providedIn: 'root'
 })
 export class DashboardService {
-
-    /** UserSettings state: "loaded" or undefined (default) */
-    state: "loaded" | undefined;
 
     /** Current active dashboard */
     dashboard: Dashboard;
@@ -127,10 +115,10 @@ export class DashboardService {
     /** Default dashboard (active by default or if the user re-initializes the dashboard) */
     defaultDashboard: Dashboard;
 
-    /** Newly created dashboard that are not yet saved */
+    /** Newly created dashboards that are not yet saved */
     draftDashboards: Dashboard[] = [];
 
-    /** Newly created dashboard that are not yet saved */
+    /** A stored dashboards that are modified */
     changedDashboards: Dashboard[] = [];
 
     /** Options of the Gridster dashboard component*/
@@ -194,11 +182,9 @@ export class DashboardService {
             maxCols: 8
         };
 
-        // Manage URL changes (which may include dashboard name or config to be imported)
-        this.router.events.subscribe(event => {
-            if(event instanceof NavigationEnd) {
-                this.handleNavigation();
-            }
+        // Manage URL (query) changes (which may include dashboard name or config to be imported)
+        this.searchService.queryStream.subscribe(() => {
+            this.handleNavigation();
         })
 
         // Dashboards are stored in User Settings
@@ -212,23 +198,28 @@ export class DashboardService {
             }
         });
 
-        // Manage Auto-save dashboards. We need to wait for the dashboard initial loading before enabling the changes detection
+        // Manage Auto-save dashboards.
         this.dashboardChanged.subscribe((dashboard: Dashboard) => {
             if (this.dashboard && this.defaultDashboard) {
-                // If a saved dashboard is modified, then add it to the changed dashboards list
-                const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
-                if (this.getDashboard(dashboard.name) && (index === -1)) {
-                    this.changedDashboards.push(dashboard)
-                }
+                if (!dashboard.name.startsWith(defaultDashboardName)) {
+                    // If a saved dashboard is modified, then add it to the changed dashboards list
+                    const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
+                    if (this.getDashboard(dashboard.name) && (index === -1)) {
+                        this.changedDashboards.push(dashboard)
+                    }
 
-                // Store the update in the list of dashboard
-                const i = this.dashboards.findIndex(d => d.name === dashboard.name);
-                this.dashboards[i] = dashboard;
+                    // Store the update in the list of dashboard
+                    const i = this.dashboards.findIndex(d => d.name === dashboard.name);
+                    this.dashboards[i] = dashboard;
+                } else {
+                    const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
+                    this.draftDashboards[i] = dashboard;
+                }
 
                 // If auto-save mode is on, automatically save it if it is part of changed dashboards
-                if(this.autoSave && (index > -1)) {
-                    this.debounceSave();
-                }
+                // if(this.autoSave && (index > -1)) {
+                //     this.debounceSave();
+                // }
             }
         });
     }
@@ -265,7 +256,7 @@ export class DashboardService {
     /**
      * Returns the list of this user's dashboards.
      * The list is stored in the user settings (this is a redirection).
-     * Using this service creates the list of dashboards if it does not already exist.
+     * It creates the list of dashboards if it does not already exist.
      */
     public get dashboards() : Dashboard[] {
         if(!this.userSettingsService.userSettings)
@@ -282,12 +273,12 @@ export class DashboardService {
         return this.dashboards.concat(this.draftDashboards);
     }
 
-    protected createDashboard(name: string, items: DashboardItemOption[]): Dashboard {
+    protected createDashboard(name: string, items: DashboardItemOption[] = []): Dashboard {
         const dashboard = {
             name: name,
             items: []
         };
-        items.forEach(item => this.addWidget(item, dashboard));
+        items.forEach(item => this.addWidget(item, dashboard, false));
         return dashboard;
     }
 
@@ -321,10 +312,12 @@ export class DashboardService {
         // There is no user-customized default dashboard: we use the first standard dashboard
         else if (this.dashboards[0]) {
             this.defaultDashboard = Utils.copy(this.dashboards[0]);
+            // Store the name of the saved default dashboard for resetting it upon next login
+            this.prefs.set("dashboard-default", this.defaultDashboard.name);
         }
         // If there is no dashboard explicitly opened currently, we open the default one if defined. If not open a new blank dashboard
         if(!this.dashboard) {
-            const _blank = this.createDashboard("New dashboard " + (this.draftDashboards.length+1), []);
+            const _blank = this.createDashboard("New dashboard " + (this.draftDashboards.length+1));
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
         }
     }
@@ -350,9 +343,6 @@ export class DashboardService {
                 && !this.changedDashboards.find(d => d.name === dashboard.name);
     }
 
-
-    // Dashboard modifications
-
     /**
      * Fire an event when a dashboard item changes
      * @param item
@@ -371,15 +361,24 @@ export class DashboardService {
     }
 
     /**
-     * Add a new widget to the dashboard. The widget is added a x = y = 0 so that Gridster automatically
+     * Add a new widget to the dashboard. If not defined, the widget is added at x = y = 0 so that Gridster automatically
      * finds a good spot to insert the widget.
      * @param option a DashboardItemOption, containing among other thing the type of widget to be created
      * @param dashboard a Dashboard object (default to the currently active widget)
-     * @param rows the number of rows that this widget should take in the dashboard (default to 3)
-     * @param cols the number of columns that this widget should take in the dashboard (default to 1 if a stat component, else 2)
+     * @param rows the number of rows that this widget should take in the dashboard
+     * @param cols the number of columns that this widget should take in the dashboard
      * @param closable whether this widget is closable (default to true)
      */
-    public addWidget(option: DashboardItemOption, dashboard: Dashboard = this.dashboard, rows = (option.type === "stat" ? 2 : 4), cols = (option.type === "stat" ? 1 : 4), x = 0, y = 0, closable = true): DashboardItem {
+    public addWidget(
+            option: DashboardItemOption,
+            dashboard: Dashboard = this.dashboard,
+            notify = true,
+            rows = (option.type === "stat" ? 2 : 4),
+            cols = (option.type === "stat" ? 1 : 4),
+            x = (option.x ? option.x : 0),
+            y = (option.y ? option.y : 0),
+            closable = true): DashboardItem {
+
         let item = {
             x: x,
             y: y,
@@ -396,7 +395,9 @@ export class DashboardService {
             item = {...item, ...option.parameters}
         }
         dashboard.items.push(item);
-        this.dashboardChanged.next(dashboard);
+        if (notify) {
+            this.dashboardChanged.next(dashboard);
+        }
         return dashboard.items[dashboard.items.length - 1];
     }
 
@@ -511,8 +512,8 @@ export class DashboardService {
                 this.manualLayoutAction,
                 this.autoLayoutAction,
                 this.fixedLayoutAction,
-                new Action({separator: true}),
-                this.autoSaveDashboardAction,
+                // new Action({separator: true}),
+                // this.autoSaveDashboardAction,
             ],
         });
 
@@ -542,7 +543,7 @@ export class DashboardService {
      * Creates a new dashboard (from scratch)
      */
     public newDashboard() {
-        const _blank = this.createDashboard("New dashboard " + (this.draftDashboards.length+1), []);
+        const _blank = this.createDashboard("New dashboard " + (this.draftDashboards.length+1));
         this.draftDashboards.push(_blank);
         this.dashboard = Utils.copy(_blank);
         delete this.searchService.queryStringParams.dashboard;
@@ -682,6 +683,7 @@ export class DashboardService {
      */
     protected saveAs(dashboard: Dashboard) {
 
+        const originalName = dashboard.name;
         const unique : ValidatorFn = (control) => {
             const unique = !control.value?.startsWith(defaultDashboardName) && !this.getDashboard(control.value);
             if(!unique) return {unique: true};
@@ -703,6 +705,9 @@ export class DashboardService {
                 // Update User settings
                 this.dashboards.push(db);
                 this.patchDashboards();
+                // Delete the saved dashboard from the draftDashboards
+                const index = this.draftDashboards.findIndex(d => d.name === originalName);
+                this.draftDashboards.splice(index, 1);
                 // Update URL (store dashboard name in the queryParams)
                 this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
                 this.searchService.navigate({skipSearch: true});
