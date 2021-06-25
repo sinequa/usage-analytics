@@ -186,7 +186,7 @@ export class DashboardService {
             },
             scrollToNewItems: true, // Scroll to new items when inserted
             gridType: 'verticalFixed', // The grid has a fixed size vertically, and fits the screen horizontally
-            fixedRowHeight: (window.innerHeight - 255) / 6,
+            fixedRowHeight: (window.innerHeight - 255) / 10,
             minRows: 6,
             minCols: 8,
             maxCols: 8
@@ -377,7 +377,7 @@ export class DashboardService {
      * @param cols the number of columns that this widget should take in the dashboard (default to 1 if a stat component, else 2)
      * @param closable whether this widget is closable (default to true)
      */
-    public addWidget(option: DashboardItemOption, dashboard: Dashboard = this.dashboard, rows = (option.type === "stat" ? 2 : 4), cols = (option.type === "stat" ? 1 : 4), x = 0, y = 0, closable = true): DashboardItem {
+    public addWidget(option: DashboardItemOption, dashboard: Dashboard = this.dashboard, rows = (option.type === "stat" ? 2 : 4), cols = (option.type === "stat" ? 1 : 3), x = 0, y = 0, closable = true): DashboardItem {
         let item = {
             x: x,
             y: y,
