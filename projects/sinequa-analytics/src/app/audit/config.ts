@@ -808,16 +808,16 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
     {
         name: "User adoption",
         items: [
-            QUERY_COUNT_TOTAL_TIMELINE,
-            QUERY_COUNT_TOTAL,
+            USER_COUNT_TOTAL_TIMELINE,
             NEW_USERS,
             REGULAR_USERS,
             USER_COUNT_TOTAL,
-            SEARCH_BY_SESSION,          
-            USER_COUNT_TOTAL_TIMELINE,
-            VIEWED_DOC_PER_SEARCH,
             SESSIONS_BY_USER,
             SESSION_COUNT_TOTAL,           
+            SEARCH_BY_SESSION,          
+            QUERY_COUNT_TOTAL,
+            VIEWED_DOC_PER_SEARCH,
+            QUERY_COUNT_TOTAL_TIMELINE,
             SESSION_COUNT_TOTAL_TIMELINE
         ]
     },
@@ -832,12 +832,12 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
             SEARCH_EXIT,
             ZERO_SEARCH,
             REFINEMENT,
+            MRR,
+            FIRST_CLICK,
             TOP_SOURCES,
             RESULT_TYPES,
             SEARCH_WITH_CLICKS,
             SEARCH_WITH_CLICKS_RATE,
-            MRR,
-            FIRST_CLICK,
             TOP_FACETS
         ]
     },
