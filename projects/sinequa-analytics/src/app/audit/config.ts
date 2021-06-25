@@ -829,14 +829,12 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
             CLICK_FIRST_DOCS,
             QUERY_BOUNCE_RATE,
             SEARCH_EXIT_RATE,
-            SEARCH_EXIT,
             ZERO_SEARCH,
             REFINEMENT,
             MRR,
             FIRST_CLICK,
             TOP_SOURCES,
             RESULT_TYPES,
-            SEARCH_WITH_CLICKS,
             SEARCH_WITH_CLICKS_RATE,
             TOP_FACETS
         ]
