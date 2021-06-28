@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ValidatorFn, Validators } from '@angular/forms';
-import { Router, NavigationEnd, UrlSerializer } from '@angular/router';
+import { Router, UrlSerializer } from '@angular/router';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { Location } from '@angular/common';
 import { Utils } from '@sinequa/core/base';
@@ -176,7 +176,7 @@ export class DashboardService {
             },
             scrollToNewItems: true, // Scroll to new items when inserted
             gridType: 'verticalFixed', // The grid has a fixed size vertically, and fits the screen horizontally
-            fixedRowHeight: (window.innerHeight - 255) / 6,
+            fixedRowHeight: (window.innerHeight - 255) / 10,
             minRows: 6,
             minCols: 8,
             maxCols: 8
@@ -374,7 +374,7 @@ export class DashboardService {
             dashboard: Dashboard = this.dashboard,
             notify = true,
             rows = (option.type === "stat" ? 2 : 4),
-            cols = (option.type === "stat" ? 1 : 4),
+            cols = (option.type === "stat" ? 1 : 3),
             x = (option.x ? option.x : 0),
             y = (option.y ? option.y : 0),
             closable = true): DashboardItem {

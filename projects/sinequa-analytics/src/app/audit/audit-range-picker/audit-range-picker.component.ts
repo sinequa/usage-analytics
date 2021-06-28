@@ -12,21 +12,7 @@ import { AuditService, RelativeTimeRanges } from "../audit.service";
     styleUrls: ["./audit-range-picker.component.scss"],
 })
 export class AuditRangePickerComponent implements OnDestroy {
-    public readonly relativeTimeRanges = [
-        RelativeTimeRanges.Last30Mins,
-        RelativeTimeRanges.Last1H,
-        RelativeTimeRanges.Last3H,
-        RelativeTimeRanges.Last6H,
-        RelativeTimeRanges.Last12H,
-        RelativeTimeRanges.Last24H,
-        RelativeTimeRanges.Last7Days,
-        RelativeTimeRanges.Last30Days,
-        RelativeTimeRanges.Last90Days,
-        RelativeTimeRanges.Last6M,
-        RelativeTimeRanges.Last1Y,
-        RelativeTimeRanges.Last2Y,
-        RelativeTimeRanges.Last5Y,
-    ];
+    public readonly relativeTimeRanges = Object.values(RelativeTimeRanges);
 
     dateRangeControl: FormControl;
     form: FormGroup;

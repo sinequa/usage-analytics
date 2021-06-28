@@ -11,8 +11,6 @@ import {
 import { forkJoin, Observable, of, ReplaySubject, Subject } from "rxjs";
 
 export enum RelativeTimeRanges {
-    Last30Mins = "Last 30 minutes",
-    Last1H = "Last 1 hour",
     Last3H = "Last 3 hours",
     Last6H = "Last 6 hours",
     Last12H = "Last 12 hours",
@@ -179,14 +177,6 @@ export class AuditService {
         } else {
             end = new Date();
             switch (timestamp) {
-                case RelativeTimeRanges.Last30Mins:
-                    start = new Date(now.setMinutes(now.getMinutes() - 30));
-                    previous = new Date(now.setMinutes(now.getMinutes() - 30));
-                    break;
-                case RelativeTimeRanges.Last1H:
-                    start = new Date(now.setHours(now.getHours() - 1));
-                    previous = new Date(now.setHours(now.getHours() - 1));
-                    break;
                 case RelativeTimeRanges.Last3H:
                     start = new Date(now.setHours(now.getHours() - 3));
                     previous = new Date(now.setHours(now.getHours() - 3));

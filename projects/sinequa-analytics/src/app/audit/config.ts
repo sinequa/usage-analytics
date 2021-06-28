@@ -42,6 +42,8 @@ export const QUERY_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
     icon: "fas fa-chart-line",
     info: "msg#widgets.queryTotalTimeLine.info",
     unique: true,
+    x: 0,
+    y: 4,
     parameters: {
         aggregationsTimeSeries: {
             name: "QueryTotal",
@@ -58,6 +60,8 @@ export const USER_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
     icon: "fas fa-chart-line",
     info: "msg#widgets.userTotalTimeLine.info",
     unique: true,
+    x: 0,
+    y: 0,
     parameters: {
         aggregationsTimeSeries: {
             name: "UserCountTotal",
@@ -74,6 +78,8 @@ export const SESSION_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
     icon: "fas fa-chart-line",
     info: "msg#widgets.sessionTotalTimeLine.info",
     unique: true,
+    x: 5,
+    y: 0,
     parameters: {
         aggregationsTimeSeries: {
             name: "SessionTotal",
@@ -106,6 +112,8 @@ export const AVG_ENGINE_RESPONSE_TIMELINE: DashboardItemOption = {
     icon: "fas fa-chart-line",
     info: "msg#widgets.avgEngineResponseTimeTimeLine.info",
     unique: true,
+    x: 0,
+    y: 4,
     parameters: {
         aggregationsTimeSeries: {
             name: "engineresponsetime",
@@ -154,6 +162,8 @@ export const AVG_RESPONSE_TIME_TIMELINE: DashboardItemOption = {
     icon: "fas fa-chart-line",
     info: "msg#widgets.avgResponseTimeTimeLine.info",
     unique: true,
+    x: 0,
+    y: 0,
     parameters: {
         aggregationsTimeSeries: {
             name: "engineresponsetime",
@@ -170,6 +180,8 @@ export const RESPONSE_TIME_TIMELINE: DashboardItemOption = {
     icon: "fas fa-chart-line",
     info: "msg#widgets.responseTimeTimeLine.info",
     unique: true,
+    x: 3,
+    y: 0,
     parameters: {
         aggregationsTimeSeries: {
             name: "ResponseTime",
@@ -366,11 +378,13 @@ export const TOP_QUERIES: DashboardItemOption = {
     text: "msg#widgets.topQueries.text",
     info: "msg#widgets.topQueries.info",
     unique: true,
+    x: 0,
+    y: 0,
     parameters: {
         chartData: {
             aggregation: "query"
         } as ChartData,
-        chartType: "Pie3D"
+        chartType: "Bar2D"
     }
 };
 
@@ -381,11 +395,13 @@ export const TOP_NO_RESULTS_QUERIES: DashboardItemOption = {
     text: "msg#widgets.topNoResultQueries.text",
     info: "msg#widgets.topNoResultQueries.info",
     unique: true,
+    x: 0,
+    y: 4,
     parameters: {
         chartData: {
             aggregation: "query"
         } as ChartData,
-        chartType: "Pie3D"
+        chartType: "Bar2D"
     }
 };
 
@@ -396,6 +412,8 @@ export const TOP_SOURCES: DashboardItemOption = {
     text: "msg#widgets.topSources.text",
     info: "msg#widgets.topSources.info",
     unique: true,
+    x: 5,
+    y: 4,
     parameters: {
         chartData: {
             aggregation: "source"
@@ -411,6 +429,8 @@ export const TOP_FACETS: DashboardItemOption = {
     text: "msg#widgets.topFacets.text",
     info: "msg#widgets.topFacets.info",
     unique: true,
+    x: 5,
+    y: 8,
     parameters: {
         chartData: {
             aggregation: "box"
@@ -426,6 +446,8 @@ export const USER_COUNT_TOTAL: DashboardItemOption = {
     text: "msg#widgets.userCountTotal.text",
     info: "msg#widgets.userCountTotal.info",
     unique: true,
+    x: 3,
+    y: 2,
     parameters: {
         statLayout: 'standard',
         valueLocation: "totalrecordcount",
@@ -440,6 +462,8 @@ export const SESSION_COUNT_TOTAL: DashboardItemOption = {
     text: "msg#widgets.sessionTotal.text",
     info: "msg#widgets.sessionTotal.info",
     unique: true,
+    x: 4,
+    y: 2,
     parameters: {
         statLayout: 'standard',
         valueLocation: "totalrecordcount",
@@ -454,6 +478,8 @@ export const QUERY_COUNT_TOTAL: DashboardItemOption = {
     text: "msg#widgets.queryTotal.text",
     info: "msg#widgets.queryTotal.info",
     unique: true,
+    x: 3,
+    y: 4,
     parameters: {
         statLayout: 'standard',
         valueLocation: "records",
@@ -468,6 +494,8 @@ export const SESSIONS_BY_USER: DashboardItemOption = {
     text: "msg#widgets.sessionsByUser.text",
     info: "msg#widgets.sessionsByUser.info",
     unique: true,
+    x: 6,
+    y: 4,
     parameters: {
         statLayout: 'standard',
         valueLocation: "aggregations",
@@ -483,6 +511,8 @@ export const SEARCH_BY_SESSION: DashboardItemOption = {
     text: "msg#widgets.avgQueriesBySession.text",
     info: "msg#widgets.avgQueriesBySession.info",
     unique: true,
+    x: 7,
+    y: 4,
     parameters: {
         statLayout: 'standard',
         valueLocation: "records",
@@ -511,6 +541,8 @@ export const VIEWED_DOC_PER_SEARCH: DashboardItemOption = {
     text: "msg#widgets.docViewsBySession.text",
     info: "msg#widgets.docViewsBySession.info",
     unique: true,
+    x: 5,
+    y: 4,
     parameters: {
         statLayout: 'standard',
         valueLocation: "aggregations",
@@ -540,6 +572,8 @@ export const NEW_USERS: DashboardItemOption = {
     text: "msg#widgets.newUsers.text",
     info: "msg#widgets.newUsers.info",
     unique: true,
+    x: 3,
+    y: 0,
     parameters: {
         statLayout: 'standard',
         valueLocation: "totalrecordcount",
@@ -554,6 +588,8 @@ export const REGULAR_USERS: DashboardItemOption = {
     text: "msg#widgets.regularUsers.text",
     info: "msg#widgets.regularUsers.info",
     unique: true,
+    x: 4,
+    y: 0,
     parameters: {
         statLayout: 'standard',
         valueLocation: "totalrecordcount",
@@ -617,6 +653,8 @@ export const FIRST_CLICK: DashboardItemOption = {
     text: "msg#widgets.clickRank1TotalRate.text",
     info: "msg#widgets.clickRank1TotalRate.info",
     unique: true,
+    x: 3,
+    y: 0,
     parameters: {
         statLayout: 'standard',
         valueLocation: "totalrecordcount",
@@ -634,6 +672,8 @@ export const MRR: DashboardItemOption = {
     text: "msg#widgets.avgMRR.text",
     info: "msg#widgets.avgMRR.info",
     unique: true,
+    x: 3,
+    y: 2,
     parameters: {
         statLayout: 'standard',
         valueLocation: "records",
@@ -648,6 +688,8 @@ export const REFINEMENT: DashboardItemOption = {
     text: "msg#widgets.queryRefine.text",
     info: "msg#widgets.queryRefine.info",
     unique: true,
+    x: 3,
+    y: 6,
     parameters: {
         valueLocation: "totalrecordcount",
         statLayout: 'standard',
@@ -693,6 +735,8 @@ export const SEARCH_WITH_CLICKS_RATE: DashboardItemOption = {
     text: "msg#widgets.queryClickRate.text",
     info: "msg#widgets.queryClickRate.info",
     unique: true,
+    x: 4,
+    y: 2,
     parameters: {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
@@ -710,6 +754,8 @@ export const ZERO_SEARCH: DashboardItemOption = {
     text: "msg#widgets.queryZero.text",
     info: "msg#widgets.queryZero.info",
     unique: true,
+    x: 3,
+    y: 4,
     parameters: {
         valueLocation: "totalrecordcount",
         statLayout: 'standard',
@@ -755,6 +801,8 @@ export const SEARCH_EXIT_RATE: DashboardItemOption = {
     text: "msg#widgets.searchExitRate.text",
     info: "msg#widgets.searchExitRate.info",
     unique: true,
+    x: 4,
+    y: 4,
     parameters: {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
@@ -772,6 +820,8 @@ export const CLICK_FIRST_DOCS: DashboardItemOption = {
     text: "msg#widgets.clickRank3.text",
     info: "msg#widgets.clickRank3.info",
     unique: true,
+    x: 4,
+    y: 0,
     parameters: {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
@@ -803,6 +853,8 @@ export const QUERY_BOUNCE_RATE: DashboardItemOption = {
     text: "msg#widgets.queryBounceRate.text",
     info: "msg#widgets.queryBounceRate.info",
     unique: true,
+    x: 4,
+    y: 6,
     parameters: {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
@@ -820,6 +872,8 @@ export const RESULT_TYPES: DashboardItemOption = {
     text: "msg#widgets.queryByResult.text",
     info: "msg#widgets.queryByResult.info",
     unique: true,
+    x: 5,
+    y: 0,
     parameters: {
         chartData: {
             aggregation: "result"
@@ -858,102 +912,117 @@ export const AVG_ENGINE_RESPONSE_TIME: DashboardItemOption = {
 
 /** Dashboards */
 export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[] = [
-    {
-        name: "msg#dashboards.userAdoption",
-        items: [
-            QUERY_COUNT_TOTAL_TIMELINE,
-            USER_COUNT_TOTAL_TIMELINE,
-            SESSION_COUNT_TOTAL_TIMELINE
-
-        ]
-    },
-    {
-        name: "msg#dashboards.relevancy",
-        items: [
-            TOP_SOURCES,
-            TOP_QUERIES,
-            TOP_NO_RESULTS_QUERIES,
-            TOP_FACETS
-        ]
-    },
-    {
-        name: "msg#dashboards.performance",
-        items: [
-            RESPONSE_TIME_TIMELINE,
-            AVG_RESPONSE_TIME_TIMELINE,
-            AVG_ENGINE_RESPONSE_TIMELINE,
-        ]
-    },
+  {
+      name: "User adoption",
+      items: [
+          USER_COUNT_TOTAL_TIMELINE,
+          NEW_USERS,
+          REGULAR_USERS,
+          USER_COUNT_TOTAL,
+          SESSIONS_BY_USER,
+          SESSION_COUNT_TOTAL,
+          SEARCH_BY_SESSION,
+          QUERY_COUNT_TOTAL,
+          VIEWED_DOC_PER_SEARCH,
+          QUERY_COUNT_TOTAL_TIMELINE,
+          SESSION_COUNT_TOTAL_TIMELINE
+      ]
+  },
+  {
+      name: "Relevancy",
+      items: [
+          TOP_QUERIES,
+          TOP_NO_RESULTS_QUERIES,
+          CLICK_FIRST_DOCS,
+          QUERY_BOUNCE_RATE,
+          SEARCH_EXIT_RATE,
+          ZERO_SEARCH,
+          REFINEMENT,
+          MRR,
+          FIRST_CLICK,
+          TOP_SOURCES,
+          RESULT_TYPES,
+          SEARCH_WITH_CLICKS_RATE,
+          TOP_FACETS
+      ]
+  },
+  {
+      name: "Performance",
+      items: [
+          AVG_RESPONSE_TIME_TIMELINE,
+          RESPONSE_TIME_TIMELINE,
+          AVG_ENGINE_RESPONSE_TIMELINE
+      ]
+  },
 ]
 
 /** Panorama */
 export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
-    {
-        name: "msg#panorama.timeline",
-        items: [
-            QUERY_COUNT_TOTAL_TIMELINE,
-            USER_COUNT_TOTAL_TIMELINE,
-            SESSION_COUNT_TOTAL_TIMELINE,
-            SEARCH_BY_SESSION_TIMELINE,
-            CLICK_BY_SEARCH_TIMELINE,
-            SESSION_DURATION_TIMELINE,
-            NEW_USERS_TIMELINE,
-            REGULAR_USERS_TIMELINE,
-            FIRST_CLICK_TIMELINE,
-            MRR_TIMELINE,
-            REFINEMENT_TIMELINE,
-            SEARCH_WITH_CLICKS_TIMELINE,
-            SEARCH_EXIT_TIMELINE,
-            ZERO_SEARCH_TIMELINE,
-            CLICK_FIRST_DOCS_TIMELINE,
-            QUERY_BOUNCE_TIMELINE,
-            CLICK_TOTAL_TIMELINE,
-            RESPONSE_TIME_TIMELINE,
-            AVG_RESPONSE_TIME_TIMELINE,
-            AVG_ENGINE_RESPONSE_TIMELINE
+  {
+      name: "Timeline",
+      items: [
+          QUERY_COUNT_TOTAL_TIMELINE,
+          USER_COUNT_TOTAL_TIMELINE,
+          SESSION_COUNT_TOTAL_TIMELINE,
+          SEARCH_BY_SESSION_TIMELINE,
+          CLICK_BY_SEARCH_TIMELINE,
+          SESSION_DURATION_TIMELINE,
+          NEW_USERS_TIMELINE,
+          REGULAR_USERS_TIMELINE,
+          FIRST_CLICK_TIMELINE,
+          MRR_TIMELINE,
+          REFINEMENT_TIMELINE,
+          SEARCH_WITH_CLICKS_TIMELINE,
+          SEARCH_EXIT_TIMELINE,
+          ZERO_SEARCH_TIMELINE,
+          CLICK_FIRST_DOCS_TIMELINE,
+          QUERY_BOUNCE_TIMELINE,
+          CLICK_TOTAL_TIMELINE,
+          RESPONSE_TIME_TIMELINE,
+          AVG_RESPONSE_TIME_TIMELINE,
+          AVG_ENGINE_RESPONSE_TIMELINE
 
-        ]
-    },
-    {
-        name: "msg#panorama.chart",
-        items: [
-            TOP_SOURCES,
-            TOP_QUERIES,
-            TOP_FACETS,
-            TOP_NO_RESULTS_QUERIES,
-            RESULT_TYPES,
-            REGULAR_NEW_USERS
-        ]
-    },
-    {
-        name: "msg#panorama.statistic",
-        items: [
-            QUERY_COUNT_TOTAL,
-            USER_COUNT_TOTAL,
-            SESSION_COUNT_TOTAL,
-            SESSIONS_BY_USER,
-            VIEWED_DOC_PER_SEARCH,
-            SEARCH_BY_SESSION,
-            CLICK_BY_SEARCH,
-            SESSION_DURATION,
-            NEW_USERS,
-            REGULAR_USERS,
-            ADOPTION_RATE,
-            REGULAR_USER_RATE,
-            FIRST_CLICK,
-            MRR,
-            REFINEMENT,
-            SEARCH_WITH_CLICKS,
-            SEARCH_WITH_CLICKS_RATE,
-            ZERO_SEARCH,
-            ZERO_SEARCH_RATE,
-            SEARCH_EXIT,
-            SEARCH_EXIT_RATE,
-            CLICK_FIRST_DOCS,
-            QUERY_BOUNCE,
-            QUERY_BOUNCE_RATE,
-            AVG_RESPONSE_TIME,
-            AVG_ENGINE_RESPONSE_TIME
-        ]
-    }
+      ]
+  },
+  {
+      name: "Chart",
+      items: [
+          TOP_SOURCES,
+          TOP_QUERIES,
+          TOP_FACETS,
+          TOP_NO_RESULTS_QUERIES,
+          RESULT_TYPES,
+          REGULAR_NEW_USERS
+      ]
+  },
+  {
+      name: "Statistics",
+      items: [
+          QUERY_COUNT_TOTAL,
+          USER_COUNT_TOTAL,
+          SESSION_COUNT_TOTAL,
+          SESSIONS_BY_USER,
+          VIEWED_DOC_PER_SEARCH,
+          SEARCH_BY_SESSION,
+          CLICK_BY_SEARCH,
+          SESSION_DURATION,
+          NEW_USERS,
+          REGULAR_USERS,
+          ADOPTION_RATE,
+          REGULAR_USER_RATE,
+          FIRST_CLICK,
+          MRR,
+          REFINEMENT,
+          SEARCH_WITH_CLICKS,
+          SEARCH_WITH_CLICKS_RATE,
+          ZERO_SEARCH,
+          SEARCH_EXIT,
+          SEARCH_EXIT_RATE,
+          CLICK_FIRST_DOCS,
+          QUERY_BOUNCE,
+          QUERY_BOUNCE_RATE,
+          AVG_RESPONSE_TIME,
+          AVG_ENGINE_RESPONSE_TIME
+      ]
+  }
 ]
