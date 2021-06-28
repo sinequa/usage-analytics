@@ -45,6 +45,9 @@ export class DashboardItemComponent implements OnChanges {
     // Whether this widget can be viewed in maximized dimensions or not
     @Input() maximizable = true;
 
+    // Whether this widget can be viewed in maximized dimensions or not
+    @Input() tooltipInfo = false;
+
     // Size of the container, known only after it has been resized by the Gridster library
     @Input() width?: number;
     @Input() height?: number;
@@ -61,6 +64,7 @@ export class DashboardItemComponent implements OnChanges {
     renameAction: Action;
     fullScreenAction: Action;
     maximizeAction: Action;
+    infoAction: Action;
 
     // Properties specific to certain types of dashboard items
     innerwidth = 500;
@@ -177,7 +181,6 @@ export class DashboardItemComponent implements OnChanges {
                         } else {
                             this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
                         }
-                        // this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
                     }
                     break;
                 default:
@@ -198,6 +201,15 @@ export class DashboardItemComponent implements OnChanges {
         }
         if (this.maximizable) {
             this.actions = [this.maximizeAction, ...this.actions]
+        }
+        if (this.tooltipInfo) {
+            this.infoAction = new Action({
+                icon: "fas fa-info",
+                title: this.config.info,
+                disabled: true,
+                action: () => {}
+            });
+            this.actions = [this.infoAction, ...this.actions]
         }
 
     }

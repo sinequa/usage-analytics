@@ -95,6 +95,8 @@ export class AuditStatComponent implements OnChanges {
         switch (computation) {
             case "division":
                 return this.statProvider.divide(value1, value2);
+            case "percentage":
+                return this.statProvider.divide(value1, value2) ? (this.statProvider.divide(value1, value2)! * 100) : undefined;
             default:
                 return undefined;
         }

@@ -10,6 +10,7 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "~@fortawesome/fontawesome-free/scss/regular";
 @import "~@fortawesome/fontawesome-free/scss/solid";
 
+@import "~@sinequa/components/action/bootstrap/action";
 @import "~@sinequa/components/notification/bootstrap/notification";
 
 
@@ -108,4 +109,21 @@ bs-daterangepicker-container {
     button.btn.btn-link.dropdown-toggle::after {
         display: none !important;
     }
+}
+
+// Flag images
+.sq-flag-en:before {
+  content: url('../resources/flags/flag-en.jpg');
+}
+
+.sq-flag-en-gb:before {
+  content: url('../resources/flags/flag-en-gb.jpg');
+}
+
+.sq-flag-fr:before {
+  content: url('../resources/flags/flag-fr.jpg');
+}
+
+.sq-flag-de:before {
+  content: url('../resources/flags/flag-de.jpg');
 }

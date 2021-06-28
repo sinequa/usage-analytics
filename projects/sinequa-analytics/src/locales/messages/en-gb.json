@@ -16,6 +16,7 @@
         "network": "Network",
         "chart": "Chart",
         "heatmap": "Heatmap",
+        "tagcloud": "Tag Cloud",
 
         "addWidget": "Add Widget",
         "addWidgetTitle": "Add a widget to the dashboard",
@@ -40,7 +41,7 @@
         "openTitle": "Open a saved dashboard",
         "openDashboard": "Open Dashboard \"{dashboard}\"",
         "delete": "Delete",
-        "deleteTitle": "Delete this dashboard",
+        "deleteTitle": "Delete the current dashboard",
         "deleteConfirmTitle": "Delete the current dashboard",
         "deleteConfirmMessage": "Are your sure you want to delete the dashboard \"{dashboard}\"?",
         "saveAs": "Save As...",
@@ -48,17 +49,17 @@
         "saveAsModalTitle": "Save Dashboard As",
         "saveAsModalMessage": "Enter a name for this dashboard",
         "save": "Save",
-        "saveTitle": "Save this dashboard",
+        "saveTitle": "Save the dashboard",
         "saveSuccess": "Dashboard saved",
         "saveFailure": "Dashboard could not be saved!",
         "autoSave": "Auto-save",
         "autoSaveTitle": "Automatically save your dashboard",
         "setDefault": "Default dashboard",
-        "setDefaultTitle": "Mark as default dashboard",
+        "setDefaultTitle": "Set as default dashboard",
         "setDefaultConfirm": "Do you want to set \"{dashboard}\" as the default dashboard?",
         "setDefaultConfirmTitle": "Default dashboard",
         "setDefaultSuccess": "\"{dashboard}\" was set as the default dashboard",
-        "settingsTitle": "Settings",
+        "settingsTitle": "Dashboard settings",
         "widgetClose": "Close",
         "renameWidget": "Rename widget",
         "renameWidgetMessage": "Enter a new name for this widget",
@@ -295,4 +296,5 @@
         "chart": "Chart",
         "statistic": "Statistic"
     }
+
 }

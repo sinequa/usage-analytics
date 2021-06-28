@@ -1,5 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
-import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Action } from "@sinequa/components/action";
 import { FacetConfig } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
@@ -10,26 +9,25 @@ import { Subscription } from "rxjs";
 import { AuditService } from "./audit.service";
 import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
+import { skip } from 'rxjs/operators';
 
 @Component({
     selector: "sq-audit",
     templateUrl: "./audit.component.html",
     styleUrls: ["./audit.component.scss"],
 })
-export class AuditComponent implements OnDestroy {
+export class AuditComponent implements OnDestroy, OnInit {
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
-    private routerSubscription: Subscription;
+    private _querySubscription: Subscription;
     private _loginSubscription: Subscription;
 
     constructor(
         public auditService: AuditService,
         public dashboardService: DashboardService,
-        public ui: UIService,
-        protected router: Router,
-        protected route: ActivatedRoute,
-        public searchService: SearchService,
+        private ui: UIService,
+        private searchService: SearchService,
         public loginService: LoginService,
         private appService: AppService
     ) {
@@ -41,23 +39,28 @@ export class AuditComponent implements OnDestroy {
         });
 
         // Upon login (ie access to user settings) initialize the dashboard widgets and actions
-        this._loginSubscription = this.loginService.events.subscribe(event => {
+        this._loginSubscription = this.loginService.events.subscribe((event) => {
             if (event.type === "session-start") {
+                // searchService.query is not yet defined from url, need to force its value
+                this.searchService.setQuery(this.searchService.getQueryFromUrl());
+
                 // Request data upon login
-                this.routerSubscription = this.router.events.subscribe({
-                    next: (event) => {
-                        if (event instanceof NavigationEnd) {
-                            this.auditService.updateAuditFilters();
-                        }
-                    },
-                });
+                this.auditService.updateAuditFilters();
+                this._querySubscription = this.searchService.queryStream
+                                            .pipe(skip(1))
+                                            .subscribe(() => this.auditService.updateAuditFilters());
 
                 // Note: available dashboards and the default dashboard must be set post-login so that it can be overridden by the user settings
-                this.dashboards = this.dashboardService.allDashboards;
+                //this.dashboards = this.dashboardService.allDashboards;
                 this.dashboardService.setDefaultDashboard();
                 this.dashboardActions = this.dashboardService.createDashboardActions();
             }
         });
+
+    }
+
+    ngOnInit() {
+
     }
 
     /**
@@ -73,7 +76,7 @@ export class AuditComponent implements OnDestroy {
     }
 
     ngOnDestroy() {
-        this.routerSubscription?.unsubscribe();
+        this._querySubscription?.unsubscribe();
         this._loginSubscription?.unsubscribe();
     }
 
