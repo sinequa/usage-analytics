@@ -12,11 +12,18 @@ import { AuditService, RelativeTimeRanges } from "../audit.service";
     styleUrls: ["./audit-range-picker.component.scss"],
 })
 export class AuditRangePickerComponent implements OnDestroy {
+    /** List of relative time range options */
     public readonly relativeTimeRanges = Object.values(RelativeTimeRanges);
 
-    dateRangeControl: FormControl;
-    form: FormGroup;
+    /** Display the date selection options */
     showDateRangeOptions = false;
+
+    /** Form for the date pickers */
+    form: FormGroup;
+    dateRangeControl: FormControl;
+    applySamePeriodForTrendsControl: FormControl;
+    customRangeForTrendsControl: FormControl;
+
     displayedRange: string;
 
     private _querySubscription: Subscription;
@@ -26,16 +33,38 @@ export class AuditRangePickerComponent implements OnDestroy {
         private auditService: AuditService,
         private searchService: SearchService
     ) {
+        // Create the form
         this.dateRangeControl = new FormControl([undefined, undefined]);
+        this.applySamePeriodForTrendsControl = new FormControl(true);
+        this.customRangeForTrendsControl = new FormControl([undefined, undefined]);
+
         this.form = this.formBuilder.group({
             dateRange: this.dateRangeControl,
+            applySamePeriodForTrends: this.applySamePeriodForTrendsControl,
+            customRangeForTrends: this.customRangeForTrendsControl
         });
 
+        // Listen to form changes
         this.dateRangeControl.valueChanges.subscribe((value: Date[]) => {
-            this.auditService.auditRange$.next(value);
+            this.auditService.updateRangeFilter(value);
             this.showDateRangeOptions = false;
         });
 
+        this.applySamePeriodForTrendsControl.valueChanges.subscribe((value: boolean) => {
+            const customRange = this.customRangeForTrendsControl.value as (Date | undefined)[];
+            if(!value && customRange[0] && customRange[1]) {
+                this.auditService.updatePreviousRangeFilter(customRange as Date[]);
+            }
+            else if(!!this.auditService.previousRange) { // No need to reset the previous range if it is already undefined
+                this.auditService.updatePreviousRangeFilter(undefined);
+            }
+        });
+
+        this.customRangeForTrendsControl.valueChanges.subscribe((value: Date[]) => {
+            this.auditService.updatePreviousRangeFilter(value);
+        });
+
+        // Subscribe to query stream to update the displayedRange
         this._querySubscription = this.searchService.queryStream.subscribe(() => {
             const value = this.auditService.getAuditTimestampFromUrl();
             if (value) {
@@ -59,12 +88,19 @@ export class AuditRangePickerComponent implements OnDestroy {
         this._querySubscription?.unsubscribe();
     }
 
+    /**
+     * Toggle the visibility of the panel
+     */
     toggleDateRangeOptions() {
         this.showDateRangeOptions = !this.showDateRangeOptions;
     }
 
+    /**
+     * Select a predefined value from a button
+     * @param value
+     */
     setAuditRange(value: string) {
-        this.auditService.auditRange$.next(value);
+        this.auditService.updateRangeFilter(value);
         this.showDateRangeOptions = false;
     }
 }

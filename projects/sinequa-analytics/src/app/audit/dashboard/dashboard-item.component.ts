@@ -310,7 +310,7 @@ export class DashboardItemComponent implements OnChanges {
 
     updateAuditRange(range: Date[]) {
         if (!!range) {
-            this.auditService.auditRange$.next(range);
+            this.auditService.updateRangeFilter(range);
         }
     }
 
