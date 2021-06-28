@@ -24,7 +24,7 @@
             (click)="openDashboard(dashboard)">
 
             <i *ngIf="dashboardService.isDefaultDashboard(dashboard)" class="fas fa-bookmark"></i>
-            {{dashboard?.name}}
+            {{dashboard?.name  | sqMessage}}
             <span *ngIf="!dashboardService.isDashboardSaved(dashboard)">*</span>
 
             <!-- Button to save tab modifications-->
@@ -57,6 +57,7 @@
                 [previousDataSet]="auditService.previousPeriodData$ | async"
                 [width]="item.width"
                 [height]="item.height"
+                [tooltipInfo]="!!item.info"
                 [buttonsStyle]="isDark()? 'dark' : 'light'">
             </sq-dashboard-item>
         </gridster-item>

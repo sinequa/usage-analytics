@@ -9,19 +9,20 @@
 </div>
 <div class="card flex-column dateRange-options text-muted position-absolute" *ngIf="showDateRangeOptions">
     <div class="d-flex flex-column py-2 px-2">
-        <span class="pb-1">Relative time ranges</span>
+        <span class="pb-1">Predefined Date Range</span>
         <div class="d-flex flex-wrap">
             <button
                 *ngFor="let item of relativeTimeRanges"
                 type="button"
                 class="btn btn-outline-secondary btn-sm mr-1 mb-1"
+                [ngClass]="{active: item === displayedRange}"
                 (click)="setAuditRange(item)">
                 {{item}}
             </button>
         </div>
     </div>
     <div class="d-flex flex-column py-2 px-2">
-        <span class="pb-1">Absolute time range</span>
+        <span class="pb-1">Date Range</span>
         <div class="d-flex flex-wrap" [formGroup]="form">
             <sq-date-range-picker
                 [options]="{closedRange: true}"

@@ -1,14 +1,14 @@
-<button type="button" class="btn btn-outline-primary panorama-btn" (click)="togglePanorama()" [sqTooltip]="'Add widget' | sqMessage">
+<button type="button" class="btn btn-outline-primary panorama-btn" (click)="togglePanorama()" [sqTooltip]="'msg#dashboard.addWidget' | sqMessage">
     <i class="fas fa-plus"></i>
 </button>
 
 <div class="card flex-column panorama text-muted position-absolute" *ngIf="showPanorama">
     <div *ngFor="let element of panorama" class="mb-3">
         <details>
-            <summary>{{element.name}}</summary>
+            <summary>{{element.name | sqMessage}}</summary>
             <div class="d-flex flex-wrap">
                 <button [sqIcon]="item.icon" type="button" class="btn btn-outline-secondary mx-1 my-1" *ngFor="let item of element.items" (click)="addWidget(item)">
-                    <div class="button-text">{{item.text}}</div>
+                    <div class="button-text">{{item.text | sqMessage}}</div>
                 </button>
             </div>
         </details>
