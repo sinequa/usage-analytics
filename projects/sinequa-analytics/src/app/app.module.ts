@@ -58,10 +58,9 @@ import deLocale from "../locales/de";
 //     auditEnabled: true
 // };
 export const startConfig: StartConfig = {
-    app: "sesame",
-    url: environment.url,
+    app: "training",
     production: environment.production,
-    autoOAuthProvider: environment.autoOAuthProvider,
+    autoSAMLProvider: environment.autoSAMLProvider,
     auditEnabled: true
 };
 

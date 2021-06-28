@@ -9,7 +9,6 @@ import { UserSettingsWebService } from '@sinequa/core/web-services';
 import { ModalResult, ModalService, PromptOptions, ModalButton, ConfirmType } from '@sinequa/core/modal';
 import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
-// import { DashboardAddItemModel, DashboardAddItemComponent } from './dashboard-add-item.component';
 import { GridsterConfig, GridsterItem } from 'angular-gridster2';
 import { NotificationsService } from '@sinequa/core/notification';
 import { Subject } from 'rxjs';
@@ -128,7 +127,6 @@ export class DashboardService {
     manualLayoutAction: Action;
     autoLayoutAction: Action;
     fixedLayoutAction: Action;
-    autoSaveAction: Action;
     saveDashboardAction: Action;
     autoSaveDashboardAction: Action;
 
@@ -189,10 +187,9 @@ export class DashboardService {
 
         // Dashboards are stored in User Settings
         this.userSettingsService.events.subscribe(event => {
-            console.log(this.userSettingsService.userSettings)
             // E.g. new login occurs
             // ==> Menus need to be rebuilt
-            if(this.autoSaveAction) {
+            if(this.autoSaveDashboardAction) {
                 this.updateAutoSaveAction();
                 this.setLayout(this.layout);
             }
@@ -640,7 +637,7 @@ export class DashboardService {
      * Update the state of the auto-save action
      */
     protected updateAutoSaveAction() {
-        this.autoSaveAction.selected = this.autoSave;
+        this.autoSaveDashboardAction.selected = this.autoSave;
     }
 
     /**

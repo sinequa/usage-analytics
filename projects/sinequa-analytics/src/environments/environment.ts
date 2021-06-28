@@ -2,16 +2,11 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-// export const environment = {
-//   url: "https://localhost:4200",
-//   autoSAMLProvider: "identity-dev",
-//   production: false
-// };
 export const environment = {
-    autoOAuthProvider: "google",
-    url: "https://insight-dev.sinequa.com",
-    production: false
-  };
+  url: "https://localhost:4200",
+  autoSAMLProvider: "identity-dev",
+  production: false
+};
 
   /*
    * For easier debugging in development mode, you can import the following file
