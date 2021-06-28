@@ -15,6 +15,7 @@
                 *ngFor="let item of relativeTimeRanges"
                 type="button"
                 class="btn btn-outline-secondary btn-sm mr-1 mb-1"
+                [ngClass]="{active: item === displayedRange}"
                 (click)="setAuditRange(item)">
                 {{item}}
             </button>
