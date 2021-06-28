@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import { Action } from "@sinequa/components/action";
 import { FacetConfig } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
@@ -16,7 +16,7 @@ import { skip } from 'rxjs/operators';
     templateUrl: "./audit.component.html",
     styleUrls: ["./audit.component.scss"],
 })
-export class AuditComponent implements OnDestroy, OnInit {
+export class AuditComponent implements OnDestroy {
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
@@ -34,7 +34,7 @@ export class AuditComponent implements OnDestroy, OnInit {
         // When the screen is resized, we resize the dashboard row height, so that items keep fitting the screen height
         this.ui.addResizeListener((event) => {
             this.dashboardService.options.fixedRowHeight =
-            (window.innerHeight - 255) / 6;
+            (window.innerHeight - 255) / 10;
             this.dashboardService.updateOptions(this.dashboardService.options);
         });
 
@@ -51,15 +51,10 @@ export class AuditComponent implements OnDestroy, OnInit {
                                             .subscribe(() => this.auditService.updateAuditFilters());
 
                 // Note: available dashboards and the default dashboard must be set post-login so that it can be overridden by the user settings
-                //this.dashboards = this.dashboardService.allDashboards;
                 this.dashboardService.setDefaultDashboard();
                 this.dashboardActions = this.dashboardService.createDashboardActions();
             }
         });
-
-    }
-
-    ngOnInit() {
 
     }
 
