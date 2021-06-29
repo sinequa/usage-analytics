@@ -8,7 +8,7 @@ import {
     PrincipalWebService,
     Results,
 } from "@sinequa/core/web-services";
-import { forkJoin, Observable, of, ReplaySubject, Subject } from "rxjs";
+import { forkJoin, Observable, of, ReplaySubject } from "rxjs";
 
 export enum RelativeTimeRanges {
     Last3H = "Last 3 hours",
@@ -37,9 +37,11 @@ export interface AuditDatasetFilters {
 })
 export class AuditService {
 
-    public auditRange$ = new Subject<string | Date[]>();
     public data$ = new ReplaySubject<{ [key: string]: Results | DatasetError }>(1);
     public previousPeriodData$ = new ReplaySubject<{ [key: string]: Results | DatasetError }>(1);
+
+    /** Reference period for trends calculation. If not set, this period is inferred from the main period automatically */
+    public previousRange: Date[] | undefined;
 
     constructor(
         public datasetWebService: DatasetWebService,
@@ -48,9 +50,6 @@ export class AuditService {
         public appService: AppService,
         public principalService: PrincipalWebService
     ) {
-        this.auditRange$.subscribe((range) => {
-            this.updateRangeFilter(range);
-        });
     }
 
     get webServiceName(): string | undefined{
@@ -65,10 +64,11 @@ export class AuditService {
     }
 
     public updateAuditFilters() {
-        /** Programmatically handle the dummy search query with respect to audit requirements
+        /** 
+         * Programmatically handle the dummy search query with respect to audit requirements
          * This will bring the use of all searchService functionalities in a dataset web service context,
          * without the nightmare of rewriting a dedicated service for this purpose
-        */
+         */
         if (!this.searchService.query.findSelect("audit_timestamp")) {
             this.updateRangeFilter(RelativeTimeRanges.Last30Days);
         }
@@ -132,7 +132,7 @@ export class AuditService {
         }
     }
 
-    private updateRangeFilter(timestamp: Date[] | string, search = true) {
+    public updateRangeFilter(timestamp: Date[] | string) {
         let expr: string;
         if (Utils.isString(timestamp)) {
             expr = this.exprBuilder.makeExpr("timestamp", timestamp);
@@ -144,9 +144,12 @@ export class AuditService {
         }
         this.searchService.query.removeSelect("audit_timestamp");
         this.searchService.query.addSelect(expr, "audit_timestamp");
-        if (search) {
-            this.searchService.search();
-        }
+        this.searchService.search();
+    }
+
+    public updatePreviousRangeFilter(range: Date[] | undefined) {
+        this.previousRange = range;
+        this.updateAuditFilters();
     }
 
     private getTimestampValueFromExpr(expr: Expr): string | Date[] {
@@ -227,9 +230,12 @@ export class AuditService {
                     break;
             }
         }
+        // Override the previous date if the previous range is set
+        previous = this.previousRange?.[0] || previous; 
+        const previousEnd = this.previousRange?.[1] || start;
         return {
             currentRange: this.exprBuilder.makeRangeExpr("timestamp", start, end),
-            previousRange: this.exprBuilder.makeRangeExpr("timestamp", previous, start),
+            previousRange: this.exprBuilder.makeRangeExpr("timestamp", previous, previousEnd),
             previous: Utils.toSqlValue(previous),
             start: Utils.toSqlValue(start),
             end: Utils.toSqlValue(end)
