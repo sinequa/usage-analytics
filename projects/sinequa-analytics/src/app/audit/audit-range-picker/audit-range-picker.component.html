@@ -1,3 +1,4 @@
+<!-- Header with dropdown button-->
 <div class="d-flex align-items-center justify-content-between dateRange pl-3 pr-2 py-1">
     <span>
         <i class="far fa-clock mr-2"></i>
@@ -7,30 +8,59 @@
         <i class="fas fa-chevron-{{showDateRangeOptions ? 'up' : 'down'}}"></i>
     </button>
 </div>
+<!-- Dropdown card with the content-->
 <div class="card flex-column dateRange-options text-muted position-absolute" *ngIf="showDateRangeOptions">
-    <div class="d-flex flex-column py-2 px-2">
-        <span class="pb-1">Predefined Date Range</span>
-        <div class="d-flex flex-wrap">
-            <button
-                *ngFor="let item of relativeTimeRanges"
-                type="button"
-                class="btn btn-outline-secondary btn-sm mr-1 mb-1"
-                [ngClass]="{active: item === displayedRange}"
-                (click)="setAuditRange(item)">
-                {{item}}
-            </button>
+    <form [formGroup]="form">
+        <!-- List of predefined filters -->
+        <div class="d-flex flex-column py-2 px-2">
+            <span class="pb-1">Predefined Date Range</span>
+            <div class="d-flex flex-wrap">
+                <button
+                    *ngFor="let item of relativeTimeRanges"
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm mr-1 mb-1"
+                    [ngClass]="{active: item === displayedRange}"
+                    (click)="setAuditRange(item)">
+                    {{item}}
+                </button>
+            </div>
         </div>
-    </div>
-    <div class="d-flex flex-column py-2 px-2">
-        <span class="pb-1">Date Range</span>
-        <div class="d-flex flex-wrap" [formGroup]="form">
-            <sq-date-range-picker
-                [options]="{closedRange: true}"
-                [formControlName]="'dateRange'"
-                sqAdvancedFormValidation
-                [field]="'dateRange'"
-                [validationForm]="form">
-            </sq-date-range-picker>
+        <!-- Custom date range selector -->
+        <div class="d-flex flex-column py-2 px-2">
+            <span class="pb-1">Date Range</span>
+            <div class="d-flex flex-wrap">
+                <sq-date-range-picker
+                    [options]="{closedRange: true}"
+                    [formControlName]="'dateRange'"
+                    sqAdvancedFormValidation
+                    [field]="'dateRange'"
+                    [validationForm]="form">
+                </sq-date-range-picker>
+            </div>
         </div>
-    </div>
+        <!-- Custom date range selector -->
+        <div class="d-flex flex-column py-2 px-2">
+            <span class="pb-1">Trends calculations</span>
+            <!-- Default mode checkbox -->
+            <div class="custom-control custom-checkbox my-1">
+                <input class="custom-control-input" type="checkbox" id="applySameRange" [formControl]="applySamePeriodForTrendsControl">
+                <label class="custom-control-label" for="applySameRange" [sqTooltip]="'For example, if &quot;Last 6 months&quot; is selected above, trends will be automatically computed against the previous 6 months period'">
+                    Use the preceding period of same duration
+                </label>
+            </div>
+            <!-- Select comparison period -->
+            <div *ngIf="!applySamePeriodForTrendsControl.value" sqTooltip="This period is used a baseline to measure the evolution of the metrics displayed in the dashboard">
+                <span class="pb-1">Custom period</span>
+                <div class="d-flex flex-wrap">
+                    <sq-date-range-picker
+                        [options]="{closedRange: true}"
+                        [formControlName]="'customRangeForTrends'"
+                        sqAdvancedFormValidation
+                        [field]="'customRangeForTrends'"
+                        [validationForm]="form">
+                    </sq-date-range-picker>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
