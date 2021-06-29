@@ -913,7 +913,7 @@ export const AVG_ENGINE_RESPONSE_TIME: DashboardItemOption = {
 /** Dashboards */
 export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[] = [
   {
-      name: "User adoption",
+      name: "msg#dashboards.userAdoption",
       items: [
           USER_COUNT_TOTAL_TIMELINE,
           NEW_USERS,
@@ -929,7 +929,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
       ]
   },
   {
-      name: "Relevancy",
+      name: "msg#dashboards.relevancy",
       items: [
           TOP_QUERIES,
           TOP_NO_RESULTS_QUERIES,
@@ -947,7 +947,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
       ]
   },
   {
-      name: "Performance",
+      name: "msg#dashboards.performance",
       items: [
           AVG_RESPONSE_TIME_TIMELINE,
           RESPONSE_TIME_TIMELINE,

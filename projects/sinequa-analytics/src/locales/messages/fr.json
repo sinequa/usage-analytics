@@ -41,8 +41,8 @@
         "openTitle": "Ouvrir un tableau de bord enregistré",
         "openDashboard": "Ouvrir le tableau de bord \"{dashboard}\"",
         "delete": "Supprimer",
-        "deleteTitle": "Supprimer le tableau de bord actuel",
-        "deleteConfirmTitle": "Supprimer le tableau de bord actuel",
+        "deleteTitle": "Supprimer le tableau de bord",
+        "deleteConfirmTitle": "Supprimer le tableau de bord",
         "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer le tableau de bord \"{dashboard}\"?",
         "saveAs": "Enregistrer sous...",
         "saveAsTitle": "Enregistrer le tableau de bord actuel pour le rouvrir plus tard",
@@ -72,232 +72,255 @@
 
     "widgets": {
         "queryTotalTimeLine": {
-            "text": "Queries Over Time",
-            "info": ""
+            "text": "requêtes de recherche",
+            "info": "Nombre de requêtes de recherche pendant la plage de dates donnée"
         },
         "userTotalTimeLine": {
-            "text": "Users Over Time",
-            "info": ""
-        },
-        "sessionTotalTimeLine": {
-            "text": "Sessions Over Time",
-            "info": ""
-        },
-        "avgClicksByQueryTimeLine": {
-            "text": "Average Click By Search Over Time",
-            "info": ""
-        },
-        "avgEngineResponseTimeTimeLine": {
-            "text": "Average Engine Response Over Time",
-            "info": ""
-        },
-        "avgMRRTimeLine": {
-            "text": "Average MRR Over Time",
-            "info": ""
-        },
-        "avgQueriesBySessionTimeLine": {
-            "text": "Average Search By Session Over Time",
-            "info": ""
-        },
-        "avgResponseTimeTimeLine": {
-            "text": "Average Response Time Over Time",
-            "info": ""
-        },
-        "responseTimeTimeLine": {
-            "text": "Response Time Over Time",
-            "info": ""
-        },
-        "avgSessionDurationTimeLine": {
-            "text": "Average Session Duration Over Time",
-            "info": ""
-        },
-        "clickRank1TotalTimeLine": {
-            "text": "First Click Over Time",
-            "info": ""
-        },
-        "clickRank3TimeLine": {
-            "text": "Click On First 3 Documents Over Time",
-            "info": ""
-        },
-        "clickTotalTimeLine": {
-            "text": "Click Total Over Time",
-            "info": ""
-        },
-        "newUsersTimeLine": {
-            "text": "New Users Over Time",
-            "info": ""
-        },
-        "queryBounceTimeLine": {
-            "text": "Query Bounce Over Time",
-            "info": ""
-        },
-        "queryClickTimeLine": {
-            "text": "Search With Clicks Over Time",
-            "info": ""
-        },
-        "queryRefineTimeLine": {
-            "text": "Refinement Over Time",
-            "info": ""
-        },
-        "queryZeroTimeLine": {
-            "text": "Zero Search Over Time",
-            "info": ""
-        },
-        "regularUsersTimeLine": {
-            "text": "Regular Users Over Time",
-            "info": ""
-        },
-        "searchExitTimeLine": {
-            "text": "Search Exit Over Time",
-            "info": ""
-        },
-        "topQueries": {
-            "text": "Top Queries",
-            "info": ""
-        },
-        "topNoResultQueries": {
-            "text": "Top No Results Queries",
-            "info": ""
-        },
-        "topSources": {
-            "text": "Top Sources",
-            "info": ""
-        },
-        "topFacets": {
-            "text": "Most Used Filters",
-            "info": ""
+            "text": "utilisateurs",
+            "info": "Nombre d’utilisateurs pendant la plage de dates donnée"
         },
         "userCountTotal": {
-            "text": "Users",
-            "info": ""
+            "text": "utilisateurs",
+            "info": "Nombre d’utilisateurs"
+        },
+        "sessionTotalTimeLine": {
+            "text": "Sessions",
+            "info": "Nombre de sessions pendant la période donnée"
+        },
+        "avgClicksByQueryTimeLine": {
+            "text": "Moyenne clics par requête de recherche",
+            "info": "Nombre moyen de clics pour une requête de recherche"
+        },
+        "avgEngineResponseTimeTimeLine": {
+            "text": "Réponse moyenne du moteur",
+            "info": "Temps de réponse moyen du moteur (en ms) pendant la plage de dates donnée"
+        },
+        "avgEngineResponseTime": {
+            "text": "Temps de réponse moyen du moteur",
+            "info": "Temps de réponse moyen du moteur (en ms) pendant la plage de dates donnée"
+        },
+        "avgQueriesBySessionTimeLine": {
+            "text": "Moyenne requêtes de recherche par session",
+            "info": "Nombre moyen de requêtes de recherche par session pendant la plage de dates donnée"
+        },
+        "avgResponseTimeTimeLine": {
+            "text": "Moyenne temps de réponse",
+            "info": "Temps de réponse moyen (en ms) pendant la plage de dates donnée. Il comprend le back-office et le moteur."
+        },
+        "avgResponseTime": {
+            "text": "Moyenne temps de réponse",
+            "info": "Temps de réponse moyen (en ms) pendant la plage de dates donnée. Il comprend le back-office et le moteur"
+        },
+        "responseTimeTimeLine": {
+            "text": "Temps de réponse",
+            "info": "Temps de réponse (en ms) pendant la plage de dates donnée. Il comprend le back-office et le moteur"
+        },
+        "avgSessionDurationTimeLine": {
+            "text": "Durée moyenne de la session",
+            "info": "Durée moyenne de la session (en ms) pendant la plage de dates donnée"
+        },
+        "avgMRRTimeLine": {
+            "text": "Rang réciproque moyen (MRR)",
+            "info": "Rang réciproque moyen pendant la plage de dates donnée. Le MMR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus il est mieux. 1 est lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée"
+        },
+        "avgMRR": {
+            "text": "Moyenne MRR",
+            "info": "Rang réciproque moyen pendant la plage de dates donnée. Le MMR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus il est mieux. 1 est lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée"
+        },
+        "clickRank1TotalTimeLine": {
+            "text": "Clics sur le premier document",
+            "info": "Nombre de recherches où l’utilisateur clique sur le premier document pendant la plage de dates donnée"
+        },
+        "clickRank1TotalRate": {
+            "text": "Clics sur le premier document",
+            "info": "Nombre de recherches où l’utilisateur clique sur le premier document pendant la plage de dates donnée"
+        },
+        "clickRank3TimeLine": {
+            "text": "Clics sur les 3 premiers documents",
+            "info": "Nombre de recherches pour lesquelles l’utilisateur clique sur les 3 premiers documents pendant la plage de dates donnée"
+        },
+        "clickRank3": {
+            "text": "Clics sur les 3 premiers documents",
+            "info": "Nombre de recherches pour lesquelles l’utilisateur clique sur les 3 premiers documents pendant la plage de dates donnée"
+        },
+        "clickTotalTimeLine": {
+            "text": "Total clics",
+            "info": "Nombre de clics pendant une recherche de la plage de dates donnée"
+        },
+        "newUsersTimeLine": {
+            "text": "Nouveaux utilisateurs",
+            "info": "Utilisateurs qui se sont connectés pour la première fois pendant la plage de dates donnée"
+        },
+        "newUsers": {
+            "text": "Nouveaux utilisateurs",
+            "info": "Utilisateurs qui se sont connectés pour la première fois pendant la plage de dates donnée"
+        },
+        "queryBounceTimeLine": {
+            "text": "Rebond",
+            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire sans contenu (basé sur le temps de séjour)"
+        },
+        "queryBounce": {
+            "text": "Rebond",
+            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire sans contenu (basé sur le temps de séjour)"
+        },
+        "queryBounceRate": {
+            "text": "Taux de rebond",
+            "info": "Nombre de rebonds pour une requête de recherche par rapport au nombre total de recherches"
+        },
+        "queryClickTimeLine": {
+            "text": "Requêtes de recherche avec clics",
+            "info": "Nombre de requêtes de recherche où l’utilisateur a cliqué sur un document au moins une fois"
+        },
+        "queryClick": {
+            "text": "Requêtes de recherche avec clics",
+            "info": "Nombre de requêtes de recherche où l’utilisateur a cliqué sur un document au moins une fois"
+        },
+        "queryClickRate": {
+            "text": "Taux de requêtes de recherche avec clics",
+            "info": "Nombre de requêtes de recherche où l’utilisateur a cliqué sur un document au moins une fois par rapport au nombre total de recherches"
+        },
+        "queryRefineTimeLine": {
+            "text": "Affinement",
+            "info": "Nombre de requêtes de recherche où l’utilisateur devrait faire un affinement (comme l’utilisation de facettes)"
+        },
+        "queryRefine": {
+            "text": "Affinement",
+            "info": "Nombre de requêtes de recherche où l’utilisateur devrait faire un affinement (comme l’utilisation de facettes)"
+        },
+        "queryRefineRate": {
+            "text": "Taux d'affinement",
+            "info": "Nombre de requêtes de recherche pour lesquelles l’utilisateur devrait faire un affinement par rapport au nombre total de recherches"
+        },
+        "queryZeroTimeLine": {
+            "text": "Recherches sans résultats",
+            "info": "Nombre de requêtes de recherche sans résultats appariés"
+        },
+        "queryZero": {
+            "text": "Recherches sans résultats",
+            "info": "Nombre de requêtes de recherche sans résultats appariés"
+        },
+        "queryZeroRate": {
+            "text": "Taux de recherches sans résultats",
+            "info": "Nombre de requêtes de recherche sans résultats appariés par rapport au nombre total de recherches"
+        },
+        "regularUsersTimeLine": {
+            "text": "Utilisateurs réguliers",
+            "info": "Nombre d’utilisateurs pour qui ce n’est pas la première utilisation"
+        },
+        "regularUsers": {
+            "text": "Utilisateurs réguliers",
+            "info": "Nombre d’utilisateurs pour qui ce n’est pas la première utilisation"
+        },
+        "adoptionRate": {
+            "text": "Taux d'adoption",
+            "info": "Nombre de nouveaux utilisateurs par rapport au nombre total d’utilisateurs potentiels"
+        },
+        "regularUsersRate": {
+            "text": "Taux d’utilisation régulière",
+            "info": "Nombre d’utilisateurs par rapport au nombre total d’utilisateurs potentiels"
+        },
+        "regular_newUsers": {
+            "text": "Utilisateurs réguliers/nouveaux",
+            "info": "Nombre d’utilisateurs réguliers par rapport au nombre total de nouveaux utilisateurs"
+        },
+        "searchExitTimeLine": {
+            "text": "Recherches quittées",
+            "info": "Nombre de recherches où l’utilisateur ne fait rien après avoir affiché une page de résultats"
+        },
+        "searchExit": {
+            "text": "Recherches quittées",
+            "info": "Nombre de recherches où l’utilisateur ne fait rien après avoir affiché une page de résultats"
+        },
+        "searchExitRate": {
+            "text": "Taux de recherches quittées",
+            "info": "Nombre de recherches pour lesquelles l’utilisateur ne fait rien après avoir affiché une page de résultats par rapport au nombre total de recherches"
+        },
+        "queryByResult": {
+            "text": "Types de résultats de recherche",
+            "info": "Types de résultats de recherche"
+        },
+        "topQueries": {
+            "text": "Principales requêtes",
+            "info": "Requêtes de recheche les plus fréquemment posées"
+        },
+        "topNoResultQueries": {
+            "text": "Principales requêtes sans résultats",
+            "info": "Requêtes de recheche sans résultats les plus fréquemment posées"
+        },
+        "topSources": {
+            "text": "Principales sources",
+            "info": "Sources de la plupart des documents cliqués"
+        },
+        "topFacets": {
+            "text": "Filtres les plus utilisés",
+            "info": "Filtres les plus utilisés"
         },
         "sessionTotal": {
             "text": "Sessions",
-            "info": ""
+            "info": "Nombre de sessions"
         },
         "queryTotal": {
-            "text": "Queries",
-            "info": ""
+            "text": "Requêtes de recherche",
+            "info": "Nombre de requêtes de recherche"
         },
         "sessionsByUser": {
-            "text": "Average Sessions By User",
-            "info": ""
+            "text": "Moyenne sessions par utilisateur",
+            "info": "Nombre moyen de sessions par utilisateur"
         },
         "avgQueriesBySession": {
-            "text": "Average Search By Session",
-            "info": ""
+            "text": "Moyenne recherches par session",
+            "info": "Nombre moyen de recherches par session"
         },
         "avgClicksByQuery": {
-            "text": "Average Click By Search",
-            "info": ""
+            "text": "Moyenne clics par recherche",
+            "info": "Nombre moyen de documents cliqués par recherche"
         },
         "docViewsBySession": {
-            "text": "Average Viewed Documents Per Search",
-            "info": ""
+            "text": "Moyenne documents consultés par recherche",
+            "info": "Nombre moyen de documents consultés (Document Navigator) par recherche"
         },
         "avgSessionDuration": {
-            "text": "Average Session By Duration",
-            "info": ""
-        },
-        "newUsers": {
-            "text": "New Users",
-            "info": ""
-        },
-        "regularUsers": {
-            "text": "Regular Users",
-            "info": ""
-        },
-        "adoptionRate": {
-            "text": "Adoption Rate",
-            "info": ""
-        },
-        "regularUsersRate": {
-            "text": "Regular User Rate",
-            "info": ""
-        },
-        "regular_newUsers": {
-            "text": "Regular/New Users",
-            "info": ""
-        },
-        "clickRank1TotalRate": {
-            "text": "First Click",
-            "info": ""
-        },
-        "avgMRR": {
-            "text": "Average MRR",
-            "info": ""
-        },
-        "queryRefine": {
-            "text": "Refinement",
-            "info": ""
-        },
-        "queryRefineRate": {
-            "text": "Refinement Rate",
-            "info": ""
-        },
-        "queryClick": {
-            "text": "Search With Clicks",
-            "info": ""
-        },
-        "queryClickRate": {
-            "text": "Search With Clicks Rate",
-            "info": ""
-        },
-        "queryZero": {
-            "text": "Zero Search",
-            "info": ""
-        },
-        "queryZeroRate": {
-            "text": "Zero Search Rate",
-            "info": ""
-        },
-        "searchExit": {
-            "text": "Search Exit",
-            "info": ""
-        },
-        "searchExitRate": {
-            "text": "Search Exit Rate",
-            "info": ""
-        },
-        "clickRank3": {
-            "text": "Click On First 3 Documents",
-            "info": ""
-        },
-        "queryBounce": {
-            "text": "Bounce",
-            "info": ""
-        },
-        "queryBounceRate": {
-            "text": "Bounce Rate",
-            "info": ""
-        },
-        "queryByResult": {
-            "text": "Result Types",
-            "info": ""
-        },
-        "avgResponseTime": {
-            "text": "Average Response Time",
-            "info": ""
-        },
-        "avgEngineResponseTime": {
-            "text": "Average Engine Response Time",
-            "info": ""
+            "text": "Durée moyenne de session",
+            "info": "Durée moyenne de session"
         }
     },
 
     "dashboards": {
-        "userAdoption": "User Adoption",
-        "relevancy": "Relevancy",
-        "performance": "Performance"
+        "userAdoption": "Adoption utilisateur",
+        "relevancy": "Pertinence",
+        "performance": "Performance",
+        "newDashboard": "Nouveau tableau de bord"
     },
 
     "panorama": {
-        "timeline": "Timeline",
-        "chart": "Chart",
-        "statistic": "Statistic"
+        "timeline": "Historique",
+        "chart": "Graphique",
+        "statistic": "Statistique"
     },
-    
-        
+
+    "dateRange": {
+        "predefinedDateRange": "Plage de dates prédéfinie",
+        "absoluteDateRange": "Plage de dates",
+        "trendsCalculations": {
+            "title": "Calculs des tendances",
+            "label": "Utiliser la période précédente de même durée",
+            "tooltip": "Par exemple, si \"Derniers 6 mois\" est sélectionné ci-dessus, les tendances seront automatiquement calculées par rapport à la période précédente de 6 mois",
+            "customPeriod": "Période personnalisée",
+            "customPeriodTooltip": "Cette période est utilisée comme base de référence pour mesurer l’évolution des métriques affichées dans le tableau de bord"
+        },
+        "last3H": "3 dernières heures",
+        "last6H": "6 dernières heures",
+        "last12H": "12 dernières heures",
+        "last24H": "24 dernières heures",
+        "last7D": "7 derniers jours",
+        "last30D": "30 derniers jours",
+        "last90D": "90 derniers jours",
+        "last6M": "6 derniers mois",
+        "last1Y": "Dernière année",
+        "last2Y": "2 dernières années",
+        "last5Y": "5 dernières années"
+    },
+
     "export": {
         "button": {
             "title": "Export CSV",

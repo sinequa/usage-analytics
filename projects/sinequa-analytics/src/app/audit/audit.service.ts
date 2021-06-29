@@ -11,17 +11,17 @@ import {
 import { forkJoin, Observable, of, ReplaySubject } from "rxjs";
 
 export enum RelativeTimeRanges {
-    Last3H = "Last 3 hours",
-    Last6H = "Last 6 hours",
-    Last12H = "Last 12 hours",
-    Last24H = "Last 24 hours",
-    Last7Days = "Last 7 days",
-    Last30Days = "Last 30 days",
-    Last90Days = "Last 90 days",
-    Last6M = "Last 6 months",
-    Last1Y = "Last 1 year",
-    Last2Y = "Last 2 years",
-    Last5Y = "Last 5 years",
+    Last3H = "msg#dateRange.last3H",
+    Last6H = "msg#dateRange.last6H",
+    Last12H = "msg#dateRange.last12H",
+    Last24H = "msg#dateRange.last24H",
+    Last7Days = "msg#dateRange.last7D",
+    Last30Days = "msg#dateRange.last30D",
+    Last90Days = "msg#dateRange.last90D",
+    Last6M = "msg#dateRange.last6M",
+    Last1Y = "msg#dateRange.last1Y",
+    Last2Y = "msg#dateRange.last2Y",
+    Last5Y = "msg#dateRange.last5Y",
 }
 
 export interface AuditDatasetFilters {
@@ -64,7 +64,7 @@ export class AuditService {
     }
 
     public updateAuditFilters() {
-        /** 
+        /**
          * Programmatically handle the dummy search query with respect to audit requirements
          * This will bring the use of all searchService functionalities in a dataset web service context,
          * without the nightmare of rewriting a dedicated service for this purpose
@@ -231,7 +231,7 @@ export class AuditService {
             }
         }
         // Override the previous date if the previous range is set
-        previous = this.previousRange?.[0] || previous; 
+        previous = this.previousRange?.[0] || previous;
         const previousEnd = this.previousRange?.[1] || start;
         return {
             currentRange: this.exprBuilder.makeRangeExpr("timestamp", start, end),

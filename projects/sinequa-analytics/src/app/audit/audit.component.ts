@@ -18,9 +18,9 @@ import {ExportService} from "./export.service";
     templateUrl: "./audit.component.html",
     styleUrls: ["./audit.component.scss"],
 })
-export class AuditComponent implements OnDestroy, OnInit {
+export class AuditComponent implements OnDestroy {
     @ViewChildren(DashboardItemComponent) dashboardItems: QueryList<DashboardItemComponent>
-    
+
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
@@ -63,7 +63,7 @@ export class AuditComponent implements OnDestroy, OnInit {
 
     }
 
-    exportCSV() {        
+    exportCSV() {
         // exports
         const items = this.dashboardItems.map(item => item);
         this.exportService.export(this.dashboardService.dashboard.name, items);
