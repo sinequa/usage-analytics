@@ -319,5 +319,15 @@
         "last1Y": "Dernière année",
         "last2Y": "2 dernières années",
         "last5Y": "5 dernières années"
+    },
+
+    "export": {
+        "button": {
+            "title": "Export CSV",
+            "tooltip": "Exporter le dashboard dans des fichiers .csv"
+        },
+        "title": "Export CSV",
+        "nothing": "{filename}, pas de données à exporter!",
+        "success": "Export {filename} réussi"
     }
 }

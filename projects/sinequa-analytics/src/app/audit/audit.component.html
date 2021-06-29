@@ -10,6 +10,9 @@
         >
         <sq-facet-multi #facet class="card position-absolute" [results]="(auditService.data$ | async)?.applications" [facets]="facets" [showProgressBar]="false" ></sq-facet-multi>
     </sq-facet-card>
+    
+    <button type="button" class="btn btn-primary" sqTooltip="{{ 'msg#export.button.tooltip' | sqMessage }}" (click)="exportCSV()">{{ 'msg#export.button.title' | sqMessage }}</button>
+
 </div>
 
 <!-- Dashboard tabs -->

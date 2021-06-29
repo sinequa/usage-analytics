@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component } from "@angular/core";
 import { PANORAMA } from "../config";
 import { DashboardItemOption, DashboardService } from "../dashboard/dashboard.service";
 
@@ -7,14 +7,11 @@ import { DashboardItemOption, DashboardService } from "../dashboard/dashboard.se
     templateUrl: "./widget-panorama.component.html",
     styleUrls: ["./widget-panorama.component.scss"],
 })
-export class WidgetPanoramaComponent implements OnDestroy {
+export class WidgetPanoramaComponent {
 
     showPanorama = false;
 
     constructor(public dashboardService: DashboardService) {
-    }
-
-    ngOnDestroy() {
     }
 
     togglePanorama() {
