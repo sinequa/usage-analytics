@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, QueryList, ViewChildren } from "@angular/core";
 import { Action } from "@sinequa/components/action";
 import { FacetConfig } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
@@ -10,13 +10,17 @@ import { AuditService } from "./audit.service";
 import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import { skip } from 'rxjs/operators';
+import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
+import {ExportService} from "./export.service";
 
 @Component({
     selector: "sq-audit",
     templateUrl: "./audit.component.html",
     styleUrls: ["./audit.component.scss"],
 })
-export class AuditComponent implements OnDestroy {
+export class AuditComponent implements OnDestroy, OnInit {
+    @ViewChildren(DashboardItemComponent) dashboardItems: QueryList<DashboardItemComponent>
+    
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
@@ -29,7 +33,8 @@ export class AuditComponent implements OnDestroy {
         private ui: UIService,
         private searchService: SearchService,
         public loginService: LoginService,
-        private appService: AppService
+        private appService: AppService,
+        private exportService: ExportService
     ) {
         // When the screen is resized, we resize the dashboard row height, so that items keep fitting the screen height
         this.ui.addResizeListener((event) => {
@@ -56,6 +61,12 @@ export class AuditComponent implements OnDestroy {
             }
         });
 
+    }
+
+    exportCSV() {        
+        // exports
+        const items = this.dashboardItems.map(item => item);
+        this.exportService.export(this.dashboardService.dashboard.name, items);
     }
 
     /**
