@@ -101,7 +101,7 @@ export interface DashboardItemOption {
 }
 
 // Name of the "default dashboard" (displayed prior to any user customization)
-export const defaultDashboardName = "New dashboard";
+export const defaultDashboardName = "msg#dashboards.newDashboard";
 
 @Injectable({
     providedIn: 'root'
@@ -128,7 +128,6 @@ export class DashboardService {
     autoLayoutAction: Action;
     fixedLayoutAction: Action;
     saveDashboardAction: Action;
-    autoSaveDashboardAction: Action;
 
     /** A subject firing events when the dashboard changes */
     dashboardChanged = new Subject<Dashboard>();
@@ -188,35 +187,27 @@ export class DashboardService {
         // Dashboards are stored in User Settings
         this.userSettingsService.events.subscribe(event => {
             // E.g. new login occurs
-            // ==> Menus need to be rebuilt
-            if(this.autoSaveDashboardAction) {
-                this.updateAutoSaveAction();
-                this.setLayout(this.layout);
-            }
+            // ==> settings need to be rebuilt
+            this.setLayout(this.layout);
         });
 
         // Manage Auto-save dashboards.
         this.dashboardChanged.subscribe((dashboard: Dashboard) => {
             if (this.dashboard && this.defaultDashboard) {
-                if (!dashboard.name.startsWith(defaultDashboardName)) {
-                    // If a saved dashboard is modified, then add it to the changed dashboards list
+                // If a saved dashboard is modified, then add it to the changed dashboards list
+                if (!dashboard.name.startsWith(this.formatMessage(defaultDashboardName))) {
                     const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
                     if (this.getDashboard(dashboard.name) && (index === -1)) {
                         this.changedDashboards.push(dashboard)
                     }
-
                     // Store the update in the list of dashboard
                     const i = this.dashboards.findIndex(d => d.name === dashboard.name);
                     this.dashboards[i] = dashboard;
                 } else {
+                    // If a draft dashboard is modified, then add it to the draft dashboards list
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards[i] = dashboard;
                 }
-
-                // If auto-save mode is on, automatically save it if it is part of changed dashboards
-                // if(this.autoSave && (index > -1)) {
-                //     this.debounceSave();
-                // }
             }
         });
     }
@@ -289,10 +280,10 @@ export class DashboardService {
 
     /**
      * Retrieves a dashboard configuration from the user settings
-     * @param dashboard
+     * @param name
      */
-    public getDashboard(dashboard: string): Dashboard | undefined {
-        return this.dashboards.find(d => d.name === dashboard);
+    public getDashboard(name: string): Dashboard | undefined {
+        return this.dashboards.find(d => this.formatMessage(d.name) === this.formatMessage(name));
     }
 
     /**
@@ -314,7 +305,8 @@ export class DashboardService {
         }
         // If there is no dashboard explicitly opened currently, we open the default one if defined. If not open a new blank dashboard
         if(!this.dashboard) {
-            const _blank = this.createDashboard("New dashboard " + (this.draftDashboards.length+1));
+            const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+            const _blank = this.createDashboard(name);
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
         }
     }
@@ -324,7 +316,8 @@ export class DashboardService {
      * @param items
      */
     public setSharedDashboard(items: DashboardItem[]) {
-        const _shared = {name: defaultDashboardName+this.draftDashboards+1, items};
+        const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+        const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
         this.dashboard = Utils.copy(_shared);
         this.dashboardChanged.next(this.dashboard);
@@ -336,7 +329,7 @@ export class DashboardService {
     public isDashboardSaved(dashboard = this.dashboard): boolean {
         return this.defaultDashboard
                 && dashboard
-                && !dashboard.name.startsWith(defaultDashboardName)
+                && !dashboard.name.startsWith(this.formatMessage(defaultDashboardName))
                 && !this.changedDashboards.find(d => d.name === dashboard.name);
     }
 
@@ -427,7 +420,7 @@ export class DashboardService {
             title: 'msg#dashboard.renameWidget',
             message: 'msg#dashboard.renameWidgetMessage',
             buttons: [],
-            output: this.intlService.formatMessage(item.title),
+            output: this.formatMessage(item.title),
             validators: [Validators.required]
         };
 
@@ -487,20 +480,6 @@ export class DashboardService {
             this.setLayout(this.layout);
         }
 
-        // Action to toggle auto-save mode
-        this.autoSaveDashboardAction = new Action({
-            text: 'msg#dashboard.autoSave',
-            title: 'msg#dashboard.autoSaveTitle',
-            selected: this.autoSave,
-            action: (action) => {
-                this.prefs.set("auto-save-dashboards", !this.autoSave);
-                action.selected = this.autoSave;
-                if(this.autoSave && this.isDashboardSaved()) {
-                    this.patchDashboards();
-                }
-            }
-        });
-
         // Assemble the actions into one menu
         const settings = new Action({
             icon: 'fas fa-ellipsis-v',
@@ -508,9 +487,7 @@ export class DashboardService {
             children: [
                 this.manualLayoutAction,
                 this.autoLayoutAction,
-                this.fixedLayoutAction,
-                // new Action({separator: true}),
-                // this.autoSaveDashboardAction,
+                this.fixedLayoutAction
             ],
         });
 
@@ -540,7 +517,8 @@ export class DashboardService {
      * Creates a new dashboard (from scratch)
      */
     public newDashboard() {
-        const _blank = this.createDashboard("New dashboard " + (this.draftDashboards.length+1));
+        const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+        const _blank = this.createDashboard(name);
         this.draftDashboards.push(_blank);
         this.dashboard = Utils.copy(_blank);
         delete this.searchService.queryStringParams.dashboard;
@@ -551,7 +529,7 @@ export class DashboardService {
         this.modalService.confirm({
             title: "msg#dashboard.deleteConfirmTitle",
             message: "msg#dashboard.deleteConfirmMessage",
-            messageParams: {values: {dashboard: dashboard.name}},
+            messageParams: {values: {dashboard: this.formatMessage(dashboard.name)}},
             confirmType: ConfirmType.Warning,
             buttons: [
                 new ModalButton({
@@ -565,6 +543,8 @@ export class DashboardService {
         }).then(value => {
             if(value === ModalResult.OK) {
                 const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
+
+                // Delete the dashboard
                 if (this.isDashboardSaved(dashboard)) {
                     const i = this.dashboards.findIndex(d => d.name === dashboard.name);
                     this.dashboards.splice(i, 1);
@@ -578,6 +558,7 @@ export class DashboardService {
                     this.draftDashboards.splice(i, 1);
                 }
 
+                // Open next/previous dashboard. If not existing, create new empty dashboard
                 if (this.allDashboards[index]) {
                     this.dashboard = Utils.copy(this.allDashboards[index]);
                 } else if (this.allDashboards[index - 1]) {
@@ -606,7 +587,7 @@ export class DashboardService {
         this.modalService.confirm({
             title: "msg#dashboard.setDefaultConfirmTitle",
             message: "msg#dashboard.setDefaultConfirm",
-            messageParams: {values: {dashboard: dashboard.name}},
+            messageParams: {values: {dashboard: this.formatMessage(dashboard.name)}},
             buttons: [
                 new ModalButton({
                     result: ModalResult.OK,
@@ -624,20 +605,13 @@ export class DashboardService {
                     // Store the name of the saved default dashboard for resetting it upon next login
                     this.prefs.set("dashboard-default", this.defaultDashboard.name);
                     // Notify user that this worked
-                    this.notificationService.success("msg#dashboard.setDefaultSuccess", {dashboard: dashboard.name});
+                    this.notificationService.success("msg#dashboard.setDefaultSuccess", {dashboard: this.formatMessage(dashboard.name)});
                 } else {
                     this.notificationService.error("Could not mark the dashboard as default...");
-                    console.error("Could not mark the dashboard as default:", dashboard.name);
+                    console.error("Could not mark the dashboard as default:", this.formatMessage(dashboard.name));
                 }
             }
         });
-    }
-
-    /**
-     * Update the state of the auto-save action
-     */
-    protected updateAutoSaveAction() {
-        this.autoSaveDashboardAction.selected = this.autoSave;
     }
 
     /**
@@ -682,7 +656,7 @@ export class DashboardService {
 
         const originalName = dashboard.name;
         const unique : ValidatorFn = (control) => {
-            const unique = !control.value?.startsWith(defaultDashboardName) && !this.getDashboard(control.value);
+            const unique = !control.value?.startsWith(this.formatMessage(defaultDashboardName)) && !this.getDashboard(control.value);
             if(!unique) return {unique: true};
             return null;
         };
@@ -691,7 +665,7 @@ export class DashboardService {
             title: 'msg#dashboard.saveAsModalTitle',
             message: 'msg#dashboard.saveAsModalMessage',
             buttons: [],
-            output: dashboard.name,
+            output: this.formatMessage(dashboard.name),
             validators: [Validators.required, unique]
         };
 
@@ -712,8 +686,6 @@ export class DashboardService {
         });
 
     }
-
-    debounceSave = Utils.debounce(() => this.patchDashboards(false), 200); // debounce save to avoid multiple events
 
     /**
      * Updates the list of dashboards in the user settings
@@ -744,5 +716,9 @@ export class DashboardService {
     /** Getter for the layout mode preference */
     public get layout(): string {
         return this.prefs.get("dashboard-layout") || "manual";
+    }
+
+    private formatMessage(message: string) : string {
+        return this.intlService.formatMessage(message);
     }
 }
