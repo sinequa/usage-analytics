@@ -181,7 +181,7 @@
         "queryRefineTimeLine": {
             "text": "Refinement",
             "info": "Number of search queries where the user has to do a refinement (like usage of facets)"
-        },        
+        },
         "queryRefine": {
             "text": "Refinement",
             "info": "Number of search queries where the user has to do a refinement (like usage of facets)"
@@ -287,7 +287,8 @@
     "dashboards": {
         "userAdoption": "User Adoption",
         "relevancy": "Relevancy",
-        "performance": "Performance"
+        "performance": "Performance",
+        "newDashboard": "New Dashboard"
     },
 
     "panorama": {

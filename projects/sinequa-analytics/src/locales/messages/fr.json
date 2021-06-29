@@ -288,7 +288,8 @@
     "dashboards": {
         "userAdoption": "User Adoption",
         "relevancy": "Relevancy",
-        "performance": "Performance"
+        "performance": "Performance",
+        "newDashboard": "New Dashboard"
     },
 
     "panorama": {
