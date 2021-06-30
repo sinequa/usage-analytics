@@ -1,4 +1,4 @@
-import { Component, OnDestroy, QueryList, ViewChildren } from "@angular/core";
+import { Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { Action } from "@sinequa/components/action";
 import { FacetConfig } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
@@ -6,10 +6,11 @@ import { UIService } from "@sinequa/components/utils";
 import { AppService } from "@sinequa/core/app-utils";
 import { LoginService } from "@sinequa/core/login";
 import { Subscription } from "rxjs";
+import { skip } from 'rxjs/operators';
+
 import { AuditService } from "./audit.service";
 import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
-import { skip } from 'rxjs/operators';
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
 
@@ -20,7 +21,10 @@ import {ExportService} from "./export.service";
 })
 export class AuditComponent implements OnDestroy {
     @ViewChildren(DashboardItemComponent) dashboardItems: QueryList<DashboardItemComponent>
-
+    @ViewChild("content", {static: false}) content: ElementRef;
+  
+    public exportAction: Action;
+    
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
@@ -60,12 +64,35 @@ export class AuditComponent implements OnDestroy {
                 this.dashboardActions = this.dashboardService.createDashboardActions();
             }
         });
+        
+        this.exportAction = new Action({
+            icon: "fas fa-file-export",
+            name: "exportAsCSV",
+            action: () => this.exportCSV(),
+            children: [
+                new Action({
+                    title: "msg#export.button.exportPNG",
+                    text: "msg#export.button.exportPNG",
+                    name: "exportAsPNG",
+                    action: () => {
+                        this.makePNG();
+                    }
+                }),
+                new Action({
+                    title: "msg#export.button.tooltipCSV",
+                    text: "msg#export.button.exportCSV",
+                    name: "exportAsCSV",
+                    action: () => this.exportCSV()
+                })
+            ]
+        })
 
     }
 
-    /**
-     * Export current dashboard data as csv files
-     */
+    makePNG() {
+        this.exportService.exportToPNG(this.dashboardService.dashboard.name, this.content);
+    }
+    
     exportCSV() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);

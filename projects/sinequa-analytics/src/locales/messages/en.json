@@ -323,8 +323,10 @@
 
     "export": {
         "button": {
-            "title": "Export CSV",
-            "tooltip": "Export current dashboard to .csv files"
+            "title": "Export",
+            "tooltipCSV": "Export current dashboard to .csv files",
+            "exportCSV": "Export as CSV",
+            "exportPNG": "Export as PNG image"
         },
         "title": "Export CSV",
         "nothing": "{filename}, nothing to export!",
