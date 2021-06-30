@@ -73,96 +73,96 @@
 
     "widgets": {
         "queryTotalTimeLine": {
-            "text": "requêtes de recherche",
-            "info": "Nombre de requêtes de recherche pendant la plage de dates donnée"
+            "text": "Requêtes de recherche",
+            "info": "Nombre de requêtes de recherche"
         },
         "userTotalTimeLine": {
-            "text": "utilisateurs",
-            "info": "Nombre d’utilisateurs pendant la plage de dates donnée"
+            "text": "Utilisateurs",
+            "info": "Nombre d'utilisateurs"
         },
         "userCountTotal": {
-            "text": "utilisateurs",
-            "info": "Nombre d’utilisateurs"
+            "text": "Utilisateurs",
+            "info": "Nombre d'utilisateurs"
         },
         "sessionTotalTimeLine": {
             "text": "Sessions",
-            "info": "Nombre de sessions pendant la période donnée"
+            "info": "Nombre de sessions"
         },
         "avgClicksByQueryTimeLine": {
-            "text": "Moyenne clics par requête de recherche",
-            "info": "Nombre moyen de clics pour une requête de recherche"
+            "text": "Moyenne des clics de document par requête de recherche",
+            "info": "Nombre de clics sur documents moyen par requête de recherche"
         },
         "avgEngineResponseTimeTimeLine": {
-            "text": "Réponse moyenne du moteur",
-            "info": "Temps de réponse moyen du moteur (en ms) pendant la plage de dates donnée"
+            "text": "Temps de réponse moyen du moteur (en ms)",
+            "info": "Temps de réponse moyen du moteur (en ms)"
         },
         "avgEngineResponseTime": {
             "text": "Temps de réponse moyen du moteur",
-            "info": "Temps de réponse moyen du moteur (en ms) pendant la plage de dates donnée"
+            "info": "Temps de réponse moyen du moteur (en ms)"
         },
         "avgQueriesBySessionTimeLine": {
-            "text": "Moyenne requêtes de recherche par session",
-            "info": "Nombre moyen de requêtes de recherche par session pendant la plage de dates donnée"
+            "text": "Nombre moyen de requêtes de recherche par session (en ms)",
+            "info": "Nombre moyen de requêtes de recherche par session"
         },
         "avgResponseTimeTimeLine": {
-            "text": "Moyenne temps de réponse",
-            "info": "Temps de réponse moyen (en ms) pendant la plage de dates donnée. Il comprend le back-office et le moteur."
+            "text": "Moyenne des temps de réponse (en ms)",
+            "info": "Temps de réponse moyen (en ms). Il comprend le back-office et le moteur."
         },
         "avgResponseTime": {
-            "text": "Moyenne temps de réponse",
-            "info": "Temps de réponse moyen (en ms) pendant la plage de dates donnée. Il comprend le back-office et le moteur"
+            "text": "Moyenne des temps de réponse",
+            "info": "Temps de réponse moyen (en ms). Il comprend le back-office et le moteur"
         },
         "responseTimeTimeLine": {
-            "text": "Temps de réponse",
-            "info": "Temps de réponse (en ms) pendant la plage de dates donnée. Il comprend le back-office et le moteur"
+            "text": "Temps de réponse (en ms)",
+            "info": "Temps de réponse (en ms). Il comprend le back-office et le moteur"
         },
         "avgSessionDurationTimeLine": {
-            "text": "Durée moyenne de la session",
-            "info": "Durée moyenne de la session (en ms) pendant la plage de dates donnée"
+            "text": "Durée moyenne de la session (en ms)",
+            "info": "Durée moyenne de la session (en ms)"
         },
         "avgMRRTimeLine": {
             "text": "Rang réciproque moyen (MRR)",
-            "info": "Rang réciproque moyen pendant la plage de dates donnée. Le MMR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus il est mieux. 1 est lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée"
+            "info": "Rang réciproque moyen pendant. Le MMR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus les résultats sont pertinents. La valeur 1 est obtenue lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée"
         },
         "avgMRR": {
             "text": "Moyenne MRR",
-            "info": "Rang réciproque moyen pendant la plage de dates donnée. Le MMR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus il est mieux. 1 est lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée"
+            "info": "Rang réciproque moyen pendant. Le MMR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus les résultats sont pertinents. La valeur 1 est obtenue lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée"
         },
         "clickRank1TotalTimeLine": {
             "text": "Clics sur le premier document",
-            "info": "Nombre de recherches où l’utilisateur clique sur le premier document pendant la plage de dates donnée"
+            "info": "Nombre de recherches où l'utilisateur clique sur le premier document"
         },
         "clickRank1TotalRate": {
             "text": "Clics sur le premier document",
-            "info": "Nombre de recherches où l’utilisateur clique sur le premier document pendant la plage de dates donnée"
+            "info": "Nombre de recherches où l'utilisateur clique sur le premier document"
         },
         "clickRank3TimeLine": {
             "text": "Clics sur les 3 premiers documents",
-            "info": "Nombre de recherches pour lesquelles l’utilisateur clique sur les 3 premiers documents pendant la plage de dates donnée"
+            "info": "Nombre de recherches pour lesquelles l'utilisateur clique sur l'un des 3 premiers documents"
         },
         "clickRank3": {
             "text": "Clics sur les 3 premiers documents",
-            "info": "Nombre de recherches pour lesquelles l’utilisateur clique sur les 3 premiers documents pendant la plage de dates donnée"
+            "info": "Nombre de recherches pour lesquelles l'utilisateur clique sur l'un des 3 premiers documents"
         },
         "clickTotalTimeLine": {
-            "text": "Total clics",
-            "info": "Nombre de clics pendant une recherche de la plage de dates donnée"
+            "text": "Total des documents cliqués",
+            "info": "Nombre de clics de documents pendant une recherche"
         },
         "newUsersTimeLine": {
             "text": "Nouveaux utilisateurs",
-            "info": "Utilisateurs qui se sont connectés pour la première fois pendant la plage de dates donnée"
+            "info": "Utilisateurs qui se sont connectés pour la première fois"
         },
         "newUsers": {
             "text": "Nouveaux utilisateurs",
-            "info": "Utilisateurs qui se sont connectés pour la première fois pendant la plage de dates donnée"
+            "info": "Utilisateurs qui se sont connectés pour la première fois"
         },
         "queryBounceTimeLine": {
             "text": "Rebond",
-            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire sans contenu (basé sur le temps de séjour)"
+            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire son contenu (basé sur le dwell time)"
         },
         "queryBounce": {
             "text": "Rebond",
-            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire sans contenu (basé sur le temps de séjour)"
+            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire son contenu (basé sur le dwell time)"
         },
         "queryBounceRate": {
             "text": "Taux de rebond",
@@ -170,87 +170,87 @@
         },
         "queryClickTimeLine": {
             "text": "Requêtes de recherche avec clics",
-            "info": "Nombre de requêtes de recherche où l’utilisateur a cliqué sur un document au moins une fois"
+            "info": "Nombre de requêtes de recherche où l'utilisateur a cliqué sur un document au moins une fois"
         },
         "queryClick": {
             "text": "Requêtes de recherche avec clics",
-            "info": "Nombre de requêtes de recherche où l’utilisateur a cliqué sur un document au moins une fois"
+            "info": "Nombre de requêtes de recherche où l'utilisateur a cliqué sur un document au moins une fois"
         },
         "queryClickRate": {
             "text": "Taux de requêtes de recherche avec clics",
-            "info": "Nombre de requêtes de recherche où l’utilisateur a cliqué sur un document au moins une fois par rapport au nombre total de recherches"
+            "info": "Nombre de requêtes de recherche où l'utilisateur a cliqué sur un document au moins une fois par rapport au nombre total de recherches"
         },
         "queryRefineTimeLine": {
             "text": "Affinement",
-            "info": "Nombre de requêtes de recherche où l’utilisateur devrait faire un affinement (comme l’utilisation de facettes)"
+            "info": "Nombre de requêtes de recherche où l'utilisateur a fait un affinement (comme l'utilisation de facettes)"
         },
         "queryRefine": {
             "text": "Affinement",
-            "info": "Nombre de requêtes de recherche où l’utilisateur devrait faire un affinement (comme l’utilisation de facettes)"
+            "info": "Nombre de requêtes de recherche où l'utilisateur a fait un affinement (comme l'utilisation de facettes)"
         },
         "queryRefineRate": {
             "text": "Taux d'affinement",
-            "info": "Nombre de requêtes de recherche pour lesquelles l’utilisateur devrait faire un affinement par rapport au nombre total de recherches"
+            "info": "Nombre de requêtes de recherche pour lesquelles l'utilisateur a fait un affinement par rapport au nombre total de recherches"
         },
         "queryZeroTimeLine": {
             "text": "Recherches sans résultats",
-            "info": "Nombre de requêtes de recherche sans résultats appariés"
+            "info": "Nombre de requêtes de recherche sans résultats"
         },
         "queryZero": {
             "text": "Recherches sans résultats",
-            "info": "Nombre de requêtes de recherche sans résultats appariés"
+            "info": "Nombre de requêtes de recherche sans résultats"
         },
         "queryZeroRate": {
             "text": "Taux de recherches sans résultats",
-            "info": "Nombre de requêtes de recherche sans résultats appariés par rapport au nombre total de recherches"
+            "info": "Nombre de requêtes de recherche sans résultats par rapport au nombre total de recherches"
         },
         "regularUsersTimeLine": {
             "text": "Utilisateurs réguliers",
-            "info": "Nombre d’utilisateurs pour qui ce n’est pas la première utilisation"
+            "info": "Nombre d'utilisateurs pour qui ce n'est pas la première utilisation"
         },
         "regularUsers": {
             "text": "Utilisateurs réguliers",
-            "info": "Nombre d’utilisateurs pour qui ce n’est pas la première utilisation"
+            "info": "Nombre d'utilisateurs pour qui ce n'est pas la première utilisation"
         },
         "adoptionRate": {
             "text": "Taux d'adoption",
-            "info": "Nombre de nouveaux utilisateurs par rapport au nombre total d’utilisateurs potentiels"
+            "info": "Nombre de nouveaux utilisateurs par rapport au nombre total d'utilisateurs potentiels"
         },
         "regularUsersRate": {
-            "text": "Taux d’utilisation régulière",
-            "info": "Nombre d’utilisateurs par rapport au nombre total d’utilisateurs potentiels"
+            "text": "Taux d'utilisateurs réguliers",
+            "info": "Nombre d'utilisateurs réguliers par rapport au nombre total d'utilisateurs potentiels"
         },
         "regular_newUsers": {
             "text": "Utilisateurs réguliers/nouveaux",
-            "info": "Nombre d’utilisateurs réguliers par rapport au nombre total de nouveaux utilisateurs"
+            "info": "Nombre d'utilisateurs réguliers par rapport au nombre total de nouveaux utilisateurs"
         },
         "searchExitTimeLine": {
             "text": "Recherches quittées",
-            "info": "Nombre de recherches où l’utilisateur ne fait rien après avoir affiché une page de résultats"
+            "info": "Nombre de recherches où l'utilisateur ne fait rien après avoir affiché une page de résultats"
         },
         "searchExit": {
             "text": "Recherches quittées",
-            "info": "Nombre de recherches où l’utilisateur ne fait rien après avoir affiché une page de résultats"
+            "info": "Nombre de recherches où l'utilisateur ne fait rien après avoir affiché une page de résultats"
         },
         "searchExitRate": {
             "text": "Taux de recherches quittées",
-            "info": "Nombre de recherches pour lesquelles l’utilisateur ne fait rien après avoir affiché une page de résultats par rapport au nombre total de recherches"
+            "info": "Nombre de recherches pour lesquelles l'utilisateur ne fait rien après avoir affiché une page de résultats par rapport au nombre total de recherches"
         },
         "queryByResult": {
             "text": "Types de résultats de recherche",
             "info": "Types de résultats de recherche"
         },
         "topQueries": {
-            "text": "Principales requêtes",
+            "text": "Requêtes les plus fréquentes",
             "info": "Requêtes de recheche les plus fréquemment posées"
         },
         "topNoResultQueries": {
-            "text": "Principales requêtes sans résultats",
+            "text": "Requêtes les plus fréquentes sans résultats",
             "info": "Requêtes de recheche sans résultats les plus fréquemment posées"
         },
         "topSources": {
             "text": "Principales sources",
-            "info": "Sources de la plupart des documents cliqués"
+            "info": "Sources des documents cliqués les plus cliqués"
         },
         "topFacets": {
             "text": "Filtres les plus utilisés",
@@ -265,20 +265,20 @@
             "info": "Nombre de requêtes de recherche"
         },
         "sessionsByUser": {
-            "text": "Moyenne sessions par utilisateur",
+            "text": "Moyenne des sessions par utilisateur",
             "info": "Nombre moyen de sessions par utilisateur"
         },
         "avgQueriesBySession": {
-            "text": "Moyenne recherches par session",
+            "text": "Moyenne des recherches par session",
             "info": "Nombre moyen de recherches par session"
         },
         "avgClicksByQuery": {
-            "text": "Moyenne clics par recherche",
-            "info": "Nombre moyen de documents cliqués par recherche"
+            "text": "Moyenne des documents cliqués par recherche",
+            "info": "Nombre moyen des documents cliqués par recherche"
         },
         "docViewsBySession": {
-            "text": "Moyenne documents consultés par recherche",
-            "info": "Nombre moyen de documents consultés (Document Navigator) par recherche"
+            "text": "Moyenne des documents consultés par recherche",
+            "info": "Nombre moyen des documents consultés (Document Navigator) par recherche"
         },
         "avgSessionDuration": {
             "text": "Durée moyenne de session",
@@ -307,7 +307,7 @@
             "label": "Utiliser la période précédente de même durée",
             "tooltip": "Par exemple, si \"Derniers 6 mois\" est sélectionné ci-dessus, les tendances seront automatiquement calculées par rapport à la période précédente de 6 mois",
             "customPeriod": "Période personnalisée",
-            "customPeriodTooltip": "Cette période est utilisée comme base de référence pour mesurer l’évolution des métriques affichées dans le tableau de bord"
+            "customPeriodTooltip": "Cette période est utilisée comme base de référence pour mesurer l'évolution des métriques affichées dans le tableau de bord"
         },
         "last3H": "3 dernières heures",
         "last6H": "6 dernières heures",

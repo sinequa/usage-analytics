@@ -73,11 +73,11 @@
     "widgets": {
         "queryTotalTimeLine": {
             "text": "Search Queries",
-            "info": "Number of search queries for the given date range"
+            "info": "Number of search queries"
         },
         "userTotalTimeLine": {
             "text": "Users",
-            "info": "Number of users for the given date range"
+            "info": "Number of users"
         },
         "userCountTotal": {
             "text": "Users",
@@ -85,83 +85,83 @@
         },
         "sessionTotalTimeLine": {
             "text": "Sessions",
-            "info": "Number of sessions for the given date range"
+            "info": "Number of sessions"
         },
         "avgClicksByQueryTimeLine": {
-            "text": "Average Click By Search Query",
+            "text": "Average Document Clicks By Search Query",
             "info": "Average number of click for a search query"
         },
         "avgEngineResponseTimeTimeLine": {
-            "text": "Average Engine Response",
-            "info": "Average Engine response time (in ms) for the given date range"
+            "text": "Average Engine Response (in ms)",
+            "info": "Average Engine response time (in ms)"
         },
         "avgEngineResponseTime": {
             "text": "Average Engine Response Time",
-            "info": "Average Engine response time (in ms) for the given date range"
+            "info": "Average Engine response time (in ms)"
         },
         "avgQueriesBySessionTimeLine": {
-            "text": "Average Search By Session",
-            "info": "Average number of search queries per session for the given date range"
+            "text": "Average Search By Session (in ms)",
+            "info": "Average number of search queries per session"
         },
         "avgResponseTimeTimeLine": {
-            "text": "Average Response Time",
-            "info": "Average response time (in ms) for the given date range. It includes backend and engine."
+            "text": "Average Response Time (in ms)",
+            "info": "Average response time (in ms). It includes backend and engine."
         },
         "avgResponseTime": {
             "text": "Average Response Time",
-            "info": "Average response time (in ms) for the given date range. It includes backend and engine."
+            "info": "Average response time (in ms). It includes backend and engine."
         },
         "responseTimeTimeLine": {
-            "text": "Response Time",
-            "info": "Response time (in ms) for the given date range. It includes backend and engine."
+            "text": "Response Time (in ms)",
+            "info": "Response time (in ms). It includes backend and engine."
         },
         "avgSessionDurationTimeLine": {
-            "text": "Average Session Duration",
-            "info": "Average session duration (in ms) for the given date range."
+            "text": "Average Session Duration (in ms)",
+            "info": "Average session duration (in ms)."
         },
         "avgMRRTimeLine": {
             "text": "Mean reciprocal rank (MRR)",
-            "info": "Mean reciprocal rank for the given date range. MMR is an average on result rank clicked. The More it is closed to 1, the more it is. 1 is when the rank #1 (first result) is clicked for a given query."
+            "info": "Mean reciprocal rank. MMR is an average on result rank clicked. The More it is closed to 1, the more results are relevant. The 1 value is obtained when the rank #1 (first result) is clicked for a given query."
         },
         "avgMRR": {
             "text": "Average MRR",
-            "info": "Mean reciprocal rank for the given date range. MMR is an average on result rank clicked. The More it is closed to 1, the more it is. 1 is when the rank #1 (first result) is clicked for a given query."
+            "info": "Mean reciprocal rank. MMR is an average on result rank clicked. The More it is closed to 1, the more results are relevant. The 1 value is obtained when the rank #1 (first result) is clicked for a given query."
         },
         "clickRank1TotalTimeLine": {
-            "text": "First Click",
-            "info": "Number of search where the user clicks on the first document for the given date range."
+            "text": "First Document Clicked",
+            "info": "Number of search where the user clicks on the first document."
         },
         "clickRank1TotalRate": {
-            "text": "First Click",
+            "text": "First Document Clicked",
             "info": "Number of search where the user clicks on the first document compared to the total number of search."
         },
         "clickRank3TimeLine": {
             "text": "Click On First 3 Documents",
-            "info": "Number of search where the user clicks on the first 3 documents for the given date range."
+            "info": "Number of search where the user clicks on the first 3 documents."
         },
         "clickRank3": {
             "text": "Click On First 3 Documents",
-            "info": "Number of search where the user clicks on the first 3 documents for the given date range."
+            "info": "Number of search where the user clicks on the first 3 documents."
         },
         "clickTotalTimeLine": {
-            "text": "Click Total",
-            "info": "Number of click for a search for the given date range."
+            "text": "Document Clicked Total",
+            "info": "Number of documents clicked for a search."
         },
         "newUsersTimeLine": {
             "text": "New Users",
-            "info": "Users that have logged-in for the first time on the given date range"
+            "info": "Users that have logged-in for the first time"
         },
         "newUsers": {
             "text": "New Users",
-            "info": "Users that have logged-in for the first time on the given date range"
+            "info": "Users that have logged-in for the first time"
         },
         "queryBounceTimeLine": {
             "text": "Bounce",
-            "info": "Number of Bounce for a search query. A bounce is when an user clicks on a document but do not read the content (based on the dwell time)"
+            "info": "Number of Bounce for a search query. A bounce is when an user clicks on a document but does not read the content (based on the dwell time)"
         },
         "queryBounce": {
             "text": "Bounce",
-            "info": "Number of Bounce for a search query. A bounce is when an user clicks on a document but do not read the content (based on the dwell time)"
+            "info": "Number of Bounce for a search query. A bounce is when an user clicks on a document but does not read the content (based on the dwell time)"
         },
         "queryBounceRate": {
             "text": "Bounce Rate",
@@ -169,15 +169,15 @@
         },
         "queryClickTimeLine": {
             "text": "Search Query With Clicks",
-            "info": "Number of search queries where the user has click on a document at least one time."
+            "info": "Number of search queries where the user has clicked on a document at least one time."
         },
         "queryClick": {
             "text": "Search With Clicks",
-            "info": "Number of search queries where the user has click on a document at least one time."
+            "info": "Number of search queries where the user has clicked on a document at least one time."
         },
         "queryClickRate": {
             "text": "Search With Clicks Rate",
-            "info": "Number of search queries where the user has click on a document at least one time compared to the total number of search"
+            "info": "Number of search queries where the user has clicked on a document at least one time compared to the total number of search"
         },
         "queryRefineTimeLine": {
             "text": "Refinement",
