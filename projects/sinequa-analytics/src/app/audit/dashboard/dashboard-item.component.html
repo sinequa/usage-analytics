@@ -8,14 +8,23 @@
     [ngSwitch]="config.type">
 
     <!-- Timeline view-->
-    <sq-timeline *ngSwitchCase="'timeline'"
-        [data]="timeSeries"
-        [width]="innerwidth"
-        [height]="innerheight"
-        [showTooltip]="true"
-        (rangeChange)="updateAuditRange($event)"
-        (selectionChange)="updateAuditRange($event)">
-    </sq-timeline>
+    <section *ngSwitchCase="'timeline'">
+        <sq-timeline
+            [data]="timeSeries"
+            [width]="innerwidth"
+            [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
+            [showTooltip]="true"
+            (rangeChange)="updateAuditRange($event)"
+            (selectionChange)="updateAuditRange($event)">
+        </sq-timeline>
+        <sq-timeline-legend
+            *ngIf="timeSeries?.length > 1"
+            [data]="timeSeries"
+            [yOffset]="8"
+            [legendStyles]="{'justify-content': 'center'}">
+        </sq-timeline-legend>
+    </section>
+
 
     <!-- Statistic view -->
     <sq-audit-stat *ngSwitchCase="'stat'"
