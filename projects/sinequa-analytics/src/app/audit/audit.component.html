@@ -10,9 +10,6 @@
         >
         <sq-facet-multi #facet class="card position-absolute" [results]="(auditService.data$ | async)?.applications" [facets]="facets" [showProgressBar]="false" ></sq-facet-multi>
     </sq-facet-card>
-    
-    <button type="button" class="btn btn-primary" sqTooltip="{{ 'msg#export.button.tooltip' | sqMessage }}" (click)="exportCSV()">{{ 'msg#export.button.title' | sqMessage }}</button>
-
 </div>
 
 <!-- Dashboard tabs -->
@@ -48,7 +45,10 @@
         <button [sqIcon]="'fas fa-plus-circle'" [sqTooltip]="'msg#dashboard.newTitle' | sqMessage" class="btn btn-link btn-xs py-0 ml-1" (click)="newDashboard()"></button>
     </li>
     <div class="btn-group dashboard-actions" [sq-action-buttons]="{items: dashboardActions, style: 'link', rightAligned: true}"></div>
-    <sq-widget-panorama class="ml-auto"></sq-widget-panorama>
+    <button type="button" class="btn btn-outline-primary ml-auto export-btn" (click)="exportCSV()" [sqTooltip]="'msg#export.button.title' | sqMessage">
+        <i class="fas fa-file-export"></i>
+    </button>
+    <sq-widget-panorama class="ml-2"></sq-widget-panorama>
 </ul>
 
 <div class="flex-grow-1" style="overflow-y: auto">

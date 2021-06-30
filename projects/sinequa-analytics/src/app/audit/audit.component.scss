@@ -40,11 +40,11 @@ $facet-width: 260px;
 
 .audit-filters {
     gap: 1rem;
-    
+
     sq-facet-card {
         min-width: $facet-width;
     }
-    
+
     sq-facet-multi {
         z-index: 100;
         width: $facet-width;
@@ -88,4 +88,9 @@ gridster-item.gridster-item-resizing {
 .new-dashboard:hover {
     cursor: pointer;
     opacity: 0.7;
+}
+
+.export-btn {
+    height: 38px;
+    width: 42px;
 }
