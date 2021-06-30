@@ -1,0 +1,17 @@
+pipeline {
+    agent { label 'Sun' }
+	options { disableConcurrentBuilds() }
+	stages {
+		stage('NPM Install') {
+			steps {
+				bat "npm ci"	
+			}
+		}
+		stage('Build') {
+			steps {
+				bat "npm run build --if-present"
+			}
+		}
+	}
+}
+

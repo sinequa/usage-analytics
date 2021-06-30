@@ -63,10 +63,13 @@ export class AuditComponent implements OnDestroy {
 
     }
 
+    /**
+     * Export current dashboard data as csv files
+     */
     exportCSV() {
-        // exports
         const items = this.dashboardItems.map(item => item);
-        this.exportService.export(this.dashboardService.dashboard.name, items);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
+        this.exportService.export(name, items);
     }
 
     /**

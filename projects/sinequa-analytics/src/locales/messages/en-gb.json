@@ -67,7 +67,8 @@
         "fullScreenTitle": "Full screen",
         "exitFullScreenTitle": "Exit full screen",
         "maximizeTitle": "Maximize",
-        "minimizeTitle": "Reduce"
+        "minimizeTitle": "Reduce",
+        "noDataToDisplay": "No data to display"
     },
 
     "widgets": {

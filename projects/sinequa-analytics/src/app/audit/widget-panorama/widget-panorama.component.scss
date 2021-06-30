@@ -6,6 +6,11 @@
     overflow-y: auto;
     right: 1%;
 
+    &-btn {
+        height: 38px;
+        width: 42px;
+    }
+
     button {
         min-height: 100px;
         min-width: 100px;
@@ -17,7 +22,7 @@
         & i {
             font-size: x-large;
         }
-        
+
         .button-text {
             padding: .5rem;
             font-size: .6rem;
