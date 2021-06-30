@@ -718,7 +718,7 @@ export class DashboardService {
         return this.prefs.get("dashboard-layout") || "manual";
     }
 
-    private formatMessage(message: string) : string {
+    formatMessage(message: string) : string {
         return this.intlService.formatMessage(message);
     }
 }

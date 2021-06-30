@@ -93,7 +93,7 @@ export class SesameLocalesConfig implements LocalesConfig {
         this.locales = [
             { name: "en", display: "msg#locale.en", data: enLocale},
             { name: "fr", display: "msg#locale.fr", data: frLocale},
-            { name: "de", display: "msg#locale.de", data: deLocale},
+            // { name: "de", display: "msg#locale.de", data: deLocale},
         ];
         this.defaultLocale = this.locales[0];
     }
