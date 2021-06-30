@@ -1,6 +1,8 @@
-import {Injectable} from '@angular/core';
+import {ElementRef, Injectable} from '@angular/core';
 import {IntlService} from '@sinequa/core/intl';
 import {NotificationsService} from '@sinequa/core/notification';
+import domtoimage from "dom-to-image";
+import { saveAs } from "file-saver";
 
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
 import {StatProvider} from './dashboard/providers/stat.provider';
@@ -9,12 +11,58 @@ import {StatProvider} from './dashboard/providers/stat.provider';
   providedIn: 'root',
 })
 export class ExportService {
+  
+  /**
+   * returns a stringy date to append to the extract's filename
+   */
+  get date(): string {
+    return this.translate.formatDate(Date.now());
+  }
+  
   constructor(
     private statProvider: StatProvider,
     private translate: IntlService,
     private notificationService: NotificationsService
     ) { }
   
+  /**
+   * Create an .png image from a specific HTML element and save it
+   * 
+   * @param filename name of the file
+   * @param element HTML ElementRef used to create the image. All elements included in
+   * are converted into the image.
+   */
+  exportToPNG(filename: string, element: ElementRef) {
+        // to export all the widget, including those outside the viewport,
+        // we need to know the real gridster's height.
+        // we use a <div> tag inside <gridster> component to export it's content.
+        // we can't use <gridster> component because it's not a real HTML Element.
+        
+        // this is the gridster's height
+        const height = element.nativeElement.offsetParent.scrollHeight;
+
+        // now, as we know the height, set it to our #content div.
+        element.nativeElement.style.height = `${height}px`;
+        
+        // lib used to create image from specific HTML element
+        domtoimage.toBlob(element.nativeElement).then(blob => {
+            saveAs(blob,  `${filename}_${this.date}.png`);
+            // do not forget to remove our previous height to allow gridster to adjust automatically his height
+            element.nativeElement.style = undefined;
+            
+            // notify user
+            const title = this.translate.formatMessage("msg#export.title");
+            const msg = this.translate.formatMessage("msg#export.success", {filename});
+            this.notificationService.success(msg,undefined, title);        
+          } );
+  }
+  
+  /**
+   * Export all widgets of a specific dashboard to a .csv file
+   * 
+   * @param filename name of the file
+   * @param items Array of Dashboard Item
+   */
   export(filename:string, items: DashboardItemComponent[]) {
     // export stats in one file
     this.extractStats(filename, items);
@@ -85,6 +133,13 @@ export class ExportService {
     return ({title})
   }
   
+  
+  /**
+   * Create a list of rows for each stat widgets and save the results in a .csv file
+   * 
+   * @param filename name of the file
+   * @param items array of dashboard items
+   */
   private extractStats(filename: string, items: DashboardItemComponent[]) {
     const stats = items.filter(item => item.config.type === "stat");
     if(stats.length === 0) return;
@@ -93,9 +148,15 @@ export class ExportService {
       acc.push(this.extractStatRow(item));
       return acc;
     }, <any>[])
-    this.exportToCsv(`${filename}.csv`, results);
+    this.exportToCsv(`${filename}_${this.date}.csv`, results);
   }
   
+  /**
+   * save each charts data in is own .csv file.
+   * 
+   * @param filename name of the file
+   * @param items array of dashboard items
+   */
   private extractCharts(filename: string, items: DashboardItemComponent[]) {
     const charts = items.filter(item => item.config.type === "chart").map(item => {
       const title = this.translate.formatMessage(item.config.title);
@@ -107,11 +168,18 @@ export class ExportService {
     // [{value, count }]
     charts.forEach(chart => {
       const results = chart.data?.map(item => item);
-      this.exportToCsv(`${filename}_${chart.title}.csv`, results!);
+      this.exportToCsv(`${filename}_${chart.title}_${this.date}.csv`, results!);
     })
 
   }
   
+  /**
+   * Extract for each timeline all series used. Each serie's values are in it's specific column.
+   * The result is save in a .csv file.
+   * 
+   * @param filename name of the file
+   * @param items array of dashboard items
+   */
   private extractTimelines(filename: string, items: DashboardItemComponent[]) {
     // timelines components extractions
     // a timeserie could contains one or more series
@@ -147,7 +215,7 @@ export class ExportService {
       // [ [K, V], [K1, V1] ... ]
       // we only need each V
       const results = Array.from(resultsMap.entries()).map(it => it[1]);
-      this.exportToCsv(`${filename}_${series.title}.csv`, results);
+      this.exportToCsv(`${filename}_${series.title}_${this.date}.csv`, results);
     })
   }
 }

@@ -324,8 +324,10 @@
 
     "export": {
         "button": {
-            "title": "Export CSV",
-            "tooltip": "Exporter le dashboard dans des fichiers .csv"
+            "title": "Export",
+            "tooltipCSV": "Exporter le dashboard dans des fichiers .csv",
+            "exportCSV": "Exporter en CSV",
+            "exportPNG": "Exporter au format image PNG"
         },
         "title": "Export CSV",
         "nothing": "{filename}, pas de données à exporter!",

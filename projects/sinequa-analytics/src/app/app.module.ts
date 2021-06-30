@@ -115,7 +115,7 @@ const selectionOptions: SelectionOptions = {
 
         WebServicesModule.forRoot(startConfig),
         IntlModule.forRoot(SesameLocalesConfig),
-        LoginModule.forRoot(),
+        LoginModule,
         ModalModule,
         BsSearchModule.forRoot(searchOptions),
         BsNotificationModule,
