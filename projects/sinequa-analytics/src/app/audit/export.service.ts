@@ -11,6 +11,14 @@ import {StatProvider} from './dashboard/providers/stat.provider';
   providedIn: 'root',
 })
 export class ExportService {
+  
+  /**
+   * returns a stringy date to append to the extract's filename
+   */
+  get date(): string {
+    return this.translate.formatDate(Date.now());
+  }
+  
   constructor(
     private statProvider: StatProvider,
     private translate: IntlService,
@@ -38,10 +46,15 @@ export class ExportService {
         
         // lib used to create image from specific HTML element
         domtoimage.toBlob(element.nativeElement).then(blob => {
-            saveAs(blob,  `${filename}.png`);
+            saveAs(blob,  `${filename}_${this.date}.png`);
             // do not forget to remove our previous height to allow gridster to adjust automatically his height
             element.nativeElement.style = undefined;
-        } );
+            
+            // notify user
+            const title = this.translate.formatMessage("msg#export.title");
+            const msg = this.translate.formatMessage("msg#export.success", {filename});
+            this.notificationService.success(msg,undefined, title);        
+          } );
   }
   
   /**
@@ -135,7 +148,7 @@ export class ExportService {
       acc.push(this.extractStatRow(item));
       return acc;
     }, <any>[])
-    this.exportToCsv(`${filename}.csv`, results);
+    this.exportToCsv(`${filename}_${this.date}.csv`, results);
   }
   
   /**
@@ -155,7 +168,7 @@ export class ExportService {
     // [{value, count }]
     charts.forEach(chart => {
       const results = chart.data?.map(item => item);
-      this.exportToCsv(`${filename}_${chart.title}.csv`, results!);
+      this.exportToCsv(`${filename}_${chart.title}_${this.date}.csv`, results!);
     })
 
   }
@@ -202,7 +215,7 @@ export class ExportService {
       // [ [K, V], [K1, V1] ... ]
       // we only need each V
       const results = Array.from(resultsMap.entries()).map(it => it[1]);
-      this.exportToCsv(`${filename}_${series.title}.csv`, results);
+      this.exportToCsv(`${filename}_${series.title}_${this.date}.csv`, results);
     })
   }
 }

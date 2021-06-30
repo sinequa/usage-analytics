@@ -90,7 +90,8 @@ export class AuditComponent implements OnDestroy {
     }
 
     makePNG() {
-        this.exportService.exportToPNG(this.dashboardService.dashboard.name, this.content);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
+        this.exportService.exportToPNG(name, this.content);
     }
     
     exportCSV() {
