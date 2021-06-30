@@ -48,7 +48,7 @@ import { environment } from "../environments/environment";
 import {LocalesConfig, Locale} from "@sinequa/core/intl";
 import enLocale from "../locales/en";
 import frLocale from "../locales/fr";
-import deLocale from "../locales/de";
+// import deLocale from "../locales/de";
 
 // Initialization of @sinequa/core
 // export const startConfig: StartConfig = {
