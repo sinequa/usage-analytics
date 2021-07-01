@@ -235,9 +235,9 @@
             "text": "Search Exit Rate",
             "info": "Number of search where the user does nothing after displaying a results page compared to the total number of search"
         },
-        "queryByResult": {
-            "text": "Result Types",
-            "info": "Types of search results"
+        "queryByResult": { 
+            "text": "Last Action",
+            "info": "Last action after a search:\n - 'search.exit.logout': Do a search, do not click on a document, logout.\n - 'search.exit.timeout': Do a search, do not click on a document, leave the page.\n - 'search.with.click': Do one or several searches, click on a document as a last action.\n - 'search.with.no.click':  Do one or several searches, do not click on a document as a last action."
         },
         "topQueries": {
             "text": "Top Queries",
