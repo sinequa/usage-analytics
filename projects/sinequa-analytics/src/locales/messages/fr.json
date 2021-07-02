@@ -237,8 +237,8 @@
             "info": "Nombre de recherches pour lesquelles l'utilisateur ne fait rien après avoir affiché une page de résultats par rapport au nombre total de recherches"
         },
         "queryByResult": {
-            "text": "Types de résultats de recherche",
-            "info": "Types de résultats de recherche"
+            "text": "Dernière Action",
+            "info": "Dernière action après une recherche:\n - 'search.exit.logout': Effectue une recherche, ne clique sur aucun document, déconnexion.\n - 'search.exit.timeout': Effectue une recherche, ne clique sur aucun document, quitte la page.\n - 'search.with.click': Effectue une ou plusieurs recherches, clique sur une document comme dernière action.\n - 'search.with.no.click':  Effectue une ou plusieurs recherches, ne clique sur aucun document comme dernière action."
         },
         "topQueries": {
             "text": "Requêtes les plus fréquentes",
