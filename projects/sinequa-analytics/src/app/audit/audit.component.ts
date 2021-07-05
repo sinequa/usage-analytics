@@ -68,15 +68,19 @@ export class AuditComponent implements OnDestroy {
         this.exportAction = new Action({
             icon: "fas fa-file-export",
             name: "exportAsCSV",
-            action: () => this.exportCSV(),
+            action: () => this.exportSheets(),
             children: [
+                new Action({
+                    title: "msg#export.button.exportXLS",
+                    text: "msg#export.button.exportXLS",
+                    name: "exportAsXLS",
+                    action: () => this.exportSheets()
+                }),
                 new Action({
                     title: "msg#export.button.exportPNG",
                     text: "msg#export.button.exportPNG",
                     name: "exportAsPNG",
-                    action: () => {
-                        this.makePNG();
-                    }
+                    action: () => this.exportPNG()
                 }),
                 new Action({
                     title: "msg#export.button.tooltipCSV",
@@ -89,7 +93,7 @@ export class AuditComponent implements OnDestroy {
 
     }
 
-    makePNG() {
+    exportPNG() {
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToPNG(name, this.content);
     }
@@ -97,7 +101,13 @@ export class AuditComponent implements OnDestroy {
     exportCSV() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
-        this.exportService.export(name, items);
+        this.exportService.exportToCsv(name, items);
+    }
+    
+    exportSheets() {
+        const items = this.dashboardItems.map(item => item);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
+        this.exportService.exportToSheets(name, items);
     }
 
     /**

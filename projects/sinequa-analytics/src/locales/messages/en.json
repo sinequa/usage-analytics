@@ -1,6 +1,6 @@
 {
     "app": {
-        "name": "Sinequa Analytics"
+        "name": "Usage Analytics"
     },
 
     "locale": {
@@ -192,15 +192,15 @@
             "info": "Number of search queries where the user has to do a refinement compared to the total number of search"
         },
         "queryZeroTimeLine": {
-            "text": "Zero Search",
+            "text": "Zero Result Search",
             "info": "Number of search queries with no matched results"
         },
         "queryZero": {
-            "text": "Zero Search",
+            "text": "Zero Result Search",
             "info": "Number of search queries with no matched results"
         },
         "queryZeroRate": {
-            "text": "Zero Search Rate",
+            "text": "Zero Result Search Rate",
             "info": "Number of search queries with no matched results compared to the total number of search"
         },
         "regularUsersTimeLine": {
@@ -326,9 +326,10 @@
             "title": "Export",
             "tooltipCSV": "Export current dashboard to .csv files",
             "exportCSV": "Export as CSV",
-            "exportPNG": "Export as PNG image"
+            "exportPNG": "Export as PNG image",
+            "exportXLS": "Export as Excel"
         },
-        "title": "Export CSV",
+        "title": "Export",
         "nothing": "{filename}, nothing to export!",
         "success": "Export {filename} successfully"
     }
