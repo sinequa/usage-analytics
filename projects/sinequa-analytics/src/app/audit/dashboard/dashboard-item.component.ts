@@ -156,10 +156,14 @@ export class DashboardItemComponent implements OnChanges {
                 case "timeline":
                     this.timeSeries = [];
                     if (this.config.aggregationsTimeSeries) {
-                        this.timeSeries.push(...this.timelineProvider.getAggregationsTimeSeries(this.dataset[this.config.query], this.config.aggregationsTimeSeries));
+                        this.timeSeries.push(
+                            ...this.timelineProvider.getAggregationsTimeSeries(this.dataset[this.config.query], this.config.aggregationsTimeSeries, this.auditService.mask)
+                        );
                     }
                     if (this.config.recordsTimeSeries) {
-                        this.timeSeries.push(...this.timelineProvider.getRecordsTimeSeries(this.dataset[this.config.query], this.config.recordsTimeSeries));
+                        this.timeSeries.push(
+                            ...this.timelineProvider.getRecordsTimeSeries(this.dataset[this.config.query], this.config.recordsTimeSeries)
+                        );
                     }
                     break;
                 case "chart":
