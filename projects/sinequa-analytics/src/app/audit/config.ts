@@ -78,8 +78,8 @@ export const SESSION_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
     icon: "fas fa-chart-line",
     info: "msg#widgets.sessionTotalTimeLine.info",
     unique: true,
-    x: 5,
-    y: 0,
+    x: 0,
+    y: 8,
     parameters: {
         aggregationsTimeSeries: {
             name: "SessionTotal",
@@ -413,7 +413,7 @@ export const TOP_SOURCES: DashboardItemOption = {
     info: "msg#widgets.topSources.info",
     unique: true,
     x: 5,
-    y: 4,
+    y: 0,
     parameters: {
         chartData: {
             aggregation: "source"
@@ -430,7 +430,7 @@ export const TOP_FACETS: DashboardItemOption = {
     info: "msg#widgets.topFacets.info",
     unique: true,
     x: 5,
-    y: 8,
+    y: 4,
     parameters: {
         chartData: {
             aggregation: "box"
@@ -447,7 +447,7 @@ export const USER_COUNT_TOTAL: DashboardItemOption = {
     info: "msg#widgets.userCountTotal.info",
     unique: true,
     x: 3,
-    y: 2,
+    y: 6,
     parameters: {
         statLayout: 'standard',
         valueLocation: "totalrecordcount",
@@ -478,8 +478,8 @@ export const QUERY_COUNT_TOTAL: DashboardItemOption = {
     text: "msg#widgets.queryTotal.text",
     info: "msg#widgets.queryTotal.info",
     unique: true,
-    x: 3,
-    y: 4,
+    x: 4,
+    y: 6,
     parameters: {
         statLayout: 'standard',
         valueLocation: "records",
@@ -494,8 +494,8 @@ export const SESSIONS_BY_USER: DashboardItemOption = {
     text: "msg#widgets.sessionsByUser.text",
     info: "msg#widgets.sessionsByUser.info",
     unique: true,
-    x: 6,
-    y: 4,
+    x: 4,
+    y: 8,
     parameters: {
         statLayout: 'standard',
         valueLocation: "aggregations",
@@ -511,8 +511,8 @@ export const SEARCH_BY_SESSION: DashboardItemOption = {
     text: "msg#widgets.avgQueriesBySession.text",
     info: "msg#widgets.avgQueriesBySession.info",
     unique: true,
-    x: 7,
-    y: 4,
+    x: 6,
+    y: 8,
     parameters: {
         statLayout: 'standard',
         valueLocation: "records",
@@ -527,6 +527,8 @@ export const CLICK_BY_SEARCH: DashboardItemOption = {
     text: "msg#widgets.avgClicksByQuery.text",
     info: "msg#widgets.avgClicksByQuery.info",
     unique: true,
+    "x" : 4,
+    "y" : 4,
     parameters: {
         statLayout: 'standard',
         valueLocation: "records",
@@ -542,7 +544,7 @@ export const VIEWED_DOC_PER_SEARCH: DashboardItemOption = {
     info: "msg#widgets.docViewsBySession.info",
     unique: true,
     x: 5,
-    y: 4,
+    y: 8,
     parameters: {
         statLayout: 'standard',
         valueLocation: "aggregations",
@@ -558,6 +560,8 @@ export const SESSION_DURATION: DashboardItemOption = {
     text: "msg#widgets.avgSessionDuration.text",
     info: "msg#widgets.avgSessionDuration.info",
     unique: true,
+    "x" : 3,
+    "y" : 8,    
     parameters: {
         statLayout: 'standard',
         valueLocation: "records",
@@ -604,6 +608,8 @@ export const ADOPTION_RATE: DashboardItemOption = {
     text: "msg#widgets.adoptionRate.text",
     info: "msg#widgets.adoptionRate.info",
     unique: true,
+    x : 3,
+    y : 2,
     parameters: {
         statLayout: 'standard',
         valueLocation: "totalrecordcount",
@@ -801,7 +807,7 @@ export const SEARCH_EXIT_RATE: DashboardItemOption = {
     text: "msg#widgets.searchExitRate.text",
     info: "msg#widgets.searchExitRate.info",
     unique: true,
-    x: 4,
+    x: 5,
     y: 4,
     parameters: {
         valueLocation: "totalrecordcount",
@@ -853,8 +859,8 @@ export const QUERY_BOUNCE_RATE: DashboardItemOption = {
     text: "msg#widgets.queryBounceRate.text",
     info: "msg#widgets.queryBounceRate.info",
     unique: true,
-    x: 4,
-    y: 6,
+    x : 4,
+    y : 4,    
     parameters: {
         valueLocation: "totalrecordcount",
         relatedQuery: "queryTotal",
@@ -925,7 +931,12 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
           QUERY_COUNT_TOTAL,
           VIEWED_DOC_PER_SEARCH,
           QUERY_COUNT_TOTAL_TIMELINE,
-          SESSION_COUNT_TOTAL_TIMELINE
+          SESSION_COUNT_TOTAL_TIMELINE,
+          CLICK_BY_SEARCH,
+          ADOPTION_RATE,
+          SESSION_DURATION,
+          TOP_SOURCES,
+          TOP_FACETS
       ]
   },
   {
@@ -940,10 +951,8 @@ export const  STANDARD_DASHBOARDS: {name: string, items: DashboardItemOption[]}[
           REFINEMENT,
           MRR,
           FIRST_CLICK,
-          TOP_SOURCES,
           RESULT_TYPES,
-          SEARCH_WITH_CLICKS_RATE,
-          TOP_FACETS
+          SEARCH_WITH_CLICKS_RATE
       ]
   },
   {
