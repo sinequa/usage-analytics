@@ -872,7 +872,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {option: DashboardItemO
             {option: QUERY_COUNT_TOTAL, position: {x: 4, y: 6}},
             {option: VIEWED_DOC_PER_SEARCH, position: {x: 5, y: 8}},
             {option: QUERY_COUNT_TOTAL_TIMELINE, position: {x: 0, y: 4}},
-            {option: SESSION_COUNT_TOTAL_TIMELINE, position: {x: 5, y: 0,}},
+            {option: SESSION_COUNT_TOTAL_TIMELINE, position: {x: 0, y: 8}},
             {option: CLICK_BY_SEARCH, position: {x: 4, y: 4}},
             {option: ADOPTION_RATE, position: {x : 3, y : 2}},
             {option: SESSION_DURATION, position: {x : 3, y : 8}},
