@@ -27,7 +27,7 @@
     "@formatjs/intl-relativetimeformat": "^4.5.12",
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@sinequa/analytics": "^11.6.1-DEV-2",
-    "@sinequa/components": "^11.6.1-DEV-2",
+    "@sinequa/components": "^11.6.1-DEV-3",
     "@sinequa/core": "^11.6.1-DEV-2",
     "@swimlane/ngx-charts": "^14.0.0",
     "angular-fusioncharts": "3.0.4",
