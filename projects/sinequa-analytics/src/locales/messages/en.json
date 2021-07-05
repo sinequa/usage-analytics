@@ -284,6 +284,11 @@
             "info": "Average Session Duration"
         }
     },
+    
+    "stat": {
+        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}",
+        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}"
+    },
 
     "dashboards": {
         "userAdoption": "User Adoption",
