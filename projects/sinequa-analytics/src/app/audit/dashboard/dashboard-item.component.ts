@@ -252,23 +252,26 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     toggleMaximizedView(): void {
-        const elem = this.gridsterItemComponent.el;
+        const gridsterItem = this.gridsterItemComponent.el;
+        const gridsterContainer = gridsterItem.parentElement?.parentElement;
+        if(gridsterContainer) {
+            gridsterItem.classList.toggle('widget-maximized-view'); // allow container of gridsterItem to full-fill its direct parent dimensions
+            gridsterContainer.classList.toggle('no-scroll');  // disable the gridster element's scroll
 
-        elem.classList.toggle('widget-maximized-view'); // allow container of gridsterItem to full-fill its direct parent dimensions
-        elem.parentElement?.classList.toggle('no-scroll'); // disable the direct parent scroll
+            if (gridsterItem.classList.contains('widget-maximized-view')) { // update component defined in gridsterItem to full-fill its maximized space
+                this.config.height = gridsterContainer.clientHeight!;
+                this.config.width = gridsterContainer.clientWidth!;
+                gridsterContainer.scrollTop = 0; // scroll up to view the full screen item
+            } else {
+                // update height/width to the dimensions of the gridsterItemComponent
+                this.config.height = this.gridsterItemComponent.height;
+                this.config.width = this.gridsterItemComponent.width;
+            }
 
-        if (elem.classList.contains('widget-maximized-view')) { // update component defined in gridsterItem to full-fill its maximized space
-            this.config.height = elem.parentElement?.clientHeight!;
-            this.config.width = elem.parentElement?.clientWidth!;
-        } else {
-            // update height/width to the dimensions of the gridsterItemComponent
-            this.config.height = this.gridsterItemComponent.height;
-            this.config.width = this.gridsterItemComponent.width;
-        }
-
-        // update related full-screen actions since they can not be performed in maximized mode
-        if (this.fullScreenExpandable) {
-            this.fullScreenAction.disabled = elem.classList.contains('widget-maximized-view');
+            // update related full-screen actions since they can not be performed in maximized mode
+            if (this.fullScreenExpandable) {
+                this.fullScreenAction.disabled = gridsterItem.classList.contains('widget-maximized-view');
+            }
         }
     }
 
