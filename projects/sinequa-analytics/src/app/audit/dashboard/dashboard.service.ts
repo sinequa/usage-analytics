@@ -76,8 +76,6 @@ export interface DashboardItemOption {
     text: string;
     unique: boolean;
     info?: string;
-    x?: number;
-    y?: number;
     parameters?: {
         // For type === 'timeline'
         aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
@@ -98,6 +96,13 @@ export interface DashboardItemOption {
         statLayout?: StatLayout // the ui of displaying the stat
 
     }
+}
+
+export interface DashboardItemPosition {
+    x?: number;
+    y?: number;
+    rows?: number;
+    cols?: number;
 }
 
 // Name of the "default dashboard" (displayed prior to any user customization)
@@ -261,12 +266,12 @@ export class DashboardService {
         return this.dashboards.concat(this.draftDashboards);
     }
 
-    protected createDashboard(name: string, items: DashboardItemOption[] = []): Dashboard {
+    protected createDashboard(name: string, items: {option: DashboardItemOption, position: DashboardItemPosition}[] = []): Dashboard {
         const dashboard = {
             name: name,
             items: []
         };
-        items.forEach(item => this.addWidget(item, dashboard, false));
+        items.forEach(item => this.addWidget(item.option, dashboard, false, item.position.rows, item.position.cols, item.position.x, item.position.y));
         return dashboard;
     }
 
@@ -365,8 +370,8 @@ export class DashboardService {
             notify = true,
             rows = (option.type === "stat" ? 2 : 4),
             cols = (option.type === "stat" ? 1 : 3),
-            x = (option.x ? option.x : 0),
-            y = (option.y ? option.y : 0),
+            x = 0,
+            y = 0,
             closable = true): DashboardItem {
 
         let item = {
