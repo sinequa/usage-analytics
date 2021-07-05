@@ -7,6 +7,30 @@ import { saveAs } from "file-saver";
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
 import {StatProvider} from './dashboard/providers/stat.provider';
 
+
+type XLRowType = {
+  attributeStyleID: string,
+  nameType: string,
+  data: string,
+  attributeFormula: string
+}
+
+type XLSheetType = {
+  rows: string,
+  nameWS: string
+}
+
+type XLWorkbookType = {
+  created: number,
+  worksheets: string
+}
+
+type ExtractModel = {
+  title:string,
+  filename: string,
+  tables:string[]
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -53,7 +77,7 @@ export class ExportService {
             // notify user
             const title = this.translate.formatMessage("msg#export.title");
             const msg = this.translate.formatMessage("msg#export.success", {filename});
-            this.notificationService.success(msg,undefined, title);        
+            this.notificationService.success(msg,undefined, title);
           } );
   }
   
@@ -63,24 +87,58 @@ export class ExportService {
    * @param filename name of the file
    * @param items Array of Dashboard Item
    */
-  export(filename:string, items: DashboardItemComponent[]) {
-    // export stats in one file
-    this.extractStats(filename, items);
+  exportToCsv(filename:string, items: DashboardItemComponent[]) {
+      // export stats in one file
+      const stats = this.extractStats(filename, items);
+      if (stats) {
+        this.saveToCsv(stats.filename, stats.tables.join('\n'));
+      }
+      
+      // export each timelines in a specific file
+      const timelines = this.extractTimelines(filename, items);
+      timelines.forEach(timeline => this.saveToCsv(timeline.filename, timeline.tables.join('\n')));
+      
+      // export each charts in a specific file
+      const charts = this.extractCharts(filename, items);
+      charts.forEach(chart => this.saveToCsv(chart.filename, chart.tables.join('\n')));
+    }
+  
+  /**
+   * Export all widgets of a specific dashboard to a Excel Open XML format file
+   * 
+   * @param filename name of the file
+   * @param items Array of Dashboard Item
+   */
+  exportToSheets(filename:string, items: DashboardItemComponent[]) {
+    const tables:ExtractModel[] = [];
     
-    // export each timelines in a specific file
-    this.extractTimelines(filename, items);
+    // export stats
+    tables.push(this.extractStats(filename, items) || {} as ExtractModel);
     
-    // export each charts in a specific file
-    this.extractCharts(filename, items);
+    // export each timelines
+    tables.push(...this.extractTimelines(filename, items));
+    
+    // export each charts
+    tables.push(...this.extractCharts(filename, items));
+    
+    // as csv files joined in a single array, split them in their own sheet
+    this.csvToExcel(tables, filename);
   }
   
-  exportToCsv(filename: string, rows: object[]) {
+  /**
+   * Convert a array of object to csv rows
+   * 
+   * @param filename csv filename
+   * @param rows array of object to convert into csv
+   * @returns a csv string
+   */
+  objectToCsv(filename: string, rows: object[]): string[] {
     const title = this.translate.formatMessage("msg#export.title");
 
     if (!rows || !rows.length) {
       const msg = this.translate.formatMessage("msg#export.nothing", {filename});
       this.notificationService.warning(msg, undefined, title);
-      return;
+      return [];
     }
     const separator = ',';
     const keys = Object.keys(rows[0]);
@@ -97,6 +155,13 @@ export class ExportService {
           }
           return cell;
         }).join(separator)).join('\n');
+
+    // split results to obtain a array of rows
+    return csvData.split('\n');
+  }
+  
+  private saveToCsv(filename: string, csvData: string) {
+    const title = this.translate.formatMessage("msg#export.title");
 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
@@ -133,14 +198,14 @@ export class ExportService {
     return ({title})
   }
   
-  
   /**
-   * Create a list of rows for each stat widgets and save the results in a .csv file
+   * Create a list of rows for each stat widgets
    * 
    * @param filename name of the file
    * @param items array of dashboard items
+   * @returns object with all stats data
    */
-  private extractStats(filename: string, items: DashboardItemComponent[]) {
+  private extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
     const stats = items.filter(item => item.config.type === "stat");
     if(stats.length === 0) return;
     
@@ -148,28 +213,35 @@ export class ExportService {
       acc.push(this.extractStatRow(item));
       return acc;
     }, <any>[])
-    this.exportToCsv(`${filename}_${this.date}.csv`, results);
+    
+    const file = `${filename}_${this.date}.csv`;
+    return {title: "stats", filename: file, tables: this.objectToCsv(file, results)};
   }
   
   /**
-   * save each charts data in is own .csv file.
+   * Extract each charts data.
    * 
    * @param filename name of the file
    * @param items array of dashboard items
+   * @returns Array of charts data
    */
-  private extractCharts(filename: string, items: DashboardItemComponent[]) {
+  private extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     const charts = items.filter(item => item.config.type === "chart").map(item => {
       const title = this.translate.formatMessage(item.config.title);
       
-      return {title, data: item.chartResults.aggregations[0].items?.map(item => ({value: `'${item.value}`, count: item.count}))}
+      return {title, data: item.chartResults.aggregations[0].items?.map(item => ({value: item.value, count: item.count}))}
     });
-    if(charts.length === 0) return;
+    if(charts.length === 0) return [];
     
     // [{value, count }]
+    const values:ExtractModel[] = [];
     charts.forEach(chart => {
       const results = chart.data?.map(item => item);
-      this.exportToCsv(`${filename}_${chart.title}_${this.date}.csv`, results!);
-    })
+      const file = `${filename}_${chart.title}_${this.date}.csv`;
+      const r:string[] = this.objectToCsv(file, results!);
+      if(r) values.push({title: chart.title, filename: file, tables: r});
+    });
+    return values;
 
   }
   
@@ -180,7 +252,7 @@ export class ExportService {
    * @param filename name of the file
    * @param items array of dashboard items
    */
-  private extractTimelines(filename: string, items: DashboardItemComponent[]) {
+  private extractTimelines(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     // timelines components extractions
     // a timeserie could contains one or more series
     // no needs of timeline-provider here as timeseries is the final results after timeline-provider works
@@ -188,7 +260,7 @@ export class ExportService {
       const title = this.translate.formatMessage(item.config.title);
       return {title, timeSeries: item.timeSeries}
     });
-    if(timeseries.length === 0) return;
+    if(timeseries.length === 0) return [];
 
     // convert series to { title, items: [series, series,...]}
     const series = timeseries.map(series => ({title: series.title, items: series.timeSeries.map(serie => serie.dates.map(item => {
@@ -199,6 +271,7 @@ export class ExportService {
     }));
     
     // export each series individually
+    const values:ExtractModel[] = [];
     series.forEach(series => {
       const resultsMap = series.items.reduce((acc, serie) => {
 
@@ -215,7 +288,70 @@ export class ExportService {
       // [ [K, V], [K1, V1] ... ]
       // we only need each V
       const results = Array.from(resultsMap.entries()).map(it => it[1]);
-      this.exportToCsv(`${filename}_${series.title}_${this.date}.csv`, results);
-    })
+      const file = `${filename}_${series.title}_${this.date}.csv`;
+      values.push({title: series.title, filename: file, tables: this.objectToCsv(file, results)});
+    });
+    return values;
+  }
+  
+  
+  private csvToExcel(tables: {title:string, tables:string[]}[], filename: string) {
+    const title = this.translate.formatMessage("msg#export.title");
+
+    const uri = 'data:application/xml;base64,';
+    const tmplWorkbookXML = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:excel"  xmlns:html="https://www.w3.org/TR/html401/">'
+      + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>Sinequa R&amp;D</Author><Created>{created}</Created></DocumentProperties>'
+      + '<Styles>'
+      + '<Style ss:ID="Currency"><NumberFormat ss:Format="Currency"></NumberFormat></Style>'
+      + '<Style ss:ID="Date"><NumberFormat ss:Format="Medium Date"></NumberFormat></Style>'
+      + '</Styles>' 
+      + '{worksheets}</Workbook>'
+    const tmplWorksheetXML = '<Worksheet ss:Name="{nameWS}"><Table>{rows}</Table></Worksheet>'
+    const tmplCellXML = '<Cell{attributeStyleID}{attributeFormula}><Data ss:Type="{nameType}">{data}</Data></Cell>'
+    const base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+    const format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
+    
+    let workbookXML = "";
+    let worksheetsXML = "";
+    let rowsXML = "";
+
+    for(const [index, values] of tables.entries()) {
+      if(values.tables){
+        for(const row of values.tables) {
+          rowsXML += '<Row>';
+          for(const cell of row.split(',')) {
+              const ctx: XLRowType = {
+                attributeStyleID: '',
+                nameType: 'String',
+                data: cell,
+                attributeFormula: ''
+              };
+              rowsXML += format(tmplCellXML, ctx);
+          }
+          rowsXML += '</Row>'
+        }
+        
+        // replace not supported characters on sheets name : \ / * ? : [ ] by an underscore
+        const sheetName = values.title.replace(/[\\\/*?:\[\]]/g, '_');
+        const ctx: XLSheetType = {rows: rowsXML, nameWS: sheetName || `Sheet ${index}`};
+        worksheetsXML += format(tmplWorksheetXML, ctx);
+        rowsXML = "";
+      }
+    }
+    
+    const ctx: XLWorkbookType = {created: (new Date()).getTime(), worksheets: worksheetsXML};
+    workbookXML = format(tmplWorkbookXML, ctx);
+
+    // saveAs()
+    const link = document.createElement("a");
+    link.href = uri + base64(workbookXML);
+    link.download = `${filename}_${this.date}.xml` || 'Workbook.xml';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    const msg = this.translate.formatMessage("msg#export.success", {filename});
+    this.notificationService.success(msg,undefined, title);
   }
 }

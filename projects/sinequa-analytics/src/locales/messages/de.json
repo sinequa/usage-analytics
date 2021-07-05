@@ -326,7 +326,7 @@
             "title": "Export CSV",
             "tooltip": "Export current dashboard to .csv files"
         },
-        "title": "Export CSV",
+        "title": "Export",
         "nothing": "{filename}, nothing to export!",
         "success": "Export {filename} successfully"
     }
