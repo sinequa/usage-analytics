@@ -874,7 +874,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {option: DashboardItemO
             {option: QUERY_COUNT_TOTAL_TIMELINE, position: {x: 0, y: 4}},
             {option: SESSION_COUNT_TOTAL_TIMELINE, position: {x: 0, y: 8}},
             {option: CLICK_BY_SEARCH, position: {x: 4, y: 4}},
-            {option: ADOPTION_RATE, position: {x : 3, y : 2}},
+            {option: ADOPTION_RATE, position: {x : 3, y : 2, rows : 4}},
             {option: SESSION_DURATION, position: {x : 3, y : 8}},
             {option: TOP_SOURCES, position: {x: 5, y: 0}},
             {option: TOP_FACETS, position: {x: 5, y: 4}}
@@ -887,7 +887,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {option: DashboardItemO
             {option: TOP_NO_RESULTS_QUERIES, position: {x: 0, y: 4}},
             {option: CLICK_FIRST_DOCS, position: {x: 4, y: 0}},
             {option: QUERY_BOUNCE_RATE, position: {x: 4, y: 4}},
-            {option: SEARCH_EXIT_RATE, position: {x: 5, y: 4}},
+            {option: SEARCH_EXIT_RATE, position: {x: 5, y: 4, rows : 4}},
             {option: ZERO_SEARCH, position: {x: 3, y: 4}},
             {option: REFINEMENT, position: {x: 3, y: 6}},
             {option: MRR, position: {x: 3, y: 2}},
