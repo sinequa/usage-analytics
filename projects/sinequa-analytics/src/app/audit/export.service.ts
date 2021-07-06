@@ -7,6 +7,7 @@ import { saveAs } from "file-saver";
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
 import {StatProvider} from './dashboard/providers/stat.provider';
 
+import {xlsx} from "./xlsx";
 
 type XLRowType = {
   attributeStyleID: string,
@@ -75,9 +76,7 @@ export class ExportService {
             element.nativeElement.style = undefined;
             
             // notify user
-            const title = this.translate.formatMessage("msg#export.title");
-            const msg = this.translate.formatMessage("msg#export.success", {filename});
-            this.notificationService.success(msg,undefined, title);
+            this.notifySuccess(filename)
           } );
   }
   
@@ -104,12 +103,12 @@ export class ExportService {
     }
   
   /**
-   * Export all widgets of a specific dashboard to a Excel Open XML format file
+   * Export all widgets of a specific dashboard to a Open XML format file
    * 
    * @param filename name of the file
-   * @param items Array of Dashboard Item
+   * @param items Array of Dashboard Items
    */
-  exportToSheets(filename:string, items: DashboardItemComponent[]) {
+  exportToXML(filename:string, items: DashboardItemComponent[]) {
     const tables:ExtractModel[] = [];
     
     // export stats
@@ -122,7 +121,46 @@ export class ExportService {
     tables.push(...this.extractCharts(filename, items));
     
     // as csv files joined in a single array, split them in their own sheet
-    this.csvToExcel(tables, filename);
+    this.csvToXML(tables, filename);
+  }
+  
+  /**
+   * Export all widgets of a specific dashboard to a XLSX file
+   * @param filename name of the file to save
+   * @param items Array of Dashboard Items
+   */
+  exportXLSX(filename:string, items: DashboardItemComponent[]) {
+    const tables:ExtractModel[] = [];
+    
+    // export stats
+    const stats = this.extractStats(filename, items);
+    if(stats) tables.push(stats);
+    
+    // export each timelines
+    tables.push(...this.extractTimelines(filename, items).filter(timeline => timeline.tables.length > 0));
+    
+    // export each charts
+    tables.push(...this.extractCharts(filename, items).filter(chart => chart.tables.length > 0));
+
+    // Excel sheet's name limited to 31 characters
+    const worksheets = tables.map(worksheet => ({
+      data: [...worksheet.tables.map(it => it.split(","))],
+      name: worksheet.title.slice(0,30)
+    }));
+    
+    const file = `${filename}_${this.date}.xlsx`;
+
+    // this object transforms all that stuff in a real Excel Workbook
+    // and download it for the user
+    xlsx({
+      creator: 'Sinequa',
+      lastModifiedBy: '',
+      worksheets: worksheets
+    }).then((content) => {
+      saveAs(content, file);
+      this.notifySuccess(file);
+    });
+    
   }
   
   /**
@@ -161,8 +199,6 @@ export class ExportService {
   }
   
   private saveToCsv(filename: string, csvData: string) {
-    const title = this.translate.formatMessage("msg#export.title");
-
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
       navigator.msSaveBlob(blob, filename);
@@ -180,8 +216,7 @@ export class ExportService {
       }
     }
     
-    const msg = this.translate.formatMessage("msg#export.success", {filename});
-    this.notificationService.success(msg,undefined, title);
+    this.notifySuccess(filename);
   }
   
   private extractStatRow(item: DashboardItemComponent) : any {
@@ -203,7 +238,7 @@ export class ExportService {
    * 
    * @param filename name of the file
    * @param items array of dashboard items
-   * @returns object with all stats data
+   * @returns a {@link ExtractModel} object with all stats data or undefined
    */
   private extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
     const stats = items.filter(item => item.config.type === "stat");
@@ -294,11 +329,14 @@ export class ExportService {
     return values;
   }
   
-  
-  private csvToExcel(tables: {title:string, tables:string[]}[], filename: string) {
-    const title = this.translate.formatMessage("msg#export.title");
-
-    const uri = 'data:application/xml;base64,';
+  /**
+   * Convert csv array in a XML Workbook representation
+   * 
+   * @param tables contains data per worksheet
+   * @param filename
+   */
+  private csvToXML(tables: {title:string, tables:string[]}[], filename: string) {
+    const uri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
     const tmplWorkbookXML = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:excel"  xmlns:html="https://www.w3.org/TR/html401/">'
       + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>Sinequa R&amp;D</Author><Created>{created}</Created></DocumentProperties>'
       + '<Styles>'
@@ -345,12 +383,22 @@ export class ExportService {
     // saveAs()
     const link = document.createElement("a");
     link.href = uri + base64(workbookXML);
-    link.download = `${filename}_${this.date}.xml` || 'Workbook.xml';
+    link.download = `${filename}_${this.date}.xls` || 'Workbook.xls';
     link.target = '_blank';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
+    this.notifySuccess(filename);
+  }
+  
+  /**
+   * Notify user about the download success
+   * 
+   * @param filename name of the file downloaded with success
+   */
+  private notifySuccess(filename:string) {
+    const title = this.translate.formatMessage("msg#export.title");
     const msg = this.translate.formatMessage("msg#export.success", {filename});
     this.notificationService.success(msg,undefined, title);
   }

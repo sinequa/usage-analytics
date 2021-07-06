@@ -67,14 +67,14 @@ export class AuditComponent implements OnDestroy {
         
         this.exportAction = new Action({
             icon: "fas fa-file-export",
-            name: "exportAsCSV",
-            action: () => this.exportSheets(),
+            name: "exportAsXLSX",
+            action: () => this.exportXLSX(),
             children: [
                 new Action({
                     title: "msg#export.button.exportXLS",
                     text: "msg#export.button.exportXLS",
                     name: "exportAsXLS",
-                    action: () => this.exportSheets()
+                    action: () => this.exportXLSX()
                 }),
                 new Action({
                     title: "msg#export.button.exportPNG",
@@ -104,10 +104,10 @@ export class AuditComponent implements OnDestroy {
         this.exportService.exportToCsv(name, items);
     }
     
-    exportSheets() {
+    exportXLSX() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
-        this.exportService.exportToSheets(name, items);
+        this.exportService.exportXLSX(name, items);
     }
 
     /**
