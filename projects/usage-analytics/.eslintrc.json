@@ -10,9 +10,9 @@
       ],
       "parserOptions": {
         "project": [
-          "projects/sinequa-analytics/tsconfig.json",
-          "projects/sinequa-analytics/tsconfig.spec.json",
-          "projects/sinequa-analytics/e2e/tsconfig.json"
+          "projects/usage-analytics/tsconfig.json",
+          "projects/usage-analytics/tsconfig.spec.json",
+          "projects/usage-analytics/e2e/tsconfig.json"
         ],
         "createDefaultProgram": true
       },

@@ -1,6 +1,7 @@
 import { Component, Input, SimpleChanges,  OnChanges} from '@angular/core';
 
 import { Results, DatasetError} from '@sinequa/core/web-services';
+import {AuditService} from '../../audit.service';
 import { DashboardItem } from '../dashboard.service';
 import { Evaluation, StatProvider, Trend } from '../providers/stat.provider';
 
@@ -22,7 +23,42 @@ export class AuditStatComponent implements OnChanges {
     trendEvaluation: Evaluation;
     percentageChange: number | undefined;
 
-    constructor(public statProvider: StatProvider) {}
+    constructor(
+        public statProvider: StatProvider,
+        private auditService: AuditService
+        ) {}
+    
+    /**
+     * returns current range filter
+     */
+    get currentRange(): string | undefined {
+        return this.auditService.currentFilter;
+    }
+    
+    /**
+     * returns previous range filter if defined
+     */
+    get previousRange(): string | undefined {
+        const range = this.auditService.previousFilter;
+        if(range === undefined) {
+            return this.currentRange;
+        }
+        
+        return range;
+    }
+    
+    /**
+     * returns the correct tooltip based on currentRange and previousRange values
+     */
+    get trendTooltip(): string {
+        if( this.currentRange !== this.previousRange) {
+            // here previous is a dates range
+            return "msg#stat.trendTooltipPrevDates";
+        }
+        
+        // here previous is undefined
+        return "msg#stat.trendTooltip";
+    }
 
     ngOnChanges(changes: SimpleChanges) {
 

@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { SearchService } from "@sinequa/components/search";
 import { AppService, Expr, ExprBuilder } from "@sinequa/core/app-utils";
 import { Utils } from "@sinequa/core/base";
+import {IntlService} from "@sinequa/core/intl";
 import {
     DatasetError,
     DatasetWebService,
@@ -43,14 +44,20 @@ export class AuditService {
     /** Reference period for trends calculation. If not set, this period is inferred from the main period automatically */
     public previousRange: Date[] | undefined;
 
+    public mask: string = "YYYY-MM-DD";
+
+    // used by stats component tooltip
+    public currentFilter: string | undefined;
+    public previousFilter: string | undefined;
+
     constructor(
         public datasetWebService: DatasetWebService,
         public searchService: SearchService,
         public exprBuilder: ExprBuilder,
         public appService: AppService,
-        public principalService: PrincipalWebService
-    ) {
-    }
+        public principalService: PrincipalWebService,
+        private intl: IntlService
+    ) {}
 
     get webServiceName(): string | undefined{
         if(this.appService.app && this.appService.app.webServices){
@@ -83,6 +90,16 @@ export class AuditService {
             .select!.filter((item) => item.facet !== "audit_timestamp")
             .map((item) => item.expression);
         const timestamp = this.getAuditTimestampFromUrl();
+
+        // convert range filters to something more readable
+        // used by stats component tooltip
+        // here: start boundaries
+        if(Array.isArray(timestamp)) {
+            this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
+        } else {
+            this.currentFilter = timestamp;
+        }
+
         const parsedTimestamp = this.parseAuditTimestamp(timestamp!);
 
         const currentFilters = this.exprBuilder.concatAndExpr([...exprs, parsedTimestamp.currentRange]);
@@ -90,8 +107,8 @@ export class AuditService {
 
         /** Update the audit dashboard data (previous and current period) */
         const dataSources = [
-            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end),
-            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start),
+            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask),
+            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask),
             this.principalService.list()
         ] as Observable<{[key: string]: Results | DatasetError;}>[];
 
@@ -118,11 +135,12 @@ export class AuditService {
         return undefined;
     }
 
-    private getAuditData(filters: string, start: string, end: string): Observable<{[key: string]: Results | DatasetError;}> {
+    private getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError;}> {
         const params = {
             select: filters,
-            start: start,
-            end: end
+            start,
+            end,
+            mask
         };
         if (this.webServiceName) {
             return this.datasetWebService.getAll(this.webServiceName, params);
@@ -148,6 +166,15 @@ export class AuditService {
     }
 
     public updatePreviousRangeFilter(range: Date[] | undefined) {
+        // convert previous range filters to something more readable
+        // used by stats component tooltip
+        // here: end boundaries
+        if(Array.isArray(range)) {
+            this.previousFilter = `[${this.intl.formatDate(range[0])} - ${this.intl.formatDate(range[1])}]`;
+        } else {
+            this.previousFilter = undefined;
+        }
+
         this.previousRange = range;
         this.updateAuditFilters();
     }
