@@ -43,11 +43,13 @@ export class AuditService {
 
     /** Reference period for trends calculation. If not set, this period is inferred from the main period automatically */
     public previousRange: Date[] | undefined;
-    
+
+    public mask: string = "YYYY-MM-DD";
+
     // used by stats component tooltip
     public currentFilter: string | undefined;
     public previousFilter: string | undefined;
-    
+
     constructor(
         public datasetWebService: DatasetWebService,
         public searchService: SearchService,
@@ -105,8 +107,8 @@ export class AuditService {
 
         /** Update the audit dashboard data (previous and current period) */
         const dataSources = [
-            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end),
-            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start),
+            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask),
+            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask),
             this.principalService.list()
         ] as Observable<{[key: string]: Results | DatasetError;}>[];
 
@@ -133,11 +135,12 @@ export class AuditService {
         return undefined;
     }
 
-    private getAuditData(filters: string, start: string, end: string): Observable<{[key: string]: Results | DatasetError;}> {
+    private getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError;}> {
         const params = {
             select: filters,
-            start: start,
-            end: end
+            start,
+            end,
+            mask
         };
         if (this.webServiceName) {
             return this.datasetWebService.getAll(this.webServiceName, params);
