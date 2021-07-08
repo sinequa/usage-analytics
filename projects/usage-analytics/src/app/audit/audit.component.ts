@@ -13,7 +13,6 @@ import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
-import {GridsterItemComponent} from "angular-gridster2";
 
 @Component({
     selector: "sq-audit",
@@ -23,7 +22,6 @@ import {GridsterItemComponent} from "angular-gridster2";
 export class AuditComponent implements OnDestroy {
     @ViewChildren(DashboardItemComponent) dashboardItems: QueryList<DashboardItemComponent>
     @ViewChild("content", {static: false}) content: ElementRef;
-    @ViewChildren(GridsterItemComponent) gridsterItems: QueryList<GridsterItemComponent>
   
     public exportAction: Action;
     
