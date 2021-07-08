@@ -1,6 +1,6 @@
 {
     "app": {
-        "name": "Sinequa Analytics"
+        "name": "Usage Analytics"
     },
 
     "locale": {
@@ -286,6 +286,11 @@
         }
     },
 
+    "stat": {
+        "trendTooltip": "Cette tendance a été calculé à partir de la période \"{currentDate}\" et \"{trendRange}\" précédent(e)(s)",
+        "trendTooltipPrevDates": "Cette tendance a été calculé à partir de {currentDate} et le {trendRange}"
+    },
+
     "dashboards": {
         "userAdoption": "Adoption utilisateur",
         "relevancy": "Pertinence",
@@ -327,9 +332,10 @@
             "title": "Export",
             "tooltipCSV": "Exporter le dashboard dans des fichiers .csv",
             "exportCSV": "Exporter en CSV",
-            "exportPNG": "Exporter au format image PNG"
+            "exportPNG": "Exporter au format image PNG",
+            "exportXLS": "Exporter au format Excel"
         },
-        "title": "Export CSV",
+        "title": "Export",
         "nothing": "{filename}, pas de données à exporter!",
         "success": "Export {filename} réussi"
     }
