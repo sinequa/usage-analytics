@@ -56,7 +56,7 @@
 
 <gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete">
     <div #content>
-        <gridster-item [item]="item" *ngFor="let item of dashboardService.dashboard.items; index as i">
+        <gridster-item [item]="item" *ngFor="let item of dashboardService.dashboard.items; index as i" [attr.focus]="i === focusElementIndex">
             <sq-dashboard-item
                 [config]="item"
                 [dataset]="auditService.data$ | async"

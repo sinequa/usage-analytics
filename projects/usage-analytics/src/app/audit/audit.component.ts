@@ -13,7 +13,7 @@ import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
-import {GridsterComponent, GridsterItemComponent} from "angular-gridster2";
+import {GridsterItemComponent} from "angular-gridster2";
 
 @Component({
     selector: "sq-audit",
@@ -23,7 +23,6 @@ import {GridsterComponent, GridsterItemComponent} from "angular-gridster2";
 export class AuditComponent implements OnDestroy {
     @ViewChildren(DashboardItemComponent) dashboardItems: QueryList<DashboardItemComponent>
     @ViewChild("content", {static: false}) content: ElementRef;
-    @ViewChild('gridster') gridster: GridsterComponent;
     @ViewChildren(GridsterItemComponent) gridsterItems: QueryList<GridsterItemComponent>
   
     public exportAction: Action;
@@ -31,11 +30,11 @@ export class AuditComponent implements OnDestroy {
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
+    // keep track of focused element
+    public focusElementIndex: number;
+
     private _querySubscription: Subscription;
     private _loginSubscription: Subscription;
-    
-    // keep track of focused element
-    private previousFocusElement:GridsterItemComponent;
 
     constructor(
         public auditService: AuditService,
@@ -171,12 +170,6 @@ export class AuditComponent implements OnDestroy {
     // Focus the clicked gridster-item
     // unset previous gridster-item if any
     setFocus(index: number, event: MouseEvent) {
-      const item = this.gridsterItems.toArray()[index];
-      if(item && item !== this.previousFocusElement) {
-        this.previousFocusElement?.el.toggleAttribute("focus");
-        item.el.toggleAttribute("focus");
-        this.previousFocusElement = item;
-      }
+        this.focusElementIndex = index;
     }
-  
   }

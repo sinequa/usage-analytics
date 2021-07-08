@@ -35,7 +35,7 @@
     
     // gridster-item focused got a higher z-index
     // but below move-in z-index
-    gridster-item[focus] {
+    gridster-item[focus="true"] {
         z-index: 90 !important;
     }
 }
