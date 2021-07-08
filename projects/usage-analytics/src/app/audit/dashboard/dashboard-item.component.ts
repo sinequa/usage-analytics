@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges} from '@angular/core';
+import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
 
 import { Results, Record, DatasetError, Aggregation } from '@sinequa/core/web-services';
@@ -320,5 +320,4 @@ export class DashboardItemComponent implements OnChanges {
             this.auditService.updateRangeFilter(range);
         }
     }
-
 }

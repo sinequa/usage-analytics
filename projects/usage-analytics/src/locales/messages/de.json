@@ -73,23 +73,23 @@
     "widgets": {
       "queryTotalTimeLine": {
           "text": "Search Queries",
-          "info": "Number of search queries for the given date range"
+          "info": "Number of search queries for the given date range."
       },
       "userTotalTimeLine": {
           "text": "Users",
-          "info": "Number of users for the given date range"
+          "info": "Number of users for the given date range."
       },
       "userCountTotal": {
           "text": "Users",
-          "info": "Number of users"
+          "info": "Number of users."
       },
       "sessionTotalTimeLine": {
           "text": "Sessions",
-          "info": "Number of sessions for the given date range"
+          "info": "Number of sessions for the given date range."
       },
       "avgClicksByQueryTimeLine": {
           "text": "Average Click By Search Query",
-          "info": "Average number of click for a search query"
+          "info": "Average number of click for a search query."
       },
       "avgEngineResponseTimeTimeLine": {
           "text": "Average Engine Response",
@@ -177,31 +177,31 @@
       },
       "queryClickRate": {
           "text": "Search With Clicks Rate",
-          "info": "Number of search queries where the user has click on a document at least one time compared to the total number of search"
+          "info": "Number of search queries where the user has click on a document at least one time compared to the total number of search."
       },
       "queryRefineTimeLine": {
           "text": "Refinement",
-          "info": "Number of search queries where the user has to do a refinement (like usage of facets)"
+          "info": "Number of search queries where the user has to do a refinement (like usage of facets)."
       },
       "queryRefine": {
           "text": "Refinement",
-          "info": "Number of search queries where the user has to do a refinement (like usage of facets)"
+          "info": "Number of search queries where the user has to do a refinement (like usage of facets)."
       },
       "queryRefineRate": {
           "text": "Refinement Rate",
-          "info": "Number of search queries where the user has to do a refinement compared to the total number of search"
+          "info": "Number of search queries where the user has to do a refinement compared to the total number of search."
       },
       "queryZeroTimeLine": {
           "text": "Zero Search",
-          "info": "Number of search queries with no matched results"
+          "info": "Number of search queries with no matched results."
       },
       "queryZero": {
           "text": "Zero Search",
-          "info": "Number of search queries with no matched results"
+          "info": "Number of search queries with no matched results."
       },
       "queryZeroRate": {
           "text": "Zero Search Rate",
-          "info": "Number of search queries with no matched results compared to the total number of search"
+          "info": "Number of search queries with no matched results compared to the total number of search."
       },
       "regularUsersTimeLine": {
           "text": "Regular Users",
@@ -213,75 +213,75 @@
       },
       "adoptionRate": {
           "text": "Adoption Rate",
-          "info": "Number of new users compared to the total number of potential user"
+          "info": "Number of new users compared to the total number of potential user."
       },
       "regularUsersRate": {
           "text": "Regular User Rate",
-          "info": "Number of users compared to the total number of potential user"
+          "info": "Number of users compared to the total number of potential user."
       },
       "regular_newUsers": {
           "text": "Regular/New Users",
-          "info": "Number of regular users compared to total the number of new user"
+          "info": "Number of regular users compared to total the number of new user."
       },
       "searchExitTimeLine": {
           "text": "Search Exit",
-          "info": "Number of search where the user does nothing after displaying a results page"
+          "info": "Number of search where the user does nothing after displaying a results page."
       },
       "searchExit": {
           "text": "Search Exit",
-          "info": "Number of search where the user does nothing after displaying a results page"
+          "info": "Number of search where the user does nothing after displaying a results page."
       },
       "searchExitRate": {
           "text": "Search Exit Rate",
-          "info": "Number of search where the user does nothing after displaying a results page compared to the total number of search"
+          "info": "Number of search where the user does nothing after displaying a results page compared to the total number of search."
       },
       "queryByResult": {
           "text": "Result Types",
-          "info": "Types of search results"
+          "info": "Types of search results."
       },
       "topQueries": {
           "text": "Top Queries",
-          "info": "Most frequently queries asked"
+          "info": "Most frequently queries asked."
       },
       "topNoResultQueries": {
           "text": "Top No Result Queries",
-          "info": "Most frequently queries asked with no result"
+          "info": "Most frequently queries asked with no result."
       },
       "topSources": {
           "text": "Top Sources",
-          "info": "Sources of most clicked documents"
+          "info": "Sources of most clicked documents."
       },
       "topFacets": {
           "text": "Most Used Filters",
-          "info": "Filters most used"
+          "info": "Filters most used."
       },
       "sessionTotal": {
           "text": "Sessions",
-          "info": "Number of sessions"
+          "info": "Number of sessions."
       },
       "queryTotal": {
           "text": "Queries",
-          "info": "Number of search queries"
+          "info": "Number of search queries."
       },
       "sessionsByUser": {
           "text": "Average Sessions By User",
-          "info": "Average number of session per user"
+          "info": "Average number of session per user."
       },
       "avgQueriesBySession": {
           "text": "Average Search By Session",
-          "info": "Average number of search per session"
+          "info": "Average number of search per session."
       },
       "avgClicksByQuery": {
           "text": "Average Click By Search",
-          "info": "Average number of clicked document per search"
+          "info": "Average number of clicked document per search."
       },
       "docViewsBySession": {
           "text": "Average Viewed Documents Per Search",
-          "info": "Average number of viewed documents (Document Navigator) per search"
+          "info": "Average number of viewed documents (Document Navigator) per search."
       },
       "avgSessionDuration": {
           "text": "Average Session Duration",
-          "info": "Average Session Duration"
+          "info": "Average Session Duration."
       }
     },
 
@@ -304,9 +304,9 @@
         "trendsCalculations": {
             "title": "Trends calculations",
             "label": "Use the preceding period of same duration",
-            "tooltip": "For example, if  \"Last 6 months \" is selected above, trends will be automatically computed against the previous 6 months period",
+            "tooltip": "For example, if  \"Last 6 months \" is selected above, trends will be automatically computed against the previous 6 months period.",
             "customPeriod": "Custom Period",
-            "customPeriodTooltip": "This period is used a baseline to measure the evolution of the metrics displayed in the dashboard"
+            "customPeriodTooltip": "This period is used a baseline to measure the evolution of the metrics displayed in the dashboard."
         },
         "last3H": "Last 3 hours",
         "last6H": "Last 6 hours",

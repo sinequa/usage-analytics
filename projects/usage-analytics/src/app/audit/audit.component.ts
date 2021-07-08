@@ -28,6 +28,9 @@ export class AuditComponent implements OnDestroy {
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
+    // keep track of focused element
+    public focusElementIndex: number;
+
     private _querySubscription: Subscription;
     private _loginSubscription: Subscription;
 
@@ -161,4 +164,10 @@ export class AuditComponent implements OnDestroy {
     isDark(): boolean {
         return document.body.classList.contains("dark");
     }
-}
+  
+    // Focus the clicked gridster-item
+    // unset previous gridster-item if any
+    setFocus(index: number, event: MouseEvent) {
+        this.focusElementIndex = index;
+    }
+  }
