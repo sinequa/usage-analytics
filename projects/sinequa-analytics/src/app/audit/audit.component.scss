@@ -5,13 +5,39 @@
     gap: 1rem;
 }
 
-// hide buttons from facet card
-// display them only on hover
-::ng-deep  gridster .card .card-header .btn-group {
-    display: none;
-}
-::ng-deep gridster .card .card-header:hover .btn-group {
-    display: flex;
+::ng-deep gridster {
+    // always display gridster-item buttons while
+    // dropdown list is visible
+    gridster-item .btn-group .show {
+        button {
+            visibility: visible;
+        }
+        ~button {
+            visibility: visible;
+        }
+    }
+    
+    // hide gridster-item buttons
+    gridster-item {
+        border-radius: 0.25em;
+        overflow: initial;
+        button {
+            visibility: hidden;
+        }
+    }
+    
+    // display gridster-item button on mouse over
+    gridster-item:hover {
+        button {
+            visibility: visible;
+        }
+    }
+    
+    // gridster-item focused got a higher z-index
+    // but below move-in z-index
+    gridster-item[focus] {
+        z-index: 90 !important;
+    }
 }
 
 .main-content {
@@ -70,11 +96,6 @@ gridster.display-grid {
     ::ng-deep iframe {
         pointer-events: none !important;
     }
-}
-
-gridster-item {
-    border-radius: 0.25em;
-    overflow: initial;
 }
 
 gridster-item.gridster-item-moving {

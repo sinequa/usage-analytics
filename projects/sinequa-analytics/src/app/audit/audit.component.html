@@ -64,7 +64,8 @@
                 [width]="item.width"
                 [height]="item.height"
                 [tooltipInfo]="!!item.info"
-                [buttonsStyle]="isDark()? 'dark' : 'light'">
+                [buttonsStyle]="isDark()? 'dark' : 'light'"
+                (actionClicked)="setFocus(i, $event)">
             </sq-dashboard-item>
         </gridster-item>
     </div>
