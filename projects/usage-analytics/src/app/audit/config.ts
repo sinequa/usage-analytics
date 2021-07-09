@@ -906,10 +906,10 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {option: DashboardItemO
     },
 ]
 
-/** Panorama */
-export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
+/** Palette */
+export const PALETTE: {name: string, items: DashboardItemOption[]}[] = [
   {
-      name: "Timeline",
+      name: "msg#palette.timelines",
       items: [
           QUERY_COUNT_TOTAL_TIMELINE,
           USER_COUNT_TOTAL_TIMELINE,
@@ -937,7 +937,7 @@ export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
       ]
   },
   {
-      name: "Chart",
+      name: "msg#palette.charts",
       items: [
           TOP_SOURCES,
           TOP_QUERIES,
@@ -948,7 +948,7 @@ export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
       ]
   },
   {
-      name: "Statistics",
+      name: "msg#palette.statistics",
       items: [
           QUERY_COUNT_TOTAL,
           USER_COUNT_TOTAL,

@@ -17,6 +17,7 @@ import { IntlService } from '@sinequa/core/intl';
 import { AggregationTimeSeries, RecordsTimeSeries } from './providers/timeline-provider';
 import { STANDARD_DASHBOARDS } from '../config';
 import { ChartData } from './providers/chart-provider';
+import { AppService } from '@sinequa/core/app-utils';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -148,7 +149,8 @@ export class DashboardService {
         public location: Location,
         public urlSerializer: UrlSerializer,
         public clipboard: Clipboard,
-        public intlService: IntlService
+        public intlService: IntlService,
+        public appService: AppService
     ) {
         // Default options of the Gridster dashboard
         this.options = {
@@ -254,9 +256,10 @@ export class DashboardService {
         if(!this.userSettingsService.userSettings)
             this.userSettingsService.userSettings = {};
         if(!this.userSettingsService.userSettings["dashboards"]) {
-            this.userSettingsService.userSettings["dashboards"] = STANDARD_DASHBOARDS.map(
-                (sd) => this.createDashboard(sd.name, sd.items)
-            ) as Dashboard[];
+            const dashboards = this.appService.app?.data?.standardDashboards as any || STANDARD_DASHBOARDS;
+            this.userSettingsService.userSettings["dashboards"] = dashboards.map(
+                sd => this.createDashboard(sd.name, sd.items)
+            );
         }
         return this.userSettingsService.userSettings["dashboards"];
     }
