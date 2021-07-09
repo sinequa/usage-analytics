@@ -119,10 +119,7 @@ export class AuditComponent implements OnDestroy {
      * the app configuration on the server
      */
     public get facets(): FacetConfig[] {
-        if(this.appService.app && this.appService.app.data && this.appService.app.data.facets){
-        return <FacetConfig[]> <any> this.appService.app.data.facets;
-        }
-        return FACETS;
+        return this.appService.app?.data?.facets as any || FACETS;
     }
 
     ngOnDestroy() {

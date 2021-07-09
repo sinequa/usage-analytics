@@ -6,30 +6,35 @@
 }
 
 ::ng-deep gridster {
+    // allow dropdown to be visible when it's height
+    // is taller than the widget's height
+    gridster-item {
+        overflow: visible;
+        border-radius: 0.25em;
+    }
+
     // always display gridster-item buttons while
     // dropdown list is visible
     gridster-item .btn-group .show {
         button {
-            visibility: visible;
+            display: inline-block;
         }
         ~button {
-            visibility: visible;
+            display: inline-block;
         }
     }
     
     // hide gridster-item buttons
-    gridster-item {
-        border-radius: 0.25em;
-        overflow: initial;
+    gridster-item[focus="false"] {
         button {
-            visibility: hidden;
+            display: none;
         }
     }
     
     // display gridster-item button on mouse over
     gridster-item:hover {
         button {
-            visibility: visible;
+            display: inline-block;
         }
     }
     

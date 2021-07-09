@@ -1,7 +1,5 @@
 import { FacetConfig } from "@sinequa/components/facet";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
-import { ChartData } from "./dashboard/providers/chart-provider";
-import { AggregationTimeSeries } from "./dashboard/providers/timeline-provider";
 
 /** Filters */
 export const FACETS: FacetConfig[] = [
@@ -33,948 +31,950 @@ export const FACETS: FacetConfig[] = [
     }
 ];
 
-
 /** Widgets */
-export const QUERY_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "queryTotalTimeLine",
-    text: "msg#widgets.queryTotalTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.queryTotalTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "QueryTotal",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Query Count Total", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
-export const USER_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "userCountTotalTimeLine",
-    text: "msg#widgets.userTotalTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.userTotalTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "UserCountTotal",
-            dateField: "value",
-            valueFields: [{name: "count", title: "User Count Total", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    queryCountTotalTimeline: {
+        type: "timeline",
+        query: "queryTotalTimeLine",
+        text: "msg#widgets.queryTotalTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.queryTotalTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "QueryTotal",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "sum", title: "Query Count Total", primary: true}]
+            }
+        }
+    },
 
-export const SESSION_COUNT_TOTAL_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "sessionTotalTimeLine",
-    text: "msg#widgets.sessionTotalTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.sessionTotalTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "SessionTotal",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Session Count Total", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    userCountTotalTimeline: {
+        type: "timeline",
+        query: "userCountTotalTimeLine",
+        text: "msg#widgets.userTotalTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.userTotalTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "UserCountTotal",
+                dateField: "value",
+                valueFields: [{name: "count", title: "User Count Total", primary: true}]
+            }
+        }
+    },
 
-export const CLICK_BY_SEARCH_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "avgClicksByQueryTimeLine",
-    text: "msg#widgets.avgClicksByQueryTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.avgClicksByQueryTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "AvgClicksByQuery",
-            dateField: "value",
-            valueFields: [{operatorResults: true, name: "avg", title: "Average Click By Search", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    sessionCountTotalTimeline: {
+        type: "timeline",
+        query: "sessionTotalTimeLine",
+        text: "msg#widgets.sessionTotalTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.sessionTotalTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "SessionTotal",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Session Count Total", primary: true}]
+            }
+        }
+    },
 
-export const AVG_ENGINE_RESPONSE_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "avgEngineResponseTimeTimeLine",
-    text: "msg#widgets.avgEngineResponseTimeTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.avgEngineResponseTimeTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "engineresponsetime",
-            dateField: "value",
-            valueFields: [{operatorResults: true, name: "avg", title: "Average Engine Response", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    clickBySearchTimeline: {
+        type: "timeline",
+        query: "avgClicksByQueryTimeLine",
+        text: "msg#widgets.avgClicksByQueryTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.avgClicksByQueryTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "AvgClicksByQuery",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "avg", title: "Average Click By Search", primary: true}]
+            }
+        }
+    },
 
-export const MRR_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "avgMRRTimeLine",
-    text: "msg#widgets.avgMRRTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.avgMRRTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "AvgMRR",
-            dateField: "value",
-            valueFields: [{operatorResults: true, name: "avg", title: "Average MRR", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    avgEngineResponseTimeline: {
+        type: "timeline",
+        query: "avgEngineResponseTimeTimeLine",
+        text: "msg#widgets.avgEngineResponseTimeTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.avgEngineResponseTimeTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "engineresponsetime",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "avg", title: "Average Engine Response", primary: true}]
+            }
+        }
+    },
 
-export const SEARCH_BY_SESSION_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "avgQueriesBySessionTimeLine",
-    text: "msg#widgets.avgQueriesBySessionTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.avgQueriesBySessionTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "AvgQueriesBySession",
-            dateField: "value",
-            valueFields: [{operatorResults: true, name: "avg", title: "Average Search By Session", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    mrrTimeline: {
+        type: "timeline",
+        query: "avgMRRTimeLine",
+        text: "msg#widgets.avgMRRTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.avgMRRTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "AvgMRR",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "avg", title: "Average MRR", primary: true}]
+            }
+        }
+    },
 
-export const AVG_RESPONSE_TIME_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "avgResponseTimeTimeLine",
-    text: "msg#widgets.avgResponseTimeTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.avgResponseTimeTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "engineresponsetime",
-            dateField: "value",
-            valueFields: [{operatorResults: true, name: "avg", title: "Average Response Time", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    searchBySessionTimeline: {
+        type: "timeline",
+        query: "avgQueriesBySessionTimeLine",
+        text: "msg#widgets.avgQueriesBySessionTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.avgQueriesBySessionTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "AvgQueriesBySession",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "avg", title: "Average Search By Session", primary: true}]
+            }
+        }
+    },
 
-export const RESPONSE_TIME_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "responseTimeTimeLine",
-    text: "msg#widgets.responseTimeTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.responseTimeTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "ResponseTime",
-            dateField: "value",
-            valueFields: [
-                {operatorResults: true, name: "avg", title: "Average", primary: true},
-                {operatorResults: true, name: "max", title: "Maximum", primary: true},
-                {operatorResults: true, name: "min", title: "Minimum", primary: false}
-            ]
-        } as AggregationTimeSeries
-    }
-};
+    avgResponseTimeTimeline: {
+        type: "timeline",
+        query: "avgResponseTimeTimeLine",
+        text: "msg#widgets.avgResponseTimeTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.avgResponseTimeTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "engineresponsetime",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "avg", title: "Average Response Time", primary: true}]
+            }
+        }
+    },
 
-export const SESSION_DURATION_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "avgSessionDurationTimeLine",
-    text: "msg#widgets.avgSessionDurationTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.avgSessionDurationTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "AvgSessionDuration",
-            dateField: "value",
-            valueFields: [{operatorResults: true, name: "avg", title: "Average Session Duration", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    responseTimeTimeline: {
+        type: "timeline",
+        query: "responseTimeTimeLine",
+        text: "msg#widgets.responseTimeTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.responseTimeTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "ResponseTime",
+                dateField: "value",
+                valueFields: [
+                    {operatorResults: true, name: "avg", title: "Average", primary: true},
+                    {operatorResults: true, name: "max", title: "Maximum", primary: true},
+                    {operatorResults: true, name: "min", title: "Minimum", primary: false}
+                ]
+            }
+        }
+    },
 
-export const FIRST_CLICK_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "clickRank1TotalTimeLine",
-    text: "msg#widgets.clickRank1TotalTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.clickRank1TotalTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "ClickRank1Total",
-            dateField: "value",
-            valueFields: [{name: "count", title: "First Click", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    sessionDurationTimeline: {
+        type: "timeline",
+        query: "avgSessionDurationTimeLine",
+        text: "msg#widgets.avgSessionDurationTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.avgSessionDurationTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "AvgSessionDuration",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "avg", title: "Average Session Duration", primary: true}]
+            }
+        }
+    },
 
-export const CLICK_FIRST_DOCS_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "clickRank3TimeLine",
-    text: "msg#widgets.clickRank3TimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.clickRank3TimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "ClickRank3",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Click On First 3 Documents", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    firstClickTimeline: {
+        type: "timeline",
+        query: "clickRank1TotalTimeLine",
+        text: "msg#widgets.clickRank1TotalTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.clickRank1TotalTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "ClickRank1Total",
+                dateField: "value",
+                valueFields: [{name: "count", title: "First Click", primary: true}]
+            }
+        }
+    },
 
-export const CLICK_TOTAL_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "clickTotalTimeLine",
-    text: "msg#widgets.clickTotalTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.clickTotalTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "ClickTotal",
-            dateField: "value",
-            valueFields: [{operatorResults: true, name: "sum", title: "Click Total", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    clickFirstDocsTimeline: {
+        type: "timeline",
+        query: "clickRank3TimeLine",
+        text: "msg#widgets.clickRank3TimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.clickRank3TimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "ClickRank3",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Click On First 3 Documents", primary: true}]
+            }
+        }
+    },
 
-export const NEW_USERS_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "newUsersTimeLine",
-    text: "msg#widgets.newUsersTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.newUsersTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "NewUsers",
-            dateField: "value",
-            valueFields: [{name: "count", title: "New Users", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    clickTotalTimeline: {
+        type: "timeline",
+        query: "clickTotalTimeLine",
+        text: "msg#widgets.clickTotalTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.clickTotalTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "ClickTotal",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "sum", title: "Click Total", primary: true}]
+            }
+        }
+    },
 
-export const QUERY_BOUNCE_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "queryBounceTimeLine",
-    text: "msg#widgets.queryBounceTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.queryBounceTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "QueryBounc",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Query Bounce", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    newUsersTimeline: {
+        type: "timeline",
+        query: "newUsersTimeLine",
+        text: "msg#widgets.newUsersTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.newUsersTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "NewUsers",
+                dateField: "value",
+                valueFields: [{name: "count", title: "New Users", primary: true}]
+            }
+        }
+    },
 
-export const SEARCH_WITH_CLICKS_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "queryClickTimeLine",
-    text: "msg#widgets.queryClickTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.queryClickTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "QueryClick",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Search With Clicks", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    queryBounceTimeline: {
+        type: "timeline",
+        query: "queryBounceTimeLine",
+        text: "msg#widgets.queryBounceTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.queryBounceTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "QueryBounc",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Query Bounce", primary: true}]
+            }
+        }
+    },
 
-export const REFINEMENT_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "queryRefineTimeLine",
-    text: "msg#widgets.queryRefineTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.queryRefineTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "QueryRefine",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Refinement", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    searchWithClicksTimeline: {
+        type: "timeline",
+        query: "queryClickTimeLine",
+        text: "msg#widgets.queryClickTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.queryClickTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "QueryClick",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Search With Clicks", primary: true}]
+            }
+        }
+    },
 
-export const ZERO_SEARCH_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "queryZeroTimeLine",
-    text: "msg#widgets.queryZeroTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.queryZeroTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "QueryZero",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Zero Search", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    refinementTimeline: {
+        type: "timeline",
+        query: "queryRefineTimeLine",
+        text: "msg#widgets.queryRefineTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.queryRefineTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "QueryRefine",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Refinement", primary: true}]
+            }
+        }
+    },
 
-export const REGULAR_USERS_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "regularUsersTimeLine",
-    text: "msg#widgets.regularUsersTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.regularUsersTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "RegularUsers",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Regular Users", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    zeroSearchTimeline: {
+        type: "timeline",
+        query: "queryZeroTimeLine",
+        text: "msg#widgets.queryZeroTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.queryZeroTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "QueryZero",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Zero Search", primary: true}]
+            }
+        }
+    },
 
-export const SEARCH_EXIT_TIMELINE: DashboardItemOption = {
-    type: "timeline",
-    query: "searchExitTimeLine",
-    text: "msg#widgets.searchExitTimeLine.text",
-    icon: "fas fa-chart-line",
-    info: "msg#widgets.searchExitTimeLine.info",
-    unique: true,
-    parameters: {
-        aggregationsTimeSeries: {
-            name: "SearchExit",
-            dateField: "value",
-            valueFields: [{name: "count", title: "Search Exit", primary: true}]
-        } as AggregationTimeSeries
-    }
-};
+    regularUsersTimeline: {
+        type: "timeline",
+        query: "regularUsersTimeLine",
+        text: "msg#widgets.regularUsersTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.regularUsersTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "RegularUsers",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Regular Users", primary: true}]
+            }
+        }
+    },
 
-export const TOP_QUERIES: DashboardItemOption = {
-    type: "chart",
-    query: "topQueries",
-    icon: "fas fa-chart-pie",
-    text: "msg#widgets.topQueries.text",
-    info: "msg#widgets.topQueries.info",
-    unique: true,
-    parameters: {
-        chartData: {
-            aggregation: "query"
-        } as ChartData,
-        chartType: "Bar2D"
-    }
-};
+    searchExitTimeline: {
+        type: "timeline",
+        query: "searchExitTimeLine",
+        text: "msg#widgets.searchExitTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.searchExitTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "SearchExit",
+                dateField: "value",
+                valueFields: [{name: "count", title: "Search Exit", primary: true}]
+            }
+        }
+    },
 
-export const TOP_NO_RESULTS_QUERIES: DashboardItemOption = {
-    type: "chart",
-    query: "topNoResultQueries",
-    icon: "fas fa-chart-pie",
-    text: "msg#widgets.topNoResultQueries.text",
-    info: "msg#widgets.topNoResultQueries.info",
-    unique: true,
-    parameters: {
-        chartData: {
-            aggregation: "query"
-        } as ChartData,
-        chartType: "Bar2D"
-    }
-};
+    topQueries: {
+        type: "chart",
+        query: "topQueries",
+        icon: "fas fa-chart-pie",
+        text: "msg#widgets.topQueries.text",
+        info: "msg#widgets.topQueries.info",
+        unique: true,
+        parameters: {
+            chartData: {
+                aggregation: "query"
+            },
+            chartType: "Bar2D"
+        }
+    },
 
-export const TOP_SOURCES: DashboardItemOption = {
-    type: "chart",
-    query: "topSources",
-    icon: "fas fa-chart-pie",
-    text: "msg#widgets.topSources.text",
-    info: "msg#widgets.topSources.info",
-    unique: true,
-    parameters: {
-        chartData: {
-            aggregation: "source"
-        } as ChartData,
-        chartType: "Pie3D"
-    }
-};
+    topNoResultsQueries: {
+        type: "chart",
+        query: "topNoResultQueries",
+        icon: "fas fa-chart-pie",
+        text: "msg#widgets.topNoResultQueries.text",
+        info: "msg#widgets.topNoResultQueries.info",
+        unique: true,
+        parameters: {
+            chartData: {
+                aggregation: "query"
+            },
+            chartType: "Bar2D"
+        }
+    },
 
-export const TOP_FACETS: DashboardItemOption = {
-    type: "chart",
-    query: "topFacets",
-    icon: "fas fa-chart-pie",
-    text: "msg#widgets.topFacets.text",
-    info: "msg#widgets.topFacets.info",
-    unique: true,
-    parameters: {
-        chartData: {
-            aggregation: "box"
-        } as ChartData,
-        chartType: "Pie3D"
-    }
-};
+    topSources: {
+        type: "chart",
+        query: "topSources",
+        icon: "fas fa-chart-pie",
+        text: "msg#widgets.topSources.text",
+        info: "msg#widgets.topSources.info",
+        unique: true,
+        parameters: {
+            chartData: {
+                aggregation: "source"
+            },
+            chartType: "Pie3D"
+        }
+    },
 
-export const USER_COUNT_TOTAL: DashboardItemOption = {
-    type: "stat",
-    query: "userCountTotal",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.userCountTotal.text",
-    info: "msg#widgets.userCountTotal.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        asc: true
-    }
-};
+    topFacets: {
+        type: "chart",
+        query: "topFacets",
+        icon: "fas fa-chart-pie",
+        text: "msg#widgets.topFacets.text",
+        info: "msg#widgets.topFacets.info",
+        unique: true,
+        parameters: {
+            chartData: {
+                aggregation: "box"
+            },
+            chartType: "Pie3D"
+        }
+    },
 
-export const SESSION_COUNT_TOTAL: DashboardItemOption = {
-    type: "stat",
-    query: "sessionTotal",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.sessionTotal.text",
-    info: "msg#widgets.sessionTotal.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        asc: true
-    }
-};
+    userCountTotal: {
+        type: "stat",
+        query: "userCountTotal",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.userCountTotal.text",
+        info: "msg#widgets.userCountTotal.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            asc: true
+        }
+    },
 
-export const QUERY_COUNT_TOTAL: DashboardItemOption = {
-    type: "stat",
-    query: "queryTotal",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryTotal.text",
-    info: "msg#widgets.queryTotal.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "records",
-        asc: true
-    }
-};
+    sessionCountTotal: {
+        type: "stat",
+        query: "sessionTotal",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.sessionTotal.text",
+        info: "msg#widgets.sessionTotal.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            asc: true
+        }
+    },
 
-export const SESSIONS_BY_USER: DashboardItemOption = {
-    type: "stat",
-    query: "sessionsByUser",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.sessionsByUser.text",
-    info: "msg#widgets.sessionsByUser.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "aggregations",
-        operation: "avg",
-        asc: true
-    }
-};
+    queryCountTotal: {
+        type: "stat",
+        query: "queryTotal",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryTotal.text",
+        info: "msg#widgets.queryTotal.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "records",
+            asc: true
+        }
+    },
 
-export const SEARCH_BY_SESSION: DashboardItemOption = {
-    type: "stat",
-    query: "avgQueriesBySession",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.avgQueriesBySession.text",
-    info: "msg#widgets.avgQueriesBySession.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "records",
-        asc: true
-    }
-};
+    sessionsByUser: {
+        type: "stat",
+        query: "sessionsByUser",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.sessionsByUser.text",
+        info: "msg#widgets.sessionsByUser.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "aggregations",
+            operation: "avg",
+            asc: true
+        }
+    },
 
-export const CLICK_BY_SEARCH: DashboardItemOption = {
-    type: "stat",
-    query: "avgClicksByQuery",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.avgClicksByQuery.text",
-    info: "msg#widgets.avgClicksByQuery.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "records",
-        asc: true
-    }
-};
+    searchBySession: {
+        type: "stat",
+        query: "avgQueriesBySession",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.avgQueriesBySession.text",
+        info: "msg#widgets.avgQueriesBySession.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "records",
+            asc: true
+        }
+    },
 
-export const VIEWED_DOC_PER_SEARCH: DashboardItemOption = {
-    type: "stat",
-    query: "docViewsBySession",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.docViewsBySession.text",
-    info: "msg#widgets.docViewsBySession.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "aggregations",
-        operation: "avg",
-        asc: true
-    }
-};
+    clickBySearch: {
+        type: "stat",
+        query: "avgClicksByQuery",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.avgClicksByQuery.text",
+        info: "msg#widgets.avgClicksByQuery.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "records",
+            asc: true
+        }
+    },
 
-export const SESSION_DURATION: DashboardItemOption = {
-    type: "stat",
-    query: "avgSessionDuration",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.avgSessionDuration.text",
-    info: "msg#widgets.avgSessionDuration.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "records",
-        asc: true
-    }
-};
+    viewedDocPerSearch: {
+        type: "stat",
+        query: "docViewsBySession",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.docViewsBySession.text",
+        info: "msg#widgets.docViewsBySession.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "aggregations",
+            operation: "avg",
+            asc: true
+        }
+    },
 
-export const NEW_USERS: DashboardItemOption = {
-    type: "stat",
-    query: "newUsers",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.newUsers.text",
-    info: "msg#widgets.newUsers.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        asc: true
-    }
-};
+    sessionDuration: {
+        type: "stat",
+        query: "avgSessionDuration",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.avgSessionDuration.text",
+        info: "msg#widgets.avgSessionDuration.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "records",
+            asc: true
+        }
+    },
 
-export const REGULAR_USERS: DashboardItemOption = {
-    type: "stat",
-    query: "regularUsers",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.regularUsers.text",
-    info: "msg#widgets.regularUsers.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        asc: true
-    }
-};
+    newUsers: {
+        type: "stat",
+        query: "newUsers",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.newUsers.text",
+        info: "msg#widgets.newUsers.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            asc: true
+        }
+    },
 
-export const ADOPTION_RATE: DashboardItemOption = {
-    type: "stat",
-    query: "newUsers",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.adoptionRate.text",
-    info: "msg#widgets.adoptionRate.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        relatedQuery: "totalUsers",
-        relatedValueLocation: "totalrecordcount",
-        computation: "percentage",
-        asc: true
-    }
-};
+    regularUsers: {
+        type: "stat",
+        query: "regularUsers",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.regularUsers.text",
+        info: "msg#widgets.regularUsers.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            asc: true
+        }
+    },
 
-export const REGULAR_USER_RATE: DashboardItemOption = {
-    type: "stat",
-    query: "regularUsers",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.regularUsersRate.text",
-    info: "msg#widgets.regularUsersRate.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        relatedQuery: "totalUsers",
-        relatedValueLocation: "totalrecordcount",
-        computation: "percentage",
-        asc: true
-    }
-};
+    adoptionRate: {
+        type: "stat",
+        query: "newUsers",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.adoptionRate.text",
+        info: "msg#widgets.adoptionRate.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            relatedQuery: "totalUsers",
+            relatedValueLocation: "totalrecordcount",
+            computation: "percentage",
+            asc: true
+        }
+    },
 
-export const REGULAR_NEW_USERS: DashboardItemOption = {
-    type: "chart",
-    query: "",
-    icon: "fas fa-chart-pie",
-    text: "msg#widgets.regular_newUsers.text",
-    info: "msg#widgets.regular_newUsers.info",
-    unique: true,
-    parameters: {
-        chartData: {
-            aggregation: "regular-new-user"
-        } as ChartData,
-        chartType: "Pie3D"
-    }
-};
+    regularUserRate: {
+        type: "stat",
+        query: "regularUsers",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.regularUsersRate.text",
+        info: "msg#widgets.regularUsersRate.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            relatedQuery: "totalUsers",
+            relatedValueLocation: "totalrecordcount",
+            computation: "percentage",
+            asc: true
+        }
+    },
 
-export const FIRST_CLICK: DashboardItemOption = {
-    type: "stat",
-    query: "clickRank1Total",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.clickRank1TotalRate.text",
-    info: "msg#widgets.clickRank1TotalRate.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        relatedQuery: "clickTotal",
-        relatedValueLocation: "records",
-        computation: "percentage",
-        asc: true
-    }
-};
+    regularNewUsers: {
+        type: "chart",
+        query: "",
+        icon: "fas fa-chart-pie",
+        text: "msg#widgets.regular_newUsers.text",
+        info: "msg#widgets.regular_newUsers.info",
+        unique: true,
+        parameters: {
+            chartData: {
+                aggregation: "regular-new-user"
+            },
+            chartType: "Pie3D"
+        }
+    },
 
-export const MRR: DashboardItemOption = {
-    type: "stat",
-    query: "avgMRR",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.avgMRR.text",
-    info: "msg#widgets.avgMRR.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "records",
-        asc: true
-    }
-};
+    firstClick: {
+        type: "stat",
+        query: "clickRank1Total",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.clickRank1TotalRate.text",
+        info: "msg#widgets.clickRank1TotalRate.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            relatedQuery: "clickTotal",
+            relatedValueLocation: "records",
+            computation: "percentage",
+            asc: true
+        }
+    },
 
-export const REFINEMENT: DashboardItemOption = {
-    type: "stat",
-    query: "queryRefine",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryRefine.text",
-    info: "msg#widgets.queryRefine.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        statLayout: 'standard',
-        asc: true
-    }
-};
+    mrr: {
+        type: "stat",
+        query: "avgMRR",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.avgMRR.text",
+        info: "msg#widgets.avgMRR.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "records",
+            asc: true
+        }
+    },
 
-export const REFINEMENT_RATE: DashboardItemOption = {
-    type: "stat",
-    query: "queryRefine",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryRefineRate.text",
-    info: "msg#widgets.queryRefineRate.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        relatedQuery: "queryTotal",
-        relatedValueLocation: "records",
-        computation: "percentage",
-        statLayout: 'standard',
-        asc: true
-    }
-};
+    refinement: {
+        type: "stat",
+        query: "queryRefine",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryRefine.text",
+        info: "msg#widgets.queryRefine.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            statLayout: 'standard',
+            asc: true
+        }
+    },
 
-export const SEARCH_WITH_CLICKS: DashboardItemOption = {
-    type: "stat",
-    query: "queryClick",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryClick.text",
-    info: "msg#widgets.queryClick.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        asc: true
-    }
-};
+    refinementRate: {
+        type: "stat",
+        query: "queryRefine",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryRefineRate.text",
+        info: "msg#widgets.queryRefineRate.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            relatedQuery: "queryTotal",
+            relatedValueLocation: "records",
+            computation: "percentage",
+            statLayout: 'standard',
+            asc: true
+        }
+    },
 
-export const SEARCH_WITH_CLICKS_RATE: DashboardItemOption = {
-    type: "stat",
-    query: "queryClick",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryClickRate.text",
-    info: "msg#widgets.queryClickRate.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        relatedQuery: "queryTotal",
-        relatedValueLocation: "records",
-        computation: "percentage",
-        statLayout: 'standard',
-        asc: true
-    }
-};
+    searchWithClicks: {
+        type: "stat",
+        query: "queryClick",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryClick.text",
+        info: "msg#widgets.queryClick.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            asc: true
+        }
+    },
 
-export const ZERO_SEARCH: DashboardItemOption = {
-    type: "stat",
-    query: "queryZero",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryZero.text",
-    info: "msg#widgets.queryZero.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        statLayout: 'standard',
-        asc: false
-    }
-};
+    searchWithClicksRate: {
+        type: "stat",
+        query: "queryClick",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryClickRate.text",
+        info: "msg#widgets.queryClickRate.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            relatedQuery: "queryTotal",
+            relatedValueLocation: "records",
+            computation: "percentage",
+            statLayout: 'standard',
+            asc: true
+        }
+    },
 
-export const ZERO_SEARCH_RATE: DashboardItemOption = {
-    type: "stat",
-    query: "queryZero",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryZeroRate.text",
-    info: "msg#widgets.queryZeroRate.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        relatedQuery: "queryTotal",
-        relatedValueLocation: "records",
-        computation: "percentage",
-        statLayout: 'standard',
-        asc: false
-    }
-};
+    zeroSearch: {
+        type: "stat",
+        query: "queryZero",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryZero.text",
+        info: "msg#widgets.queryZero.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            statLayout: 'standard',
+            asc: false
+        }
+    },
 
-export const SEARCH_EXIT: DashboardItemOption = {
-    type: "stat",
-    query: "searchExit",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.searchExit.text",
-    info: "msg#widgets.searchExit.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "totalrecordcount",
-        asc: false
-    }
-};
+    zeroSearchRate: {
+        type: "stat",
+        query: "queryZero",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryZeroRate.text",
+        info: "msg#widgets.queryZeroRate.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            relatedQuery: "queryTotal",
+            relatedValueLocation: "records",
+            computation: "percentage",
+            statLayout: 'standard',
+            asc: false
+        }
+    },
 
-export const SEARCH_EXIT_RATE: DashboardItemOption = {
-    type: "stat",
-    query: "searchExit",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.searchExitRate.text",
-    info: "msg#widgets.searchExitRate.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        relatedQuery: "queryTotal",
-        relatedValueLocation: "records",
-        computation: "percentage",
-        statLayout: 'standard',
-        asc: false
-    }
-};
+    searchExit: {
+        type: "stat",
+        query: "searchExit",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.searchExit.text",
+        info: "msg#widgets.searchExit.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "totalrecordcount",
+            asc: false
+        }
+    },
 
-export const CLICK_FIRST_DOCS: DashboardItemOption = {
-    type: "stat",
-    query: "clickRank3",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.clickRank3.text",
-    info: "msg#widgets.clickRank3.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        relatedQuery: "queryTotal",
-        relatedValueLocation: "records",
-        computation: "percentage",
-        statLayout: 'standard',
-        asc: true
-    }
-};
+    searchExitRate: {
+        type: "stat",
+        query: "searchExit",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.searchExitRate.text",
+        info: "msg#widgets.searchExitRate.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            relatedQuery: "queryTotal",
+            relatedValueLocation: "records",
+            computation: "percentage",
+            statLayout: 'standard',
+            asc: false
+        }
+    },
 
-export const QUERY_BOUNCE: DashboardItemOption = {
-    type: "stat",
-    query: "queryBounce",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryBounce.text",
-    info: "msg#widgets.queryBounce.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        statLayout: 'standard',
-        asc: true
-    }
-};
+    clickFirstDocs: {
+        type: "stat",
+        query: "clickRank3",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.clickRank3.text",
+        info: "msg#widgets.clickRank3.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            relatedQuery: "queryTotal",
+            relatedValueLocation: "records",
+            computation: "percentage",
+            statLayout: 'standard',
+            asc: true
+        }
+    },
 
-export const QUERY_BOUNCE_RATE: DashboardItemOption = {
-    type: "stat",
-    query: "queryBounce",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.queryBounceRate.text",
-    info: "msg#widgets.queryBounceRate.info",
-    unique: true,
-    parameters: {
-        valueLocation: "totalrecordcount",
-        relatedQuery: "queryTotal",
-        relatedValueLocation: "records",
-        computation: "percentage",
-        statLayout: 'standard',
-        asc: true
-    }
-};
+    queryBounce: {
+        type: "stat",
+        query: "queryBounce",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryBounce.text",
+        info: "msg#widgets.queryBounce.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            statLayout: 'standard',
+            asc: true
+        }
+    },
 
-export const RESULT_TYPES: DashboardItemOption = {
-    type: "chart",
-    query: "queryByResult",
-    icon: "fas fa-chart-pie",
-    text: "msg#widgets.queryByResult.text",
-    info: "msg#widgets.queryByResult.info",
-    unique: true,
-    parameters: {
-        chartData: {
-            aggregation: "result"
-        } as ChartData,
-        chartType: "Pie3D"
-    }
-};
+    queryBounceRate: {
+        type: "stat",
+        query: "queryBounce",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.queryBounceRate.text",
+        info: "msg#widgets.queryBounceRate.info",
+        unique: true,
+        parameters: {
+            valueLocation: "totalrecordcount",
+            relatedQuery: "queryTotal",
+            relatedValueLocation: "records",
+            computation: "percentage",
+            statLayout: 'standard',
+            asc: true
+        }
+    },
 
-export const AVG_RESPONSE_TIME: DashboardItemOption = {
-    type: "stat",
-    query: "avgResponseTime",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.avgResponseTime.text",
-    info: "msg#widgets.avgResponseTime.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "records",
-        asc: false
-    }
-};
+    resultTypes: {
+        type: "chart",
+        query: "queryByResult",
+        icon: "fas fa-chart-pie",
+        text: "msg#widgets.queryByResult.text",
+        info: "msg#widgets.queryByResult.info",
+        unique: true,
+        parameters: {
+            chartData: {
+                aggregation: "result"
+            },
+            chartType: "Pie3D"
+        }
+    },
 
-export const AVG_ENGINE_RESPONSE_TIME: DashboardItemOption = {
-    type: "stat",
-    query: "avgEngineResponseTime",
-    icon: "fas fa-balance-scale",
-    text: "msg#widgets.avgEngineResponseTime.text",
-    info: "msg#widgets.avgEngineResponseTime.info",
-    unique: true,
-    parameters: {
-        statLayout: 'standard',
-        valueLocation: "records",
-        asc: false
-    }
-};
+    avgResponseTime: {
+        type: "stat",
+        query: "avgResponseTime",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.avgResponseTime.text",
+        info: "msg#widgets.avgResponseTime.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "records",
+            asc: false
+        }
+    },
 
+    avgEngineResponseTime: {
+        type: "stat",
+        query: "avgEngineResponseTime",
+        icon: "fas fa-balance-scale",
+        text: "msg#widgets.avgEngineResponseTime.text",
+        info: "msg#widgets.avgEngineResponseTime.info",
+        unique: true,
+        parameters: {
+            statLayout: 'standard',
+            valueLocation: "records",
+            asc: false
+        }
+    },
+
+};
 
 /** Dashboards */
-export const  STANDARD_DASHBOARDS: {name: string, items: {option: DashboardItemOption, position: DashboardItemPosition}[]}[] = [
+export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position: DashboardItemPosition}[]}[] = [
     {
         name: "msg#dashboards.userAdoption",
         items: [
-            {option: USER_COUNT_TOTAL_TIMELINE, position: {x: 0, y: 0}},
-            {option: NEW_USERS, position: {x: 3, y: 0}},
-            {option: REGULAR_USERS, position: {x: 4, y: 0}},
-            {option: USER_COUNT_TOTAL, position: {x: 3, y: 6}},
-            {option: SESSIONS_BY_USER, position: {x: 4, y: 8}},
-            {option: SESSION_COUNT_TOTAL, position: {x: 4, y: 2}},
-            {option: SEARCH_BY_SESSION, position: {x: 6, y: 8}},
-            {option: QUERY_COUNT_TOTAL, position: {x: 4, y: 6}},
-            {option: VIEWED_DOC_PER_SEARCH, position: {x: 5, y: 8}},
-            {option: QUERY_COUNT_TOTAL_TIMELINE, position: {x: 0, y: 4}},
-            {option: SESSION_COUNT_TOTAL_TIMELINE, position: {x: 0, y: 8}},
-            {option: CLICK_BY_SEARCH, position: {x: 4, y: 4}},
-            {option: ADOPTION_RATE, position: {x : 3, y : 2, rows : 4}},
-            {option: SESSION_DURATION, position: {x : 3, y : 8}},
-            {option: TOP_SOURCES, position: {x: 5, y: 0}},
-            {option: TOP_FACETS, position: {x: 5, y: 4}}
+            {item: "userCountTotalTimeline", position: {x: 0, y: 0}},
+            {item: "newUsers", position: {x: 3, y: 0}},
+            {item: "regularUsers", position: {x: 4, y: 0}},
+            {item: "userCountTotal", position: {x: 3, y: 6}},
+            {item: "sessionsByUser", position: {x: 4, y: 8}},
+            {item: "sessionCountTotal", position: {x: 4, y: 2}},
+            {item: "searchBySession", position: {x: 6, y: 8}},
+            {item: "queryCountTotal", position: {x: 4, y: 6}},
+            {item: "viewedDocPerSearch", position: {x: 5, y: 8}},
+            {item: "queryCountTotalTimeline", position: {x: 0, y: 4}},
+            {item: "sessionCountTotalTimeline", position: {x: 0, y: 8}},
+            {item: "clickBySearch", position: {x: 4, y: 4}},
+            {item: "adoptionRate", position: {x : 3, y : 2, rows : 4}},
+            {item: "sessionDuration", position: {x : 3, y : 8}},
+            {item: "topSources", position: {x: 5, y: 0}},
+            {item: "topFacets", position: {x: 5, y: 4}}
         ]
     },
     {
         name: "msg#dashboards.relevancy",
         items: [
-            {option: TOP_QUERIES, position: {x: 0, y: 0}},
-            {option: TOP_NO_RESULTS_QUERIES, position: {x: 0, y: 4}},
-            {option: CLICK_FIRST_DOCS, position: {x: 4, y: 0}},
-            {option: QUERY_BOUNCE_RATE, position: {x: 4, y: 4}},
-            {option: SEARCH_EXIT_RATE, position: {x: 5, y: 4, rows : 4}},
-            {option: ZERO_SEARCH, position: {x: 3, y: 4}},
-            {option: REFINEMENT, position: {x: 3, y: 6}},
-            {option: MRR, position: {x: 3, y: 2}},
-            {option: FIRST_CLICK, position: {x: 3, y: 0}},
-            {option: RESULT_TYPES, position: {x: 5, y: 0}},
-            {option: SEARCH_WITH_CLICKS_RATE, position: {x: 4, y: 2}},
+            {item: "topQueries", position: {x: 0, y: 0}},
+            {item: "topNoResultsQueries", position: {x: 0, y: 4}},
+            {item: "clickFirstDocs", position: {x: 4, y: 0}},
+            {item: "queryBounceRate", position: {x: 4, y: 4}},
+            {item: "searchExitRate", position: {x: 5, y: 4, rows : 4}},
+            {item: "zeroSearch", position: {x: 3, y: 4}},
+            {item: "refinement", position: {x: 3, y: 6}},
+            {item: "mrr", position: {x: 3, y: 2}},
+            {item: "firstClick", position: {x: 3, y: 0}},
+            {item: "resultTypes", position: {x: 5, y: 0}},
+            {item: "searchWithClicksRate", position: {x: 4, y: 2}},
         ]
     },
     {
         name: "msg#dashboards.performance",
         items: [
-            {option: AVG_RESPONSE_TIME_TIMELINE, position: {x: 0, y: 0}},
-            {option: RESPONSE_TIME_TIMELINE, position: {x: 3, y: 0}},
-            {option: AVG_ENGINE_RESPONSE_TIMELINE, position: {x: 0, y: 4}}
+            {item: "avgResponseTimeTimeline", position: {x: 0, y: 0}},
+            {item: "responseTimeTimeline", position: {x: 3, y: 0}},
+            {item: "avgEngineResponseTimeline", position: {x: 0, y: 4}}
         ]
-    },
+    }
 ]
 
-/** Panorama */
-export const PANORAMA: {name: string, items: DashboardItemOption[]}[] = [
+/** Palette */
+export const PALETTE: {name: string, items: string[]}[] = [
   {
-      name: "Timeline",
+      name: "msg#palette.timelines",
       items: [
-          QUERY_COUNT_TOTAL_TIMELINE,
-          USER_COUNT_TOTAL_TIMELINE,
-          SESSION_COUNT_TOTAL_TIMELINE,
-          SEARCH_BY_SESSION_TIMELINE,
-          CLICK_BY_SEARCH_TIMELINE,
-          SESSION_DURATION_TIMELINE,
-          NEW_USERS_TIMELINE,
-          REGULAR_USERS_TIMELINE,
-          FIRST_CLICK_TIMELINE,
-          MRR_TIMELINE,
-          REFINEMENT_TIMELINE,
-          REFINEMENT_RATE,
-          SEARCH_WITH_CLICKS_TIMELINE,
-          SEARCH_EXIT_TIMELINE,
-          ZERO_SEARCH_TIMELINE,
-          ZERO_SEARCH_RATE,
-          CLICK_FIRST_DOCS_TIMELINE,
-          QUERY_BOUNCE_TIMELINE,
-          CLICK_TOTAL_TIMELINE,
-          RESPONSE_TIME_TIMELINE,
-          AVG_RESPONSE_TIME_TIMELINE,
-          AVG_ENGINE_RESPONSE_TIMELINE
+          "queryCountTotalTimeline",
+          "userCountTotalTimeline",
+          "sessionCountTotalTimeline",
+          "searchBySessionTimeline",
+          "clickBySearchTimeline",
+          "sessionDurationTimeline",
+          "newUsersTimeline",
+          "regularUsersTimeline",
+          "firstClickTimeline",
+          "mrrTimeline",
+          "refinementTimeline",
+          "refinementRate",
+          "searchWithClicksTimeline",
+          "searchExitTimeline",
+          "zeroSearchTimeline",
+          "zeroSearchRate",
+          "clickFirstDocsTimeline",
+          "queryBounceTimeline",
+          "clickTotalTimeline",
+          "responseTimeTimeline",
+          "avgResponseTimeTimeline",
+          "avgEngineResponseTimeline"
 
       ]
   },
   {
-      name: "Chart",
+      name: "msg#palette.charts",
       items: [
-          TOP_SOURCES,
-          TOP_QUERIES,
-          TOP_FACETS,
-          TOP_NO_RESULTS_QUERIES,
-          RESULT_TYPES,
-          REGULAR_NEW_USERS
+          "topSources",
+          "topQueries",
+          "topFacets",
+          "topNoResultsQueries",
+          "resultTypes",
+          "regularNewUsers"
       ]
   },
   {
-      name: "Statistics",
+      name: "msg#palette.statistics",
       items: [
-          QUERY_COUNT_TOTAL,
-          USER_COUNT_TOTAL,
-          SESSION_COUNT_TOTAL,
-          SESSIONS_BY_USER,
-          VIEWED_DOC_PER_SEARCH,
-          SEARCH_BY_SESSION,
-          CLICK_BY_SEARCH,
-          SESSION_DURATION,
-          NEW_USERS,
-          REGULAR_USERS,
-          ADOPTION_RATE,
-          REGULAR_USER_RATE,
-          FIRST_CLICK,
-          MRR,
-          REFINEMENT,
-          SEARCH_WITH_CLICKS,
-          SEARCH_WITH_CLICKS_RATE,
-          ZERO_SEARCH,
-          SEARCH_EXIT,
-          SEARCH_EXIT_RATE,
-          CLICK_FIRST_DOCS,
-          QUERY_BOUNCE,
-          QUERY_BOUNCE_RATE,
-          AVG_RESPONSE_TIME,
-          AVG_ENGINE_RESPONSE_TIME
+          "queryCountTotal",
+          "userCountTotal",
+          "sessionCountTotal",
+          "sessionsByUser",
+          "viewedDocPerSearch",
+          "searchBySession",
+          "clickBySearch",
+          "sessionDuration",
+          "newUsers",
+          "regularUsers",
+          "adoptionRate",
+          "regularUserRate",
+          "firstClick",
+          "mrr",
+          "refinement",
+          "searchWithClicks",
+          "searchWithClicksRate",
+          "zeroSearch",
+          "searchExit",
+          "searchExitRate",
+          "clickFirstDocs",
+          "queryBounce",
+          "queryBounceRate",
+          "avgResponseTime",
+          "avgEngineResponseTime"
       ]
   }
 ]

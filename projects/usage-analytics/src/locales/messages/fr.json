@@ -298,10 +298,10 @@
         "newDashboard": "Nouveau tableau de bord"
     },
 
-    "panorama": {
-        "timeline": "Historique",
-        "chart": "Graphique",
-        "statistic": "Statistique"
+    "palette": {
+        "timelines": "Historiques",
+        "charts": "Graphiques",
+        "statistics": "Statistiques"
     },
 
     "dateRange": {
