@@ -287,7 +287,7 @@ export class DashboardService {
             return {
                 name: d.name,
                 items: d.items.filter(i => Utils.isString(i.item) && widgets[i.item])
-                              .map(i => {return {item: widgets[i.item], position: i.position}})
+                              .map(i => ({item: widgets[i.item], position: i.position}))
             };
         });
     }
