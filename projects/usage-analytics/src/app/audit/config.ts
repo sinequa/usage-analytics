@@ -45,7 +45,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             aggregationsTimeSeries: {
                 name: "QueryTotal",
                 dateField: "value",
-                valueFields: [{name: "count", title: "Query Count Total", primary: true}]
+                valueFields: [{operatorResults: true, name: "sum", title: "Query Count Total", primary: true}]
             }
         }
     },
