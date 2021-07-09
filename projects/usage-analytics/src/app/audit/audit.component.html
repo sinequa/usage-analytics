@@ -49,7 +49,7 @@
     <!-- export actions -->
     <div class="ml-auto">
         <sq-action-buttons [sq-action-buttons]="{items: [exportAction], style:'outline-primary', rightAligned: true}"></sq-action-buttons>
-        <sq-widget-palette class="ml-2"></sq-widget-palette>
+        <sq-widget-palette class="ml-2" *ngIf="loginService.complete"></sq-widget-palette>
     </div>
     
 </ul>

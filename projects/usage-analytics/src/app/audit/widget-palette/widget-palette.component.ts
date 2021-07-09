@@ -1,6 +1,5 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { AppService } from "@sinequa/core/app-utils";
-import { PALETTE } from "../config";
 import { DashboardItemOption, DashboardService } from "../dashboard/dashboard.service";
 
 @Component({
@@ -8,9 +7,10 @@ import { DashboardItemOption, DashboardService } from "../dashboard/dashboard.se
     templateUrl: "./widget-palette.component.html",
     styleUrls: ["./widget-palette.component.scss"],
 })
-export class WidgetPaletteComponent {
+export class WidgetPaletteComponent implements OnInit {
 
     showPalette = false;
+    palette: {name: string, items: DashboardItemOption[]}[];
 
     constructor(
         public dashboardService: DashboardService,
@@ -18,12 +18,12 @@ export class WidgetPaletteComponent {
     ) {
     }
 
-    togglePalette() {
-        this.showPalette = !this.showPalette;
+    ngOnInit() {
+        this.palette = this.dashboardService.getPalette();
     }
 
-    public get palette(): {name: string, items: DashboardItemOption[]}[] {
-        return this.appService.app?.data?.palette as any || PALETTE;
+    togglePalette() {
+        this.showPalette = !this.showPalette;
     }
 
     addWidget(item: DashboardItemOption) {

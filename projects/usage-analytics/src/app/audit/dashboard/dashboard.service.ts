@@ -15,7 +15,7 @@ import { Subject } from 'rxjs';
 import { UserPreferences } from '@sinequa/components/user-settings';
 import { IntlService } from '@sinequa/core/intl';
 import { AggregationTimeSeries, RecordsTimeSeries } from './providers/timeline-provider';
-import { STANDARD_DASHBOARDS } from '../config';
+import { PALETTE, STANDARD_DASHBOARDS, WIDGETS } from '../config';
 import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
 
@@ -248,6 +248,51 @@ export class DashboardService {
     }
 
     /**
+     * Returns the list of widgets from the configuration defined
+     * on the server (appService.app.data.widgets and appService.app.data.customWidgets) 
+     * or in the config.ts file (WIDGETS)
+     */
+    public getWidgets(): {[key: string]: DashboardItemOption} {
+        const widgets = this.appService.app?.data?.widgets || WIDGETS;
+        const customWidgets = this.appService.app?.data?.customWidgets || {};
+        return Utils.extend(widgets, customWidgets);
+    }
+
+    /**
+     * Builds the palette of widgets from the configuration defined
+     * on the server (appService.app.data.palette) or in the config.ts file (PALETTE)
+     */
+    public getPalette(): {name: string, items: DashboardItemOption[]}[] {
+        // Construct palette from configuration
+        const palette = this.appService.app?.data?.palette as any as {name: string, items: string[]}[] || PALETTE;
+        const widgets = this.getWidgets();
+        return palette.map(p => {
+            return {
+                name: p.name,
+                items: p.items.filter(i => Utils.isString(i) && widgets[i])
+                              .map(i => widgets[i])
+            }
+        });
+    }
+
+    /**
+     * Returns the list of standard dashboard from the configuration defined
+     * on the server (appService.app.data.standardDashboards) or in the config.ts file (STANDARD_DASHBOARDS)
+     */
+    public getStandardDashboards(): {name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[]}[] {
+        const dashboards = this.appService.app?.data?.standardDashboards as any as {name: string, items: {item: string, position: DashboardItemPosition}[]}[]
+            || STANDARD_DASHBOARDS;
+        const widgets = this.getWidgets();
+        return dashboards.map(d => {
+            return {
+                name: d.name,
+                items: d.items.filter(i => Utils.isString(i.item) && widgets[i.item])
+                              .map(i => {return {item: widgets[i.item], position: i.position}})
+            };
+        });
+    }
+
+    /**
      * Returns the list of this user's dashboards.
      * The list is stored in the user settings (this is a redirection).
      * It creates the list of dashboards if it does not already exist.
@@ -256,10 +301,10 @@ export class DashboardService {
         if(!this.userSettingsService.userSettings)
             this.userSettingsService.userSettings = {};
         if(!this.userSettingsService.userSettings["dashboards"]) {
-            const dashboards = this.appService.app?.data?.standardDashboards as any || STANDARD_DASHBOARDS;
-            this.userSettingsService.userSettings["dashboards"] = dashboards.map(
-                sd => this.createDashboard(sd.name, sd.items)
-            );
+            this.userSettingsService.userSettings["dashboards"] = 
+                this.getStandardDashboards().map(
+                    sd => this.createDashboard(sd.name, sd.items)
+                );
         }
         return this.userSettingsService.userSettings["dashboards"];
     }
@@ -268,12 +313,12 @@ export class DashboardService {
         return this.dashboards.concat(this.draftDashboards);
     }
 
-    protected createDashboard(name: string, items: {option: DashboardItemOption, position: DashboardItemPosition}[] = []): Dashboard {
+    protected createDashboard(name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[] = []): Dashboard {
         const dashboard = {
             name: name,
             items: []
         };
-        items.forEach(item => this.addWidget(item.option, dashboard, false, item.position.rows, item.position.cols, item.position.x, item.position.y));
+        items.forEach(item => this.addWidget(item.item, dashboard, false, item.position.rows, item.position.cols, item.position.x, item.position.y));
         return dashboard;
     }
 
