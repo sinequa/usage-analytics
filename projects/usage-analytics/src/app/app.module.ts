@@ -37,7 +37,7 @@ import { AppComponent } from "./app.component";
 import { AuditComponent } from "./audit/audit.component";
 import { AuditRangePickerComponent } from "./audit/audit-range-picker/audit-range-picker.component";
 import { DashboardItemComponent } from "./audit/dashboard/dashboard-item.component";
-import { WidgetPanoramaComponent } from "./audit/widget-panorama/widget-panorama.component";
+import { WidgetPaletteComponent } from "./audit/widget-palette/widget-palette.component";
 import { AuditStatComponent } from "./audit/dashboard/audit-stat/audit-stat.component";
 import { IconComponent } from "./audit/icon/icon.component";
 
@@ -136,7 +136,7 @@ const selectionOptions: SelectionOptions = {
         AuditComponent,
         AuditRangePickerComponent,
         DashboardItemComponent,
-        WidgetPanoramaComponent,
+        WidgetPaletteComponent,
         AuditStatComponent,
         IconComponent
     ],

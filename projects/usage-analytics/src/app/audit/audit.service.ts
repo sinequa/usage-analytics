@@ -117,7 +117,6 @@ export class AuditService {
             (data) => {
                 this.data$.next({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
                 this.previousPeriodData$.next({...data[1], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
-                console.log({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
             }
         )
     }

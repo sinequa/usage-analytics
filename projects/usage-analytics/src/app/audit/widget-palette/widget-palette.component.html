@@ -1,9 +1,9 @@
-<button type="button" class="btn btn-outline-primary panorama-btn" (click)="togglePanorama()" [sqTooltip]="'msg#dashboard.addWidget' | sqMessage">
+<button type="button" class="btn btn-outline-primary palette-btn" (click)="togglePalette()" [sqTooltip]="'msg#dashboard.addWidget' | sqMessage">
     <i class="fas fa-plus"></i>
 </button>
 
-<div class="card flex-column panorama text-muted position-absolute" *ngIf="showPanorama">
-    <div *ngFor="let element of panorama" class="mb-3">
+<div class="card flex-column palette text-muted position-absolute" *ngIf="showPalette">
+    <div *ngFor="let element of palette" class="mb-3">
         <details>
             <summary>{{element.name | sqMessage}}</summary>
             <div class="d-flex flex-wrap">

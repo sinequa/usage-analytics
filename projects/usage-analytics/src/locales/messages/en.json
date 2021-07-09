@@ -297,10 +297,10 @@
         "newDashboard": "New Dashboard"
     },
 
-    "panorama": {
-        "timeline": "Timeline",
-        "chart": "Chart",
-        "statistic": "Statistic"
+    "palette": {
+        "timelines": "Timelines",
+        "charts": "Charts",
+        "statistics": "Statistics"
     },
 
     "dateRange": {
