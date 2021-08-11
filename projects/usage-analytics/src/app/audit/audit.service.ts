@@ -10,6 +10,7 @@ import {
     Results,
 } from "@sinequa/core/web-services";
 import { forkJoin, Observable, of, ReplaySubject } from "rxjs";
+import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 
 export enum RelativeTimeRanges {
     Last3H = "msg#dateRange.last3H",
@@ -37,6 +38,10 @@ export interface AuditDatasetFilters {
     providedIn: "root"
 })
 export class AuditService {
+
+    private readonly defaultDatasets:  string[] = ["applications"];
+
+    public datasets: string[] = [];
 
     public data$ = new ReplaySubject<{ [key: string]: Results | DatasetError }>(1);
     public previousPeriodData$ = new ReplaySubject<{ [key: string]: Results | DatasetError }>(1);
@@ -117,6 +122,7 @@ export class AuditService {
             (data) => {
                 this.data$.next({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
                 this.previousPeriodData$.next({...data[1], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
+                console.log({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
             }
         )
     }
@@ -134,6 +140,19 @@ export class AuditService {
         return undefined;
     }
 
+    public updateDatasetsList(dashboard: Dashboard): void {
+        const datasets: string[] = [];
+        dashboard.items.forEach(
+            (item) => {
+                datasets.push(item.query);
+                if (item.relatedQuery) {
+                    datasets.push(item.relatedQuery);
+                }
+            }
+        );
+        this.datasets = datasets;
+    }
+
     private getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError;}> {
         const params = {
             select: filters,
@@ -142,7 +161,8 @@ export class AuditService {
             mask
         };
         if (this.webServiceName) {
-            return this.datasetWebService.getAll(this.webServiceName, params);
+            const datasets = this.defaultDatasets.concat(this.datasets);
+            return this.datasetWebService.getBulk(this.webServiceName, params, datasets);
         } else {
             console.error("No DataSet found")
             return of({})
