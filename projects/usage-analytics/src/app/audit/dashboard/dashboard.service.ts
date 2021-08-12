@@ -106,6 +106,11 @@ export interface DashboardItemPosition {
     cols?: number;
 }
 
+export interface DashboardChange {
+    dashboard: Dashboard,
+    updateDatasets: boolean
+}
+
 // Name of the "default dashboard" (displayed prior to any user customization)
 export const defaultDashboardName = "msg#dashboards.newDashboard";
 
@@ -136,7 +141,7 @@ export class DashboardService {
     saveDashboardAction: Action;
 
     /** A subject firing events when the dashboard changes */
-    dashboardChanged = new Subject<Dashboard>();
+    dashboardChanged = new Subject<DashboardChange>();
 
     constructor(
         public modalService: ModalService,
@@ -198,8 +203,9 @@ export class DashboardService {
         });
 
         // Manage Auto-save dashboards.
-        this.dashboardChanged.subscribe((dashboard: Dashboard) => {
+        this.dashboardChanged.subscribe((changes: DashboardChange) => {
             if (this.dashboard && this.defaultDashboard) {
+                const dashboard = changes.dashboard;
                 // If a saved dashboard is modified, then add it to the changed dashboards list
                 if (!dashboard.name.startsWith(this.formatMessage(defaultDashboardName))) {
                     const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
@@ -213,6 +219,10 @@ export class DashboardService {
                     // If a draft dashboard is modified, then add it to the draft dashboards list
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards[i] = dashboard;
+                }
+                // if needed, update datasets and trigger search in order to consider the changes
+                if (changes.updateDatasets) {
+                    this.searchService.navigate({skipSearch: true});
                 }
             }
         });
@@ -249,7 +259,7 @@ export class DashboardService {
 
     /**
      * Returns the list of widgets from the configuration defined
-     * on the server (appService.app.data.widgets and appService.app.data.customWidgets) 
+     * on the server (appService.app.data.widgets and appService.app.data.customWidgets)
      * or in the config.ts file (WIDGETS)
      */
     public getWidgets(): {[key: string]: DashboardItemOption} {
@@ -301,7 +311,7 @@ export class DashboardService {
         if(!this.userSettingsService.userSettings)
             this.userSettingsService.userSettings = {};
         if(!this.userSettingsService.userSettings["dashboards"]) {
-            this.userSettingsService.userSettings["dashboards"] = 
+            this.userSettingsService.userSettings["dashboards"] =
                 this.getStandardDashboards().map(
                     sd => this.createDashboard(sd.name, sd.items)
                 );
@@ -372,7 +382,7 @@ export class DashboardService {
         const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
         this.dashboard = Utils.copy(_shared);
-        this.dashboardChanged.next(this.dashboard);
+        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: true});
     }
 
     /**
@@ -389,8 +399,8 @@ export class DashboardService {
      * Fire an event when a dashboard item changes
      * @param item
      */
-    public notifyItemChange(item: DashboardItem) {
-        this.dashboardChanged.next(this.dashboard);
+    public notifyItemChange(item: DashboardItem, notify = false) {
+        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: notify});
     }
 
     /**
@@ -438,7 +448,7 @@ export class DashboardService {
         }
         dashboard.items.push(item);
         if (notify) {
-            this.dashboardChanged.next(dashboard);
+            this.dashboardChanged.next({dashboard: dashboard, updateDatasets: true});
         }
         return dashboard.items[dashboard.items.length - 1];
     }

@@ -22,9 +22,9 @@ import {ExportService} from "./export.service";
 export class AuditComponent implements OnDestroy {
     @ViewChildren(DashboardItemComponent) dashboardItems: QueryList<DashboardItemComponent>
     @ViewChild("content", {static: false}) content: ElementRef;
-  
+
     public exportAction: Action;
-    
+
     public dashboards: Dashboard[] = [];
     public dashboardActions: Action[];
 
@@ -62,18 +62,18 @@ export class AuditComponent implements OnDestroy {
                 // searchService.query is not yet defined from url, need to force its value
                 this.searchService.setQuery(this.searchService.getQueryFromUrl());
 
+                // Note: available dashboards and the default dashboard must be set post-login so that it can be overridden by the user settings
+                this.dashboardService.setDefaultDashboard();
+                this.dashboardActions = this.dashboardService.createDashboardActions();
+
                 // Request data upon login
                 this.auditService.updateAuditFilters();
                 this._querySubscription = this.searchService.queryStream
                                             .pipe(skip(1))
                                             .subscribe(() => this.auditService.updateAuditFilters());
-
-                // Note: available dashboards and the default dashboard must be set post-login so that it can be overridden by the user settings
-                this.dashboardService.setDefaultDashboard();
-                this.dashboardActions = this.dashboardService.createDashboardActions();
             }
         });
-        
+
         this.exportAction = new Action({
             icon: "fas fa-file-export",
             name: "exportAsXLSX",
@@ -106,13 +106,13 @@ export class AuditComponent implements OnDestroy {
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToPNG(name, this.content);
     }
-    
+
     exportCSV() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToCsv(name, items);
     }
-    
+
     exportXLSX() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
@@ -167,7 +167,7 @@ export class AuditComponent implements OnDestroy {
     isDark(): boolean {
         return document.body.classList.contains("dark");
     }
-  
+
     // Focus the clicked gridster-item
     // unset previous gridster-item if any
     setFocus(index: number, event: MouseEvent) {
