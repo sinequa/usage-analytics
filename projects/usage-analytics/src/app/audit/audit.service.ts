@@ -10,7 +10,7 @@ import {
     Results,
 } from "@sinequa/core/web-services";
 import { forkJoin, Observable, of, ReplaySubject } from "rxjs";
-import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
+import { Dashboard } from "./dashboard/dashboard.service";
 
 export enum RelativeTimeRanges {
     Last3H = "msg#dateRange.last3H",
