@@ -67,7 +67,6 @@ export class AuditComponent implements OnDestroy {
                 this.dashboardActions = this.dashboardService.createDashboardActions();
 
                 // Request data upon login
-                this.auditService.updateDatasetsList(this.dashboardService.dashboard);
                 this.auditService.updateAuditFilters();
                 this._querySubscription = this.searchService.queryStream
                                             .pipe(skip(1))
@@ -140,7 +139,6 @@ export class AuditComponent implements OnDestroy {
 
     openDashboard(dashboard: Dashboard): void {
         this.dashboardService.openDashboard(dashboard);
-        this.auditService.updateDatasetsList(this.dashboardService.dashboard);
     }
 
     saveDashboard(dashboard, $event): void {

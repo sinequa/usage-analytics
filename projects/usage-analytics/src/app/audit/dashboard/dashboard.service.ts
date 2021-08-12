@@ -18,7 +18,6 @@ import { AggregationTimeSeries, RecordsTimeSeries } from './providers/timeline-p
 import { PALETTE, STANDARD_DASHBOARDS, WIDGETS } from '../config';
 import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
-import { AuditService } from '../audit.service';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -107,6 +106,11 @@ export interface DashboardItemPosition {
     cols?: number;
 }
 
+export interface DashboardChange {
+    dashboard: Dashboard,
+    updateDatasets: boolean
+}
+
 // Name of the "default dashboard" (displayed prior to any user customization)
 export const defaultDashboardName = "msg#dashboards.newDashboard";
 
@@ -137,7 +141,7 @@ export class DashboardService {
     saveDashboardAction: Action;
 
     /** A subject firing events when the dashboard changes */
-    dashboardChanged = new Subject<Dashboard>();
+    dashboardChanged = new Subject<DashboardChange>();
 
     constructor(
         public modalService: ModalService,
@@ -151,8 +155,7 @@ export class DashboardService {
         public urlSerializer: UrlSerializer,
         public clipboard: Clipboard,
         public intlService: IntlService,
-        public appService: AppService,
-        public auditService: AuditService
+        public appService: AppService
     ) {
         // Default options of the Gridster dashboard
         this.options = {
@@ -200,8 +203,9 @@ export class DashboardService {
         });
 
         // Manage Auto-save dashboards.
-        this.dashboardChanged.subscribe((dashboard: Dashboard) => {
+        this.dashboardChanged.subscribe((changes: DashboardChange) => {
             if (this.dashboard && this.defaultDashboard) {
+                const dashboard = changes.dashboard;
                 // If a saved dashboard is modified, then add it to the changed dashboards list
                 if (!dashboard.name.startsWith(this.formatMessage(defaultDashboardName))) {
                     const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
@@ -216,9 +220,10 @@ export class DashboardService {
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards[i] = dashboard;
                 }
-                // update datasets and trigger search in order to consider the changes
-                this.auditService.updateDatasetsList(this.dashboard);
-                this.searchService.navigate({skipSearch: true});
+                // if needed, update datasets and trigger search in order to consider the changes
+                if (changes.updateDatasets) {
+                    this.searchService.navigate({skipSearch: true});
+                }
             }
         });
     }
@@ -377,7 +382,7 @@ export class DashboardService {
         const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
         this.dashboard = Utils.copy(_shared);
-        this.dashboardChanged.next(this.dashboard);
+        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: true});
     }
 
     /**
@@ -394,8 +399,8 @@ export class DashboardService {
      * Fire an event when a dashboard item changes
      * @param item
      */
-    public notifyItemChange(item: DashboardItem) {
-        this.dashboardChanged.next(this.dashboard);
+    public notifyItemChange(item: DashboardItem, notify = false) {
+        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: notify});
     }
 
     /**
@@ -443,7 +448,7 @@ export class DashboardService {
         }
         dashboard.items.push(item);
         if (notify) {
-            this.dashboardChanged.next(dashboard);
+            this.dashboardChanged.next({dashboard: dashboard, updateDatasets: true});
         }
         return dashboard.items[dashboard.items.length - 1];
     }
@@ -454,7 +459,7 @@ export class DashboardService {
      */
     public removeItem(item: DashboardItem) {
         this.dashboard.items.splice(this.dashboard.items.indexOf(item), 1);
-        this.notifyItemChange(item);
+        this.notifyItemChange(item, true);
     }
 
     /**
