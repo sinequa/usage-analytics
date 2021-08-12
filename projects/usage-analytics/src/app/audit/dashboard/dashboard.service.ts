@@ -459,7 +459,7 @@ export class DashboardService {
      */
     public removeItem(item: DashboardItem) {
         this.dashboard.items.splice(this.dashboard.items.indexOf(item), 1);
-        this.notifyItemChange(item, true);
+        this.notifyItemChange(item);
     }
 
     /**
