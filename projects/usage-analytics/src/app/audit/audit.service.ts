@@ -218,10 +218,28 @@ export class AuditService {
             end = new Date(timestamp[1]);
             // One day in milliseconds
             const oneDay = 1000 * 60 * 60 * 24;
+            // One month in milliseconds
+            const oneMonth = 30 * oneDay;
+            // One year in milliseconds
+            const oneYear = 12 * oneMonth;
             // Calculating the time difference between the two dates
             const diffInTime = end.getTime() - start.getTime();
             // Calculating the number of days between the two dates
             const diffInDays = Math.round(diffInTime / oneDay);
+            // Calculating the number of days between the two dates
+            const diffInMonths = Math.round(diffInTime / oneMonth);
+            // Calculating the number of days between the two dates
+            const diffInYears = Math.round(diffInTime / oneYear);
+
+            if (diffInMonths <= 3) {
+                this.mask = "YYYY-MM-DD";
+            } else {
+                if (diffInYears > 3) {
+                    this.mask = "YYYY";
+                } else {
+                    this.mask = "YYYY-MM";
+                }
+            }
 
             const temp = new Date(timestamp[0]); // Need to use different copy of start to not override it
             previous = new Date(temp.setDate(temp.getDate() - diffInDays));
@@ -231,50 +249,62 @@ export class AuditService {
                 case RelativeTimeRanges.Last3H:
                     start = new Date(now.setHours(now.getHours() - 3));
                     previous = new Date(now.setHours(now.getHours() - 3));
+                    this.mask = "YYYY-MM-DD";
                     break;
                 case RelativeTimeRanges.Last6H:
                     start = new Date(now.setHours(now.getHours() - 6));
                     previous = new Date(now.setHours(now.getHours() - 6));
+                    this.mask = "YYYY-MM-DD";
                     break;
                 case RelativeTimeRanges.Last12H:
                     start = new Date(now.setHours(now.getHours() - 12));
                     previous = new Date(now.setHours(now.getHours() - 12));
+                    this.mask = "YYYY-MM-DD";
                     break;
                 case RelativeTimeRanges.Last24H:
                     start = new Date(now.setHours(now.getHours() - 24));
                     previous = new Date(now.setHours(now.getHours() - 24));
+                    this.mask = "YYYY-MM-DD";
                     break;
                 case RelativeTimeRanges.Last7Days:
                     start = new Date(now.setDate(now.getDate() - 7));
                     previous = new Date(now.setDate(now.getDate() - 7));
+                    this.mask = "YYYY-MM-DD";
                     break;
                 case RelativeTimeRanges.Last30Days:
                     start = new Date(now.setDate(now.getDate() - 30));
                     previous = new Date(now.setDate(now.getDate() - 30));
+                    this.mask = "YYYY-MM-DD";
                     break;
                 case RelativeTimeRanges.Last90Days:
                     start = new Date(now.setDate(now.getDate() - 90));
                     previous = new Date(now.setDate(now.getDate() - 90));
+                    this.mask = "YYYY-MM-DD";
                     break;
                 case RelativeTimeRanges.Last6M:
                     start = new Date(now.setMonth(now.getMonth() - 6));
                     previous = new Date(now.setMonth(now.getMonth() - 6));
+                    this.mask = "YYYY-MM";
                     break;
                 case RelativeTimeRanges.Last1Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 1));
                     previous = new Date(now.setFullYear(now.getFullYear() - 1));
+                    this.mask = "YYYY-MM";
                     break;
                 case RelativeTimeRanges.Last2Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 2));
                     previous = new Date(now.setFullYear(now.getFullYear() - 2));
+                    this.mask = "YYYY-MM";
                     break;
                 case RelativeTimeRanges.Last5Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 5));
                     previous = new Date(now.setFullYear(now.getFullYear() - 5));
+                    this.mask = "YYYY";
                     break;
                 default:
                     start = new Date(now.setDate(now.getDate() - 30));
                     previous = new Date(now.setDate(now.getDate() - 30));
+                    this.mask = "YYYY-MM-DD";
                     break;
             }
         }
