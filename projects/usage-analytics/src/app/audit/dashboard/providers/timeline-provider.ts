@@ -1,10 +1,12 @@
 import { Injectable } from "@angular/core";
-import { BasicColumn, depthSeparator } from "@sinequa/analytics/ag-grid";
+import { depthSeparator } from "@sinequa/analytics/ag-grid";
 import { TimelineDate, TimelineSeries, BsFacetTimelineComponent } from "@sinequa/analytics/timeline";
 import { Utils } from "@sinequa/core/base";
 import { Aggregation, DatasetError, Record, Results } from "@sinequa/core/web-services";
 import * as d3 from 'd3';
+import { ColDef } from "ag-grid-community";
 import moment from 'moment';
+import { IntlService } from "@sinequa/core/intl";
 
 export interface TimeSeries {
     dateField: string;
@@ -28,7 +30,7 @@ export interface RecordsTimeSeries extends TimeSeries {}
 @Injectable()
 export class TimelineProvider {
 
-    constructor() {}
+    constructor(public intlService: IntlService) {}
 
     public getAggregationsTimeSeries(data: Results | DatasetError, aggregationsTimeSeries: AggregationTimeSeries | AggregationTimeSeries[], mask: string): TimelineSeries[] {
         if (!Utils.isArray(aggregationsTimeSeries)) {
@@ -54,8 +56,16 @@ export class TimelineProvider {
         return this.defaultStyleRules(timeSeries);
     }
 
-    public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[]): BasicColumn[] {
-        const columnDefs = [{ headerName: 'Date', field: 'value', sortable: true, filter: true }] as BasicColumn[];
+    public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[]): ColDef[] {
+        const columnDefs = [{
+            headerName: 'Date',
+            field: 'value',
+            sortable: true,
+            filter: true,
+            cellRenderer: (params: any): HTMLElement |string => {
+                return this.intlService.formatDate(new Date(params.value));
+            }
+        }] as ColDef[];
         if (!Utils.isArray(configs)) {
             configs = [configs];
         }

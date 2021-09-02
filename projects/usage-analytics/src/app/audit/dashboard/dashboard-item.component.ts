@@ -13,8 +13,9 @@ import { DashboardItem, DashboardService } from './dashboard.service';
 import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
-import { BasicColumn } from '@sinequa/analytics/ag-grid';
 import { Utils } from '@sinequa/core/base';
+import { ColDef } from "ag-grid-community";
+
 /**
  * A wrapper component for all widgets in the dashboard.
  * The component is in charge of updating inputs going into each widget.
@@ -92,7 +93,7 @@ export class DashboardItemComponent implements OnChanges {
     private icon: string;
     private title: string;
     gridView = false;
-    columnDefs: BasicColumn[] = []
+    columnDefs: ColDef[] = []
     aggregations: string[] = [];
 
     constructor(

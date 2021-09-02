@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { BasicColumn } from "@sinequa/analytics/ag-grid";
 import { Utils } from "@sinequa/core/base";
 import { Aggregation, DatasetError, Record, Results } from "@sinequa/core/web-services";
+import { ColDef } from "ag-grid-community";
 
 export interface ChartData {
     aggregation: string;
@@ -34,7 +34,7 @@ export class ChartProvider {
 
     }
 
-    public getGridColumnDefs(config: ChartData): BasicColumn[] {
+    public getGridColumnDefs(config: ChartData): ColDef[] {
         return [
             {
                 headerName: config.displayedValueName ? config.displayedValueName : 'Label',
