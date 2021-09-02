@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { BasicColumn, depthSeparator } from "@sinequa/analytics/ag-grid";
 import { TimelineDate, TimelineSeries, BsFacetTimelineComponent } from "@sinequa/analytics/timeline";
 import { Utils } from "@sinequa/core/base";
 import { Aggregation, DatasetError, Record, Results } from "@sinequa/core/web-services";
@@ -15,6 +16,7 @@ export interface TimelineValueField {
     operatorResults?: boolean
     title?: string;
     primary?: boolean;
+    displayedName?: string;
 }
 
 export interface AggregationTimeSeries extends TimeSeries {
@@ -52,9 +54,29 @@ export class TimelineProvider {
         return this.defaultStyleRules(timeSeries);
     }
 
+    public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[]): BasicColumn[] {
+        const columnDefs = [{ headerName: 'Date', field: 'value', sortable: true, filter: true }] as BasicColumn[];
+        if (!Utils.isArray(configs)) {
+            configs = [configs];
+        }
+        for (const config of configs) {
+            for (const valueField of config.valueFields) {
+                columnDefs.push(
+                    {
+                        headerName: valueField.displayedName ? valueField.displayedName : valueField.name,
+                        field: valueField.operatorResults? ("operatorResults"+ depthSeparator + valueField.name) : valueField.name,
+                        sortable: true,
+                        filter: true
+                    }
+                )
+            }
+        }
+        return columnDefs;
+    }
+
     protected makeAggregationSeries(aggregation: Aggregation, aggregationTimeSeries: AggregationTimeSeries, mask: string): TimelineSeries[] {
         const timeSeries: TimelineSeries[] = [];
-        
+
         const timeInterval = BsFacetTimelineComponent.getD3TimeInterval(mask);
 
         if (aggregation && aggregation.items) {
@@ -71,7 +93,7 @@ export class TimelineProvider {
 
                 // in case the dates are not already sorted...
                 rawDates.sort((a,b)=>a.date.getTime()- b.date.getTime());
-                
+
                 rawDates.forEach((item,i) => {
                     const date = item.date;
                     if(i === 0 || timeInterval.offset(dates[dates.length-1].date, 1) < date) {

@@ -10,6 +10,7 @@
     <!-- Timeline view-->
     <section *ngSwitchCase="'timeline'">
         <sq-timeline
+            *ngIf="!gridView"
             [data]="timeSeries"
             [width]="innerwidth"
             [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
@@ -19,11 +20,19 @@
             (selectionChange)="updateAuditRange($event)">
         </sq-timeline>
         <sq-timeline-legend
-            *ngIf="timeSeries?.length > 1"
+            *ngIf="timeSeries?.length > 1 && !gridView"
             [data]="timeSeries"
             [yOffset]="8"
             [legendStyles]="{'justify-content': 'center'}">
         </sq-timeline-legend>
+        <sq-basic-grid-view
+            *ngIf="gridView"
+            [results]="dataset[config.query]"
+            [aggregations]="aggregations"
+            [columnDefs]="columnDefs"
+            [width]="innerwidth"
+            [height]="innerheight + 'px'">
+        </sq-basic-grid-view>
     </section>
 
 
@@ -38,6 +47,7 @@
     <div class="overflow-hidden" *ngSwitchCase="'chart'">
         <sq-fusion-chart
             #facet
+            *ngIf="!gridView"
             [results]="chartResults"
             [chart]="chart"
             [aggregation]="config?.chartData?.aggregation"
@@ -47,6 +57,14 @@
             (initialized)="onChartInitialized($event)"
             (typeChange)="onChartTypeChange($event)">
         </sq-fusion-chart>
+        <sq-basic-grid-view
+            *ngIf="gridView"
+            [results]="chartResults"
+            [aggregations]="aggregations"
+            [columnDefs]="columnDefs"
+            [width]="innerwidth"
+            [height]="innerheight + 'px'">
+        </sq-basic-grid-view>
     </div>
 
     <!-- Heatmap view -->

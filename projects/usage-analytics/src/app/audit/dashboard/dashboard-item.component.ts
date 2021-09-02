@@ -13,6 +13,8 @@ import { DashboardItem, DashboardService } from './dashboard.service';
 import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
+import { BasicColumn } from '@sinequa/analytics/ag-grid';
+import { Utils } from '@sinequa/core/base';
 /**
  * A wrapper component for all widgets in the dashboard.
  * The component is in charge of updating inputs going into each widget.
@@ -65,6 +67,7 @@ export class DashboardItemComponent implements OnChanges {
     fullScreenAction: Action;
     maximizeAction: Action;
     infoAction: Action;
+    chartOrGridAction: Action;
 
     // Properties specific to certain types of dashboard items
     innerwidth = 500;
@@ -85,6 +88,12 @@ export class DashboardItemComponent implements OnChanges {
 
     // Timeline
     timeSeries: TimelineSeries[] = [];
+
+    private icon: string;
+    private title: string;
+    gridView = false;
+    columnDefs: BasicColumn[] = []
+    aggregations: string[] = [];
 
     constructor(
         public gridsterItemComponent: GridsterItemComponent,
@@ -126,12 +135,33 @@ export class DashboardItemComponent implements OnChanges {
                             : "msg#dashboard.maximizeTitle";
             }
         });
+
+        this.chartOrGridAction = new Action({
+            icon: "fas fa-th-list",
+            title: "Grid view",
+            action: (action) => {
+                this.gridView = !this.gridView;
+                action.icon = this.gridView
+                            ? this.icon
+                            : "fas fa-th-list";
+                action.title = this.gridView
+                            ? this.title
+                            : "Grid view";
+            }
+        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
 
         if(this.config.type === "chart") {
             this.chart.theme = this.buttonsStyle === "dark"? "candy" : "fusion";
+            this.icon = "fas fa-chart-pie";
+            this.title = "Chart view";
+        }
+
+        if(this.config.type === "timeline") {
+            this.icon = "fas fa-chart-line";
+            this.title = "Timeline view";
         }
 
         // Manage width and height changes. Some components need additional treatment
@@ -159,11 +189,16 @@ export class DashboardItemComponent implements OnChanges {
                         this.timeSeries.push(
                             ...this.timelineProvider.getAggregationsTimeSeries(this.dataset[this.config.query], this.config.aggregationsTimeSeries, this.auditService.mask)
                         );
+                        this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
+                        this.aggregations = Utils.isArray(this.config.aggregationsTimeSeries)
+                                            ? this.config.aggregationsTimeSeries.map((agg) => agg.name)
+                                            : [this.config.aggregationsTimeSeries.name]
                     }
                     if (this.config.recordsTimeSeries) {
                         this.timeSeries.push(
                             ...this.timelineProvider.getRecordsTimeSeries(this.dataset[this.config.query], this.config.recordsTimeSeries)
                         );
+                        this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
                     }
                     break;
                 case "chart":
@@ -185,6 +220,8 @@ export class DashboardItemComponent implements OnChanges {
                         } else {
                             this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
                         }
+                        this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
+                        this.aggregations = [this.config.chartData.aggregation]
                     }
                     break;
                 default:
@@ -205,6 +242,9 @@ export class DashboardItemComponent implements OnChanges {
         }
         if (this.maximizable) {
             this.actions = [this.maximizeAction, ...this.actions]
+        }
+        if (this.config.type === "chart" || this.config.type === "timeline") {
+            this.actions = [this.chartOrGridAction, ...this.actions]
         }
         if (this.tooltipInfo) {
             this.infoAction = new Action({

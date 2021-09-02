@@ -31,6 +31,7 @@ import {SelectionOptions, SELECTION_OPTIONS} from "@sinequa/components/selection
 import { BsTimelineModule } from "@sinequa/analytics/timeline";
 import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
 import { FusionChartsModule } from "@sinequa/analytics/fusioncharts";
+import { AgGridModule } from "@sinequa/analytics/ag-grid";
 
 // Components
 import { AppComponent } from "./app.component";
@@ -51,12 +52,6 @@ import frLocale from "../locales/fr";
 // import deLocale from "../locales/de";
 
 // Initialization of @sinequa/core
-// export const startConfig: StartConfig = {
-//     app: "training",
-//     production: environment.production,
-//     autoSAMLProvider: environment.autoSAMLProvider,
-//     auditEnabled: true
-// };
 export const startConfig: StartConfig = {
     app: "training",
     production: environment.production,
@@ -130,6 +125,7 @@ const selectionOptions: SelectionOptions = {
         GridsterModule,
         BsTimelineModule,
         BsHeatmapModule,
+        AgGridModule
     ],
     declarations: [
         AppComponent,
@@ -138,7 +134,7 @@ const selectionOptions: SelectionOptions = {
         DashboardItemComponent,
         WidgetPaletteComponent,
         AuditStatComponent,
-        IconComponent
+        IconComponent,
     ],
     providers: [
         // Provides an APP_INITIALIZER which will fetch application configuration information from the Sinequa
