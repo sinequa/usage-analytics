@@ -25,14 +25,16 @@
             [yOffset]="8"
             [legendStyles]="{'justify-content': 'center'}">
         </sq-timeline-legend>
-        <sq-basic-grid-view
+        <ag-grid-angular
             *ngIf="gridView"
-            [results]="dataset[config.query]"
-            [aggregations]="aggregations"
+            [ngClass]="'ag-theme-alpine'"
+            [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+            [rowData]="rowData"
             [columnDefs]="columnDefs"
-            [width]="innerwidth"
-            [height]="innerheight + 'px'">
-        </sq-basic-grid-view>
+            [defaultColDef]="defaultColDef"
+            (gridReady)="onGridReady($event)"
+        >
+        </ag-grid-angular>
     </section>
 
 
@@ -57,14 +59,16 @@
             (initialized)="onChartInitialized($event)"
             (typeChange)="onChartTypeChange($event)">
         </sq-fusion-chart>
-        <sq-basic-grid-view
+        <ag-grid-angular
             *ngIf="gridView"
-            [results]="chartResults"
-            [aggregations]="aggregations"
+            [ngClass]="'ag-theme-alpine'"
+            [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+            [rowData]="rowData"
             [columnDefs]="columnDefs"
-            [width]="innerwidth"
-            [height]="innerheight + 'px'">
-        </sq-basic-grid-view>
+            [defaultColDef]="defaultColDef"
+            (gridReady)="onGridReady($event)"
+        >
+        </ag-grid-angular>
     </div>
 
     <!-- Heatmap view -->

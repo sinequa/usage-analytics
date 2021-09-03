@@ -37,16 +37,13 @@ export class ChartProvider {
     public getGridColumnDefs(config: ChartData): ColDef[] {
         return [
             {
-                headerName: config.displayedValueName ? config.displayedValueName : 'Label',
+                headerName: config.displayedValueName || 'Label',
                 field: config.valueField || 'value',
-                sortable: true,
-                filter: true
             },
             {
-                headerName: config.displayedWeightName ? config.displayedWeightName : 'Count',
+                headerName: config.displayedWeightName || 'Count',
                 field: config.weightField || 'count',
-                sortable: true,
-                filter: true
+                filter: 'agNumberColumnFilter'
             }
         ];
     }

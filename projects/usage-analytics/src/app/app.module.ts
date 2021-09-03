@@ -6,6 +6,7 @@ import { LocationStrategy, HashLocationStrategy } from "@angular/common";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { GridsterModule } from "angular-gridster2";
+import { AgGridModule } from 'ag-grid-angular';
 
 // @sinequa/core library
 import { WebServicesModule, StartConfigWebService, StartConfig } from "@sinequa/core/web-services";
@@ -31,7 +32,6 @@ import {SelectionOptions, SELECTION_OPTIONS} from "@sinequa/components/selection
 import { BsTimelineModule } from "@sinequa/analytics/timeline";
 import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
 import { FusionChartsModule } from "@sinequa/analytics/fusioncharts";
-import { AgGridModule } from "@sinequa/analytics/ag-grid";
 
 // Components
 import { AppComponent } from "./app.component";

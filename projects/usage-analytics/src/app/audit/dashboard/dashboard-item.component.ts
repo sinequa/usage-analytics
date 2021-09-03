@@ -1,7 +1,8 @@
 import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
+import { ColDef, GridApi, GridReadyEvent } from "ag-grid-community";
 
-import { Results, Record, DatasetError, Aggregation } from '@sinequa/core/web-services';
+import { Results, Record, DatasetError, Aggregation, AggregationItem } from '@sinequa/core/web-services';
 import { ExprBuilder } from '@sinequa/core/app-utils'
 
 import { Action } from '@sinequa/components/action';
@@ -13,8 +14,7 @@ import { DashboardItem, DashboardService } from './dashboard.service';
 import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
-import { Utils } from '@sinequa/core/base';
-import { ColDef } from "ag-grid-community";
+
 
 /**
  * A wrapper component for all widgets in the dashboard.
@@ -94,7 +94,14 @@ export class DashboardItemComponent implements OnChanges {
     private title: string;
     gridView = false;
     columnDefs: ColDef[] = []
-    aggregations: string[] = [];
+    rowData: (Record | AggregationItem)[] = [];
+    defaultColDef: ColDef = {
+        resizable: true,
+        sortable: true,
+        filter: true
+    }
+    /** ag-grid API for the grid */
+    gridApi: GridApi | null | undefined;
 
     constructor(
         public gridsterItemComponent: GridsterItemComponent,
@@ -191,15 +198,14 @@ export class DashboardItemComponent implements OnChanges {
                             ...this.timelineProvider.getAggregationsTimeSeries(this.dataset[this.config.query], this.config.aggregationsTimeSeries, this.auditService.mask)
                         );
                         this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
-                        this.aggregations = Utils.isArray(this.config.aggregationsTimeSeries)
-                                            ? this.config.aggregationsTimeSeries.map((agg) => agg.name)
-                                            : [this.config.aggregationsTimeSeries.name]
+                        this.rowData = this.timelineProvider.getAggregationsRowData(this.dataset[this.config.query], this.config.aggregationsTimeSeries);
                     }
                     if (this.config.recordsTimeSeries) {
                         this.timeSeries.push(
                             ...this.timelineProvider.getRecordsTimeSeries(this.dataset[this.config.query], this.config.recordsTimeSeries)
                         );
                         this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
+                        this.rowData = (this.dataset[this.config.query] as Results).records
                     }
                     break;
                 case "chart":
@@ -222,7 +228,7 @@ export class DashboardItemComponent implements OnChanges {
                             this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
                         }
                         this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
-                        this.aggregations = [this.config.chartData.aggregation]
+                        this.rowData = (this.dataset[this.config.query] as Results).aggregations.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
                     }
                     break;
                 default:
@@ -245,6 +251,7 @@ export class DashboardItemComponent implements OnChanges {
             this.actions = [this.maximizeAction, ...this.actions]
         }
         if (this.config.type === "chart" || this.config.type === "timeline") {
+            this.resizeGrid();
             this.actions = [this.chartOrGridAction, ...this.actions]
         }
         if (this.tooltipInfo) {
@@ -320,8 +327,20 @@ export class DashboardItemComponent implements OnChanges {
         }
     }
 
-    // Specific callback methods for the CHART widget
+    // Specific callback methods for the ag-grid widget
+    onGridReady(event: GridReadyEvent) {
+        this.gridApi = event.api;
+        this.resizeGrid();
+    }
 
+    /**
+     * Resize the grid
+     */
+    resizeGrid() {
+        this.gridApi?.sizeColumnsToFit();
+    }
+
+    // Specific callback methods for the CHART widget
     onChartInitialized(chartObj: any) {
         this.chartObj = chartObj;
         this.chartObj.resizeTo(this.width, this.innerheight);
