@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
 import { TimelineDate, TimelineSeries, BsFacetTimelineComponent } from "@sinequa/analytics/timeline";
 import { Utils } from "@sinequa/core/base";
-import { Aggregation, DatasetError, Record, Results } from "@sinequa/core/web-services";
+import { Aggregation, AggregationItem, DatasetError, Record, Results } from "@sinequa/core/web-services";
 import * as d3 from 'd3';
+import { ColDef, ValueGetterParams } from "ag-grid-community";
 import moment from 'moment';
+import { IntlService } from "@sinequa/core/intl";
 
 export interface TimeSeries {
     dateField: string;
@@ -15,6 +17,7 @@ export interface TimelineValueField {
     operatorResults?: boolean
     title?: string;
     primary?: boolean;
+    displayedName?: string;
 }
 
 export interface AggregationTimeSeries extends TimeSeries {
@@ -26,7 +29,7 @@ export interface RecordsTimeSeries extends TimeSeries {}
 @Injectable()
 export class TimelineProvider {
 
-    constructor() {}
+    constructor(public intlService: IntlService) {}
 
     public getAggregationsTimeSeries(data: Results | DatasetError, aggregationsTimeSeries: AggregationTimeSeries | AggregationTimeSeries[], mask: string): TimelineSeries[] {
         if (!Utils.isArray(aggregationsTimeSeries)) {
@@ -52,9 +55,59 @@ export class TimelineProvider {
         return this.defaultStyleRules(timeSeries);
     }
 
+    public getAggregationsRowData(data: Results | DatasetError, aggregationsTimeSeries: AggregationTimeSeries | AggregationTimeSeries[]): AggregationItem[] {
+        if (!Utils.isArray(aggregationsTimeSeries)) {
+            aggregationsTimeSeries = [aggregationsTimeSeries];
+        }
+        const items: AggregationItem[] = [];
+        if (data && !(data as DatasetError).errorMessage && (data as Results).aggregations) {
+            for (const aggregationTimeSeries of aggregationsTimeSeries) {
+                const aggregation = (data as Results).aggregations.find((aggr: Aggregation) => Utils.eqNC(aggr.name, aggregationTimeSeries.name));
+                if (aggregation?.items) {
+                    items.push(...aggregation.items);
+                }
+            }
+        }
+        return items;
+    }
+
+    public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[]): ColDef[] {
+        const columnDefs = [{
+            headerName: 'Date',
+            field: 'value',
+            filter: 'agDateColumnFilter',
+            cellRenderer: (params: any): HTMLElement | string => {
+                return this.intlService.formatDate(new Date(params.value));
+            }
+        }] as ColDef[];
+        if (!Utils.isArray(configs)) {
+            configs = [configs];
+        }
+        for (const config of configs) {
+            for (const valueField of config.valueFields) {
+                const colDef: ColDef = {
+                    headerName: valueField.displayedName || valueField.name,
+                    filter: "agNumberColumnFilter",
+                    cellRenderer: (params: any): HTMLElement | string => {
+                        return this.intlService.formatNumber(params.value);
+                    }
+                }
+                if (valueField.operatorResults) {
+                    colDef.valueGetter = (params: ValueGetterParams) => {
+                        return (params.data as AggregationItem).operatorResults?.[valueField.name]
+                    }
+                } else {
+                    colDef.field = valueField.name
+                }
+                columnDefs.push(colDef);
+            }
+        }
+        return columnDefs;
+    }
+
     protected makeAggregationSeries(aggregation: Aggregation, aggregationTimeSeries: AggregationTimeSeries, mask: string): TimelineSeries[] {
         const timeSeries: TimelineSeries[] = [];
-        
+
         const timeInterval = BsFacetTimelineComponent.getD3TimeInterval(mask);
 
         if (aggregation && aggregation.items) {
@@ -71,7 +124,7 @@ export class TimelineProvider {
 
                 // in case the dates are not already sorted...
                 rawDates.sort((a,b)=>a.date.getTime()- b.date.getTime());
-                
+
                 rawDates.forEach((item,i) => {
                     const date = item.date;
                     if(i === 0 || timeInterval.offset(dates[dates.length-1].date, 1) < date) {

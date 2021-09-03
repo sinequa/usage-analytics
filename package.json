@@ -30,6 +30,8 @@
     "@sinequa/components": "11.6.1-DEV-5",
     "@sinequa/core": "11.7.0-DEV-1",
     "@swimlane/ngx-charts": "^14.0.0",
+    "ag-grid-angular": "^25.2.0",
+    "ag-grid-community": "^25.2.0",
     "angular-fusioncharts": "3.0.4",
     "angular-gridster2": "^10.1.4",
     "atomicjs": "^4.4.1",

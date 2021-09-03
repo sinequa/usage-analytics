@@ -1,11 +1,14 @@
 import { Injectable } from "@angular/core";
 import { Utils } from "@sinequa/core/base";
 import { Aggregation, DatasetError, Record, Results } from "@sinequa/core/web-services";
+import { ColDef } from "ag-grid-community";
 
 export interface ChartData {
-    aggregation
+    aggregation: string;
     valueField?: string;
     weightField?: string;
+    displayedValueName?: string;
+    displayedWeightName?: string;
 }
 
 @Injectable()
@@ -29,6 +32,20 @@ export class ChartProvider {
             aggregations: [{name: config.aggregation, column: "", items: []}] as Aggregation[]
         } as  Results;
 
+    }
+
+    public getGridColumnDefs(config: ChartData): ColDef[] {
+        return [
+            {
+                headerName: config.displayedValueName || 'Label',
+                field: config.valueField || 'value',
+            },
+            {
+                headerName: config.displayedWeightName || 'Count',
+                field: config.weightField || 'count',
+                filter: 'agNumberColumnFilter'
+            }
+        ];
     }
 
 }

@@ -1,7 +1,8 @@
 import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
+import { ColDef, GridApi, GridReadyEvent } from "ag-grid-community";
 
-import { Results, Record, DatasetError, Aggregation } from '@sinequa/core/web-services';
+import { Results, Record, DatasetError, Aggregation, AggregationItem } from '@sinequa/core/web-services';
 import { ExprBuilder } from '@sinequa/core/app-utils'
 
 import { Action } from '@sinequa/components/action';
@@ -13,6 +14,8 @@ import { DashboardItem, DashboardService } from './dashboard.service';
 import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
+
+
 /**
  * A wrapper component for all widgets in the dashboard.
  * The component is in charge of updating inputs going into each widget.
@@ -65,6 +68,7 @@ export class DashboardItemComponent implements OnChanges {
     fullScreenAction: Action;
     maximizeAction: Action;
     infoAction: Action;
+    chartOrGridAction: Action;
 
     // Properties specific to certain types of dashboard items
     innerwidth = 500;
@@ -85,6 +89,19 @@ export class DashboardItemComponent implements OnChanges {
 
     // Timeline
     timeSeries: TimelineSeries[] = [];
+
+    private icon: string;
+    private title: string;
+    gridView = false;
+    columnDefs: ColDef[] = []
+    rowData: (Record | AggregationItem)[] = [];
+    defaultColDef: ColDef = {
+        resizable: true,
+        sortable: true,
+        filter: true
+    }
+    /** ag-grid API for the grid */
+    gridApi: GridApi | null | undefined;
 
     constructor(
         public gridsterItemComponent: GridsterItemComponent,
@@ -126,12 +143,33 @@ export class DashboardItemComponent implements OnChanges {
                             : "msg#dashboard.maximizeTitle";
             }
         });
+
+        this.chartOrGridAction = new Action({
+            icon: "fas fa-th-list",
+            title: "Grid view",
+            action: (action) => {
+                this.gridView = !this.gridView;
+                action.icon = this.gridView
+                            ? this.icon
+                            : "fas fa-th-list";
+                action.title = this.gridView
+                            ? this.title
+                            : "Grid view";
+            }
+        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
 
         if(this.config.type === "chart") {
             this.chart.theme = this.buttonsStyle === "dark"? "candy" : "fusion";
+            this.icon = "fas fa-chart-pie";
+            this.title = "Chart view";
+        }
+
+        if(this.config.type === "timeline") {
+            this.icon = "fas fa-chart-line";
+            this.title = "Timeline view";
         }
 
         // Manage width and height changes. Some components need additional treatment
@@ -159,11 +197,15 @@ export class DashboardItemComponent implements OnChanges {
                         this.timeSeries.push(
                             ...this.timelineProvider.getAggregationsTimeSeries(this.dataset[this.config.query], this.config.aggregationsTimeSeries, this.auditService.mask)
                         );
+                        this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
+                        this.rowData = this.timelineProvider.getAggregationsRowData(this.dataset[this.config.query], this.config.aggregationsTimeSeries);
                     }
                     if (this.config.recordsTimeSeries) {
                         this.timeSeries.push(
                             ...this.timelineProvider.getRecordsTimeSeries(this.dataset[this.config.query], this.config.recordsTimeSeries)
                         );
+                        this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
+                        this.rowData = (this.dataset[this.config.query] as Results).records
                     }
                     break;
                 case "chart":
@@ -185,6 +227,8 @@ export class DashboardItemComponent implements OnChanges {
                         } else {
                             this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
                         }
+                        this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
+                        this.rowData = (this.dataset[this.config.query] as Results).aggregations.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
                     }
                     break;
                 default:
@@ -205,6 +249,10 @@ export class DashboardItemComponent implements OnChanges {
         }
         if (this.maximizable) {
             this.actions = [this.maximizeAction, ...this.actions]
+        }
+        if (this.config.type === "chart" || this.config.type === "timeline") {
+            this.resizeGrid();
+            this.actions = [this.chartOrGridAction, ...this.actions]
         }
         if (this.tooltipInfo) {
             this.infoAction = new Action({
@@ -279,8 +327,20 @@ export class DashboardItemComponent implements OnChanges {
         }
     }
 
-    // Specific callback methods for the CHART widget
+    // Specific callback methods for the ag-grid widget
+    onGridReady(event: GridReadyEvent) {
+        this.gridApi = event.api;
+        this.resizeGrid();
+    }
 
+    /**
+     * Resize the grid
+     */
+    resizeGrid() {
+        this.gridApi?.sizeColumnsToFit();
+    }
+
+    // Specific callback methods for the CHART widget
     onChartInitialized(chartObj: any) {
         this.chartObj = chartObj;
         this.chartObj.resizeTo(this.width, this.innerheight);
