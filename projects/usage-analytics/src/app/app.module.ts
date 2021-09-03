@@ -6,6 +6,7 @@ import { LocationStrategy, HashLocationStrategy } from "@angular/common";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { GridsterModule } from "angular-gridster2";
+import { AgGridModule } from 'ag-grid-angular';
 
 // @sinequa/core library
 import { WebServicesModule, StartConfigWebService, StartConfig } from "@sinequa/core/web-services";
@@ -51,12 +52,6 @@ import frLocale from "../locales/fr";
 // import deLocale from "../locales/de";
 
 // Initialization of @sinequa/core
-// export const startConfig: StartConfig = {
-//     app: "training",
-//     production: environment.production,
-//     autoSAMLProvider: environment.autoSAMLProvider,
-//     auditEnabled: true
-// };
 export const startConfig: StartConfig = {
     app: "training",
     production: environment.production,
@@ -130,6 +125,7 @@ const selectionOptions: SelectionOptions = {
         GridsterModule,
         BsTimelineModule,
         BsHeatmapModule,
+        AgGridModule
     ],
     declarations: [
         AppComponent,
@@ -138,7 +134,7 @@ const selectionOptions: SelectionOptions = {
         DashboardItemComponent,
         WidgetPaletteComponent,
         AuditStatComponent,
-        IconComponent
+        IconComponent,
     ],
     providers: [
         // Provides an APP_INITIALIZER which will fetch application configuration information from the Sinequa
