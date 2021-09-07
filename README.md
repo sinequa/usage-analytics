@@ -8,12 +8,12 @@ For more information about Sinequa libraries, please refer to the [Sinequa docum
 
 ## Dataset Web service
 Behind the scenes, *Usage Analytics* uses the **Dataset Web Service** to retrieve the data.
-It allows getting information from indexes through multiple SQL queries. Thus, it is the best fit to build dashboard reports, 360 view and so on.
+It allows getting information from indexes through multiple SQL queries. Thus, it is the best fit to build dashboard reports, 360 views and so on.
 
-However, using the dataset web service within native Sinequa libraries needs quite simple adjustments :
+However, using the dataset web service within native Sinequa libraries requires a few simple adjustments :
 
 - Deactivate Search for the route where you want to use Dataset web service.
-- Listen to Search events and send request to Dataset web service, using Query object to store parameters.
+- Listen to Search events and send requests to the Dataset web service, using the Query object to store parameters.
 
 <span style="display:block;text-align:center">![DataSet Web Service](/docs/assets/dataset.png)</span>
 
@@ -21,7 +21,7 @@ This logic is implemented in the `audit.service.ts` :
 
 - `updateAuditFilters(): void`
 
-    This method programmatically handle the search lifecycle and bring the use of all searchService functionalities (update of breadcrumbs, extract filters from the query object, build the global query's select expression ...) in a dataset web service without the nightmare of rewriting a dedicated service for this purpose.
+    This method programmatically handles the search lifecycle and brings the use of all searchService functionalities (update of breadcrumbs, extract filters from the query object, build the global query's select expression ...) in a dataset web service without the complexity of rewriting a dedicated service for this purpose.
 
 - `getAuditTimestampFromUrl(): string | Date[] | undefined`
 
@@ -47,7 +47,7 @@ This logic is implemented in the `audit.service.ts` :
 
 Dashboards of *Usage Analytics* are based on the [**angular-gridster2**](https://tiberiuzuld.github.io/angular-gridster2/) library.
 
-The application comes up with most likely browser's user experience. Each tab is a dashboard that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a list of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
+The application is organized in multiple tabs. Each tab is a dashboard that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a palette of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
 
 Dashboards can be saved with a name, marked as default and shared with colleagues. Users can also manage their dashboards' settings.
 
@@ -76,7 +76,7 @@ There are three levels in the above snippet:
 - `<gridster-item>`: A component provided by the [angular-gridster2](https://tiberiuzuld.github.io/angular-gridster2/) library for wrapping each widget of the dashboard. This component will be responsible for managing the positioning, dragging and resizing of the widgets. The component takes in an **`item`** object (of type [`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts)).
 - `<sq-dashboard-item>`: A Sinequa component that is defined at the app level (`app/audit/dashboard/dashboard-item.component.ts`). This component is essentially a switch to display the right component in function of the widget type. The widget type is passed via the **`config`** input. Notice that the `item` input of `<gridster-item>` is also used for this `config` input. This is because we chose to use a single object to manage both the state of the widget ([`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts) interface) and its configuration (`DashboardItem` interface). The `DashboardItem` interface is in fact a direct extension of [`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts).
 
-Notice in the snippet above that the list of dashboard items, as well the options of the dashboard, are managed by a new `DashboardService`. This Angular service, which lives in the Pepper app (`app/audit/dashboard/dashboard.service.ts`), manages the following tasks:
+Notice in the snippet above that the list of dashboard items, as well the options of the dashboard, are managed by a new `DashboardService`. This Angular service, which lives in the Usage Analytics app (`app/audit/dashboard/dashboard.service.ts`), manages the following tasks:
 
 - Generating dashboards.
 - Storing the state of the dashboard and its global options.
@@ -85,24 +85,43 @@ Notice in the snippet above that the list of dashboard items, as well the option
 - Editing the dashboard (adding or removing items).
 - Emitting events when the dashboard changes.
 
-## Architectures
+## Configuration
 
-*Usage Analytics* is designed to support 2 types of architecture :
+*Usage Analytics* is designed to support 2 types of configuration :
 
-- Client side configuration.
-- Server side configuration.
+- Built-in configuration: the default configuration is defined in the source code of the app. It can be modified there, but it requires recompiling the application.
+- Server side configuration: administrators can override the built-in configuration by providing their own configuration in the Sinequa administration.
 
 <span style="display:block;text-align:center">![Client side configuration](/docs/assets/client_side_architecture.png)
 *Client side configuration*
 </span>
 
-
 <span style="display:block;text-align:center">![Server side configuration](/docs/assets/server_side_architecture.png)
 *Server side configuration*
 </span>
 
-Notice that the difference is quite simple. It is related to the way we are defining dashboards, widgets, palette ...
-This can be done whether in local config file at app level or hosted by the Sinequa server.
+The configuration allows to define the list and settings of each widget, the content of the default dashboards and the content of the widget palettes.
+This can be done whether in local config file at app level ([`config.ts`](https://github.sinequa.com/CustomerSolutions/sba-sinequa-analytics-internal/blob/SBA-337-usage_analytics_doc/projects/usage-analytics/src/app/audit/config.ts)) or defined on the Sinequa server (Application > Customization (JSON)). The configuration defined on the server overrides the one defined locally.
+
+Typically the configuration in `config.ts` is stored in structures called `WIDGETS`, `PALETTES`, or `FACETS`. To override these structures on the server-side, simply add them to the "Customization (JSON)" object (with their name in lower case). For example:
+
+```
+{
+  "widgets": {
+     "my-custom-widget": { ... }
+  }
+}
+```
+
+In the case of the list of widgets, it would be cumbersome to redefine the (long) list of widgets on the server when overriding just one widget. So it's possible instead to define a `customWidgets` object, which is merged with the default list:
+
+```
+{
+  "customWidgets": {
+     "my-custom-widget": { ... }
+  }
+}
+```
 
 `DashboardService` handles those cases while initializing the application :
 
@@ -119,7 +138,7 @@ This can be done whether in local config file at app level or hosted by the Sine
     This method returns the list of standard dashboard from the configuration defined on the server (appService.app.data.standardDashboards) or in the config.ts file (STANDARD_DASHBOARDS).
 
 ## Export
-Dashboards are exportable as Excel, CSV or image file. This feature is very important for example in case data should be injected in other systems or visualized in demos.
+Dashboards are exportable as Excel, CSV or image files. This feature is useful when data should be injected in other systems or visualized in demos.
 
 <span style="display:block;text-align:center">![Export Dashboard](/docs/assets/export_dashboard.png)</span>
 
