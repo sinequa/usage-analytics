@@ -2,7 +2,7 @@
 
 *Usage Analytics* is an application built on top of Sinequa libraries, as a collaborative and interactive set of dashboards.
 
-<span style="display:block;text-align:center">![Usage Analytics](/docs/assets/app.png)</span>
+<span style="display:block;text-align:center">![Usage Analytics](/docs/assets/app.PNG)</span>
 
 For more information about Sinequa libraries, please refer to the [Sinequa documentation](https://doc.sinequa.com) and the [SBA framework documentation](https://sinequa.github.io/sba-angular).
 
@@ -15,7 +15,7 @@ However, using the dataset web service within native Sinequa libraries requires 
 - Deactivate Search for the route where you want to use Dataset web service.
 - Listen to Search events and send requests to the Dataset web service, using the Query object to store parameters.
 
-<span style="display:block;text-align:center">![DataSet Web Service](/docs/assets/dataset.png)</span>
+<span style="display:block;text-align:center">![DataSet Web Service](/docs/assets/dataset.PNG)</span>
 
 This logic is implemented in the `audit.service.ts` :
 
@@ -140,7 +140,7 @@ In the case of the list of widgets, it would be cumbersome to redefine the (long
 ## Export
 Dashboards are exportable as Excel, CSV or image files. This feature is useful when data should be injected in other systems or visualized in demos.
 
-<span style="display:block;text-align:center">![Export Dashboard](/docs/assets/export_dashboard.png)</span>
+<span style="display:block;text-align:center">![Export Dashboard](/docs/assets/export_dashboard.PNG)</span>
 
 `ExportService` handles the export workflow from data extraction till file generation and its download :
 
