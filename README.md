@@ -51,7 +51,7 @@ The application is organized in multiple tabs. Each tab is a dashboard that can 
 
 Dashboards can be saved with a name, marked as default and shared with colleagues. Users can also manage their dashboards' settings.
 
-<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.png)</span>
+<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
 
 
 A dashboard is basically defined by the following simplified piece of code :
