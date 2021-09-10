@@ -228,7 +228,7 @@ export class DashboardItemComponent implements OnChanges {
                             this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
                         }
                         this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
-                        this.rowData = (this.dataset[this.config.query] as Results).aggregations.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
+                        this.rowData = (this.dataset[this.config.query] as Results)?.aggregations.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
                     }
                     break;
                 default:

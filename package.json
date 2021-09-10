@@ -1,6 +1,6 @@
 {
-  "name": "audit",
-  "version": "0.0.0",
+  "name": "usage-analytics",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve -- --ssl=true --proxyConfig=./projects/usage-analytics/src/proxy.conf.json",
@@ -12,7 +12,6 @@
   },
   "private": true,
   "dependencies": {
-    "@agm/core": "^3.0.0-beta.0",
     "@angular/animations": "12.2.4",
     "@angular/cdk": "11.0.2",
     "@angular/common": "12.2.4",
@@ -102,7 +101,6 @@
     "protractor": "^7.0.0",
     "sass-color-helpers": "^2.1.1",
     "ts-node": "~8.3.0",
-    "tslint": "~6.1.0",
     "typescript": "~4.3.5"
   }
 }
