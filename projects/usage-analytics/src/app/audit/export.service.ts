@@ -36,23 +36,23 @@ type ExtractModel = {
   providedIn: 'root',
 })
 export class ExportService {
-  
+
   /**
    * returns a stringy date to append to the extract's filename
    */
   get date(): string {
     return this.translate.formatDate(Date.now());
   }
-  
+
   constructor(
     private statProvider: StatProvider,
     private translate: IntlService,
     private notificationService: NotificationsService
     ) { }
-  
+
   /**
    * Create an .png image from a specific HTML element and save it
-   * 
+   *
    * @param filename name of the file
    * @param element HTML ElementRef used to create the image. All elements included in
    * are converted into the image.
@@ -62,27 +62,27 @@ export class ExportService {
         // we need to know the real gridster's height.
         // we use a <div> tag inside <gridster> component to export it's content.
         // we can't use <gridster> component because it's not a real HTML Element.
-        
+
         // this is the gridster's height
         const height = element.nativeElement.offsetParent.scrollHeight;
 
         // now, as we know the height, set it to our #content div.
         element.nativeElement.style.height = `${height}px`;
-        
+
         // lib used to create image from specific HTML element
         domtoimage.toBlob(element.nativeElement).then(blob => {
             saveAs(blob,  `${filename}_${this.date}.png`);
             // do not forget to remove our previous height to allow gridster to adjust automatically his height
             element.nativeElement.style = undefined;
-            
+
             // notify user
             this.notifySuccess(filename)
           } );
   }
-  
+
   /**
    * Export all widgets of a specific dashboard to a .csv file
-   * 
+   *
    * @param filename name of the file
    * @param items Array of Dashboard Item
    */
@@ -92,38 +92,38 @@ export class ExportService {
       if (stats) {
         this.saveToCsv(stats.filename, stats.tables.join('\n'));
       }
-      
+
       // export each timelines in a specific file
       const timelines = this.extractTimelines(filename, items);
       timelines.forEach(timeline => this.saveToCsv(timeline.filename, timeline.tables.join('\n')));
-      
+
       // export each charts in a specific file
       const charts = this.extractCharts(filename, items);
       charts.forEach(chart => this.saveToCsv(chart.filename, chart.tables.join('\n')));
     }
-  
+
   /**
    * Export all widgets of a specific dashboard to a Open XML format file
-   * 
+   *
    * @param filename name of the file
    * @param items Array of Dashboard Items
    */
   exportToXML(filename:string, items: DashboardItemComponent[]) {
     const tables:ExtractModel[] = [];
-    
+
     // export stats
     tables.push(this.extractStats(filename, items) || {} as ExtractModel);
-    
+
     // export each timelines
     tables.push(...this.extractTimelines(filename, items));
-    
+
     // export each charts
     tables.push(...this.extractCharts(filename, items));
-    
+
     // as csv files joined in a single array, split them in their own sheet
     this.csvToXML(tables, filename);
   }
-  
+
   /**
    * Export all widgets of a specific dashboard to a XLSX file
    * @param filename name of the file to save
@@ -131,14 +131,14 @@ export class ExportService {
    */
   exportXLSX(filename:string, items: DashboardItemComponent[]) {
     const tables:ExtractModel[] = [];
-    
+
     // export stats
     const stats = this.extractStats(filename, items);
     if(stats) tables.push(stats);
-    
+
     // export each timelines
     tables.push(...this.extractTimelines(filename, items).filter(timeline => timeline.tables.length > 0));
-    
+
     // export each charts
     tables.push(...this.extractCharts(filename, items).filter(chart => chart.tables.length > 0));
 
@@ -147,7 +147,7 @@ export class ExportService {
       data: [...worksheet.tables.map(it => it.split(","))],
       name: worksheet.title.slice(0,30)
     }));
-    
+
     const file = `${filename}_${this.date}.xlsx`;
 
     // this object transforms all that stuff in a real Excel Workbook
@@ -160,12 +160,12 @@ export class ExportService {
       saveAs(content, file);
       this.notifySuccess(file);
     });
-    
+
   }
-  
+
   /**
    * Convert a array of object to csv rows
-   * 
+   *
    * @param filename csv filename
    * @param rows array of object to convert into csv
    * @returns a csv string
@@ -197,7 +197,7 @@ export class ExportService {
     // split results to obtain a array of rows
     return csvData.split('\n');
   }
-  
+
   private saveToCsv(filename: string, csvData: string) {
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
@@ -215,27 +215,27 @@ export class ExportService {
         document.body.removeChild(link);
       }
     }
-    
+
     this.notifySuccess(filename);
   }
-  
+
   private extractStatRow(item: DashboardItemComponent) : any {
     // translate title with sqMessagePipe
     const title = this.translate.formatMessage(item.config.title);
     const {previousDataSet, dataset, config} = item;
-    
+
     if(previousDataSet !== null && dataset !== null){
       // TODO: decimalsPrecision should be a parameter value
       const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config, 1);
       return ({title, value, percentageChange, trend, trendEvaluation});
     }
-    
+
     return ({title})
   }
-  
+
   /**
    * Create a list of rows for each stat widgets
-   * 
+   *
    * @param filename name of the file
    * @param items array of dashboard items
    * @returns a {@link ExtractModel} object with all stats data or undefined
@@ -243,19 +243,19 @@ export class ExportService {
   private extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
     const stats = items.filter(item => item.config.type === "stat");
     if(stats.length === 0) return;
-    
+
     const results = stats.reduce((acc, item) => {
       acc.push(this.extractStatRow(item));
       return acc;
     }, <any>[])
-    
+
     const file = `${filename}_${this.date}.csv`;
     return {title: "stats", filename: file, tables: this.objectToCsv(file, results)};
   }
-  
+
   /**
    * Extract each charts data.
-   * 
+   *
    * @param filename name of the file
    * @param items array of dashboard items
    * @returns Array of charts data
@@ -263,11 +263,11 @@ export class ExportService {
   private extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     const charts = items.filter(item => item.config.type === "chart").map(item => {
       const title = this.translate.formatMessage(item.config.title);
-      
-      return {title, data: item.chartResults.aggregations[0].items?.map(item => ({value: item.value, count: item.count}))}
+
+      return {title, data: item.chartResults.aggregations[0].items?.map(elem => ({value: elem.value, count: elem.count}))}
     });
     if(charts.length === 0) return [];
-    
+
     // [{value, count }]
     const values:ExtractModel[] = [];
     charts.forEach(chart => {
@@ -279,11 +279,11 @@ export class ExportService {
     return values;
 
   }
-  
+
   /**
    * Extract for each timeline all series used. Each serie's values are in it's specific column.
    * The result is save in a .csv file.
-   * 
+   *
    * @param filename name of the file
    * @param items array of dashboard items
    */
@@ -298,40 +298,40 @@ export class ExportService {
     if(timeseries.length === 0) return [];
 
     // convert series to { title, items: [series, series,...]}
-    const series = timeseries.map(series => ({title: series.title, items: series.timeSeries.map(serie => serie.dates.map(item => {
-        const row = {title: series.title, date: item.date.toLocaleDateString("en-US", {year: '2-digit', month: '2-digit', day: '2-digit'})};
+    const series = timeseries.map(el => ({title: el.title, items: el.timeSeries.map(serie => serie.dates.map(item => {
+        const row = {title: el.title, date: item.date.toLocaleDateString("en-US", {year: '2-digit', month: '2-digit', day: '2-digit'})};
         row[serie.name] = item.value;
         return row;
       }))
     }));
-    
+
     // export each series individually
     const values:ExtractModel[] = [];
-    series.forEach(series => {
-      const resultsMap = series.items.reduce((acc, serie) => {
+    series.forEach(serie => {
+      const resultsMap = serie.items.reduce((acc, sr) => {
 
-        serie.forEach(value => {
+        sr.forEach(value => {
           // get previous value to be appended
           const p = acc.get(value.date.toString());
           acc.set(value.date.toString(), {...p, ...value});
         })
-        
-        
+
+
         return acc;
       }, new Map());
-      
+
       // [ [K, V], [K1, V1] ... ]
       // we only need each V
       const results = Array.from(resultsMap.entries()).map(it => it[1]);
-      const file = `${filename}_${series.title}_${this.date}.csv`;
-      values.push({title: series.title, filename: file, tables: this.objectToCsv(file, results)});
+      const file = `${filename}_${serie.title}_${this.date}.csv`;
+      values.push({title: serie.title, filename: file, tables: this.objectToCsv(file, results)});
     });
     return values;
   }
-  
+
   /**
    * Convert csv array in a XML Workbook representation
-   * 
+   *
    * @param tables contains data per worksheet
    * @param filename
    */
@@ -342,13 +342,13 @@ export class ExportService {
       + '<Styles>'
       + '<Style ss:ID="Currency"><NumberFormat ss:Format="Currency"></NumberFormat></Style>'
       + '<Style ss:ID="Date"><NumberFormat ss:Format="Medium Date"></NumberFormat></Style>'
-      + '</Styles>' 
+      + '</Styles>'
       + '{worksheets}</Workbook>'
     const tmplWorksheetXML = '<Worksheet ss:Name="{nameWS}"><Table>{rows}</Table></Worksheet>'
     const tmplCellXML = '<Cell{attributeStyleID}{attributeFormula}><Data ss:Type="{nameType}">{data}</Data></Cell>'
     const base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
     const format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
-    
+
     let workbookXML = "";
     let worksheetsXML = "";
     let rowsXML = "";
@@ -358,25 +358,25 @@ export class ExportService {
         for(const row of values.tables) {
           rowsXML += '<Row>';
           for(const cell of row.split(',')) {
-              const ctx: XLRowType = {
+              const ctx_: XLRowType = {
                 attributeStyleID: '',
                 nameType: 'String',
                 data: cell,
                 attributeFormula: ''
               };
-              rowsXML += format(tmplCellXML, ctx);
+              rowsXML += format(tmplCellXML, ctx_);
           }
           rowsXML += '</Row>'
         }
-        
+
         // replace not supported characters on sheets name : \ / * ? : [ ] by an underscore
         const sheetName = values.title.replace(/[\\\/*?:\[\]]/g, '_');
-        const ctx: XLSheetType = {rows: rowsXML, nameWS: sheetName || `Sheet ${index}`};
-        worksheetsXML += format(tmplWorksheetXML, ctx);
+        const _ctx: XLSheetType = {rows: rowsXML, nameWS: sheetName || `Sheet ${index}`};
+        worksheetsXML += format(tmplWorksheetXML, _ctx);
         rowsXML = "";
       }
     }
-    
+
     const ctx: XLWorkbookType = {created: (new Date()).getTime(), worksheets: worksheetsXML};
     workbookXML = format(tmplWorkbookXML, ctx);
 
@@ -391,10 +391,10 @@ export class ExportService {
 
     this.notifySuccess(filename);
   }
-  
+
   /**
    * Notify user about the download success
-   * 
+   *
    * @param filename name of the file downloaded with success
    */
   private notifySuccess(filename:string) {

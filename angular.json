@@ -22,7 +22,6 @@
             "main": "projects/usage-analytics/src/main.ts",
             "polyfills": "projects/usage-analytics/src/polyfills.ts",
             "tsConfig": "projects/usage-analytics/tsconfig.json",
-            "aot": true,
             "preserveSymlinks": true,
             "assets": [
               "projects/usage-analytics/src/assests/favicon.ico",
@@ -60,13 +59,6 @@
                 }
               ],
               "outputPath": "dist/usage-analytics",
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "budgets": [
                 {
                   "type": "initial",
@@ -79,13 +71,23 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development" : {
+              "outputPath": "dist-debug/usage-analytics",
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "usage-analytics:build"
+            "browserTarget": "usage-analytics:build:development"
           },
           "configurations": {
             "production": {
@@ -117,15 +119,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "projects/usage-analytics/tsconfig.json",
-              "projects/usage-analytics/tsconfig.spec.json",
-              "projects/usage-analytics/e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "projects/usage-analytics/**/*.ts",
+              "projects/usage-analytics/**/*.html"
             ]
           }
         },

@@ -5,8 +5,8 @@
 //----------------------------------------------------------
 import JSZip from "jszip";
 
-export const xlsx = function(file: any): Promise<any> { 
-  
+export const xlsx = function(file: any): Promise<any> {
+
 	let s, i, j, k, l, t, w, index, data, val, style, border, borderIndex, font, fontIndex,
 		worksheet, id, columns, cols, colWidth, cell, merges, merged;
 
@@ -18,8 +18,8 @@ export const xlsx = function(file: any): Promise<any> {
   const defaultFontName = 'Calibri';
   const defaultFontSize = 11;
 
-	function numAlpha(i) {
-		const t = Math.floor(i / 26) - 1; return (t > -1 ? numAlpha(t) : '') + alphabet.charAt(i % 26); 
+	function numAlpha(num) {
+		const _t = Math.floor(num / 26) - 1; return (_t > -1 ? numAlpha(_t) : '') + alphabet.charAt(num % 26);
 	}
 
 	function convertDate(input) {
@@ -32,8 +32,8 @@ export const xlsx = function(file: any): Promise<any> {
 	function typeOf(obj) {
 		return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 	}
-	
-	function escapeXML(s) { return typeof s === 'string' ? s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;') : ''; }
+
+	function escapeXML(str) { return typeof str === 'string' ? str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;') : ''; }
 
 	// Save
   const sharedStrings = [[], 0] as any;
@@ -54,13 +54,13 @@ export const xlsx = function(file: any): Promise<any> {
   const styles = new Array(1);
   const borders = new Array(1);
   const fonts = new Array(1);
-  
+
   w = file.worksheets.length;
-  while (w--) { 
+  while (w--) {
     // Generate worksheet (gather sharedStrings), and possibly table files, then generate entries for constant files below
     id = w + 1;
     // Generate sheetX.xml in var s
-    worksheet = file.worksheets[w]; 
+    worksheet = file.worksheets[w];
     data = worksheet.data;
     s = '';
     columns = [];
@@ -72,7 +72,7 @@ export const xlsx = function(file: any): Promise<any> {
       while (++j < k) {
         cell = data[i][j]; val = cell.hasOwnProperty('value') ? cell.value : cell; t = '';
         style = { // supported styles: borders, hAlign, formatCode and font style
-          borders: cell.borders, 
+          borders: cell.borders,
           hAlign: cell.hAlign,
           vAlign: cell.vAlign,
           bold: cell.bold,
@@ -82,31 +82,31 @@ export const xlsx = function(file: any): Promise<any> {
           formatCode: cell.formatCode || 'General'
         };
         colWidth = 0;
-        if ((cell.type && cell.type === 'text') || (val && typeof val === 'string' && !isFinite(val as any))) { 
+        if ((cell.type && cell.type === 'text') || (val && typeof val === 'string' && !isFinite(val as any))) {
           // If value is string, and not string of just a number, place a sharedString reference instead of the value
           val = escapeXML(val);
           sharedStrings[1]++; // Increment total count, unique count derived from sharedStrings[0].length
           index = sharedStrings[0].indexOf(val);
           colWidth = val.length;
           if (index < 0) {
-            index = sharedStrings[0].push(val) - 1; 
+            index = sharedStrings[0].push(val) - 1;
           }
           val = index;
           t = 's';
         }
-        else if (typeof val === 'boolean') { 
-          val = (val ? 1 : 0); 
-          t = 'b'; 
+        else if (typeof val === 'boolean') {
+          val = (val ? 1 : 0);
+          t = 'b';
           colWidth = 1;
         }
-        else if (typeOf(val) === 'date') { 
-          val = convertDate(val); 
-          style.formatCode = cell.formatCode || 'mm-dd-yy'; 
+        else if (typeOf(val) === 'date') {
+          val = convertDate(val);
+          style.formatCode = cell.formatCode || 'mm-dd-yy';
           colWidth = val.length;
         }
         else if (typeof val === 'object') { val = null; } // unsupported value
         else { colWidth = (''+val).length; } // number, or string which is a number
-        
+
         // use stringified version as unic and reproductible style signature
         style = JSON.stringify(style);
         index = styles.indexOf(style);
@@ -171,7 +171,7 @@ export const xlsx = function(file: any): Promise<any> {
       + ' workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15" x14ac:dyDescent="0.25"/>'
       + cols
       + '<sheetData>'
-      + s 
+      + s
       + '</sheetData>';
     if (merges.length > 0) {
       s += '<mergeCells count="' + merges.length + '">';
@@ -181,8 +181,8 @@ export const xlsx = function(file: any): Promise<any> {
       s += '</mergeCells>';
     }
     s += '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>';
-    if (worksheet.table) { 
-      s += '<tableParts count="1"><tablePart r:id="rId1"/></tableParts>'; 
+    if (worksheet.table) {
+      s += '<tableParts count="1"><tablePart r:id="rId1"/></tableParts>';
     }
     xlWorksheets?.file('sheet' + id + '.xml', s + '</worksheet>');
 
@@ -190,8 +190,8 @@ export const xlsx = function(file: any): Promise<any> {
       i = -1; l = data[0].length; t = numAlpha(data[0].length - 1) + data.length;
       s = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" id="' + id
         + '" name="Table' + id + '" displayName="Table' + id + '" ref="A1:' + t + '" totalsRowShown="0"><autoFilter ref="A1:' + t + '"/><tableColumns count="' + data[0].length + '">';
-      while (++i < l) { 
-        s += '<tableColumn id="' + (i + 1) + '" name="' + (data[0][i].hasOwnProperty('value') ? data[0][i].value : data[0][i]) + '"/>'; 
+      while (++i < l) {
+        s += '<tableColumn id="' + (i + 1) + '" name="' + (data[0][i].hasOwnProperty('value') ? data[0][i].value : data[0][i]) + '"/>';
       }
       s += '</tableColumns><tableStyleInfo name="TableStyleMedium2" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/></table>';
 
@@ -208,16 +208,16 @@ export const xlsx = function(file: any): Promise<any> {
 
   // xl/styles.xml
   i = styles.length; t = [];
-  while (--i) { 
+  while (--i) {
     // Don't process index 0, already added
     style = JSON.parse(styles[i]);
 
     // cell formating, refer to it if necessary
     if (style.formatCode !== 'General') {
       index = numFmts.indexOf(style.formatCode);
-      if (index < 0) { 
-        index = 164 + t.length; 
-        t.push('<numFmt formatCode="' + style.formatCode + '" numFmtId="' + index + '"/>'); 
+      if (index < 0) {
+        index = 164 + t.length;
+        t.push('<numFmt formatCode="' + style.formatCode + '" numFmtId="' + index + '"/>');
       }
       style.formatCode = index
     } else {
@@ -273,8 +273,8 @@ export const xlsx = function(file: any): Promise<any> {
     }
 
     // declares style, and refer to optionnal formatCode, font and borders
-    styles[i] = ['<xf xfId="0" fillId="0" borderId="', 
-      borderIndex, 
+    styles[i] = ['<xf xfId="0" fillId="0" borderId="',
+      borderIndex,
       '" fontId="',
       fontIndex,
       '" numFmtId="',

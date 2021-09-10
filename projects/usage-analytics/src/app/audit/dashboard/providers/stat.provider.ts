@@ -11,7 +11,7 @@ type MayBe<T> = T | undefined;
 
 @Injectable( { providedIn: 'root'})
 export class StatProvider {
-    
+
     decimalsPrecision: number = 1;
 
     constructor() {}
@@ -77,11 +77,11 @@ export class StatProvider {
         }
         return undefined;
     }
-    
+
     // refacto
-    
+
     /**
-     * 
+     *
      * @param previousDataSet previous dataset used to set trend
      * @param dataset current dataset used to compute values
      * @param config dashboard item configuration
@@ -89,20 +89,19 @@ export class StatProvider {
      * @returns an object containing computed values {value, percentageChange, trend, trendEvaluation}
      */
     getvalues(
-        previousDataSet: {[key: string]: Results | DatasetError}, 
-        dataset: {[key: string]: Results | DatasetError}, 
+        previousDataSet: {[key: string]: Results | DatasetError},
+        dataset: {[key: string]: Results | DatasetError},
         config: DashboardItem, decimalsPrecision: number
         ): {value: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
-            
-        let current: number | undefined;
-        let previous: number | undefined;
+
+        const current: number | undefined = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation);
+        const previous: number | undefined = this.getBasicValue(previousDataSet[config.query], config.operation, config.valueLocation);
+
         let relatedCurrent: number | undefined;
         let relatedPrevious: number | undefined;
-        
+
         let value, percentageChange, trend;
-        
-        current = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation);
-        previous = this.getBasicValue(previousDataSet[config.query], config.operation, config.valueLocation);
+
         if (!config.computation) {
             value = this.roundValue(current);
             percentageChange = this.getPercentageChange(current, previous);
@@ -115,10 +114,10 @@ export class StatProvider {
             trend = this.getTrend(value, this.computeBasicValue(previous, relatedPrevious, config.computation));
         }
         const trendEvaluation = this.getTrendEvaluation(trend, config.asc);
-    
+
         return {value, percentageChange, trend, trendEvaluation}
     }
-    
+
     getPercentageChange(newValue: number | undefined, oldValue: number | undefined): number | undefined {
         if (newValue && oldValue) {
             return this.roundValue((newValue - oldValue) === 0 ? 0 : 100 * Math.abs(( newValue - oldValue ) / oldValue));

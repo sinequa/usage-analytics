@@ -114,7 +114,7 @@ export class AuditService {
             this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask),
             this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask),
             this.principalService.list()
-        ] as Observable<{[key: string]: Results | DatasetError;}>[];
+        ] as Observable<{[key: string]: Results | DatasetError}>[];
 
 
         forkJoin(...dataSources).subscribe(
@@ -155,7 +155,7 @@ export class AuditService {
         return datasets;
     }
 
-    private getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError;}> {
+    private getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError}> {
         const params = {
             select: filters,
             start,

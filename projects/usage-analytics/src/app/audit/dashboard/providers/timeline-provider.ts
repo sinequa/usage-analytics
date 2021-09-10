@@ -9,12 +9,12 @@ import { IntlService } from "@sinequa/core/intl";
 
 export interface TimeSeries {
     dateField: string;
-    valueFields: TimelineValueField[]
+    valueFields: TimelineValueField[];
 }
 
 export interface TimelineValueField {
     name: string;
-    operatorResults?: boolean
+    operatorResults?: boolean;
     title?: string;
     primary?: boolean;
     displayedName?: string;
@@ -76,9 +76,7 @@ export class TimelineProvider {
             headerName: 'Date',
             field: 'value',
             filter: 'agDateColumnFilter',
-            cellRenderer: (params: any): HTMLElement | string => {
-                return this.intlService.formatDate(new Date(params.value));
-            }
+            cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(new Date(params.value))
         }] as ColDef[];
         if (!Utils.isArray(configs)) {
             configs = [configs];
@@ -88,14 +86,10 @@ export class TimelineProvider {
                 const colDef: ColDef = {
                     headerName: valueField.displayedName || valueField.name,
                     filter: "agNumberColumnFilter",
-                    cellRenderer: (params: any): HTMLElement | string => {
-                        return this.intlService.formatNumber(params.value);
-                    }
+                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
                 }
                 if (valueField.operatorResults) {
-                    colDef.valueGetter = (params: ValueGetterParams) => {
-                        return (params.data as AggregationItem).operatorResults?.[valueField.name]
-                    }
+                    colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[valueField.name]
                 } else {
                     colDef.field = valueField.name
                 }
@@ -176,13 +170,11 @@ export class TimelineProvider {
         if (timeSeries.length > 1) {
             const colors = d3.schemeCategory10;
             timeSeries = timeSeries.map(
-                (serie: TimelineSeries, index: number) => {
-                    return {
+                (serie: TimelineSeries, index: number) => ({
                         ...serie,
                         lineStyles: {'stroke-width': 1, 'stroke': colors[index]},
                         areaStyles: {'fill': 'none'}
-                    }
-                }
+                    })
             );
         }
         return timeSeries;

@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from "@angular/core";
 import { ComponentWithLogin, LoginService } from "@sinequa/core/login";
 
 @Component({
-    selector: "app",
+    selector: "sq-app",
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.scss"]
 })

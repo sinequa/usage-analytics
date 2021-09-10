@@ -50,8 +50,8 @@ export interface DashboardItem extends GridsterItem {
     relatedValueLocation?: StatValueLocation; // where to find the field value of the second stat operands
     relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
     computation?: StatOperation; // operation to get the global value of the stat
-    asc?: boolean // if the positive evaluation is at increase or decrease trend
-    statLayout?: StatLayout // the ui of displaying the stat
+    asc?: boolean; // if the positive evaluation is at increase or decrease trend
+    statLayout?: StatLayout; // the ui of displaying the stat
 }
 
 /**
@@ -79,24 +79,24 @@ export interface DashboardItemOption {
     info?: string;
     parameters?: {
         // For type === 'timeline'
-        aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
-        recordsTimeSeries?: RecordsTimeSeries;
+        aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[],
+        recordsTimeSeries?: RecordsTimeSeries,
 
         // For type === 'chart'
-        chartData?: ChartData;
-        chartType?: string;
+        chartData?: ChartData,
+        chartType?: string,
 
         // For type === 'stat'
-        valueLocation?: StatValueLocation; // where to find field value
-        operation?: StatOperation; // operation to compute the value
-        relatedQuery?: string; // query containing the second leg of the stat operands
-        relatedValueLocation?: StatValueLocation; // where to find the field value of the second stat operands
-        relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
-        computation?: StatOperation; // operation to get the global value of the stat
-        asc?: boolean // if the positive evaluation is at increase or decrease trend
+        valueLocation?: StatValueLocation, // where to find field value
+        operation?: StatOperation, // operation to compute the value
+        relatedQuery?: string, // query containing the second leg of the stat operands
+        relatedValueLocation?: StatValueLocation, // where to find the field value of the second stat operands
+        relatedOperation?: StatOperation, // operation to compute the value of the second stat operands
+        computation?: StatOperation, // operation to get the global value of the stat
+        asc?: boolean, // if the positive evaluation is at increase or decrease trend
         statLayout?: StatLayout // the ui of displaying the stat
 
-    }
+    };
 }
 
 export interface DashboardItemPosition {
@@ -107,8 +107,8 @@ export interface DashboardItemPosition {
 }
 
 export interface DashboardChange {
-    dashboard: Dashboard,
-    updateDatasets: boolean
+    dashboard: Dashboard;
+    updateDatasets: boolean;
 }
 
 // Name of the "default dashboard" (displayed prior to any user customization)
@@ -276,13 +276,11 @@ export class DashboardService {
         // Construct palette from configuration
         const palette = this.appService.app?.data?.palette as any as {name: string, items: string[]}[] || PALETTE;
         const widgets = this.getWidgets();
-        return palette.map(p => {
-            return {
+        return palette.map(p => ({
                 name: p.name,
                 items: p.items.filter(i => Utils.isString(i) && widgets[i])
                               .map(i => widgets[i])
-            }
-        });
+            }));
     }
 
     /**
@@ -293,13 +291,11 @@ export class DashboardService {
         const dashboards = this.appService.app?.data?.standardDashboards as any as {name: string, items: {item: string, position: DashboardItemPosition}[]}[]
             || STANDARD_DASHBOARDS;
         const widgets = this.getWidgets();
-        return dashboards.map(d => {
-            return {
+        return dashboards.map(d => ({
                 name: d.name,
                 items: d.items.filter(i => Utils.isString(i.item) && widgets[i.item])
                               .map(i => ({item: widgets[i.item], position: i.position}))
-            };
-        });
+            }));
     }
 
     /**
@@ -718,8 +714,8 @@ export class DashboardService {
 
         const originalName = dashboard.name;
         const unique : ValidatorFn = (control) => {
-            const unique = !control.value?.startsWith(this.formatMessage(defaultDashboardName)) && !this.getDashboard(control.value);
-            if(!unique) return {unique: true};
+            const checkUnique = !control.value?.startsWith(this.formatMessage(defaultDashboardName)) && !this.getDashboard(control.value);
+            if(!checkUnique) return {unique: true};
             return null;
         };
 
