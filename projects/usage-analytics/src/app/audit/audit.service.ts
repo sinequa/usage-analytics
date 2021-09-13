@@ -95,19 +95,24 @@ export class AuditService {
             .map((item) => item.expression);
         const timestamp = this.getAuditTimestampFromUrl();
 
-        // convert range filters to something more readable
-        // used by stats component tooltip
-        // here: start boundaries
-        if(Array.isArray(timestamp)) {
-            this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
-        } else {
-            this.currentFilter = timestamp;
-        }
-
         const parsedTimestamp = this.parseAuditTimestamp(timestamp!);
 
         const currentFilters = this.exprBuilder.concatAndExpr([...exprs, parsedTimestamp.currentRange]);
         const previousFilters = this.exprBuilder.concatAndExpr([...exprs, parsedTimestamp.previousRange]);
+
+        // convert range filters to something more readable
+        // used by stats component tooltip
+        if(Array.isArray(timestamp)) {
+            this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
+            this.previousFilter =  this.previousRange
+                                    ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
+                                    : `[${this.intl.formatDate(parsedTimestamp.previous)} - ${this.intl.formatDate(parsedTimestamp.start)}]`;
+        } else {
+            this.currentFilter = timestamp;
+            this.previousFilter =  this.previousRange
+                                    ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
+                                    : timestamp;
+        }
 
         /** Update the audit dashboard data (previous and current period) */
         const dataSources = [
@@ -187,15 +192,6 @@ export class AuditService {
     }
 
     public updatePreviousRangeFilter(range: Date[] | undefined) {
-        // convert previous range filters to something more readable
-        // used by stats component tooltip
-        // here: end boundaries
-        if(Array.isArray(range)) {
-            this.previousFilter = `[${this.intl.formatDate(range[0])} - ${this.intl.formatDate(range[1])}]`;
-        } else {
-            this.previousFilter = undefined;
-        }
-
         this.previousRange = range;
         this.updateAuditFilters();
     }

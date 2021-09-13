@@ -27,26 +27,21 @@ export class AuditStatComponent implements OnChanges {
         public statProvider: StatProvider,
         private auditService: AuditService
         ) {}
-    
+
     /**
      * returns current range filter
      */
     get currentRange(): string | undefined {
         return this.auditService.currentFilter;
     }
-    
+
     /**
      * returns previous range filter if defined
      */
     get previousRange(): string | undefined {
-        const range = this.auditService.previousFilter;
-        if(range === undefined) {
-            return this.currentRange;
-        }
-        
-        return range;
+        return this.auditService.previousFilter;
     }
-    
+
     /**
      * returns the correct tooltip based on currentRange and previousRange values
      */
@@ -55,7 +50,7 @@ export class AuditStatComponent implements OnChanges {
             // here previous is a dates range
             return "msg#stat.trendTooltipPrevDates";
         }
-        
+
         // here previous is undefined
         return "msg#stat.trendTooltip";
     }
