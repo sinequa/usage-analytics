@@ -7,7 +7,13 @@
         <details>
             <summary>{{element.name | sqMessage}}</summary>
             <div class="d-flex flex-wrap">
-                <button [sqIcon]="item.icon" type="button" class="btn btn-outline-secondary mx-1 my-1" *ngFor="let item of element.items" (click)="addWidget(item)">
+                <button
+                    [sqIcon]="item.icon"
+                    type="button"
+                    class="btn btn-outline-secondary mx-1 my-1"
+                    *ngFor="let item of element.items"
+                    (click)="addWidget(item)"
+                    [sqTooltip]="item?.info | sqMessage">
                     <div class="button-text">{{item.text | sqMessage}}</div>
                 </button>
             </div>
