@@ -30,7 +30,7 @@ export class WidgetPaletteComponent implements OnInit {
         this.dashboardService.addWidget(item);
     }
 
-    @HostListener('window:click', ['$event'])
+    @HostListener('window:click', [])
     clickOut() {
         this.showPalette = false;
     }

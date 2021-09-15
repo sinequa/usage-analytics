@@ -96,7 +96,7 @@ export class AuditRangePickerComponent implements OnDestroy {
         this.showDateRangeOptions = !this.showDateRangeOptions;
     }
 
-    @HostListener('window:click', ['$event'])
+    @HostListener('window:click', [])
     clickOut() {
         this.showDateRangeOptions = false;
     }
