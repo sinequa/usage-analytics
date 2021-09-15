@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, HostListener, OnDestroy } from "@angular/core";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { SearchService } from "@sinequa/components/search";
 import { Utils } from "@sinequa/core/base";
@@ -12,6 +12,7 @@ import { AuditService, RelativeTimeRanges } from "../audit.service";
     styleUrls: ["./audit-range-picker.component.scss"],
 })
 export class AuditRangePickerComponent implements OnDestroy {
+
     /** List of relative time range options */
     public readonly relativeTimeRanges = Object.values(RelativeTimeRanges);
 
@@ -93,6 +94,11 @@ export class AuditRangePickerComponent implements OnDestroy {
      */
     toggleDateRangeOptions() {
         this.showDateRangeOptions = !this.showDateRangeOptions;
+    }
+
+    @HostListener('window:click', [])
+    clickOut() {
+        this.showDateRangeOptions = false;
     }
 
     /**

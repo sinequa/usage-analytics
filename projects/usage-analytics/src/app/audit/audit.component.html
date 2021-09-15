@@ -7,6 +7,7 @@
         [collapsible]="true"
         [startCollapsed]="true"
         [buttonsStyle]="isDark()? 'dark' : 'light'"
+        [collapseOnClickOutside]="true"
         >
         <sq-facet-multi #facet class="card position-absolute" [results]="(auditService.data$ | async)?.applications" [facets]="facets" [showProgressBar]="false" ></sq-facet-multi>
     </sq-facet-card>
@@ -51,7 +52,7 @@
         <sq-action-buttons [sq-action-buttons]="{items: [exportAction], style:'outline-primary', rightAligned: true}"></sq-action-buttons>
         <sq-widget-palette class="ml-2" *ngIf="loginService.complete"></sq-widget-palette>
     </div>
-    
+
 </ul>
 
 <gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete">

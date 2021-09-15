@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, HostListener, OnInit } from "@angular/core";
 import { AppService } from "@sinequa/core/app-utils";
 import { DashboardItemOption, DashboardService } from "../dashboard/dashboard.service";
 
@@ -28,6 +28,11 @@ export class WidgetPaletteComponent implements OnInit {
 
     addWidget(item: DashboardItemOption) {
         this.dashboardService.addWidget(item);
+    }
+
+    @HostListener('window:click', [])
+    clickOut() {
+        this.showPalette = false;
     }
 
 }

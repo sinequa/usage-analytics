@@ -4,12 +4,12 @@
         <i class="far fa-clock mr-2"></i>
         {{displayedRange | sqMessage}}
     </span>
-    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage">
+    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions(); $event.stopPropagation()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage">
         <i class="fas fa-chevron-{{showDateRangeOptions ? 'up' : 'down'}}"></i>
     </button>
 </div>
 <!-- Dropdown card with the content-->
-<div class="card flex-column dateRange-options text-muted position-absolute" *ngIf="showDateRangeOptions">
+<div class="card flex-column dateRange-options text-muted position-absolute" *ngIf="showDateRangeOptions" (click)="$event.stopPropagation()">
     <form [formGroup]="form">
         <!-- List of predefined filters -->
         <div class="d-flex flex-column py-2 px-2">
