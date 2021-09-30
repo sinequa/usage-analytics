@@ -210,7 +210,7 @@ export class DashboardItemComponent implements OnChanges {
                     break;
                 case "chart":
                     if (this.config.chartData) {
-                        if (this.config.title === 'Regular/New Users') {
+                        if (this.config.title === 'msg#widgets.regular_newUsers.text') {
                             this.chartResults = {
                                 records: [] as Record[],
                                 aggregations: [
