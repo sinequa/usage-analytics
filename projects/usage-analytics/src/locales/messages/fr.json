@@ -221,8 +221,8 @@
             "info": "Nombre d'utilisateurs réguliers par rapport au nombre total d'utilisateurs potentiels."
         },
         "regular_newUsers": {
-            "text": "Utilisateurs réguliers/nouveaux",
-            "info": "Nombre d'utilisateurs réguliers par rapport au nombre total de nouveaux utilisateurs."
+            "text": "Utilisateurs nouveaux/réguliers",
+            "info": "Nombre de nouveaux utilisateurs par rapport au nombre total des utilisateurs réguliers."
         },
         "searchExitTimeLine": {
             "text": "Recherches quittées",
