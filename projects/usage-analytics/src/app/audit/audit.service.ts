@@ -126,7 +126,8 @@ export class AuditService {
             (data) => {
                 this.data$.next({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
                 this.previousPeriodData$.next({...data[1], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
-            }
+            },
+            () => console.error('dataset request errors')
         )
     }
 
@@ -169,7 +170,7 @@ export class AuditService {
         };
         if (this.webServiceName) {
             const datasets = this.defaultDatasets.concat(this.updateDatasetsList());
-            return this.datasetWebService.getBulk(this.webServiceName, params, datasets);
+            return this.datasetWebService.getBulk(this.webServiceName, params, Array.from(new Set(datasets))); // Here we remove duplicate datasets
         } else {
             console.error("No DataSet found")
             return of({})

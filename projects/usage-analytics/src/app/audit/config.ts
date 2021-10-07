@@ -596,7 +596,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
     regularNewUsers: {
         type: "chart",
-        query: "",
+        query: "newUsers",
         icon: "fas fa-chart-pie",
         text: "msg#widgets.regular_newUsers.text",
         info: "msg#widgets.regular_newUsers.info",
@@ -605,7 +605,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             chartData: {
                 aggregation: "regular-new-user"
             },
-            chartType: "Pie3D"
+            chartType: "Pie3D",
+            relatedQuery: "regularUsers",
         }
     },
 
