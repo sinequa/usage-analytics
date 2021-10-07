@@ -217,10 +217,12 @@ export class DashboardItemComponent implements OnChanges {
                                     {
                                         name: "regular-new-user",
                                         column: "",
-                                        items: [
-                                            {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
-                                            {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
-                                        ]
+                                        items: (this.dataset["newUsers"] && this.dataset["regularUsers"])
+                                              ? [
+                                                    {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
+                                                    {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
+                                                ]
+                                              : []
                                     }
                                 ] as Aggregation[]
                             } as  Results;
