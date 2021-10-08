@@ -114,10 +114,14 @@ export class AuditService {
                                     : timestamp;
         }
 
+        /** Update the scope of the dataset web service (app/profile), if filtering by applications is used */
+        const sba = this.getRequestScope("SBA");
+        const profile = this.getRequestScope("Profile");
+
         /** Update the audit dashboard data (previous and current period) */
         const dataSources = [
-            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask),
-            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask),
+            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, sba, profile),
+            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask, sba, profile),
             this.principalService.list()
         ] as Observable<{[key: string]: Results | DatasetError}>[];
 
@@ -132,9 +136,7 @@ export class AuditService {
     }
 
     public getAuditTimestampFromUrl(): string | Date[] | undefined {
-        const expression = this.searchService.query.findSelect(
-            "audit_timestamp"
-        )?.expression;
+        const expression = this.searchService.query.findSelect("audit_timestamp")?.expression;
         if (expression) {
             const expr = this.appService.parseExpr(expression);
             if (expr instanceof Expr) {
@@ -142,6 +144,25 @@ export class AuditService {
             }
         }
         return undefined;
+    }
+
+    /**
+     *
+     * @param facetName
+     * @returns filtered values of a given facet
+     */
+    private getRequestScope(facetName: string): string[] {
+        const expression = this.searchService.query.findSelect(facetName)?.expression;
+        if (expression) {
+            const expr = this.appService.parseExpr(expression);
+            if (expr instanceof Expr) {
+                if (expr.operands?.length > 0) {
+                    return expr.operands.map((op) => op.value!);
+                }
+                return expr.values!;
+            }
+        }
+        return [];
     }
 
     /**
@@ -161,12 +182,14 @@ export class AuditService {
         return datasets;
     }
 
-    private getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError}> {
+    private getAuditData(filters: string, start: string, end: string, mask: string, sba: string[], profile: string[]): Observable<{[key: string]: Results | DatasetError}> {
         const params = {
             select: filters,
             start,
             end,
-            mask
+            mask,
+            sba,
+            profile
         };
         if (this.webServiceName) {
             const datasets = this.defaultDatasets.concat(this.updateDatasetsList());
