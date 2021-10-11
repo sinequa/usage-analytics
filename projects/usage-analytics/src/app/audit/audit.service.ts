@@ -105,13 +105,13 @@ export class AuditService {
         const currentFilters = this.exprBuilder.concatAndExpr([...exprs, parsedTimestamp.currentRange]);
         const previousFilters = this.exprBuilder.concatAndExpr([...exprs, parsedTimestamp.previousRange]);
         /** Update the scope of the dataset web service (app/profile), if filtering by applications is used */
-        const sba = this.getRequestScope("SBA");
-        const profile = this.getRequestScope("Profile");
+        const apps = this.getRequestScope("SBA");
+        const profiles = this.getRequestScope("Profile");
 
         /** Update the audit dashboard data (previous and current period) */
         const dataSources = [
-            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, sba, profile),
-            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask, sba, profile),
+            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, apps, profiles),
+            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask, apps, profiles),
             this.principalService.list()
         ] as Observable<{[key: string]: Results | DatasetError;}>[];
 
@@ -154,14 +154,14 @@ export class AuditService {
         return [];
     }
 
-    private getAuditData(filters: string, start: string, end: string, mask: string, sba: string[], profile: string[]): Observable<{[key: string]: Results | DatasetError}> {
+    private getAuditData(filters: string, start: string, end: string, mask: string, apps: string[], profiles: string[]): Observable<{[key: string]: Results | DatasetError}> {
         const params = {
             select: filters,
             start,
             end,
             mask,
-            sba,
-            profile
+            apps,
+            profiles
         };
         if (this.webServiceName) {
             return this.datasetWebService.getAll(this.webServiceName, params);
