@@ -3,5 +3,4 @@
     <ZipFile>sinequa-analytics</ZipFile>
     <Title>Default Sinequa Analytics Workspace</Title>
     <Description>This is the default SBA workspace for Sinequa Analytics.</Description>
-	<AlphaBetaOnly>Beta</AlphaBetaOnly>
 </Sinequa>
