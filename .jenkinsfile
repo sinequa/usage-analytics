@@ -1,17 +1,132 @@
-pipeline {
-    agent { label 'Sun' }
-	options { disableConcurrentBuilds() }
-	stages {
-		stage('NPM Install') {
-			steps {
-				bat "npm ci"	
-			}
+	/*### Environment ###*/
+properties([
+	parameters([
+		string(name:"SBA_VERSION",  defaultValue: "", description: "version of sba", trim: true)
+	]),
+	disableConcurrentBuilds()
+])
+
+url           = "${env.NPM_SERVER_URL}"
+npm_user      = "${env.NPM_USER}"
+npm_pass      = "${env.NPM_PASS}"
+npm_mail      = "${env.NPM_MAIL}"
+developNumber = "${env.NPM_DEVELOP_NUMBER}"
+
+sba_version   = "${params.SBA_VERSION}"
+
+scope  = "@sinequa"
+fnpmrc = '.npmrc'
+anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
+
+def set_sba_version(curBranch) {
+	if (sba_version.length() < 1) {
+		if ( env.BRANCH_NAME.contains("release") ) {
+			sba_version = curBranch.split("%2F")[1].trim()
+		} else {
+			sba_version = developNumber
 		}
-		stage('Build') {
-			steps {
-				bat "npm run build --if-present"
-			}
+	}
+	echo "sba_version: ${sba_version}"
+}
+
+def findBranchNumber(){
+	def tmpBranch=""
+	def theBranch=""
+	// PR : 
+	//   BRANCH_NAME: PR-8208
+	//   CHANGE_TARGET: release/11.7.0
+	// BRANCH
+	//   BRANCH_NAME: develop
+	//   BRANCH_NAME: release/11.7.0
+	// return: 11.7.0
+
+	echo "Triggering job for branch ${env.BRANCH_NAME}"
+	if (env.BRANCH_NAME.contains("PR-")) {
+		tmpBranch = env.CHANGE_TARGET
+	} else {
+		tmpBranch = env.BRANCH_NAME
+	}
+	echo "tmpBranch: ${tmpBranch}"
+
+	theBranch = tmpBranch.replace("/", "%2F")
+	echo "Branch returned: ${theBranch}"
+	return theBranch
+}
+
+def simple_build() {
+	try {
+		stage('Build')        {
+			echo "npm run build --if-present"
+			// bat "npm run build --if-present"
 		}
+	} catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
 	}
 }
 
+def validation() {
+	try {
+		stage('Build')       {
+			echo "npm run buildsq --sq_version=${sba_version} --if-present"
+			// bat "npm run buildsq --sq_version=${sba_version} --if-present"
+		}
+	} catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
+	}
+}
+
+def build_or_merge() {
+	def typeAction = ""
+	if (env.BRANCH_NAME.contains("PR-")) {
+		typeAction = "build"
+	} else {
+		typeAction = "merge"
+	}
+	return typeAction
+}
+
+
+node ('Sun') {
+	currentBuild.result = "SUCCESS"
+	try {
+		def currentBranch = findBranchNumber()
+		set_sba_version(currentBranch)
+
+		stage('Checkout'){
+			checkout scm
+		}
+		stage('Create user') {
+			bat "npm-cli-login -u ${npm_user} -p ${npm_pass} -e ${npm_mail} -r ${url} -s ${scope} --config-path ${fnpmrc}"
+			sleep(2)
+			def content = ""
+			def txt = ""
+			if (fileExists(fnpmrc)) {
+				content = readFile fnpmrc
+				anpmrc.each {
+					txt += it + "\n"
+				}
+				content += txt
+				//echo "npmrc: ${content}"
+				writeFile file: fnpmrc, text: content
+			}
+			bat "npm whoami"
+		}
+
+		stage('NPM Install') {
+			bat "npm ci"
+		}
+		
+		def action = build_or_merge()
+		if ("${action}" == "build") {
+			simple_build()
+		} else {
+			validation()
+		}
+
+	} catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
+	}
+}
