@@ -283,6 +283,10 @@
         "avgSessionDuration": {
             "text": "Durée moyenne de session",
             "info": "Durée moyenne de session."
+        },
+        "userFeedbackGrid": {
+            "text": "Commentaires des utilisateurs",
+            "info": "Commentaires des utilisateurs."
         }
     },
 
@@ -301,7 +305,8 @@
     "palette": {
         "timelines": "Historiques",
         "charts": "Graphiques",
-        "statistics": "Statistiques"
+        "statistics": "Statistiques",
+        "grid": "Tables"
     },
 
     "dateRange": {

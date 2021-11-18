@@ -14,6 +14,7 @@ import { DashboardItem, DashboardService } from './dashboard.service';
 import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
+import { GridProvider } from './providers/grid-provider';
 
 
 /**
@@ -27,7 +28,7 @@ import { ChartProvider } from './providers/chart-provider';
     selector: 'sq-dashboard-item',
     templateUrl: './dashboard-item.component.html',
     styleUrls: ['./dashboard-item.component.scss'],
-    providers: [TimelineProvider, ChartProvider]
+    providers: [TimelineProvider, ChartProvider, GridProvider]
 })
 export class DashboardItemComponent implements OnChanges {
     @Input() config: DashboardItem;
@@ -110,7 +111,8 @@ export class DashboardItemComponent implements OnChanges {
         public exprBuilder: ExprBuilder,
         public auditService: AuditService,
         public timelineProvider: TimelineProvider,
-        public chartProvider: ChartProvider) {
+        public chartProvider: ChartProvider,
+        public gridProvider: GridProvider) {
 
         this.closeAction = new Action({
             icon: "fas fa-times",
@@ -172,6 +174,11 @@ export class DashboardItemComponent implements OnChanges {
             this.title = "Timeline view";
         }
 
+        if(this.config.type === "grid") {
+            this.icon = "fas fa-th-list";
+            this.title = "Grid view";
+        }
+
         // Manage width and height changes. Some components need additional treatment
         if(changes["height"] && this.height) {
             this.innerheight = this.height - 43;
@@ -218,11 +225,11 @@ export class DashboardItemComponent implements OnChanges {
                                         name: "regular-new-user",
                                         column: "",
                                         items: (this.dataset["newUsers"] && this.dataset["regularUsers"])
-                                              ? [
+                                                ? [
                                                     {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
                                                     {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
                                                 ]
-                                              : []
+                                                : []
                                     }
                                 ] as Aggregation[]
                             } as  Results;
@@ -231,6 +238,14 @@ export class DashboardItemComponent implements OnChanges {
                         }
                         this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
                         this.rowData = (this.dataset[this.config.query] as Results)?.aggregations.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
+                    }
+                    break;
+                case "grid":
+                    this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
+                    if (!!this.config.aggregationName) {
+                        this.rowData = this.gridProvider.getAggregationRowData(this.dataset[this.config.query], this.config.aggregationName)
+                    } else {
+                        this.rowData = (this.dataset[this.config.query] as Results).records
                     }
                     break;
                 default:
