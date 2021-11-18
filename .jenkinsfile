@@ -87,6 +87,24 @@ def build_or_merge() {
 	return typeAction
 }
 
+def appendFile(afile, what) {
+	def content = ""
+	def txt = ""
+	try {
+		if (fileExists(afile)) {
+			content = readFile afile
+			what.each {
+				txt += it + "\n"
+			}
+			content += txt
+			//echo "content: ${content}"
+			writeFile file: afile, text: content
+		}
+	} catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
+	}
+}
 
 node ('Sun') {
 	currentBuild.result = "SUCCESS"
@@ -97,20 +115,24 @@ node ('Sun') {
 		stage('Checkout'){
 			checkout scm
 		}
+		
+		stage('Clean') {
+			def pkg_lck = "package-lock.json"
+			echo ".Delete ${pkg_lck}"
+			bat "if exist ${pkg_lck} ( del /f ${pkg_lck} )"
+			
+			def nmfolder = "node_modules"
+			echo ".Rmdir /s /q ${nmfolder}"
+			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
+			
+			echo ".Cache clean force"
+			bat "npm cache clean --force"
+		}
+		
 		stage('Create user') {
 			bat "npm-cli-login -u ${npm_user} -p ${npm_pass} -e ${npm_mail} -r ${url} -s ${scope} --config-path ${fnpmrc}"
 			sleep(2)
-			def content = ""
-			def txt = ""
-			if (fileExists(fnpmrc)) {
-				content = readFile fnpmrc
-				anpmrc.each {
-					txt += it + "\n"
-				}
-				content += txt
-				//echo "npmrc: ${content}"
-				writeFile file: fnpmrc, text: content
-			}
+			appendFile(fnpmrc, anpmrc)
 			bat "npm whoami"
 		}
 
