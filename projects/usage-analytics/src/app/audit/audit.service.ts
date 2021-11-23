@@ -45,6 +45,9 @@ export class AuditService {
     public data$ = new ReplaySubject<Dataset>(1);
     public previousPeriodData$ = new ReplaySubject<Dataset>(1);
 
+    public currentAuditDataLoading = false;
+    public previousAuditDataLoading = false;
+
     /** Reference period for trends calculation. If not set, this period is inferred from the main period automatically */
     public previousRange: Date[] | undefined;
 
@@ -132,18 +135,23 @@ export class AuditService {
             }
         )
 
-        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, apps, profiles).subscribe(
-            (data) => {
-                currentPeriodData = {...currentPeriodData, ...data};
-                this.data$.next(currentPeriodData);
-            }
-        )
+        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, apps, profiles)
+            .subscribe(
+                (data) => {
+                    currentPeriodData = {...currentPeriodData, ...data};
+                    this.data$.next(currentPeriodData);
+                },
+                () => {},
+                () => this.currentAuditDataLoading = false
+            )
 
         this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask, apps, profiles).subscribe(
             (data) => {
                 previousPeriodData = {...previousPeriodData, ...data};
                 this.previousPeriodData$.next(previousPeriodData);
-            }
+            },
+            () => {},
+            () => this.previousAuditDataLoading = false
         )
     }
 
@@ -204,6 +212,8 @@ export class AuditService {
             profiles
         };
         if (this.webServiceName) {
+            this.currentAuditDataLoading = true;
+            this.previousAuditDataLoading = true;
             const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => datasetName !== "totalUsers"); // Exclude manual added datasets
             return from(Array.from(new Set(datasets)))
                     .pipe(
