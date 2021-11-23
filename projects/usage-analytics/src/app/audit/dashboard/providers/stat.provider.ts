@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { DatasetError, Results } from "@sinequa/core/web-services";
+import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
 import {DashboardItem} from "../dashboard.service";
 
 export type Trend = "increase" | "decrease" | "stable" | undefined;
@@ -16,8 +16,8 @@ export class StatProvider {
 
     constructor() {}
 
-    extractStatValue(data: Results | DatasetError, valueLocation: MayBe<string>): MayBe<number> {
-        if (data as Results) {
+    extractStatValue(data: Results | DatasetError | undefined, valueLocation: MayBe<string>): MayBe<number> {
+        if (data && data as Results) {
             switch (valueLocation) {
                 case "aggregations":
                     if ((data as Results).aggregations && (data as Results).aggregations[0] && (data as Results).aggregations[0].items) {
@@ -41,8 +41,8 @@ export class StatProvider {
         return undefined;
     }
 
-    aggregate(data: Results | DatasetError, valueLocation: string | undefined): number | undefined {
-        if (data as Results) {
+    aggregate(data: Results | DatasetError | undefined, valueLocation: string | undefined): number | undefined {
+        if (data && data as Results) {
             switch (valueLocation) {
                 case "aggregations":
                     if ((data as Results).aggregations && (data as Results).aggregations[0] && (data as Results).aggregations[0].items) {
@@ -89,8 +89,8 @@ export class StatProvider {
      * @returns an object containing computed values {value, percentageChange, trend, trendEvaluation}
      */
     getvalues(
-        previousDataSet: {[key: string]: Results | DatasetError},
-        dataset: {[key: string]: Results | DatasetError},
+        previousDataSet: Dataset,
+        dataset: Dataset,
         config: DashboardItem, decimalsPrecision: number
         ): {value: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
 

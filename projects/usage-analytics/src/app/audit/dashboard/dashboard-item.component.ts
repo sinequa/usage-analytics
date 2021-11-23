@@ -2,7 +2,7 @@ import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from
 import { GridsterItemComponent } from 'angular-gridster2';
 import { ColDef, GridApi, GridReadyEvent } from "ag-grid-community";
 
-import { Results, Record, DatasetError, Aggregation, AggregationItem } from '@sinequa/core/web-services';
+import { Results, Record, Aggregation, AggregationItem, Dataset } from '@sinequa/core/web-services';
 import { ExprBuilder } from '@sinequa/core/app-utils'
 
 import { Action } from '@sinequa/components/action';
@@ -32,8 +32,8 @@ import { ChartProvider } from './providers/chart-provider';
 export class DashboardItemComponent implements OnChanges {
     @Input() config: DashboardItem;
     @Input() results: Results;
-    @Input() dataset: {[key: string]: Results | DatasetError};
-    @Input() previousDataSet: {[key: string]: Results | DatasetError};
+    @Input() dataset: Dataset;
+    @Input() previousDataSet: Dataset;
 
 
     // Whether this widget can be renamed or not
@@ -189,7 +189,7 @@ export class DashboardItemComponent implements OnChanges {
             }
         }
 
-        if (changes["dataset"] && this.dataset) {
+        if (changes["dataset"] && this.dataset && this.dataset[this.config.query]) {
             switch (this.config.type) {
                 case "timeline":
                     this.timeSeries = [];
@@ -218,11 +218,11 @@ export class DashboardItemComponent implements OnChanges {
                                         name: "regular-new-user",
                                         column: "",
                                         items: (this.dataset["newUsers"] && this.dataset["regularUsers"])
-                                              ? [
+                                                ? [
                                                     {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
                                                     {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
                                                 ]
-                                              : []
+                                                : []
                                     }
                                 ] as Aggregation[]
                             } as  Results;
