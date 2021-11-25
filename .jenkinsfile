@@ -1,7 +1,8 @@
 	/*### Environment ###*/
 properties([
 	parameters([
-		string(name:"SBA_VERSION",  defaultValue: "", description: "version of sba", trim: true)
+		string(name:"SBA_VERSION", defaultValue: "", description: "version of sba", trim: true),
+		string(name:"SBA_NODE",    defaultValue: "${env.SBA_NODE}", description: "execution node name", trim: true)
 	]),
 	disableConcurrentBuilds()
 ])
@@ -19,7 +20,7 @@ fnpmrc = '.npmrc'
 anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
 
 def set_sba_version(curBranch) {
-	if (sba_version.length() < 1) {
+	if (sba_version.length() == 0) {
 		if ( env.BRANCH_NAME.contains("release") ) {
 			sba_version = curBranch.split("%2F")[1].trim()
 		} else {
@@ -57,7 +58,7 @@ def simple_build() {
 	try {
 		stage('Build')        {
 			echo "npm run build --if-present"
-			// bat "npm run build --if-present"
+			bat "npm run build --if-present"
 		}
 	} catch (err) {
 		currentBuild.result = "FAILURE"
@@ -69,7 +70,7 @@ def validation() {
 	try {
 		stage('Build')       {
 			echo "npm run buildsq --sq_version=${sba_version} --if-present"
-			// bat "npm run buildsq --sq_version=${sba_version} --if-present"
+			bat "npm run buildsq --sq_version=${sba_version} --if-present"
 		}
 	} catch (err) {
 		currentBuild.result = "FAILURE"
@@ -77,7 +78,7 @@ def validation() {
 	}
 }
 
-def build_or_merge() {
+def buildOrMerge() {
 	def typeAction = ""
 	if (env.BRANCH_NAME.contains("PR-")) {
 		typeAction = "build"
@@ -106,7 +107,7 @@ def appendFile(afile, what) {
 	}
 }
 
-node ('Sun') {
+node (params.SBA_NODE) {
 	currentBuild.result = "SUCCESS"
 	try {
 		def currentBranch = findBranchNumber()
@@ -131,7 +132,6 @@ node ('Sun') {
 		
 		stage('Create user') {
 			bat "npm-cli-login -u ${npm_user} -p ${npm_pass} -e ${npm_mail} -r ${url} -s ${scope} --config-path ${fnpmrc}"
-			sleep(2)
 			appendFile(fnpmrc, anpmrc)
 			bat "npm whoami"
 		}
@@ -140,7 +140,7 @@ node ('Sun') {
 			bat "npm i"
 		}
 		
-		def action = build_or_merge()
+		def action = buildOrMerge()
 		if ("${action}" == "build") {
 			simple_build()
 		} else {
