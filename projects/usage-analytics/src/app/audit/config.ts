@@ -856,6 +856,39 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
+    userFeedbackGrid: {
+        type: "grid",
+        query: "userFeedback",
+        text: "msg#widgets.userFeedbackGrid.text",
+        icon: "fas fa-th-list",
+        info: "msg#widgets.userFeedbackGrid.info",
+        unique: true,
+        parameters: {
+            columns: [
+                {
+                    field: "app",
+                    headerName: "App",
+                    filterType: "text",
+                    formatterType: "text"
+                },
+                {
+                    field: "message",
+                    headerName: "Message",
+                    filterType: "text",
+                    formatterType: "text"
+                },
+                {
+                    field: "detail",
+                    headerName: "Detail",
+                    filterType: "text",
+                    formatterType: "text",
+                    multiLineCell: true
+                }
+            ],
+            showTooltip: true
+        }
+    },
+
 };
 
 /** Dashboards */
@@ -909,73 +942,79 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
 
 /** Palette */
 export const PALETTE: {name: string, items: string[]}[] = [
-  {
-      name: "msg#palette.timelines",
-      items: [
-          "queryCountTotalTimeline",
-          "userCountTotalTimeline",
-          "sessionCountTotalTimeline",
-          "searchBySessionTimeline",
-          "clickBySearchTimeline",
-          "sessionDurationTimeline",
-          "newUsersTimeline",
-          "regularUsersTimeline",
-          "firstClickTimeline",
-          "mrrTimeline",
-          "refinementTimeline",
-          "searchWithClicksTimeline",
-          "searchExitTimeline",
-          "zeroSearchTimeline",
-          "clickFirstDocsTimeline",
-          "queryBounceTimeline",
-          "clickTotalTimeline",
-          "responseTimeTimeline",
-          "avgResponseTimeTimeline",
-          "avgEngineResponseTimeline"
+    {
+        name: "msg#palette.timelines",
+        items: [
+            "queryCountTotalTimeline",
+            "userCountTotalTimeline",
+            "sessionCountTotalTimeline",
+            "searchBySessionTimeline",
+            "clickBySearchTimeline",
+            "sessionDurationTimeline",
+            "newUsersTimeline",
+            "regularUsersTimeline",
+            "firstClickTimeline",
+            "mrrTimeline",
+            "refinementTimeline",
+            "searchWithClicksTimeline",
+            "searchExitTimeline",
+            "zeroSearchTimeline",
+            "clickFirstDocsTimeline",
+            "queryBounceTimeline",
+            "clickTotalTimeline",
+            "responseTimeTimeline",
+            "avgResponseTimeTimeline",
+            "avgEngineResponseTimeline"
 
-      ]
-  },
-  {
-      name: "msg#palette.charts",
-      items: [
-          "topSources",
-          "topQueries",
-          "topFacets",
-          "topNoResultsQueries",
-          "resultTypes",
-          "regularNewUsers"
-      ]
-  },
-  {
-      name: "msg#palette.statistics",
-      items: [
-          "queryCountTotal",
-          "userCountTotal",
-          "sessionCountTotal",
-          "sessionsByUser",
-          "viewedDocPerSearch",
-          "searchBySession",
-          "clickBySearch",
-          "sessionDuration",
-          "newUsers",
-          "regularUsers",
-          "adoptionRate",
-          "regularUserRate",
-          "firstClick",
-          "mrr",
-          "refinement",
-          "refinementRate",
-          "searchWithClicks",
-          "searchWithClicksRate",
-          "zeroSearch",
-          "zeroSearchRate",
-          "searchExit",
-          "searchExitRate",
-          "clickFirstDocs",
-          "queryBounce",
-          "queryBounceRate",
-          "avgResponseTime",
-          "avgEngineResponseTime"
-      ]
-  }
+        ]
+    },
+    {
+        name: "msg#palette.charts",
+        items: [
+            "topSources",
+            "topQueries",
+            "topFacets",
+            "topNoResultsQueries",
+            "resultTypes",
+            "regularNewUsers"
+        ]
+    },
+    {
+        name: "msg#palette.grid",
+        items: [
+            "userFeedbackGrid"
+        ]
+    },
+    {
+        name: "msg#palette.statistics",
+        items: [
+            "queryCountTotal",
+            "userCountTotal",
+            "sessionCountTotal",
+            "sessionsByUser",
+            "viewedDocPerSearch",
+            "searchBySession",
+            "clickBySearch",
+            "sessionDuration",
+            "newUsers",
+            "regularUsers",
+            "adoptionRate",
+            "regularUserRate",
+            "firstClick",
+            "mrr",
+            "refinement",
+            "refinementRate",
+            "searchWithClicks",
+            "searchWithClicksRate",
+            "zeroSearch",
+            "zeroSearchRate",
+            "searchExit",
+            "searchExitRate",
+            "clickFirstDocs",
+            "queryBounce",
+            "queryBounceRate",
+            "avgResponseTime",
+            "avgEngineResponseTime"
+        ]
+    }
 ]
