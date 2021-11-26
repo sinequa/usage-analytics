@@ -4,12 +4,13 @@ import { AppService, Expr, ExprBuilder } from "@sinequa/core/app-utils";
 import { Utils } from "@sinequa/core/base";
 import {IntlService} from "@sinequa/core/intl";
 import {
-    DatasetError,
+    Dataset,
     DatasetWebService,
     PrincipalWebService,
     Results,
 } from "@sinequa/core/web-services";
-import { forkJoin, Observable, of, ReplaySubject } from "rxjs";
+import { from, Observable, of, ReplaySubject } from "rxjs";
+import { mergeMap } from "rxjs/operators";
 import { DashboardService } from "./dashboard/dashboard.service";
 
 export enum RelativeTimeRanges {
@@ -41,8 +42,11 @@ export class AuditService {
 
     private readonly defaultDatasets:  string[] = ["applications"];
 
-    public data$ = new ReplaySubject<{ [key: string]: Results | DatasetError }>(1);
-    public previousPeriodData$ = new ReplaySubject<{ [key: string]: Results | DatasetError }>(1);
+    public data$ = new ReplaySubject<Dataset>(1);
+    public previousPeriodData$ = new ReplaySubject<Dataset>(1);
+
+    public currentAuditDataLoading = false;
+    public previousAuditDataLoading = false;
 
     /** Reference period for trends calculation. If not set, this period is inferred from the main period automatically */
     public previousRange: Date[] | undefined;
@@ -119,19 +123,35 @@ export class AuditService {
         const profiles = this.getRequestScope("Profile");
 
         /** Update the audit dashboard data (previous and current period) */
-        const dataSources = [
-            this.getAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, apps, profiles),
-            this.getAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask, apps, profiles),
-            this.principalService.list()
-        ] as Observable<{[key: string]: Results | DatasetError}>[];
+        let currentPeriodData = {};
+        let previousPeriodData = {};
 
+        this.principalService.list().subscribe(
+            (data: any) => {
+                currentPeriodData = {...currentPeriodData, "totalUsers": {"totalrecordcount": data?.pagination?.total}};
+                previousPeriodData = {...previousPeriodData, "totalUsers": {"totalrecordcount": data?.pagination?.total}};
+                this.data$.next(currentPeriodData);
+                this.previousPeriodData$.next(previousPeriodData);
+            }
+        )
 
-        forkJoin(...dataSources).subscribe(
+        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, apps, profiles)
+            .subscribe(
+                (data) => {
+                    currentPeriodData = {...currentPeriodData, ...data};
+                    this.data$.next(currentPeriodData);
+                },
+                () => {},
+                () => this.currentAuditDataLoading = false
+            )
+
+        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask, apps, profiles).subscribe(
             (data) => {
-                this.data$.next({...data[0], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
-                this.previousPeriodData$.next({...data[1], "totalUsers": {"totalrecordcount": data[2]?.pagination?.total}});
+                previousPeriodData = {...previousPeriodData, ...data};
+                this.previousPeriodData$.next(previousPeriodData);
             },
-            () => console.error('dataset request errors')
+            () => {},
+            () => this.previousAuditDataLoading = false
         )
     }
 
@@ -182,7 +202,7 @@ export class AuditService {
         return datasets;
     }
 
-    private getAuditData(filters: string, start: string, end: string, mask: string, apps: string[], profiles: string[]): Observable<{[key: string]: Results | DatasetError}> {
+    private getParallelStreamAuditData(filters: string, start: string, end: string, mask: string, apps: string[], profiles: string[]): Observable<Dataset> {
         const params = {
             select: filters,
             start,
@@ -192,11 +212,18 @@ export class AuditService {
             profiles
         };
         if (this.webServiceName) {
-            const datasets = this.defaultDatasets.concat(this.updateDatasetsList());
-            return this.datasetWebService.getBulk(this.webServiceName, params, Array.from(new Set(datasets))); // Here we remove duplicate datasets
+            this.currentAuditDataLoading = true;
+            this.previousAuditDataLoading = true;
+            const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => datasetName !== "totalUsers"); // Exclude manual added datasets
+            return from(Array.from(new Set(datasets)))
+                    .pipe(
+                        mergeMap(
+                            (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params)
+                        )
+                    );
         } else {
             console.error("No DataSet found")
-            return of({})
+            return of({} as Dataset)
         }
     }
 

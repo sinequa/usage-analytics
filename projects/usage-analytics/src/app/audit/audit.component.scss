@@ -5,6 +5,15 @@
     gap: 1rem;
 }
 
+::ng-deep sq-loading-bar {
+    margin-top: -15px;
+
+    .slider {
+        width: 98% !important;
+        height: 5px !important;
+    }
+}
+
 ::ng-deep gridster {
     // allow dropdown to be visible when it's height
     // is taller than the widget's height
@@ -23,21 +32,21 @@
             display: inline-block;
         }
     }
-    
+
     // hide gridster-item buttons
     gridster-item[focus="false"] {
         button {
             display: none;
         }
     }
-    
+
     // display gridster-item button on mouse over
     gridster-item:hover {
         button {
             display: inline-block;
         }
     }
-    
+
     // gridster-item focused got a higher z-index
     // but below move-in z-index
     gridster-item[focus="true"] {
