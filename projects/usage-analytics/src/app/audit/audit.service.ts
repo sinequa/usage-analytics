@@ -57,6 +57,10 @@ export class AuditService {
     public currentFilter: string | undefined;
     public previousFilter: string | undefined;
 
+    // used as tooltips
+    public infoCurrentFilter: string | undefined;
+    public infoPreviousFilter: string | undefined;
+
     constructor(
         public datasetWebService: DatasetWebService,
         public searchService: SearchService,
@@ -65,7 +69,9 @@ export class AuditService {
         public principalService: PrincipalWebService,
         private intl: IntlService,
         public dashboardService: DashboardService
-    ) {}
+    ) {
+        this.intl.events.subscribe(() => this.convertRangeFilter())
+    }
 
     get webServiceName(): string | undefined{
         if(this.appService.app && this.appService.app.webServices){
@@ -106,17 +112,18 @@ export class AuditService {
 
         // convert range filters to something more readable
         // used by stats component tooltip
-        if(Array.isArray(timestamp)) {
-            this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
-            this.previousFilter =  this.previousRange
-                                    ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
-                                    : `[${this.intl.formatDate(parsedTimestamp.previous)} - ${this.intl.formatDate(parsedTimestamp.start)}]`;
-        } else {
-            this.currentFilter = timestamp;
-            this.previousFilter =  this.previousRange
-                                    ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
-                                    : timestamp;
-        }
+        // if(Array.isArray(timestamp)) {
+        //     this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
+        //     this.previousFilter =  this.previousRange
+        //                             ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
+        //                             : `[${this.intl.formatDate(parsedTimestamp.previous)} - ${this.intl.formatDate(parsedTimestamp.start)}]`;
+        // } else {
+        //     this.currentFilter = timestamp;
+        //     this.previousFilter =  this.previousRange
+        //                             ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
+        //                             : timestamp;
+        // }
+        this.convertRangeFilter(timestamp!, parsedTimestamp);
 
         /** Update the scope of the dataset web service (app/profile), if filtering by applications is used */
         const apps = this.getRequestScope("SBA");
@@ -246,6 +253,30 @@ export class AuditService {
         this.previousRange = range;
         this.updateAuditFilters();
     }
+
+    private convertRangeFilter(timestamp?: Date[] | string, parsedTimestamp?: AuditDatasetFilters) {
+        if (!timestamp || !parsedTimestamp) {
+            timestamp = this.getAuditTimestampFromUrl();
+            parsedTimestamp = this.parseAuditTimestamp(timestamp!);
+        }
+
+        if(Array.isArray(timestamp)) {
+            this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
+            this.previousFilter =  this.previousRange
+                                    ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
+                                    : `[${this.intl.formatDate(parsedTimestamp.previous)} - ${this.intl.formatDate(parsedTimestamp.start)}]`;
+        } else {
+            this.currentFilter = timestamp;
+            this.previousFilter =  this.previousRange
+                                    ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
+                                    : timestamp;
+        }
+        this.infoCurrentFilter = `${this.intl.formatMessage('msg#dateRange.from')} ${this.intl.formatDate(parsedTimestamp.start, {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.end, {day: "numeric", month: "short", year: "numeric"})}`;
+        this.infoPreviousFilter =  this.previousRange
+                                    ? `${this.intl.formatMessage('msg#dateRange.from')}  ${this.intl.formatDate(this.previousRange[0], {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(this.previousRange[1], {day: "numeric", month: "short", year: "numeric"})}`
+                                    : `${this.intl.formatMessage('msg#dateRange.from')} ${this.intl.formatDate(parsedTimestamp.previous, {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.start, {day: "numeric", month: "short", year: "numeric"})}`;
+    }
+
 
     private getTimestampValueFromExpr(expr: Expr): string | Date[] {
         if (Utils.isString(expr.value) && expr.value.indexOf("[") > -1) {

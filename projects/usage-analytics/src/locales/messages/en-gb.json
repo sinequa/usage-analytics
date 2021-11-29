@@ -304,6 +304,9 @@
     },
 
     "dateRange": {
+        "from": "From",
+        "to": "to",
+        "dateRangeTooltip": "Analytics period: {currentDate}. Trends calculation period: {trendRange}",
         "predefinedDateRange": "Predefined Date Range",
         "absoluteDateRange": "Date Range",
         "trendsCalculations": {
