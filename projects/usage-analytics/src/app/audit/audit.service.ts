@@ -112,17 +112,6 @@ export class AuditService {
 
         // convert range filters to something more readable
         // used by stats component tooltip
-        // if(Array.isArray(timestamp)) {
-        //     this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
-        //     this.previousFilter =  this.previousRange
-        //                             ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
-        //                             : `[${this.intl.formatDate(parsedTimestamp.previous)} - ${this.intl.formatDate(parsedTimestamp.start)}]`;
-        // } else {
-        //     this.currentFilter = timestamp;
-        //     this.previousFilter =  this.previousRange
-        //                             ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
-        //                             : timestamp;
-        // }
         this.convertRangeFilter(timestamp!, parsedTimestamp);
 
         /** Update the scope of the dataset web service (app/profile), if filtering by applications is used */
