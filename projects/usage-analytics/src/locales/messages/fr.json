@@ -291,8 +291,8 @@
     },
 
     "stat": {
-        "trendTooltip": "Cette tendance a été calculé à partir de la période \"{currentDate}\" et \"{trendRange}\" précédent(e)(s)",
-        "trendTooltipPrevDates": "Cette tendance a été calculé à partir de {currentDate} et le {trendRange}"
+        "trendTooltip": "Cette tendance a été calculé à partir de la période \"{currentDate}\" et \"{trendRange}\" précédent(e)(s). \n Valeur actuelle = {currentValue}. \n Valeur précédente = {previousValue}",
+        "trendTooltipPrevDates": "Cette tendance a été calculé à partir de {currentDate} et le {trendRange}. \n Valeur actuelle = {currentValue}. \n Valeur précédente = {previousValue}"
     },
 
     "dashboards": {
