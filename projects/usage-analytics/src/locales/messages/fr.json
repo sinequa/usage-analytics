@@ -310,6 +310,9 @@
     },
 
     "dateRange": {
+        "from": "Du",
+        "to": "au",
+        "dateRangeTooltip": "Période d'analytiques: {currentDate}. Période de calculs des tendances: {trendRange}",
         "predefinedDateRange": "Plage de dates prédéfinie",
         "absoluteDateRange": "Plage de dates",
         "trendsCalculations": {

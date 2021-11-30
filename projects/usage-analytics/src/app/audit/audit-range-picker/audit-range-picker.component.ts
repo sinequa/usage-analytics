@@ -1,9 +1,5 @@
-import { Component, HostListener, OnDestroy } from "@angular/core";
+import { Component, HostListener } from "@angular/core";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
-import { SearchService } from "@sinequa/components/search";
-import { Utils } from "@sinequa/core/base";
-import moment from "moment";
-import { Subscription } from "rxjs";
 import { AuditService, RelativeTimeRanges } from "../audit.service";
 
 @Component({
@@ -11,7 +7,7 @@ import { AuditService, RelativeTimeRanges } from "../audit.service";
     templateUrl: "./audit-range-picker.component.html",
     styleUrls: ["./audit-range-picker.component.scss"],
 })
-export class AuditRangePickerComponent implements OnDestroy {
+export class AuditRangePickerComponent {
 
     /** List of relative time range options */
     public readonly relativeTimeRanges = Object.values(RelativeTimeRanges);
@@ -25,14 +21,9 @@ export class AuditRangePickerComponent implements OnDestroy {
     applySamePeriodForTrendsControl: FormControl;
     customRangeForTrendsControl: FormControl;
 
-    displayedRange: string;
-
-    private _querySubscription: Subscription;
-
     constructor(
         private formBuilder: FormBuilder,
-        private auditService: AuditService,
-        private searchService: SearchService
+        public auditService: AuditService
     ) {
         // Create the form
         this.dateRangeControl = new FormControl([undefined, undefined]);
@@ -65,28 +56,6 @@ export class AuditRangePickerComponent implements OnDestroy {
             this.auditService.updatePreviousRangeFilter(value);
         });
 
-        // Subscribe to query stream to update the displayedRange
-        this._querySubscription = this.searchService.queryStream.subscribe(() => {
-            const value = this.auditService.getAuditTimestampFromUrl();
-            if (value) {
-                if (Utils.isString(value)) {
-                    this.displayedRange = value;
-                } else {
-                    this.displayedRange =
-                        moment(value[0]).format(
-                            moment.localeData().longDateFormat("L")
-                        ) +
-                        " - " +
-                        moment(value[1]).format(
-                            moment.localeData().longDateFormat("L")
-                        );
-                }
-            }
-        });
-    }
-
-    ngOnDestroy() {
-        this._querySubscription?.unsubscribe();
     }
 
     /**
