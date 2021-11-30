@@ -289,6 +289,11 @@
         }
     },
 
+    "stat": {
+        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}",
+        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}"
+    },
+
     "dashboards": {
         "userAdoption": "User Adoption",
         "relevancy": "Relevancy",
