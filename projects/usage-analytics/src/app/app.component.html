@@ -9,7 +9,7 @@
         </div>
 
         <ul class="navbar-nav navbar-right align-items-baseline">
-            <sq-user-menu></sq-user-menu>
+            <sq-user-menu [enableDarkMode]="false"></sq-user-menu>
             <sq-feedback-menu [style]="'primary'" [rightAligned]="true" class="ml-1" *ngIf="loginService.complete">
             </sq-feedback-menu>
         </ul>
