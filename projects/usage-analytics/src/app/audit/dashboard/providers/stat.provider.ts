@@ -92,7 +92,7 @@ export class StatProvider {
         previousDataSet: Dataset,
         dataset: Dataset,
         config: DashboardItem, decimalsPrecision: number
-        ): {value: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
+        ): {value: MayBe<number>, previousValue: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
 
         const current: number | undefined = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation);
         const previous: number | undefined = this.getBasicValue(previousDataSet[config.query], config.operation, config.valueLocation);
@@ -100,22 +100,24 @@ export class StatProvider {
         let relatedCurrent: number | undefined;
         let relatedPrevious: number | undefined;
 
-        let value, percentageChange, trend;
+        let value, previousValue, percentageChange, trend;
 
         if (!config.computation) {
             value = this.roundValue(current);
+            previousValue = this.roundValue(previous);
             percentageChange = this.getPercentageChange(current, previous);
             trend = this.getTrend(current, previous)
         } else {
             relatedCurrent = this.getBasicValue(dataset[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
             relatedPrevious = this.getBasicValue(previousDataSet[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
             value = this.roundValue(this.computeBasicValue(current, relatedCurrent, config.computation));
-            percentageChange = this.getPercentageChange(value, this.computeBasicValue(previous, relatedPrevious, config.computation));
-            trend = this.getTrend(value, this.computeBasicValue(previous, relatedPrevious, config.computation));
+            previousValue = this.roundValue(this.computeBasicValue(previous, relatedPrevious, config.computation));
+            percentageChange = this.getPercentageChange(value, previousValue);
+            trend = this.getTrend(value, previousValue);
         }
         const trendEvaluation = this.getTrendEvaluation(trend, config.asc);
 
-        return {value, percentageChange, trend, trendEvaluation}
+        return {value, previousValue, percentageChange, trend, trendEvaluation}
     }
 
     getPercentageChange(newValue: number | undefined, oldValue: number | undefined): number | undefined {
