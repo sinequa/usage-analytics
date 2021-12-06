@@ -80,6 +80,7 @@
         [columnDefs]="columnDefs"
         [defaultColDef]="defaultColDef"
         (gridReady)="onGridReady($event)"
+        (columnResized)="onColumnResized($event)"
     >
     </ag-grid-angular>
 

@@ -1,6 +1,6 @@
 import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
-import { ColDef, GridApi, GridReadyEvent } from "ag-grid-community";
+import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent } from "ag-grid-community";
 
 import { Results, Record, Aggregation, AggregationItem, Dataset } from '@sinequa/core/web-services';
 import { ExprBuilder } from '@sinequa/core/app-utils'
@@ -348,6 +348,10 @@ export class DashboardItemComponent implements OnChanges {
     onGridReady(event: GridReadyEvent) {
         this.gridApi = event.api;
         this.resizeGrid();
+    }
+
+    onColumnResized(event: ColumnResizedEvent) {
+        this.gridApi?.resetRowHeights();
     }
 
     /**
