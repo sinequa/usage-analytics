@@ -75,8 +75,10 @@ export class GridProvider {
 
                 // if true, display cell value on multiple line
                 if (config.multiLineCell) {
+                    colDef.flex = 1;
                     colDef.wrapText = true;
                     colDef.autoHeight = true;
+                    colDef.cellStyle = {'white-space': 'normal', wordBreak: "normal"};
                 }
 
                 columnDefs.push(colDef);
