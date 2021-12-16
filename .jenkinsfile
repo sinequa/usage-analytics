@@ -1,4 +1,4 @@
-	/*### Environment ###*/
+// ### Environment ###
 properties([
 	parameters([
 		string(name:"SBA_VERSION", defaultValue: "", description: "version of sba", trim: true),
@@ -7,18 +7,24 @@ properties([
 	disableConcurrentBuilds()
 ])
 
+// Get mail parameters from jenkins env vars
 url           = "${env.NPM_SERVER_URL}"
 npm_user      = "${env.NPM_USER}"
 npm_pass      = "${env.NPM_PASS}"
 npm_mail      = "${env.NPM_MAIL}"
+// default version number of the develop branch
 developNumber = "${env.NPM_DEVELOP_NUMBER}"
 
+// get job variables from job parameters
 sba_version   = "${params.SBA_VERSION}"
 
+// .npmrc variables for verdaccio connection
 scope  = "@sinequa"
 fnpmrc = '.npmrc'
 anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
 
+// set the sba_version variable with the version
+// the version is calculated or is a parameter of the job
 def set_sba_version(curBranch) {
 	if (sba_version.length() == 0) {
 		if ( env.BRANCH_NAME.contains("release") ) {
@@ -30,7 +36,8 @@ def set_sba_version(curBranch) {
 	echo "sba_version: ${sba_version}"
 }
 
-def findBranchNumber(){
+// get the branch name and the version number from the right jenkins variable 
+def findBranchNumber() {
 	def tmpBranch=""
 	def theBranch=""
 	// PR : 
@@ -39,7 +46,7 @@ def findBranchNumber(){
 	// BRANCH
 	//   BRANCH_NAME: develop
 	//   BRANCH_NAME: release/11.7.0
-	// return: 11.7.0
+	// return: release%2F11.7.0
 
 	echo "Triggering job for branch ${env.BRANCH_NAME}"
 	if (env.BRANCH_NAME.contains("PR-")) {
@@ -78,6 +85,7 @@ def validation() {
 	}
 }
 
+// function to check if we are in PR or another branch
 def buildOrMerge() {
 	def typeAction = ""
 	if (env.BRANCH_NAME.contains("PR-")) {
@@ -118,10 +126,7 @@ node (params.SBA_NODE) {
 		}
 		
 		stage('Clean') {
-			def pkg_lck = "package-lock.json"
-			echo ".Delete ${pkg_lck}"
-			bat "if exist ${pkg_lck} ( del /f ${pkg_lck} )"
-			
+			// delete dependency modules
 			def nmfolder = "node_modules"
 			echo ".Rmdir /s /q ${nmfolder}"
 			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
