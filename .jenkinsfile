@@ -96,6 +96,7 @@ def buildOrMerge() {
 	return typeAction
 }
 
+// function to append lines to the end of a file
 def appendFile(afile, what) {
 	def content = ""
 	def txt = ""
@@ -122,6 +123,7 @@ node (params.SBA_NODE) {
 		set_sba_version(currentBranch)
 
 		stage('Checkout'){
+			// get the source code
 			checkout scm
 		}
 		
@@ -131,24 +133,32 @@ node (params.SBA_NODE) {
 			echo ".Rmdir /s /q ${nmfolder}"
 			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
 			
+			// clean the npm cache
 			echo ".Cache clean force"
 			bat "npm cache clean --force"
 		}
 		
 		stage('Create user') {
+			// create user for verdaccio
 			bat "npm-cli-login -u ${npm_user} -p ${npm_pass} -e ${npm_mail} -r ${url} -s ${scope} --config-path ${fnpmrc}"
+			// add connection infos in .npmrc file
 			appendFile(fnpmrc, anpmrc)
+			// check the connection
 			bat "npm whoami"
 		}
 
 		stage('NPM Install') {
+			// get the dependency modules
 			bat "npm i"
 		}
 		
+		// check if if we are in standard case of build or merge (case of PR)
 		def action = buildOrMerge()
 		if ("${action}" == "build") {
+			// just make a build
 			simple_build()
 		} else {
+			// validate the build before merge
 			validation()
 		}
 
