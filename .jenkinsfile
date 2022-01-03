@@ -23,110 +23,22 @@ scope  = "@sinequa"
 fnpmrc = '.npmrc'
 anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
 
-// set the sba_version variable with the version
-// the version is calculated or is a parameter of the job
-def set_sba_version(curBranch) {
-	if (sba_version.length() == 0) {
-		if ( env.BRANCH_NAME.contains("release") ) {
-			sba_version = curBranch.split("%2F")[1].trim()
-		} else {
-			sba_version = developNumber
-		}
-	}
-	echo "sba_version: ${sba_version}"
-}
 
-// get the branch name and the version number from the right jenkins variable 
-def findBranchNumber() {
-	def tmpBranch=""
-	def theBranch=""
-	// PR : 
-	//   BRANCH_NAME: PR-8208
-	//   CHANGE_TARGET: release/11.7.0
-	// BRANCH
-	//   BRANCH_NAME: develop
-	//   BRANCH_NAME: release/11.7.0
-	// return: release%2F11.7.0
-
-	echo "Triggering job for branch ${env.BRANCH_NAME}"
-	if (env.BRANCH_NAME.contains("PR-")) {
-		tmpBranch = env.CHANGE_TARGET
-	} else {
-		tmpBranch = env.BRANCH_NAME
-	}
-	echo "tmpBranch: ${tmpBranch}"
-
-	theBranch = tmpBranch.replace("/", "%2F")
-	echo "Branch returned: ${theBranch}"
-	return theBranch
-}
-
-def simple_build() {
-	try {
-		stage('Build')        {
-			echo "npm run build --if-present"
-			bat "npm run build --if-present"
-		}
-	} catch (err) {
-		currentBuild.result = "FAILURE"
-		throw err
-	}
-}
-
-def validation() {
-	try {
-		stage('Build')       {
-			echo "npm run buildsq --sq_version=${sba_version} --if-present"
-			bat "npm run buildsq --sq_version=${sba_version} --if-present"
-		}
-	} catch (err) {
-		currentBuild.result = "FAILURE"
-		throw err
-	}
-}
-
-// function to check if we are in PR or another branch
-def buildOrMerge() {
-	def typeAction = ""
-	if (env.BRANCH_NAME.contains("PR-")) {
-		typeAction = "build"
-	} else {
-		typeAction = "merge"
-	}
-	return typeAction
-}
-
-// function to append lines to the end of a file
-def appendFile(afile, what) {
-	def content = ""
-	def txt = ""
-	try {
-		if (fileExists(afile)) {
-			content = readFile afile
-			what.each {
-				txt += it + "\n"
-			}
-			content += txt
-			//echo "content: ${content}"
-			writeFile file: afile, text: content
-		}
-	} catch (err) {
-		currentBuild.result = "FAILURE"
-		throw err
-	}
-}
-
+// Pipeline workflow (main)
 node (params.SBA_NODE) {
+
 	currentBuild.result = "SUCCESS"
 	try {
-		def currentBranch = findBranchNumber()
-		set_sba_version(currentBranch)
 
-		stage('Checkout'){
-			// get the source code
-			checkout scm
-		}
+		// get the source code
+		checkout scm
 		
+		// load jenkins functions
+		def rootDir = pwd()
+		def jf = load "${rootDir}/.jenkins_function.groovy"
+		def currentBranch = jf.findBranchNumber()
+		jf.set_sba_version(currentBranch)
+
 		stage('Clean') {
 			// delete dependency modules
 			def nmfolder = "node_modules"
@@ -142,7 +54,7 @@ node (params.SBA_NODE) {
 			// create user for verdaccio
 			bat "npm-cli-login -u ${npm_user} -p ${npm_pass} -e ${npm_mail} -r ${url} -s ${scope} --config-path ${fnpmrc}"
 			// add connection infos in .npmrc file
-			appendFile(fnpmrc, anpmrc)
+			jf.appendFile(fnpmrc, anpmrc)
 			// check the connection
 			bat "npm whoami"
 		}
@@ -153,13 +65,22 @@ node (params.SBA_NODE) {
 		}
 		
 		// check if if we are in standard case of build or merge (case of PR)
-		def action = buildOrMerge()
+		def action = jf.buildOrMerge()
 		if ("${action}" == "build") {
-			// just make a build
-			simple_build()
+			// Build the app started on commit event
+			stage('Build') {
+				echo "npm run build --if-present"
+				bat "npm run build --if-present"
+			}
+			
 		} else {
+		
 			// validate the build before merge
-			validation()
+			// app are fired on merge event
+			stage('Validation') {
+				echo "npm run buildsq --sq_version=${sba_version} --if-present"
+				bat "npm run buildsq --sq_version=${sba_version} --if-present"
+			}
 		}
 
 	} catch (err) {
