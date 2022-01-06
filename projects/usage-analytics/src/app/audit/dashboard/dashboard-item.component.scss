@@ -7,3 +7,7 @@
 ::ng-deep sq-facet-card > .card .card-body {
     overflow-y: auto;
 }
+
+::ng-deep sq-dashboard-item .btn-group button.disabled {
+    pointer-events: auto;
+}
