@@ -18,6 +18,7 @@ import { AggregationTimeSeries, RecordsTimeSeries } from './providers/timeline-p
 import { PALETTE, STANDARD_DASHBOARDS, WIDGETS } from '../config';
 import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
+import { GridColDef } from './providers/grid-provider';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -44,6 +45,9 @@ export interface DashboardItem extends GridsterItem {
     chartType?: string; // For type === 'chart'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
+    columns?: GridColDef[]; // For type === 'grid'
+    aggregationName?: string; // For type === 'grid'
+    showTooltip?: boolean; // For type === 'grid'
     valueLocation?: StatValueLocation; // where to find field value
     operation?: StatOperation; // operation to compute the value
     relatedQuery?: string; // query containing the second leg of the stat operands
@@ -94,7 +98,12 @@ export interface DashboardItemOption {
         relatedOperation?: StatOperation, // operation to compute the value of the second stat operands
         computation?: StatOperation, // operation to get the global value of the stat
         asc?: boolean, // if the positive evaluation is at increase or decrease trend
-        statLayout?: StatLayout // the ui of displaying the stat
+        statLayout?: StatLayout, // the ui of displaying the stat
+
+        // For type === 'grid'
+        columns?: GridColDef[],
+        aggregationName?: string,
+        showTooltip?: boolean
 
     };
 }

@@ -282,7 +282,16 @@
         "avgSessionDuration": {
             "text": "Average Session Duration",
             "info": "Average session duration."
+        },
+        "userFeedbackGrid": {
+            "text": "User feedback",
+            "info": "User feedback."
         }
+    },
+
+    "stat": {
+        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}",
+        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}"
     },
 
     "dashboards": {
@@ -295,10 +304,14 @@
     "palette": {
         "timelines": "Timelines",
         "charts": "Charts",
-        "statistics": "Statistics"
+        "statistics": "Statistics",
+        "grid": "Grid"
     },
 
     "dateRange": {
+        "from": "From",
+        "to": "to",
+        "dateRangeTooltip": "Analytics period: {currentDate}. Trends calculation period: {trendRange}",
         "predefinedDateRange": "Predefined Date Range",
         "absoluteDateRange": "Date Range",
         "trendsCalculations": {

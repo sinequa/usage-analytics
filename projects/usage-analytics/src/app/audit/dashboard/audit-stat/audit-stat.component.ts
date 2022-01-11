@@ -19,6 +19,7 @@ export class AuditStatComponent implements OnChanges {
     @Input() decimalsPrecision: number = 1;
 
     value: number | undefined;
+    previousValue: number | undefined;
     trend: Trend;
     trendEvaluation: Evaluation;
     percentageChange: number | undefined;
@@ -57,9 +58,10 @@ export class AuditStatComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
 
-        if (changes["previousDataSet"] && this.previousDataSet && this.dataset) {
-            const {value, percentageChange, trend, trendEvaluation} = this.statProvider.getvalues(this.previousDataSet, this.dataset, this.config, this.decimalsPrecision);
+        if ((changes["previousDataSet"] || changes["dataset"]) && this.previousDataSet && this.dataset) {
+            const {value, previousValue, percentageChange, trend, trendEvaluation} = this.statProvider.getvalues(this.previousDataSet, this.dataset, this.config, this.decimalsPrecision);
             this.value = value;
+            this.previousValue = previousValue;
             this.percentageChange = percentageChange;
             this.trend = trend;
             this.trendEvaluation = trendEvaluation;

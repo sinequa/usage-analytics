@@ -71,6 +71,19 @@
         </ag-grid-angular>
     </div>
 
+    <!-- Grid view -->
+    <ag-grid-angular
+        *ngSwitchCase="'grid'"
+        [ngClass]="'ag-theme-alpine'"
+        [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        (gridReady)="onGridReady($event)"
+        (columnResized)="onColumnResized($event)"
+    >
+    </ag-grid-angular>
+
     <!-- Heatmap view -->
     <sq-facet-heatmap *ngSwitchCase="'heatmap'"
         #facet

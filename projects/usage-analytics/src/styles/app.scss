@@ -2,6 +2,7 @@
 
 // Bootstrap styles
 @import "~bootstrap/scss/bootstrap";
+@import "_spacing.scss"; // import spacing Bootstrap v4 compatibility utilities
 
 /*** Fontawesome ***/
 $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
@@ -59,6 +60,10 @@ sq-feedback-menu {
 bs-daterangepicker-container {
     left: 440px !important;
     top: -160px !important
+}
+
+ag-grid-angular {
+    padding: 10px;
 }
 
 // Flex basis classes

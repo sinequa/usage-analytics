@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { DatasetError, Results } from "@sinequa/core/web-services";
+import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
 import {DashboardItem} from "../dashboard.service";
 
 export type Trend = "increase" | "decrease" | "stable" | undefined;
@@ -16,8 +16,8 @@ export class StatProvider {
 
     constructor() {}
 
-    extractStatValue(data: Results | DatasetError, valueLocation: MayBe<string>): MayBe<number> {
-        if (data as Results) {
+    extractStatValue(data: Results | DatasetError | undefined, valueLocation: MayBe<string>): MayBe<number> {
+        if (data && data as Results) {
             switch (valueLocation) {
                 case "aggregations":
                     if ((data as Results).aggregations && (data as Results).aggregations[0] && (data as Results).aggregations[0].items) {
@@ -41,8 +41,8 @@ export class StatProvider {
         return undefined;
     }
 
-    aggregate(data: Results | DatasetError, valueLocation: string | undefined): number | undefined {
-        if (data as Results) {
+    aggregate(data: Results | DatasetError | undefined, valueLocation: string | undefined): number | undefined {
+        if (data && data as Results) {
             switch (valueLocation) {
                 case "aggregations":
                     if ((data as Results).aggregations && (data as Results).aggregations[0] && (data as Results).aggregations[0].items) {
@@ -89,10 +89,10 @@ export class StatProvider {
      * @returns an object containing computed values {value, percentageChange, trend, trendEvaluation}
      */
     getvalues(
-        previousDataSet: {[key: string]: Results | DatasetError},
-        dataset: {[key: string]: Results | DatasetError},
+        previousDataSet: Dataset,
+        dataset: Dataset,
         config: DashboardItem, decimalsPrecision: number
-        ): {value: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
+        ): {value: MayBe<number>, previousValue: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
 
         const current: number | undefined = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation);
         const previous: number | undefined = this.getBasicValue(previousDataSet[config.query], config.operation, config.valueLocation);
@@ -100,22 +100,24 @@ export class StatProvider {
         let relatedCurrent: number | undefined;
         let relatedPrevious: number | undefined;
 
-        let value, percentageChange, trend;
+        let value, previousValue, percentageChange, trend;
 
         if (!config.computation) {
             value = this.roundValue(current);
+            previousValue = this.roundValue(previous);
             percentageChange = this.getPercentageChange(current, previous);
             trend = this.getTrend(current, previous)
         } else {
             relatedCurrent = this.getBasicValue(dataset[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
             relatedPrevious = this.getBasicValue(previousDataSet[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
             value = this.roundValue(this.computeBasicValue(current, relatedCurrent, config.computation));
-            percentageChange = this.getPercentageChange(value, this.computeBasicValue(previous, relatedPrevious, config.computation));
-            trend = this.getTrend(value, this.computeBasicValue(previous, relatedPrevious, config.computation));
+            previousValue = this.roundValue(this.computeBasicValue(previous, relatedPrevious, config.computation));
+            percentageChange = this.getPercentageChange(value, previousValue);
+            trend = this.getTrend(value, previousValue);
         }
         const trendEvaluation = this.getTrendEvaluation(trend, config.asc);
 
-        return {value, percentageChange, trend, trendEvaluation}
+        return {value, previousValue, percentageChange, trend, trendEvaluation}
     }
 
     getPercentageChange(newValue: number | undefined, oldValue: number | undefined): number | undefined {

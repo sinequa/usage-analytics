@@ -283,12 +283,16 @@
         "avgSessionDuration": {
             "text": "Durée moyenne de session",
             "info": "Durée moyenne de session."
+        },
+        "userFeedbackGrid": {
+            "text": "Commentaires des utilisateurs",
+            "info": "Commentaires des utilisateurs."
         }
     },
 
     "stat": {
-        "trendTooltip": "Cette tendance a été calculé à partir de la période \"{currentDate}\" et \"{trendRange}\" précédent(e)(s)",
-        "trendTooltipPrevDates": "Cette tendance a été calculé à partir de {currentDate} et le {trendRange}"
+        "trendTooltip": "Cette tendance a été calculé à partir de la période \"{currentDate}\" et \"{trendRange}\" précédent(e)(s). \n Valeur actuelle = {currentValue}. \n Valeur précédente = {previousValue}",
+        "trendTooltipPrevDates": "Cette tendance a été calculé à partir de {currentDate} et le {trendRange}. \n Valeur actuelle = {currentValue}. \n Valeur précédente = {previousValue}"
     },
 
     "dashboards": {
@@ -301,10 +305,14 @@
     "palette": {
         "timelines": "Historiques",
         "charts": "Graphiques",
-        "statistics": "Statistiques"
+        "statistics": "Statistiques",
+        "grid": "Tables"
     },
 
     "dateRange": {
+        "from": "Du",
+        "to": "au",
+        "dateRangeTooltip": "Période d'analytiques: {currentDate}. Période de calculs des tendances: {trendRange}",
         "predefinedDateRange": "Plage de dates prédéfinie",
         "absoluteDateRange": "Plage de dates",
         "trendsCalculations": {
