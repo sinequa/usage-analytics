@@ -86,6 +86,12 @@ export class AuditService {
 
     public updateAuditFilters() {
         /**
+         * Reset current dashboard data
+         */
+        this.data$.next({} as Dataset);
+        this.previousPeriodData$.next({} as Dataset);
+
+        /**
          * Programmatically handle the dummy search query with respect to audit requirements
          * This will bring the use of all searchService functionalities in a dataset web service context,
          * without the nightmare of rewriting a dedicated service for this purpose
