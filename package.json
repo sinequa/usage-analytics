@@ -13,7 +13,7 @@
     "updcomponents": "npm install @sinequa/components@%npm_config_sq_version% --save-exact",
     "updanalytics": "npm install @sinequa/analytics@%npm_config_sq_version% --save-exact",
     "updsba": "npm run -s updcore && npm run -s updcomponents && npm run -s updanalytics",
-    "prebuildsq": "npm --allow-same-version --no-git-tag-version version %npm_config_sq_version% && npm run -s updsba && npm install",
+    "prebuildsq": "npm --no-git-tag-version version %npm_config_sq_version% && npm run -s updsba && npm install",
     "buildsq": "ng build"
   },
   "private": true,

@@ -69,4 +69,40 @@ def appendFile(afile, what) {
 	}
 }
 
+// function to append lines to the end of a file
+def ngAnalyticsOff() {
+	def angularFile = "angular.json"
+	def content = ""
+	def txt = '\\{ "cli": \\{"analytics": false\\},'
+	try {
+		if (fileExists(angularFile)) {
+			content = readFile angularFile
+			content = content.replaceFirst("\\{", txt)
+			//echo "content: ${content}"
+			writeFile file: angularFile, text: content
+		}
+	} catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
+	}
+}
+
+// function to update sinequa package version in package.json file
+def updatePackage(version) {
+	withEnv(["pkgVersion=${version}"]) {
+		echo "pkgVersion = ${env.pkgVersion}"
+		powershell ('''
+			$file = 'package.json'
+			write-host "Update: $file packages: @sinequa with pkgVersion: $env:pkgVersion"
+			$regex1 = '\\"\\@sinequa/core\\".*'
+			$regex2 = '\\"\\@sinequa/components\\".*'
+			$regex3 = '\\"\\@sinequa/analytics\\".*'
+			$s1 = '"@sinequa/core": "' + $env:pkgVersion + '",'
+			$s2 = '"@sinequa/components": "' + $env:pkgVersion + '",'
+			$s3 = '"@sinequa/analytics": "' + $env:pkgVersion + '",'
+			(Get-Content $file) -replace $regex1, $s1 -replace $regex2, $s2 -replace $regex3, $s3 | Set-Content $file
+			''')
+	}
+}
+
 return this
