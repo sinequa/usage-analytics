@@ -1,7 +1,7 @@
 // ### Environment ###
 properties([
 	parameters([
-		string(name:"SBA_VERSION", defaultValue: "", description: "version of sba", trim: true),
+		string(name:"SBA_VERSION",  defaultValue: "", description: "version of sba", trim: true),
 		string(name:"SBA_NODE",    defaultValue: "${env.SBA_NODE}", description: "execution node name", trim: true)
 	]),
 	disableConcurrentBuilds()
@@ -29,7 +29,7 @@ node (params.SBA_NODE) {
 
 	currentBuild.result = "SUCCESS"
 	try {
-
+	
 		// get the source code
 		checkout scm
 		
@@ -38,9 +38,9 @@ node (params.SBA_NODE) {
 		def jf = load "${rootDir}/.jenkins_function.groovy"
 		def currentBranch = jf.findBranchNumber()
 		jf.set_sba_version(currentBranch)
-
+		
 		stage('Clean') {
-			// delete dependency modules
+			// delete dependency modules 
 			def nmfolder = "node_modules"
 			echo ".Rmdir /s /q ${nmfolder}"
 			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
@@ -58,7 +58,7 @@ node (params.SBA_NODE) {
 			// check the connection
 			bat "npm whoami"
 		}
-
+		
 		stage('Prepare') {
 			// Disable all usage analytics 
 			jf.ngAnalyticsOff()
@@ -66,30 +66,29 @@ node (params.SBA_NODE) {
 		
 		// check if if we are in standard case of build or merge (case of PR)
 		def action = jf.buildOrMerge()
-		if ("${action}" == "build") {
-			// Build the app started on commit event
-			stage('Build') {
-				bat """
-					echo "npm install"
-					npm install
-					echo "npm run build --if-present"
-					npm run build --if-present
-				"""
-			}
-		} else {
+		if ("${action}" == "merge") {
 			// validate the build before merge
 			// Validate app fired on merge event
-			stage('Validation') {
+			stage('Update package') {
 				// update package.json with version
 				jf.updatePackage(sba_version)
-
-				bat """
-					npm install
-					npm run build
-				"""
 			}
 		}
-
+		
+		// Build the app started on commit event
+		stage('NPM Install') {
+			bat """
+				echo "npm install"
+				npm install
+			"""
+		}
+		
+		stage('Build') {
+			bat """
+				echo "npm run build --if-present"
+				npm run build --if-present
+			"""
+	
 	} catch (err) {
 		currentBuild.result = "FAILURE"
 		throw err
