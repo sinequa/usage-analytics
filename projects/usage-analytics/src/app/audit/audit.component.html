@@ -9,7 +9,12 @@
         [buttonsStyle]="isDark()? 'dark' : 'light'"
         [collapseOnClickOutside]="true"
         >
-        <sq-facet-multi #facet class="card position-absolute" [results]="(auditService.data$ | async)?.applications" [facets]="facets" [showProgressBar]="false" ></sq-facet-multi>
+        <sq-facet-multi
+            #facet
+            class="card position-absolute"
+            [results]="(auditService.data$ | async)?.applications"
+            [facets]="facets">
+        </sq-facet-multi>
     </sq-facet-card>
 </div>
 
