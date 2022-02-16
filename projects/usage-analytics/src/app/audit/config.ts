@@ -1,38 +1,34 @@
-import { FacetConfig, FacetListConfig } from "@sinequa/components/facet";
+import { FacetConfig } from "@sinequa/components/facet";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
 
 /** Filters */
 export const FACETS: FacetConfig[] = [
   {
+      name: "SBA",
       title: "SBA",
       type: "list",
+      aggregation: "sba",
       icon: "fas fa-globe-americas",
-      parameters: {
-          name: "SBA",
-          aggregation: "sba",
-          showCount: true,
-          searchable: true,
-          allowExclude: true,
-          allowOr: true,
-          allowAnd: false,
-          displayEmptyDistributionIntervals: false
-      }
-  } as FacetListConfig,
+      showCount: true,
+      searchable: true,
+      allowExclude: true,
+      allowOr: true,
+      allowAnd: false,
+      displayEmptyDistributionIntervals: false,
+  },
   {
+      name: "Profile",
       title: "Profile",
       type: "list",
+      aggregation: "profile",
       icon: "fas fa-building",
-      parameters: {
-          name: "Profile",
-          aggregation: "profile",
-          showCount: true,
-          searchable: true,
-          allowExclude: true,
-          allowOr: true,
-          allowAnd: false,
-          displayEmptyDistributionIntervals: false
-      }
-  } as FacetListConfig
+      showCount: true,
+      searchable: true,
+      allowExclude: true,
+      allowOr: true,
+      allowAnd: false,
+      displayEmptyDistributionIntervals: false,
+  }
 ];
 
 /** Widgets */
