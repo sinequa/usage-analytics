@@ -6,6 +6,23 @@
 
 For more information about Sinequa libraries, please refer to the [Sinequa documentation](https://doc.sinequa.com) and the [SBA framework documentation](https://sinequa.github.io/sba-angular).
 
+## Prerequisites
+Similar to any Angular application, the first step to do is to install the project **dependencies**. The list of dependencies is defined in the `package.json`.
+
+To do so, open a **Terminal** and run 
+
+```ts
+npm install
+```
+
+⚠️ You may face a problem while running the above command. This should be a node-related issue.
+
+In such case, we recommend the use of the following 
+
+```ts
+npm install --legacy-peer-deps
+```
+
 ## Dataset Web service
 Behind the scenes, *Usage Analytics* uses the **Dataset Web Service** to retrieve the data.
 It allows getting information from indexes through multiple SQL queries. Thus, it is the best fit to build dashboard reports, 360 views and so on.
