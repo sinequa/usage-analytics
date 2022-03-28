@@ -326,22 +326,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
-    regularUsersTimeline: {
-        type: "timeline",
-        query: "regularUsersTimeLine",
-        text: "msg#widgets.regularUsersTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.regularUsersTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "RegularUsers",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Regular Users", primary: true}]
-            }
-        }
-    },
-
     searchExitTimeline: {
         type: "timeline",
         query: "searchExitTimeLine",
@@ -952,7 +936,6 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "clickBySearchTimeline",
             "sessionDurationTimeline",
             "newUsersTimeline",
-            "regularUsersTimeline",
             "firstClickTimeline",
             "mrrTimeline",
             "refinementTimeline",
