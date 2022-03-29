@@ -12,8 +12,6 @@ url           = "${env.NPM_SERVER_URL}"
 npm_user      = "${env.NPM_USER}"
 npm_pass      = "${env.NPM_PASS}"
 npm_mail      = "${env.NPM_MAIL}"
-// default version number of the develop branch
-developNumber = "${env.NPM_DEVELOP_NUMBER}"
 
 // get job variables from job parameters
 sba_version   = "${params.SBA_VERSION}"
@@ -37,7 +35,9 @@ node (params.SBA_NODE) {
 		def rootDir = pwd()
 		def jf = load "${rootDir}/.jenkins_function.groovy"
 		def currentBranch = jf.findBranchNumber()
-		jf.set_sba_version(currentBranch)
+		// sba_version : releaseversion-DEV-build_number
+		sba_version = jf.get_pkg_version()
+		echo "sba_version: ${sba_version}"
 		
 		stage('Clean') {
 			// delete dependency modules 
@@ -64,15 +64,11 @@ node (params.SBA_NODE) {
 			jf.ngAnalyticsOff()
 		}
 		
-		// check if if we are in standard case of build or merge (case of PR)
-		def action = jf.buildOrMerge()
-		if ("${action}" == "merge") {
-			// validate the build before merge
-			// Validate app fired on merge event
-			stage('Update package') {
-				// update package.json with version
-				jf.updatePackage(sba_version)
-			}
+		// validate the build before merge
+		// Validate app fired on merge event
+		stage('Update package') {
+			// update package.json with version
+			jf.updatePackage(sba_version)
 		}
 		
 		// Build the app started on commit event
