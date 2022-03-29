@@ -15,7 +15,6 @@ npm_mail      = "${env.NPM_MAIL}"
 
 // get job variables from job parameters
 sba_version   = "${params.SBA_VERSION}"
-pkg_suffix    = "-DEV"
 
 // .npmrc variables for verdaccio connection
 scope  = "@sinequa"
@@ -27,6 +26,12 @@ anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
 node (params.SBA_NODE) {
 
 	currentBuild.result = "SUCCESS"
+	// no build if no package version as parameter
+	if (sba_version.length() == 0) {
+		echo "NO SBA_VERSION : NO Build !"
+		return
+	}
+
 	try {
 	
 		// get the source code
@@ -36,8 +41,7 @@ node (params.SBA_NODE) {
 		def rootDir = pwd()
 		def jf = load "${rootDir}/.jenkins_function.groovy"
 		def currentBranch = jf.findBranchNumber()
-		// sba_version : releaseversion-DEV-build_number
-		sba_version = jf.get_pkg_version()
+		// sba_version : commes from sba-internal just build before 
 		echo "sba_version: ${sba_version}"
 		
 		stage('Clean') {

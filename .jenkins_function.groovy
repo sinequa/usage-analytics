@@ -1,22 +1,5 @@
 // Useful Jenkins functions
 
-// set the sba_version variable with the version
-// the version is calculated or is a parameter of the job
-// function to get the package version in package.json file
-def get_pkg_version() {
-	def pkg_version = powershell(returnStdout: true, script: '''
-		$file = 'package.json'
-		$search = '.+"version":\\s"(.+)"'
-		$retval = (Select-String -path $file -pattern $search -Allmatches | % { $_.Matches.Groups[1].Value })
-		write-output $retval
-	''')
-	// remove CR/LF
-	pkg_version = pkg_version.trim()
-	pkg_version = "${pkg_version}${pkg_suffix}.${env.BUILD_NUMBER}"
-	echo "pkg_version: ${pkg_version}"
-	return pkg_version
-}
-
 // get the branch name and the version number from the right jenkins variable 
 def findBranchNumber() {
 	def tmpBranch=""

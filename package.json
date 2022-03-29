@@ -1,6 +1,6 @@
 {
   "name": "usage-analytics",
-  "version": "11.7.1",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve -- --ssl=true --proxyConfig=./projects/usage-analytics/src/proxy.conf.json",
