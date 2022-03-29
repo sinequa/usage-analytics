@@ -15,6 +15,7 @@ npm_mail      = "${env.NPM_MAIL}"
 
 // get job variables from job parameters
 sba_version   = "${params.SBA_VERSION}"
+pkg_suffix    = "-DEV"
 
 // .npmrc variables for verdaccio connection
 scope  = "@sinequa"
