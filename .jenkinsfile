@@ -26,10 +26,11 @@ anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
 node (params.SBA_NODE) {
 
 	currentBuild.result = "SUCCESS"
-	// no build if no package version as parameter
-	if (sba_version.length() == 0) {
-		echo "NO SBA_VERSION : NO Build !"
-		return
+	// if param sba_version is not null, the call comes from sba-internal
+	def modeCallFromSbaInternal = false
+	if (sba_version.length() > 0) {
+		echo "SBA_VERSION should comming from build of sba-internal"
+		modeCallFromSbaInternal = true
 	}
 
 	try {
@@ -70,8 +71,7 @@ node (params.SBA_NODE) {
 		}
 
 		// Validate app fired
-		def action = jf.buildOrMerge()
-		if ("${action}" != "merge") {
+		if (modeCallFromSbaInternal) {
 			// Validate app fired on merge event
 			stage('Update package') {
 				// update package.json with version
@@ -100,7 +100,7 @@ node (params.SBA_NODE) {
 		throw err
 	} finally {
 		// should no be blocker
-		if ("${action}" == "merge") {
+		if ( modeCallFromSbaInternal && (currentBuild.result == "FAILURE")) {
 			currentBuild.result = "UNSTABLE"
 		}
 	}
