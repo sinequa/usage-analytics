@@ -69,11 +69,14 @@ node (params.SBA_NODE) {
 			jf.ngAnalyticsOff()
 		}
 		
-		// validate the build before merge
-		// Validate app fired on merge event
-		stage('Update package') {
-			// update package.json with version
-			jf.updatePackage(sba_version)
+		// check if if we are in standard case of build or merge (case of PR)
+		def action = jf.buildOrMerge()
+		if ("${action}" == "merge") {
+			// Validate app fired on merge event
+			stage('Update package') {
+				// update package.json with version
+				jf.updatePackage(sba_version)
+			}
 		}
 		
 		// Build the app started on commit event
@@ -94,5 +97,10 @@ node (params.SBA_NODE) {
 	} catch (err) {
 		currentBuild.result = "FAILURE"
 		throw err
+	} finally {
+		// should no be blocker
+		if ("${action}" == "merge") {
+			currentBuild.result = "UNSTABLE"
+		}
 	}
 }

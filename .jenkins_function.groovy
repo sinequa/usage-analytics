@@ -25,6 +25,17 @@ def findBranchNumber() {
 	return theBranch
 }
 
+// function to check if we are in PR or another branch
+def buildOrMerge() {
+	def typeAction = ""
+	if (env.BRANCH_NAME.contains("PR-")) {
+		typeAction = "build"
+	} else {
+		typeAction = "merge"
+	}
+	return typeAction
+}
+
 // function to append lines to the end of a file
 def appendFile(afile, what) {
 	def content = ""
