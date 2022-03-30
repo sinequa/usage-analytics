@@ -68,16 +68,16 @@ node (params.SBA_NODE) {
 			// Disable all usage analytics 
 			jf.ngAnalyticsOff()
 		}
-		
-		// check if if we are in standard case of build or merge (case of PR)
+
+		// Validate app fired
 		def action = jf.buildOrMerge()
-		if ("${action}" == "merge") {
+		if ("${action}" != "merge") {
 			// Validate app fired on merge event
 			stage('Update package') {
 				// update package.json with version
 				jf.updatePackage(sba_version)
-			}
 		}
+
 		
 		// Build the app started on commit event
 		stage('NPM Install') {
