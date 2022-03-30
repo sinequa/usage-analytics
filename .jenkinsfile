@@ -76,6 +76,7 @@ node (params.SBA_NODE) {
 			stage('Update package') {
 				// update package.json with version
 				jf.updatePackage(sba_version)
+			}
 		}
 
 		
