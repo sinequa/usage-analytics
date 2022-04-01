@@ -64,11 +64,6 @@ node (params.SBA_NODE) {
 			// check the connection
 			bat "npm whoami"
 		}
-		
-//		stage('Prepare') {
-			// Disable all usage analytics 
-//			jf.ngAnalyticsOff()
-//		}
 
 		// Validate app fired
 		if (modeCallFromSbaInternal) {

@@ -56,24 +56,6 @@ def appendFile(afile, what) {
 	}
 }
 
-// function to append lines to the end of a file
-def ngAnalyticsOff() {
-	def angularFile = "angular.json"
-	def content = ""
-	def txt = '\\{ "cli": \\{"analytics": false\\},'
-	try {
-		if (fileExists(angularFile)) {
-			content = readFile angularFile
-			content = content.replaceFirst("\\{", txt)
-			//echo "content: ${content}"
-			writeFile file: angularFile, text: content
-		}
-	} catch (err) {
-		currentBuild.result = "FAILURE"
-		throw err
-	}
-}
-
 // function to update sinequa package version in package.json file
 def updatePackage(version) {
 	withEnv(["pkgVersion=${version}"]) {
