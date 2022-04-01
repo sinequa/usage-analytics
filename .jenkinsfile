@@ -65,10 +65,10 @@ node (params.SBA_NODE) {
 			bat "npm whoami"
 		}
 		
-		stage('Prepare') {
+//		stage('Prepare') {
 			// Disable all usage analytics 
-			jf.ngAnalyticsOff()
-		}
+//			jf.ngAnalyticsOff()
+//		}
 
 		// Validate app fired
 		if (modeCallFromSbaInternal) {
