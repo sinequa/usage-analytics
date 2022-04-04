@@ -1,18 +1,5 @@
 // Useful Jenkins functions
 
-// set the sba_version variable with the version
-// the version is calculated or is a parameter of the job
-def set_sba_version(curBranch) {
-	if (sba_version.length() == 0) {
-		if ( env.BRANCH_NAME.contains("release") ) {
-			sba_version = curBranch.split("%2F")[1].trim()
-		} else {
-			sba_version = developNumber
-		}
-	}
-	echo "sba_version: ${sba_version}"
-}
-
 // get the branch name and the version number from the right jenkins variable 
 def findBranchNumber() {
 	def tmpBranch=""
@@ -62,24 +49,6 @@ def appendFile(afile, what) {
 			content += txt
 			//echo "content: ${content}"
 			writeFile file: afile, text: content
-		}
-	} catch (err) {
-		currentBuild.result = "FAILURE"
-		throw err
-	}
-}
-
-// function to append lines to the end of a file
-def ngAnalyticsOff() {
-	def angularFile = "angular.json"
-	def content = ""
-	def txt = '\\{ "cli": \\{"analytics": false\\},'
-	try {
-		if (fileExists(angularFile)) {
-			content = readFile angularFile
-			content = content.replaceFirst("\\{", txt)
-			//echo "content: ${content}"
-			writeFile file: angularFile, text: content
 		}
 	} catch (err) {
 		currentBuild.result = "FAILURE"
