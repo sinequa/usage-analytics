@@ -1,7 +1,7 @@
 // ### Environment ###
 properties([
 	parameters([
-		string(name:"SBA_VERSION", defaultValue: "", description: "version of sba", trim: true),
+		string(name:"SBA_VERSION",  defaultValue: "", description: "version of sba", trim: true),
 		string(name:"SBA_NODE",    defaultValue: "${env.SBA_NODE}", description: "execution node name", trim: true)
 	]),
 	disableConcurrentBuilds()
@@ -12,8 +12,6 @@ url           = "${env.NPM_SERVER_URL}"
 npm_user      = "${env.NPM_USER}"
 npm_pass      = "${env.NPM_PASS}"
 npm_mail      = "${env.NPM_MAIL}"
-// default version number of the develop branch
-developNumber = "${env.NPM_DEVELOP_NUMBER}"
 
 // get job variables from job parameters
 sba_version   = "${params.SBA_VERSION}"
@@ -22,14 +20,21 @@ sba_version   = "${params.SBA_VERSION}"
 scope  = "@sinequa"
 fnpmrc = '.npmrc'
 anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
-
+inpmrc = ['node-options="--max-old-space-size=8192"']
 
 // Pipeline workflow (main)
 node (params.SBA_NODE) {
 
 	currentBuild.result = "SUCCESS"
-	try {
+	// if param sba_version is not null, the call comes from sba-internal
+	def modeCallFromSbaInternal = false
+	if (sba_version.length() > 0) {
+		echo "SBA_VERSION should comming from build of sba-internal"
+		modeCallFromSbaInternal = true
+	}
 
+	try {
+	
 		// get the source code
 		checkout scm
 		
@@ -37,10 +42,11 @@ node (params.SBA_NODE) {
 		def rootDir = pwd()
 		def jf = load "${rootDir}/.jenkins_function.groovy"
 		def currentBranch = jf.findBranchNumber()
-		jf.set_sba_version(currentBranch)
-
+		// sba_version : commes from sba-internal just build before 
+		echo "sba_version: ${sba_version}"
+		
 		stage('Clean') {
-			// delete dependency modules
+			// delete dependency modules 
 			def nmfolder = "node_modules"
 			echo ".Rmdir /s /q ${nmfolder}"
 			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
@@ -59,32 +65,52 @@ node (params.SBA_NODE) {
 			bat "npm whoami"
 		}
 
-		stage('NPM Install') {
-			// get the dependency modules
-			bat "npm i"
-		}
-		
-		// check if if we are in standard case of build or merge (case of PR)
-		def action = jf.buildOrMerge()
-		if ("${action}" == "build") {
-			// Build the app started on commit event
-			stage('Build') {
-				echo "npm run build --if-present"
-				bat "npm run build --if-present"
-			}
-			
-		} else {
-		
-			// validate the build before merge
-			// app are fired on merge event
-			stage('Validation') {
-				echo "npm run buildsq --sq_version=${sba_version} --if-present"
-				bat "npm run buildsq --sq_version=${sba_version} --if-present"
+		// Validate app fired
+		if (modeCallFromSbaInternal) {
+			// Validate app fired on merge event
+			stage('Update package') {
+				// update package.json with version
+				jf.updatePackage(sba_version)
 			}
 		}
 
+		
+		// install dependencies, fallback to official registry
+		// and retry if get on internal repo fails
+		stage('NPM Install') {
+			echo "npm install"
+			def ret = bat (script: "npm install", returnStatus: true)
+			if (ret) {
+				// set .npmrc file as original
+				// check registry
+				// install again
+				bat """
+				  echo "----------"
+				  echo "restore .npmrc file"
+				  call git restore .npmrc
+				  echo "verify the registry"
+				  call npm config get registry
+				  echo "npm install again"
+				  call npm install
+				"""
+			}
+		}
+		
+		// Build the app started on commit event
+		stage('Build') {
+			bat """
+				echo "npm run build --if-present"
+				npm run build --if-present
+			"""
+		}
+	
 	} catch (err) {
 		currentBuild.result = "FAILURE"
 		throw err
+	} finally {
+		// should no be blocker
+		if ( modeCallFromSbaInternal && (currentBuild.result == "FAILURE")) {
+			currentBuild.result = "UNSTABLE"
+		}
 	}
 }
