@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { Action } from "@sinequa/components/action";
-import { FacetConfig } from "@sinequa/components/facet";
+import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
 import { UIService } from "@sinequa/components/utils";
 import { AppService } from "@sinequa/core/app-utils";
@@ -124,7 +124,7 @@ export class AuditComponent implements OnDestroy {
      * The configuration from the config.ts file can be overriden by configuration from
      * the app configuration on the server
      */
-    public get facets(): FacetConfig[] {
+    public get facets(): FacetConfig<FacetListParams>[] {
         return this.appService.app?.data?.facets as any || FACETS;
     }
 
