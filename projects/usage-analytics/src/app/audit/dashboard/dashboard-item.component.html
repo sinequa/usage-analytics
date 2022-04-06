@@ -1,0 +1,110 @@
+<sq-facet-card
+    [icon]="config.icon"
+    [title]="config.title"
+    [collapsible]="false"
+    [actions]="actions"
+    [actionsFirst]="false"
+    [buttonsStyle]="buttonsStyle"
+    [ngSwitch]="config.type">
+
+    <section *ngIf="!loading;else spinner" class="h-100">
+        <!-- Timeline view-->
+        <section *ngSwitchCase="'timeline'">
+            <sq-timeline
+                *ngIf="!gridView"
+                [data]="timeSeries"
+                [width]="innerwidth"
+                [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
+                [showTooltip]="true"
+                [curveType]="'curveLinear'"
+                (rangeChange)="updateAuditRange($event)"
+                (selectionChange)="updateAuditRange($event)">
+            </sq-timeline>
+            <sq-timeline-legend
+                *ngIf="timeSeries?.length > 1 && !gridView"
+                [data]="timeSeries"
+                [yOffset]="8"
+                [legendStyles]="{'justify-content': 'center'}">
+            </sq-timeline-legend>
+            <ag-grid-angular
+                *ngIf="gridView"
+                [ngClass]="'ag-theme-alpine'"
+                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+                [rowData]="rowData"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                (gridReady)="onGridReady($event)"
+            >
+            </ag-grid-angular>
+        </section>
+
+
+        <!-- Statistic view -->
+        <sq-audit-stat *ngSwitchCase="'stat'"
+            [config]="config"
+            [dataset]="dataset"
+            [previousDataSet]="previousDataSet">
+        </sq-audit-stat>
+
+        <!-- Chart view -->
+        <div class="overflow-hidden" *ngSwitchCase="'chart'">
+            <sq-fusion-chart
+                #facet
+                *ngIf="!gridView"
+                [results]="chartResults"
+                [chart]="chart"
+                [aggregation]="config?.chartData?.aggregation"
+                [type]="config.chartType || 'Column2D'"
+                [types]="[{type: 'Column2D', display: 'Columns 2D'}, {type: 'Bar2D', display: 'Bars 2D'}, {type: 'Pie2D', display: 'Pie 2D'}, {type: 'Column3D', display: 'Columns 3D'}, {type: 'Bar3D', display: 'Bars 3D'}, {type: 'Pie3D', display: 'Pie 3D'}]"
+                [autohide]="false"
+                (initialized)="onChartInitialized($event)"
+                (typeChange)="onChartTypeChange($event)">
+            </sq-fusion-chart>
+            <ag-grid-angular
+                *ngIf="gridView"
+                [ngClass]="'ag-theme-alpine'"
+                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+                [rowData]="rowData"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                (gridReady)="onGridReady($event)"
+            >
+            </ag-grid-angular>
+        </div>
+
+        <!-- Grid view -->
+        <ag-grid-angular
+            *ngSwitchCase="'grid'"
+            [ngClass]="'ag-theme-alpine'"
+            [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+            [rowData]="rowData"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            (gridReady)="onGridReady($event)"
+            (columnResized)="onColumnResized($event)"
+        >
+        </ag-grid-angular>
+
+        <!-- Heatmap view -->
+        <sq-facet-heatmap *ngSwitchCase="'heatmap'"
+            #facet
+            [results]="results"
+            [fieldX]="'geo'"
+            [fieldY]="'company'"
+            [fieldsX]="['geo', 'company', 'person']"
+            [fieldsY]="['geo', 'company', 'person']"
+            [width]="innerwidth"
+            [height]="innerheight"
+            [allowResizeOption]="false">
+        </sq-facet-heatmap>
+    </section>
+
+    <ng-template #spinner>
+        <div class="sq-loading">
+            <div class="spinner-grow text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </ng-template>
+
+</sq-facet-card>

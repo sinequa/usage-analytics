@@ -1,0 +1,136 @@
+@import "~@angular/cdk/overlay-prebuilt";
+
+// Bootstrap styles
+@import "~bootstrap/scss/bootstrap";
+@import "_spacing.scss"; // import spacing Bootstrap v4 compatibility utilities
+
+/*** Fontawesome ***/
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/brands";
+@import "~@fortawesome/fontawesome-free/scss/regular";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+
+@import "~@sinequa/components/action/bootstrap/action";
+@import "~@sinequa/components/notification/bootstrap/notification";
+
+
+@import "~ngx-bootstrap/datepicker/bs-datepicker";
+@import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-alpine.css";
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: #3434d6;
+}
+
+.monospace {
+    font-family: monospace;
+}
+
+// Validation
+// sq-validation-message {
+//     @extend .invalid-feedback;
+//     .form-group > .is-invalid ~ & {
+//         display: block;
+//     }
+// }
+
+sq-feedback-menu {
+  button.btn{
+      border-radius: 19px;
+      width: 38px;
+      height: 38px;
+      padding-left: 10px;
+  }
+  .dropdown-toggle::after{
+      display: none;
+  }
+}
+
+bs-daterangepicker-container {
+    left: 440px !important;
+    top: -160px !important
+}
+
+ag-grid-angular {
+    padding: 10px;
+}
+
+// Flex basis classes
+.flex-basis-0 {
+  flex-basis: 0;
+}
+
+.flex-basis-auto {
+  flex-basis: auto;
+}
+
+// Scroll bars
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.widget-maximized-view {
+  top: 0px !important;
+  left: 0px !important;
+  z-index: 999 !important;
+  position: absolute !important;
+  height: 100% !important;
+  transform: unset !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.no-scroll {
+  overflow: hidden !important;
+}
+
+.dashboard-actions {
+    button.btn.btn-link.dropdown-toggle::after {
+        display: none !important;
+    }
+}
+
+// Flag images
+.sq-flag-en:before {
+  content: url('../resources/flags/flag-en.jpg');
+}
+
+.sq-flag-en-gb:before {
+  content: url('../resources/flags/flag-en-gb.jpg');
+}
+
+.sq-flag-fr:before {
+  content: url('../resources/flags/flag-fr.jpg');
+}
+
+.sq-flag-de:before {
+  content: url('../resources/flags/flag-de.jpg');
+}

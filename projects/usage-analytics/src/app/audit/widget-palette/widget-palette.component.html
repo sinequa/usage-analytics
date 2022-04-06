@@ -1,0 +1,22 @@
+<button type="button" class="btn btn-outline-primary palette-btn" (click)="togglePalette(); $event.stopPropagation()" [sqTooltip]="'msg#dashboard.addWidget' | sqMessage">
+    <i class="fas fa-plus"></i>
+</button>
+
+<div class="card flex-column palette text-muted position-absolute" *ngIf="showPalette" (click)="$event.stopPropagation()">
+    <div *ngFor="let element of palette" class="mb-3">
+        <details>
+            <summary>{{element.name | sqMessage}}</summary>
+            <div class="d-flex flex-wrap">
+                <button
+                    [sqIcon]="item.icon"
+                    type="button"
+                    class="btn btn-outline-secondary mx-1 my-1"
+                    *ngFor="let item of element.items"
+                    (click)="addWidget(item)"
+                    [sqTooltip]="item?.info | sqMessage">
+                    <div class="button-text">{{item.text | sqMessage}}</div>
+                </button>
+            </div>
+        </details>
+    </div>
+</div>

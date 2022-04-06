@@ -1,0 +1,348 @@
+{
+    "app": {
+        "name": "Usage Analytics"
+    },
+
+    "locale": {
+        "en": "English (United States)",
+        "en-gb": "English (United Kingdom)",
+        "fr": "Français",
+        "de": "Deutsch"
+    },
+
+    "dashboard": {
+        "map": "Map",
+        "timeline": "Timeline",
+        "network": "Network",
+        "chart": "Chart",
+        "heatmap": "Heatmap",
+
+        "addWidget": "Add widget",
+        "addWidgetTitle": "Add a widget to the dashboard",
+        "addWidgetModalTitle": "Add a widget",
+        "addWidgetItemTitle": "Create a {item} widget",
+        "addWidgetSize": "Widget size",
+        "addWidgetWidth": "Widget width",
+        "addWidgetHeight": "Widget height",
+        "share": "Share",
+        "shareTitle": "Share this dashboard with a colleague",
+        "shareSuccess": "Share link copied to your clipboard",
+        "shareError": "Share link could not be copied to your clipboard: {url}",
+        "manual": "Manual layout",
+        "manualTitle": "A manual layout allows positioning the widgets freely in the dashboard",
+        "auto": "Auto layout",
+        "autoTitle": "An automatic layout compacts the view to the top-left corner, when space is available",
+        "fixed": "Fixed layout",
+        "fixedTitle": "A fixed layout prevents any changes to the dashboard",
+        "new": "New",
+        "newTitle": "Create a new dashboard",
+        "open": "Open",
+        "openTitle": "Open a saved dashboard",
+        "openDashboard": "Open Dashboard \"{dashboard}\"",
+        "delete": "Delete",
+        "deleteTitle": "Delete this dashboard",
+        "deleteConfirmTitle": "Delete the current dashboard",
+        "deleteConfirmMessage": "Are your sure you want to delete the dashboard \"{dashboard}\"?",
+        "saveAs": "Save As...",
+        "saveAsTitle": "Save the dashboard to open it later",
+        "saveAsModalTitle": "Save dashboard as",
+        "saveAsModalMessage": "Enter a name for this dashboard",
+        "save": "Save",
+        "saveTitle": "Save this dashboard",
+        "saveSuccess": "Dashboard saved",
+        "saveFailure": "Dashboard could not be saved!",
+        "autoSave": "Auto-save",
+        "autoSaveTitle": "Automatically save your dashboard",
+        "setDefault": "Default dashboard",
+        "setDefaultTitle": "Mark as default dashboard",
+        "setDefaultConfirm": "Do you want to set \"{dashboard}\" as the default dashboard?",
+        "setDefaultConfirmTitle": "Default dashboard",
+        "setDefaultSuccess": "\"{dashboard}\" was set as the default dashboard",
+        "settingsTitle": "Settings",
+        "widgetClose": "Close",
+        "renameWidget": "Rename widget",
+        "renameWidgetMessage": "Enter a new name for this widget",
+        "renameWidgetTitle": "Rename this widget",
+        "fullScreenTitle": "Full screen",
+        "exitFullScreenTitle": "Exit full screen",
+        "maximizeTitle": "Maximize",
+        "minimizeTitle": "Reduce",
+        "noDataToDisplay": "No data to display"
+    },
+
+    "widgets": {
+        "queryTotalTimeLine": {
+            "text": "Search Queries",
+            "info": "Number of search queries."
+        },
+        "userTotalTimeLine": {
+            "text": "Users",
+            "info": "Number of users."
+        },
+        "userCountTotal": {
+            "text": "Users",
+            "info": "Number of users."
+        },
+        "sessionTotalTimeLine": {
+            "text": "Sessions",
+            "info": "Number of sessions."
+        },
+        "avgClicksByQueryTimeLine": {
+            "text": "Average Document Clicks By Search Query",
+            "info": "Average number of click for a search query."
+        },
+        "avgEngineResponseTimeTimeLine": {
+            "text": "Average Engine Response (in ms)",
+            "info": "Average engine response time (in ms)."
+        },
+        "avgEngineResponseTime": {
+            "text": "Average Engine Response Time",
+            "info": "Average engine response time (in ms)."
+        },
+        "avgQueriesBySessionTimeLine": {
+            "text": "Average Search By Session (in ms)",
+            "info": "Average number of search queries per session."
+        },
+        "avgResponseTimeTimeLine": {
+            "text": "Average Response Time (in ms)",
+            "info": "Average response time (in ms). It includes backend and engine."
+        },
+        "avgResponseTime": {
+            "text": "Average Response Time",
+            "info": "Average response time (in ms). It includes backend and engine."
+        },
+        "responseTimeTimeLine": {
+            "text": "Response Time (in ms)",
+            "info": "Response time (in ms). It includes backend and engine."
+        },
+        "avgSessionDurationTimeLine": {
+            "text": "Average Session Duration (in ms)",
+            "info": "Average session duration (in ms)."
+        },
+        "avgMRRTimeLine": {
+            "text": "Mean reciprocal rank (MRR)",
+            "info": "Mean reciprocal rank. MRR is an average on result rank clicked. The closer to 1, the more relevant the results are. The value 1 is obtained when rank #1 (first result) is clicked for a given query."
+        },
+        "avgMRR": {
+            "text": "Average MRR",
+            "info": "Mean reciprocal rank. MRR is an average on result rank clicked. The closer to 1, the more relevant the results are. The value 1 is obtained when rank #1 (first result) is clicked for a given query."
+        },
+        "clickRank1TotalTimeLine": {
+            "text": "First Document Clicked",
+            "info": "Number of searches where the user clicks on the first document."
+        },
+        "clickRank1TotalRate": {
+            "text": "First Document Clicked",
+            "info": "Number of searches where the user clicks on the first document out of the total number of searches."
+        },
+        "clickRank3TimeLine": {
+            "text": "Click On First 3 Documents",
+            "info": "Number of searches where the user clicks on the first 3 documents."
+        },
+        "clickRank3": {
+            "text": "Click On First 3 Documents",
+            "info": "Number of searches where the user clicks on the first 3 documents."
+        },
+        "clickTotalTimeLine": {
+            "text": "Document Clicked Total",
+            "info": "Number of documents clicked for a search."
+        },
+        "newUsersTimeLine": {
+            "text": "New Users",
+            "info": "Users that have logged in for the first time."
+        },
+        "newUsers": {
+            "text": "New Users",
+            "info": "Users that have loggedin for the first time."
+        },
+        "queryBounceTimeLine": {
+            "text": "Bounce",
+            "info": "Number of bounces for a search query. A bounce is when a user clicks on a document without reading its content (based on dwell time)."
+        },
+        "queryBounce": {
+            "text": "Bounce",
+            "info": "Number of bounces for a search query. A bounce is when a user clicks on a document without reading its content (based on dwell time)."
+        },
+        "queryBounceRate": {
+            "text": "Bounce Rate",
+            "info": "Number of bounces for a search query compared to the total number of searches."
+        },
+        "queryClickTimeLine": {
+            "text": "Search Query With Clicks",
+            "info": "Number of search queries where the user has clicked on a document at least one time."
+        },
+        "queryClick": {
+            "text": "Search With Clicks",
+            "info": "Number of search queries where the user has clicked on a document at least once."
+        },
+        "queryClickRate": {
+            "text": "Search With Clicks Rate",
+            "info": "Number of search queries where the user has clicked on a document at least once compared to the total number of searches."
+        },
+        "queryRefineTimeLine": {
+            "text": "Refinement",
+            "info": "Number of search queries where the user has refined the search (through facets for instance)."
+        },
+        "queryRefine": {
+            "text": "Refinement",
+            "info": "Number of search queries where the user has refined the search (through facets for instance)."
+        },
+        "queryRefineRate": {
+            "text": "Refinement Rate",
+            "info": "Number of search queries where the user has refined the search compared to the total number of searches."
+        },
+        "queryZeroTimeLine": {
+            "text": "Zero Search",
+            "info": "Number of search queries without any results."
+        },
+        "queryZero": {
+            "text": "Zero Search",
+            "info": "Number of search queries without any results."
+        },
+        "queryZeroRate": {
+            "text": "Zero Search Rate",
+            "info": "Number of search queries without any results compared to the total number of search."
+        },
+        "regularUsersTimeLine": {
+            "text": "Regular Users",
+            "info": "Number of users for whom this is not the first use."
+        },
+        "regularUsers": {
+            "text": "Regular Users",
+            "info": "Number of users for whom this is not the first use."
+        },
+        "adoptionRate": {
+            "text": "Adoption Rate",
+            "info": "Number of new users compared to the total number of potential users."
+        },
+        "regularUsersRate": {
+            "text": "Regular User Rate",
+            "info": "Number of users compared to the total number of potential users."
+        },
+        "regular_newUsers": {
+            "text": "New/Regular Users",
+            "info": "Number of new users compared to the total number of regular users."
+        },
+        "searchExitTimeLine": {
+            "text": "Search Exit",
+            "info": "Number of searches where the user does nothing after viewing the results page."
+        },
+        "searchExit": {
+            "text": "Search Exit",
+            "info": "Number of searches where the user does nothing after viewing the results page."
+        },
+        "searchExitRate": {
+            "text": "Search Exit Rate",
+            "info": "Number of search where the user does nothing after viewing the results page compared to the total number of searches."
+        },
+        "queryByResult": {
+            "text": "Last Action",
+            "info": "Last action after a search:\n - 'search.exit.logout': Runs a search, does not click on any document, logs out.\n - 'search.exit.timeout': Runs a search, does not click on a document, leaves the page.\n - 'search.with.click': Runs one or several searches, clicks on a document as a last action.\n - 'search.with.no.click':  Runs one or several searches, does not click on any document as a last action."
+        },
+        "topQueries": {
+            "text": "Top Queries",
+            "info": "Most frequently queries asked."
+        },
+        "topNoResultQueries": {
+            "text": "Top No Result Queries",
+            "info": "Most frequently queries asked without any results."
+        },
+        "topSources": {
+            "text": "Top Sources",
+            "info": "Sources of most clicked documents."
+        },
+        "topFacets": {
+            "text": "Most Used Filters",
+            "info": "Most used filters."
+        },
+        "sessionTotal": {
+            "text": "Sessions",
+            "info": "Number of sessions."
+        },
+        "queryTotal": {
+            "text": "Queries",
+            "info": "Number of search queries."
+        },
+        "sessionsByUser": {
+            "text": "Average Sessions By User",
+            "info": "Average number of sessions per user."
+        },
+        "avgQueriesBySession": {
+            "text": "Average Search By Session",
+            "info": "Average number of searches per session."
+        },
+        "avgClicksByQuery": {
+            "text": "Average Click By Search",
+            "info": "Average number of clicked documents per search."
+        },
+        "docViewsBySession": {
+            "text": "Average Viewed Documents Per Search",
+            "info": "Average number of viewed documents (Document Navigator) per search."
+        },
+        "avgSessionDuration": {
+            "text": "Average Session Duration",
+            "info": "Average session duration."
+        },
+        "userFeedbackGrid": {
+            "text": "User feedback",
+            "info": "User feedback."
+        }
+    },
+
+    "stat": {
+        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}",
+        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}"
+    },
+
+    "dashboards": {
+        "userAdoption": "User Adoption",
+        "relevancy": "Relevancy",
+        "performance": "Performance",
+        "newDashboard": "New Dashboard"
+    },
+
+    "palette": {
+        "timelines": "Timelines",
+        "charts": "Charts",
+        "statistics": "Statistics",
+        "grid": "Grid"
+    },
+
+    "dateRange": {
+        "from": "From",
+        "to": "to",
+        "dateRangeTooltip": "Analytics period: {currentDate}. Trends calculation period: {trendRange}",
+        "predefinedDateRange": "Predefined Date Range",
+        "absoluteDateRange": "Date Range",
+        "trendsCalculations": {
+            "title": "Trends calculations",
+            "label": "Use the preceding period of same duration",
+            "tooltip": "For example, if  \"Last 6 months \" is selected above, trends will be automatically computed against the previous 6 months period.",
+            "customPeriod": "Custom Period",
+            "customPeriodTooltip": "This period is used a baseline to measure the evolution of the metrics displayed in the dashboard."
+        },
+        "last3H": "Last 3 hours",
+        "last6H": "Last 6 hours",
+        "last12H": "Last 12 hours",
+        "last24H": "Last 24 hours",
+        "last7D": "Last 7 days",
+        "last30D": "Last 30 days",
+        "last90D": "Last 90 days",
+        "last6M": "Last 6 months",
+        "last1Y": "Last 1 year",
+        "last2Y": "Last 2 years",
+        "last5Y": "Last 5 years"
+    },
+
+    "export": {
+        "button": {
+            "title": "Export",
+            "tooltipCSV": "Export current dashboard to .csv files",
+            "exportCSV": "Export as CSV",
+            "exportPNG": "Export as PNG image"
+        },
+        "title": "Export CSV",
+        "nothing": "{filename}, nothing to export!",
+        "success": "Export {filename} successfully"
+    }
+}

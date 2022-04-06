@@ -1,0 +1,350 @@
+{
+    "app": {
+        "name": "Usage Analytics"
+    },
+
+    "locale": {
+        "en": "English (United States)",
+        "en-gb": "English (United Kingdom)",
+        "fr": "Français",
+        "de": "Deutsch"
+    },
+
+    "dashboard": {
+        "map": "Carte",
+        "timeline": "Historique",
+        "network": "Réseau",
+        "chart": "Graphique",
+        "heatmap": "Carte de chaleur",
+        "tagcloud": "Nuage de mots",
+
+        "addWidget": "Nouveau widget",
+        "addWidgetTitle": "Ajouter un widget au tableau de bord",
+        "addWidgetModalTitle": "Ajouter un widget",
+        "addWidgetItemTitle": "Créer un widget {item}",
+        "addWidgetSize": "Taille du widget",
+        "addWidgetWidth": "Largeur du widget",
+        "addWidgetHeight": "Hauteur du widget",
+        "share": "Partager",
+        "shareTitle": "Partager ce tableau de bord avec un collègue",
+        "shareSuccess": "Lien de partage copié dans le presse-papier",
+        "shareError": "Le lien de partage n'a pas pu être copié dans le presse-papier: {url}",
+        "manual": "Positionnement manuel",
+        "manualTitle": "Le positionnement manuel permet de placer les widgets librement dans le tableau de bord",
+        "auto": "Positionnement auto",
+        "autoTitle": "Le positionnement automatique compacte la vue vers le haut et la gauche, quand des espaces vides sont disponibles",
+        "fixed": "Positionnement fixe",
+        "fixedTitle": "Le positionnement fixe empêche toute modification du tableau de bord",
+        "new": "Nouveau",
+        "newTitle": "Créer un nouveau tableau de bord",
+        "open": "Ouvrir",
+        "openTitle": "Ouvrir un tableau de bord enregistré",
+        "openDashboard": "Ouvrir le tableau de bord \"{dashboard}\"",
+        "delete": "Supprimer",
+        "deleteTitle": "Supprimer le tableau de bord",
+        "deleteConfirmTitle": "Supprimer le tableau de bord",
+        "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer le tableau de bord \"{dashboard}\"?",
+        "saveAs": "Enregistrer sous...",
+        "saveAsTitle": "Enregistrer le tableau de bord actuel pour le rouvrir plus tard",
+        "saveAsModalTitle": "Enregistrer le tableau de bord",
+        "saveAsModalMessage": "Entrez un nom pour ce tableau de bord",
+        "save": "Enregistrer",
+        "saveTitle": "Enregistrer le tableau de bord",
+        "saveSuccess": "Tableau de bord enregistré",
+        "saveFailure": "Le tableau de bord n'a pas pu être enregistré !",
+        "autoSave": "Enregistrement auto",
+        "autoSaveTitle": "Enregistrement automatique du tableau de bord",
+        "setDefault": "Dashboard par défaut",
+        "setDefaultTitle": "Définir comme dashboard par défaut",
+        "setDefaultConfirm": "Voulez-vous définir \"{dashboard}\" comme dashboard par défaut?",
+        "setDefaultConfirmTitle": "Dashboard par défaut",
+        "setDefaultSuccess": "\"{dashboard}\" a été défini comme dashboard par défaut",
+        "settingsTitle": "Options du tableau de bord",
+        "widgetClose": "Fermer",
+        "renameWidget": "Renommer un widget",
+        "renameWidgetMessage": "Entrez un nouveau nom pour ce widget",
+        "renameWidgetTitle": "Renommer ce widget",
+        "fullScreenTitle": "Plein écran",
+        "exitFullScreenTitle": "Quitter le plein écran",
+        "maximizeTitle": "Maximiser",
+        "minimizeTitle": "Réduire",
+        "noDataToDisplay": "Aucune donnée à afficher"
+    },
+
+    "widgets": {
+        "queryTotalTimeLine": {
+            "text": "Requêtes de recherche",
+            "info": "Nombre de requêtes de recherche."
+        },
+        "userTotalTimeLine": {
+            "text": "Utilisateurs",
+            "info": "Nombre d'utilisateurs."
+        },
+        "userCountTotal": {
+            "text": "Utilisateurs",
+            "info": "Nombre d'utilisateurs."
+        },
+        "sessionTotalTimeLine": {
+            "text": "Sessions",
+            "info": "Nombre de sessions."
+        },
+        "avgClicksByQueryTimeLine": {
+            "text": "Moyenne des clics de document par requête de recherche",
+            "info": "Nombre moyen de clics sur documents par requête de recherche."
+        },
+        "avgEngineResponseTimeTimeLine": {
+            "text": "Temps de réponse moyen du moteur (en ms)",
+            "info": "Temps de réponse moyen du moteur (en ms)."
+        },
+        "avgEngineResponseTime": {
+            "text": "Temps de réponse moyen du moteur",
+            "info": "Temps de réponse moyen du moteur (en ms)."
+        },
+        "avgQueriesBySessionTimeLine": {
+            "text": "Nombre moyen de requêtes de recherche par session (en ms)",
+            "info": "Nombre moyen de requêtes de recherche par session."
+        },
+        "avgResponseTimeTimeLine": {
+            "text": "Moyenne des temps de réponse (en ms)",
+            "info": "Temps de réponse moyen (en ms). Il comprend le back-office et le moteur."
+        },
+        "avgResponseTime": {
+            "text": "Moyenne des temps de réponse",
+            "info": "Temps de réponse moyen (en ms). Il comprend le back-office et le moteur."
+        },
+        "responseTimeTimeLine": {
+            "text": "Temps de réponse (en ms)",
+            "info": "Temps de réponse (en ms). Il comprend le back-office et le moteur."
+        },
+        "avgSessionDurationTimeLine": {
+            "text": "Durée moyenne de la session (en ms)",
+            "info": "Durée moyenne de la session (en ms)."
+        },
+        "avgMRRTimeLine": {
+            "text": "Rang réciproque moyen (MRR)",
+            "info": "Rang réciproque moyen pendant. Le MRR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus les résultats sont pertinents. La valeur 1 est obtenue lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée."
+        },
+        "avgMRR": {
+            "text": "Moyenne MRR",
+            "info": "Rang réciproque moyen pendant. Le MRR est une moyenne sur le rang de résultats cliqué. Plus il est proche de 1, plus les résultats sont pertinents. La valeur 1 est obtenue lorsque le rang #1 (premier résultat) est cliqué pour une requête donnée."
+        },
+        "clickRank1TotalTimeLine": {
+            "text": "Clics sur le premier document",
+            "info": "Nombre de recherches où l'utilisateur clique sur le premier document."
+        },
+        "clickRank1TotalRate": {
+            "text": "Clics sur le premier document",
+            "info": "Nombre de recherches où l'utilisateur clique sur le premier document par rapport au nombre total de recherches."
+        },
+        "clickRank3TimeLine": {
+            "text": "Clics sur les 3 premiers documents",
+            "info": "Nombre de recherches pour lesquelles l'utilisateur clique sur l'un des 3 premiers documents."
+        },
+        "clickRank3": {
+            "text": "Clics sur les 3 premiers documents",
+            "info": "Nombre de recherches pour lesquelles l'utilisateur clique sur l'un des 3 premiers documents."
+        },
+        "clickTotalTimeLine": {
+            "text": "Total des documents cliqués",
+            "info": "Nombre de clics de documents pendant une recherche."
+        },
+        "newUsersTimeLine": {
+            "text": "Nouveaux utilisateurs",
+            "info": "Utilisateurs qui se sont connectés pour la première fois."
+        },
+        "newUsers": {
+            "text": "Nouveaux utilisateurs",
+            "info": "Utilisateurs qui se sont connectés pour la première fois."
+        },
+        "queryBounceTimeLine": {
+            "text": "Rebond",
+            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire son contenu (basé sur le dwell time)."
+        },
+        "queryBounce": {
+            "text": "Rebond",
+            "info": "Nombre de rebonds pour une requête de recherche. Un rebond est quand un utilisateur clique sur un document sans lire son contenu (basé sur le dwell time)."
+        },
+        "queryBounceRate": {
+            "text": "Taux de rebond",
+            "info": "Nombre de rebonds pour une requête de recherche par rapport au nombre total de recherches."
+        },
+        "queryClickTimeLine": {
+            "text": "Requêtes de recherche avec clics",
+            "info": "Nombre de requêtes de recherche où l'utilisateur a cliqué sur un document au moins une fois."
+        },
+        "queryClick": {
+            "text": "Requêtes de recherche avec clics",
+            "info": "Nombre de requêtes de recherche où l'utilisateur a cliqué sur un document au moins une fois."
+        },
+        "queryClickRate": {
+            "text": "Taux de requêtes de recherche avec clics",
+            "info": "Nombre de requêtes de recherche où l'utilisateur a cliqué sur un document au moins une fois par rapport au nombre total de recherches."
+        },
+        "queryRefineTimeLine": {
+            "text": "Affinement",
+            "info": "Nombre de requêtes de recherche où l'utilisateur a affiné la recherche (via l'utilisation de facettes par exemple)."
+        },
+        "queryRefine": {
+            "text": "Affinement",
+            "info": "Nombre de requêtes de recherche où l'utilisateur a affiné la recherche (via l'utilisation de facettes par exemple)."
+        },
+        "queryRefineRate": {
+            "text": "Taux d'affinement",
+            "info": "Nombre de requêtes de recherche pour lesquelles l'utilisateur a affiné la recherche par rapport au nombre total de recherches."
+        },
+        "queryZeroTimeLine": {
+            "text": "Recherches sans résultats",
+            "info": "Nombre de requêtes de recherche sans résultats."
+        },
+        "queryZero": {
+            "text": "Recherches sans résultats",
+            "info": "Nombre de requêtes de recherche sans résultats."
+        },
+        "queryZeroRate": {
+            "text": "Taux de recherches sans résultats",
+            "info": "Nombre de requêtes de recherche sans résultats par rapport au nombre total de recherches."
+        },
+        "regularUsersTimeLine": {
+            "text": "Utilisateurs réguliers",
+            "info": "Nombre d'utilisateurs pour qui ce n'est pas la première utilisation."
+        },
+        "regularUsers": {
+            "text": "Utilisateurs réguliers",
+            "info": "Nombre d'utilisateurs pour qui ce n'est pas la première utilisation."
+        },
+        "adoptionRate": {
+            "text": "Taux d'adoption",
+            "info": "Nombre de nouveaux utilisateurs par rapport au nombre total d'utilisateurs potentiels."
+        },
+        "regularUsersRate": {
+            "text": "Taux d'utilisateurs réguliers",
+            "info": "Nombre d'utilisateurs réguliers par rapport au nombre total d'utilisateurs potentiels."
+        },
+        "regular_newUsers": {
+            "text": "Utilisateurs nouveaux/réguliers",
+            "info": "Nombre de nouveaux utilisateurs par rapport au nombre total des utilisateurs réguliers."
+        },
+        "searchExitTimeLine": {
+            "text": "Recherches quittées",
+            "info": "Nombre de recherches où l'utilisateur ne fait rien suite à l'affichage d'une page de résultats."
+        },
+        "searchExit": {
+            "text": "Recherches quittées",
+            "info": "Nombre de recherches où l'utilisateur ne fait rien suite à l'affichage d'une page de résultats."
+        },
+        "searchExitRate": {
+            "text": "Taux de recherches quittées",
+            "info": "Nombre de recherches pour lesquelles l'utilisateur ne fait rien suite à l'affichage d'une page de résultats par rapport au nombre total de recherches."
+        },
+        "queryByResult": {
+            "text": "Dernière Action",
+            "info": "Dernière action après une recherche:\n - 'search.exit.logout': Effectue une recherche, ne clique sur aucun document, se déconnecte.\n - 'search.exit.timeout': Effectue une recherche, ne clique sur aucun document, quitte la page.\n - 'search.with.click': Effectue une ou plusieurs recherches, clique sur une document comme dernière action.\n - 'search.with.no.click':  Effectue une ou plusieurs recherches, ne clique sur aucun document comme dernière action."
+        },
+        "topQueries": {
+            "text": "Requêtes les plus fréquentes",
+            "info": "Requêtes de recheche les plus fréquemment posées."
+        },
+        "topNoResultQueries": {
+            "text": "Requêtes les plus fréquentes sans résultats",
+            "info": "Requêtes de recheche sans résultats les plus fréquemment posées."
+        },
+        "topSources": {
+            "text": "Principales sources",
+            "info": "Sources des documents les plus cliqués."
+        },
+        "topFacets": {
+            "text": "Filtres les plus utilisés",
+            "info": "Filtres les plus utilisés."
+        },
+        "sessionTotal": {
+            "text": "Sessions",
+            "info": "Nombre de sessions."
+        },
+        "queryTotal": {
+            "text": "Requêtes de recherche",
+            "info": "Nombre de requêtes de recherche."
+        },
+        "sessionsByUser": {
+            "text": "Moyenne des sessions par utilisateur",
+            "info": "Nombre moyen de sessions par utilisateur."
+        },
+        "avgQueriesBySession": {
+            "text": "Moyenne des recherches par session",
+            "info": "Nombre moyen de recherches par session."
+        },
+        "avgClicksByQuery": {
+            "text": "Moyenne des documents cliqués par recherche",
+            "info": "Nombre moyen des documents cliqués par recherche."
+        },
+        "docViewsBySession": {
+            "text": "Moyenne des documents consultés par recherche",
+            "info": "Nombre moyen des documents consultés (Document Navigator) par recherche."
+        },
+        "avgSessionDuration": {
+            "text": "Durée moyenne de session",
+            "info": "Durée moyenne de session."
+        },
+        "userFeedbackGrid": {
+            "text": "Commentaires des utilisateurs",
+            "info": "Commentaires des utilisateurs."
+        }
+    },
+
+    "stat": {
+        "trendTooltip": "Cette tendance a été calculé à partir de la période \"{currentDate}\" et \"{trendRange}\" précédent(e)(s). \n Valeur actuelle = {currentValue}. \n Valeur précédente = {previousValue}",
+        "trendTooltipPrevDates": "Cette tendance a été calculé à partir de {currentDate} et le {trendRange}. \n Valeur actuelle = {currentValue}. \n Valeur précédente = {previousValue}"
+    },
+
+    "dashboards": {
+        "userAdoption": "Adoption utilisateur",
+        "relevancy": "Pertinence",
+        "performance": "Performance",
+        "newDashboard": "Nouveau tableau de bord"
+    },
+
+    "palette": {
+        "timelines": "Historiques",
+        "charts": "Graphiques",
+        "statistics": "Statistiques",
+        "grid": "Tables"
+    },
+
+    "dateRange": {
+        "from": "Du",
+        "to": "au",
+        "dateRangeTooltip": "Période d'analytiques: {currentDate}. Période de calculs des tendances: {trendRange}",
+        "predefinedDateRange": "Plage de dates prédéfinie",
+        "absoluteDateRange": "Plage de dates",
+        "trendsCalculations": {
+            "title": "Calculs des tendances",
+            "label": "Utiliser la période précédente de même durée",
+            "tooltip": "Par exemple, si \"Derniers 6 mois\" est sélectionné ci-dessus, les tendances seront automatiquement calculées par rapport à la période précédente de 6 mois.",
+            "customPeriod": "Période personnalisée",
+            "customPeriodTooltip": "Cette période est utilisée comme base de référence pour mesurer l'évolution des métriques affichées dans le tableau de bord."
+        },
+        "last3H": "3 dernières heures",
+        "last6H": "6 dernières heures",
+        "last12H": "12 dernières heures",
+        "last24H": "24 dernières heures",
+        "last7D": "7 derniers jours",
+        "last30D": "30 derniers jours",
+        "last90D": "90 derniers jours",
+        "last6M": "6 derniers mois",
+        "last1Y": "Dernière année",
+        "last2Y": "2 dernières années",
+        "last5Y": "5 dernières années"
+    },
+
+    "export": {
+        "button": {
+            "title": "Export",
+            "tooltipCSV": "Exporter le dashboard dans des fichiers .csv",
+            "exportCSV": "Exporter en CSV",
+            "exportPNG": "Exporter au format image PNG",
+            "exportXLS": "Exporter au format Excel"
+        },
+        "title": "Export",
+        "nothing": "{filename}, pas de données à exporter!",
+        "success": "Export {filename} réussi"
+    }
+}

@@ -1,0 +1,29 @@
+
+::ng-deep sq-facet-card > .card {
+    height: 100%;
+}
+
+// Force the settings form of the Network and HeatMap facets to scroll rather than overflowing the widget frame
+::ng-deep sq-facet-card > .card .card-body {
+    overflow-y: auto;
+}
+
+::ng-deep sq-dashboard-item .btn-group button.disabled {
+    pointer-events: auto;
+}
+
+::ng-deep sq-collapse {
+    height: 100%;
+
+    >div {
+        height: 100%;
+    }
+}
+
+.sq-loading {
+    display: flex;
+    text-align: center;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}

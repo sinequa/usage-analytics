@@ -3,41 +3,34 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "audit": {
+    "usage-analytics": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
         }
       },
-      "root": "",
-      "sourceRoot": "src",
+      "root": "projects/usage-analytics",
+      "sourceRoot": "projects/usage-analytics/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/audit",
-            "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.json",
-            "aot": true,
+            "outputPath": "dist/usage-analytics",
+            "index": "projects/usage-analytics/src/index.html",
+            "main": "projects/usage-analytics/src/main.ts",
+            "polyfills": "projects/usage-analytics/src/polyfills.ts",
+            "tsConfig": "projects/usage-analytics/tsconfig.json",
             "preserveSymlinks": true,
             "assets": [
-              "src/assests/favicon.ico",
-              "src/assets",
-              { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "assets/monaco-editor/" }
+              "projects/usage-analytics/src/assests/favicon.ico",
+              "projects/usage-analytics/src/assets"
             ],
             "styles": [
               {
-                "input": "src/styles/app.scss",
+                "input": "projects/usage-analytics/src/styles/app.scss",
                 "bundleName": "app"
-              },
-              {
-                "input": "src/styles/preview.scss",
-                "bundleName": "preview",
-                "inject": false
               }
             ],
             "scripts": [],
@@ -54,7 +47,6 @@
               "intl-pluralrules",
               "jstz",
               "atomicjs",
-              "vis-network",
               "vis-timeline"
             ]
           },
@@ -62,22 +54,16 @@
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "replace": "projects/usage-analytics/src/environments/environment.ts",
+                  "with": "projects/usage-analytics/src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": false,
+              "outputPath": "dist/usage-analytics",
               "budgets": [
                 {
                   "type": "initial",
                   "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumError": "7mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -85,53 +71,59 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development" : {
+              "outputPath": "dist-debug/usage-analytics",
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "audit:build"
+            "browserTarget": "usage-analytics:build:development"
           },
           "configurations": {
             "production": {
-              "browserTarget": "audit:build:production"
+              "browserTarget": "usage-analytics:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "audit:build"
+            "browserTarget": "usage-analytics:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
+            "main": "projects/usage-analytics/src/test.ts",
+            "polyfills": "projects/usage-analytics/src/polyfills.ts",
+            "tsConfig": "projects/usage-analytics/tsconfig.spec.json",
+            "karmaConfig": "projects/usage-analytics/karma.conf.js",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              "projects/usage-analytics/src/favicon.ico",
+              "projects/usage-analytics/src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "projects/usage-analytics/src/styles/app.scss"
             ],
             "scripts": []
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "tsconfig.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "projects/usage-analytics/**/*.ts",
+              "projects/usage-analytics/**/*.html"
             ]
           }
         },
@@ -139,16 +131,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "audit:serve"
+            "devServerTarget": "usage-analytics:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "audit:serve:production"
+              "devServerTarget": "usage-analytics:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "audit"
+  "defaultProject": "usage-analytics"
 }
