@@ -2,7 +2,7 @@ import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from
 import { GridsterItemComponent } from 'angular-gridster2';
 import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent } from "ag-grid-community";
 
-import { Results, Record, Aggregation, AggregationItem, Dataset } from '@sinequa/core/web-services';
+import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError } from '@sinequa/core/web-services';
 import { ExprBuilder } from '@sinequa/core/app-utils'
 
 import { Action } from '@sinequa/components/action';
@@ -69,7 +69,6 @@ export class DashboardItemComponent implements OnChanges {
     fullScreenAction: Action;
     maximizeAction: Action;
     infoAction: Action;
-    chartOrGridAction: Action;
 
     // Properties specific to certain types of dashboard items
     innerwidth = 500;
@@ -91,8 +90,6 @@ export class DashboardItemComponent implements OnChanges {
     // Timeline
     timeSeries: TimelineSeries[] = [];
 
-    private icon: string;
-    private title: string;
     gridView = false;
     columnDefs: ColDef[] = []
     rowData: (Record | AggregationItem)[] = [];
@@ -103,6 +100,8 @@ export class DashboardItemComponent implements OnChanges {
     }
     /** ag-grid API for the grid */
     gridApi: GridApi | null | undefined;
+
+    errorMessage?: string;
 
     loading = true;
 
@@ -148,37 +147,12 @@ export class DashboardItemComponent implements OnChanges {
             }
         });
 
-        this.chartOrGridAction = new Action({
-            icon: "fas fa-th-list",
-            title: "Grid view",
-            action: (action) => {
-                this.gridView = !this.gridView;
-                action.icon = this.gridView
-                            ? this.icon
-                            : "fas fa-th-list";
-                action.title = this.gridView
-                            ? this.title
-                            : "Grid view";
-            }
-        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
 
         if(this.config.type === "chart") {
             this.chart.theme = this.buttonsStyle === "dark"? "candy" : "fusion";
-            this.icon = "fas fa-chart-pie";
-            this.title = "Chart view";
-        }
-
-        if(this.config.type === "timeline") {
-            this.icon = "fas fa-chart-line";
-            this.title = "Timeline view";
-        }
-
-        if(this.config.type === "grid") {
-            this.icon = "fas fa-th-list";
-            this.title = "Grid view";
         }
 
         // Manage width and height changes. Some components need additional treatment
@@ -199,61 +173,70 @@ export class DashboardItemComponent implements OnChanges {
         }
 
         if (changes["dataset"]) {
-            if (this.dataset && this.dataset[this.config.query]) {
+            if (this.dataset?.[this.config.query]) {
                 this.loading = false;
-                switch (this.config.type) {
-                    case "timeline":
-                        this.timeSeries = [];
-                        if (this.config.aggregationsTimeSeries) {
-                            this.timeSeries.push(
-                                ...this.timelineProvider.getAggregationsTimeSeries(this.dataset[this.config.query], this.config.aggregationsTimeSeries, this.auditService.mask)
-                            );
-                            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
-                            this.rowData = this.timelineProvider.getAggregationsRowData(this.dataset[this.config.query], this.config.aggregationsTimeSeries);
-                        }
-                        if (this.config.recordsTimeSeries) {
-                            this.timeSeries.push(
-                                ...this.timelineProvider.getRecordsTimeSeries(this.dataset[this.config.query], this.config.recordsTimeSeries)
-                            );
-                            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
-                            this.rowData = (this.dataset[this.config.query] as Results).records
-                        }
-                        break;
-                    case "chart":
-                        if (this.config.chartData) {
-                            if (this.config.title === 'msg#widgets.regular_newUsers.text') {
-                                this.chartResults = {
-                                    records: [] as Record[],
-                                    aggregations: [
-                                        {
-                                            name: "regular-new-user",
-                                            column: "",
-                                            items: (this.dataset["newUsers"] && this.dataset["regularUsers"])
-                                                    ? [
-                                                        {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
-                                                        {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
-                                                    ]
-                                                    : []
-                                        }
-                                    ] as Aggregation[]
-                                } as  Results;
-                            } else {
-                                this.chartResults = this.chartProvider.getChartData(this.dataset[this.config.query], this.config.chartData);
-                            }
-                            this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
-                            this.rowData = (this.dataset[this.config.query] as Results)?.aggregations.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
-                        }
-                        break;
-                    case "grid":
-                        this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
-                        if (!!this.config.aggregationName) {
-                            this.rowData = this.gridProvider.getAggregationRowData(this.dataset[this.config.query], this.config.aggregationName)
-                        } else {
-                            this.rowData = (this.dataset[this.config.query] as Results).records
-                        }
-                        break;
-                    default:
-                        break;
+                let data = this.dataset?.[this.config.query];
+
+                if((data as DatasetError).errorMessage) {
+                    this.errorMessage = (data as DatasetError).errorMessage;
+                } else {
+                    this.errorMessage = undefined;
+                    data = data as Results;
+
+                    switch (this.config.type) {
+                      case "timeline":
+                          this.timeSeries = [];
+                          if (this.config.aggregationsTimeSeries) {
+                              this.timeSeries.push(
+                                  ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
+                              );
+                              this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
+                              this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
+                          }
+                          if (this.config.recordsTimeSeries) {
+                              this.timeSeries.push(
+                                  ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
+                              );
+                              this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
+                              this.rowData = data.records
+                          }
+                          break;
+                      case "chart":
+                          if (this.config.chartData) {
+                              if (this.config.title === 'msg#widgets.regular_newUsers.text') {
+                                  this.chartResults = {
+                                      records: [] as Record[],
+                                      aggregations: [
+                                          {
+                                              name: "regular-new-user",
+                                              column: "",
+                                              items: (this.dataset["newUsers"] && this.dataset["regularUsers"])
+                                                      ? [
+                                                          {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
+                                                          {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
+                                                      ]
+                                                      : []
+                                          }
+                                      ] as Aggregation[]
+                                  } as  Results;
+                              } else {
+                                  this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
+                              }
+                              this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
+                              this.rowData = data?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
+                          }
+                          break;
+                      case "grid":
+                          this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
+                          if (this.config.aggregationName) {
+                              this.rowData = this.gridProvider.getAggregationRowData(data, this.config.aggregationName)
+                          } else {
+                              this.rowData = data.records
+                          }
+                          break;
+                      default:
+                          break;
+                  }
                 }
             } else {
                 this.loading = true
@@ -277,7 +260,6 @@ export class DashboardItemComponent implements OnChanges {
         }
         if (this.config.type === "chart" || this.config.type === "timeline") {
             this.resizeGrid();
-            this.actions = [this.chartOrGridAction, ...this.actions]
         }
         if (this.tooltipInfo) {
             this.infoAction = new Action({
@@ -376,6 +358,12 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     onChartTypeChange(type: string) {
+        if(type === 'grid') {
+          this.config.icon = "fas fa-th-list";
+        }
+        else {
+          this.config.icon = "fas fa-chart-pie";
+        }
         this.config.chartType = type;
         this.dashboardService.notifyItemChange(this.config);
     }
