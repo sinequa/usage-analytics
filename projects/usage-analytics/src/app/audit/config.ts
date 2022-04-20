@@ -391,6 +391,21 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
+    topCollections: {
+      type: "chart",
+      query: "topCollections",
+      icon: "fas fa-chart-pie",
+      text: "msg#widgets.topCollections.text",
+      info: "msg#widgets.topCollections.info",
+      unique: true,
+      parameters: {
+          chartData: {
+              aggregation: "collections"
+          },
+          chartType: "Pie3D"
+      }
+  },
+
     topFacets: {
         type: "chart",
         query: "topFacets",
@@ -959,6 +974,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
         name: "msg#palette.charts",
         items: [
             "topSources",
+            "topCollections",
             "topQueries",
             "topFacets",
             "topNoResultsQueries",

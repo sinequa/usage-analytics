@@ -252,6 +252,10 @@
             "text": "Principales sources",
             "info": "Sources des documents les plus cliqués."
         },
+        "topCollections": {
+            "text": "Principales Collections",
+            "info": "Collections des documents les plus cliqués."
+        },
         "topFacets": {
             "text": "Filtres les plus utilisés",
             "info": "Filtres les plus utilisés."

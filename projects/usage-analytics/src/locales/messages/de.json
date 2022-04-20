@@ -251,6 +251,10 @@
           "text": "Top Sources",
           "info": "Sources of most clicked documents."
       },
+      "topCollections": {
+          "text": "Top Collections",
+          "info": "Collections of most clicked documents."
+      },
       "topFacets": {
           "text": "Most Used Filters",
           "info": "Filters most used."
