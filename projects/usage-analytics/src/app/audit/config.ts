@@ -104,7 +104,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
     avgEngineResponseTimeline: {
         type: "timeline",
-        query: "avgEngineResponseTimeTimeLine",
+        query: "engineResponseTimeTimeLine",
         text: "msg#widgets.avgEngineResponseTimeTimeLine.text",
         icon: "fas fa-chart-line",
         info: "msg#widgets.avgEngineResponseTimeTimeLine.info",
@@ -114,6 +114,22 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
                 name: "engineresponsetime",
                 dateField: "value",
                 valueFields: [{operatorResults: true, name: "avg", title: "Average Engine Response", primary: true}]
+            }
+        }
+    },
+
+    maxEngineResponseTimeline: {
+        type: "timeline",
+        query: "engineResponseTimeTimeLine",
+        text: "msg#widgets.maxEngineResponseTimeTimeLine.text",
+        icon: "fas fa-chart-line",
+        info: "msg#widgets.maxEngineResponseTimeTimeLine.info",
+        unique: true,
+        parameters: {
+            aggregationsTimeSeries: {
+                name: "engineresponsetime",
+                dateField: "value",
+                valueFields: [{operatorResults: true, name: "max", title: "Maximum Engine Response", primary: true}]
             }
         }
     },
@@ -152,35 +168,35 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
     avgResponseTimeTimeline: {
         type: "timeline",
-        query: "avgResponseTimeTimeLine",
+        query: "responseTimeTimeLine",
         text: "msg#widgets.avgResponseTimeTimeLine.text",
         icon: "fas fa-chart-line",
         info: "msg#widgets.avgResponseTimeTimeLine.info",
         unique: true,
         parameters: {
             aggregationsTimeSeries: {
-                name: "engineresponsetime",
+                name: "ResponseTime",
                 dateField: "value",
                 valueFields: [{operatorResults: true, name: "avg", title: "Average Response Time", primary: true}]
             }
         }
     },
 
-    responseTimeTimeline: {
+    maxResponseTimeTimeline: {
         type: "timeline",
         query: "responseTimeTimeLine",
-        text: "msg#widgets.responseTimeTimeLine.text",
+        text: "msg#widgets.maxResponseTimeTimeLine.text",
         icon: "fas fa-chart-line",
-        info: "msg#widgets.responseTimeTimeLine.info",
+        info: "msg#widgets.maxResponseTimeTimeLine.info",
         unique: true,
         parameters: {
             aggregationsTimeSeries: {
                 name: "ResponseTime",
                 dateField: "value",
                 valueFields: [
-                    {operatorResults: true, name: "avg", title: "Average", primary: true},
-                    {operatorResults: true, name: "max", title: "Maximum", primary: true},
-                    {operatorResults: true, name: "min", title: "Minimum", primary: false}
+                    //{operatorResults: true, name: "avg", title: "Average", primary: true},
+                    {operatorResults: true, name: "max", title: "Maximum Response Time", primary: true},
+                    //{operatorResults: true, name: "min", title: "Minimum", primary: false}
                 ]
             }
         }
@@ -534,12 +550,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
-    regularUsers: {
+    activeUsers: {
         type: "stat",
-        query: "regularUsers",
+        query: "activeUsers",
         icon: "fas fa-balance-scale",
-        text: "msg#widgets.regularUsers.text",
-        info: "msg#widgets.regularUsers.info",
+        text: "msg#widgets.activeUsers.text",
+        info: "msg#widgets.activeUsers.info",
         unique: true,
         parameters: {
             statLayout: 'standard',
@@ -548,53 +564,19 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
-    adoptionRate: {
-        type: "stat",
-        query: "newUsers",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.adoptionRate.text",
-        info: "msg#widgets.adoptionRate.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            relatedQuery: "totalUsers",
-            relatedValueLocation: "totalrecordcount",
-            computation: "percentage",
-            asc: true
-        }
-    },
-
-    regularUserRate: {
-        type: "stat",
-        query: "regularUsers",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.regularUsersRate.text",
-        info: "msg#widgets.regularUsersRate.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            relatedQuery: "totalUsers",
-            relatedValueLocation: "totalrecordcount",
-            computation: "percentage",
-            asc: true
-        }
-    },
-
-    regularNewUsers: {
+    activeNewUsers: {
         type: "chart",
         query: "newUsers",
         icon: "fas fa-chart-pie",
-        text: "msg#widgets.regular_newUsers.text",
-        info: "msg#widgets.regular_newUsers.info",
+        text: "msg#widgets.active_newUsers.text",
+        info: "msg#widgets.active_newUsers.info",
         unique: true,
         parameters: {
             chartData: {
-                aggregation: "regular-new-user"
+                aggregation: "active-new-user"
             },
             chartType: "Pie3D",
-            relatedQuery: "regularUsers",
+            relatedQuery: "activeUsers",
         }
     },
 
@@ -886,7 +868,7 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
         items: [
             {item: "userCountTotalTimeline", position: {x: 0, y: 0}},
             {item: "newUsers", position: {x: 3, y: 0}},
-            {item: "regularUsers", position: {x: 4, y: 0}},
+            {item: "activeUsers", position: {x: 4, y: 0}},
             {item: "userCountTotal", position: {x: 3, y: 6}},
             {item: "sessionsByUser", position: {x: 4, y: 8}},
             {item: "sessionCountTotal", position: {x: 4, y: 2}},
@@ -896,7 +878,6 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
             {item: "queryCountTotalTimeline", position: {x: 0, y: 4}},
             {item: "sessionCountTotalTimeline", position: {x: 0, y: 8}},
             {item: "clickBySearch", position: {x: 4, y: 4}},
-            {item: "adoptionRate", position: {x : 3, y : 2, rows : 4}},
             {item: "sessionDuration", position: {x : 3, y : 8}},
             {item: "topSources", position: {x: 5, y: 0}},
             {item: "topFacets", position: {x: 5, y: 4}}
@@ -922,8 +903,9 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
         name: "msg#dashboards.performance",
         items: [
             {item: "avgResponseTimeTimeline", position: {x: 0, y: 0}},
-            {item: "responseTimeTimeline", position: {x: 3, y: 0}},
-            {item: "avgEngineResponseTimeline", position: {x: 0, y: 4}}
+            {item: "maxResponseTimeTimeline", position: {x: 3, y: 0}},
+            {item: "avgEngineResponseTimeline", position: {x: 0, y: 4}},
+            {item: "maxEngineResponseTimeTimeline", position: {x: 3, y: 4}},
         ]
     }
 ]
@@ -949,9 +931,10 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "clickFirstDocsTimeline",
             "queryBounceTimeline",
             "clickTotalTimeline",
-            "responseTimeTimeline",
             "avgResponseTimeTimeline",
-            "avgEngineResponseTimeline"
+            "maxResponseTimeTimeline",
+            "avgEngineResponseTimeline",
+            "maxEngineResponseTimeline"
 
         ]
     },
@@ -963,7 +946,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "topFacets",
             "topNoResultsQueries",
             "resultTypes",
-            "regularNewUsers"
+            "activeNewUsers"
         ]
     },
     {
@@ -984,9 +967,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "clickBySearch",
             "sessionDuration",
             "newUsers",
-            "regularUsers",
-            "adoptionRate",
-            "regularUserRate",
+            "activeUsers",
             "firstClick",
             "mrr",
             "refinement",
