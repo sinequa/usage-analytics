@@ -289,6 +289,9 @@ export class AuditService {
         if (!Utils.isString(timestamp)) {
             start = new Date(timestamp[0]);
             end = new Date(timestamp[1]);
+            end.setHours(end.getHours() + 23);
+            end.setMinutes(end.getMinutes() + 59);
+            end.setSeconds(end.getSeconds() + 59);
             // One day in milliseconds
             const oneDay = 1000 * 60 * 60 * 24;
             // One month in milliseconds
