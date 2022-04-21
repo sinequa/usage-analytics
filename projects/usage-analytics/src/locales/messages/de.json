@@ -256,8 +256,7 @@
       "topCollections": {
           "text": "Top Collections",
           "info": "Collections of most clicked documents."
-      },
-
+      },      
       "topFacets": {
           "text": "Most Used Facets",
           "info": "Most used facets."

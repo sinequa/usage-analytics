@@ -365,7 +365,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     topQueries: {
         type: "chart",
         query: "topQueries",
-        icon: "fas fa-chart-pie",
+        icon: "fas fa-th-list",
         text: "msg#widgets.topQueries.text",
         info: "msg#widgets.topQueries.info",
         unique: true,
@@ -373,14 +373,14 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             chartData: {
                 aggregation: "query"
             },
-            chartType: "Bar2D"
+            chartType: "grid"
         }
     },
 
     topNoResultsQueries: {
         type: "chart",
         query: "topNoResultQueries",
-        icon: "fas fa-chart-pie",
+        icon: "fas fa-th-list",
         text: "msg#widgets.topNoResultQueries.text",
         info: "msg#widgets.topNoResultQueries.info",
         unique: true,
@@ -388,7 +388,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             chartData: {
                 aggregation: "query"
             },
-            chartType: "Bar2D"
+            chartType: "grid"
         }
     },
 
@@ -406,6 +406,21 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             chartType: "Pie3D"
         }
     },
+
+    topCollections: {
+      type: "chart",
+      query: "topCollections",
+      icon: "fas fa-chart-pie",
+      text: "msg#widgets.topCollections.text",
+      info: "msg#widgets.topCollections.info",
+      unique: true,
+      parameters: {
+          chartData: {
+              aggregation: "collections"
+          },
+          chartType: "Pie3D"
+      }
+  },
 
     topFacets: {
         type: "chart",
@@ -942,6 +957,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
         name: "msg#palette.charts",
         items: [
             "topSources",
+            "topCollections",
             "topQueries",
             "topFacets",
             "topNoResultsQueries",
