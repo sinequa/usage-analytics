@@ -10,7 +10,7 @@ import {
     Results,
 } from "@sinequa/core/web-services";
 import { from, Observable, of, ReplaySubject } from "rxjs";
-import { mergeMap } from "rxjs/operators";
+import { catchError, mergeMap } from "rxjs/operators";
 import { DashboardService } from "./dashboard/dashboard.service";
 
 export enum RelativeTimeRanges {
@@ -220,7 +220,13 @@ export class AuditService {
             return from(Array.from(new Set(datasets)))
                     .pipe(
                         mergeMap(
-                            (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params)
+                            (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params).pipe(
+                                catchError(err => { // Catch 500 errors thrown when a query does not exist...
+                                  const error = {};
+                                  error[datasetName] = {errorCode: 500, errorMessage: "Could not find query "+datasetName};
+                                  return of(error);
+                                })
+                            )
                         )
                     );
         } else {
