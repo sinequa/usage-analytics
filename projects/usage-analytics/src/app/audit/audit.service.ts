@@ -157,7 +157,7 @@ export class AuditService {
         )
     }
 
-    public getAuditTimestampFromUrl(): string | Date[] | undefined {
+    public getAuditTimestampFromUrl(): string | string[] | undefined {
         const expression = this.searchService.query.findSelect("audit_timestamp")?.expression;
         if (expression) {
             const expr = this.appService.parseExpr(expression);
@@ -249,7 +249,7 @@ export class AuditService {
         this.updateAuditFilters();
     }
 
-    private convertRangeFilter(timestamp?: Date[] | string, parsedTimestamp?: AuditDatasetFilters) {
+    private convertRangeFilter(timestamp?: string[] | string, parsedTimestamp?: AuditDatasetFilters) {
         if (!timestamp || !parsedTimestamp) {
             timestamp = this.getAuditTimestampFromUrl();
             parsedTimestamp = this.parseAuditTimestamp(timestamp!);
@@ -273,7 +273,7 @@ export class AuditService {
     }
 
 
-    private getTimestampValueFromExpr(expr: Expr): string | Date[] {
+    private getTimestampValueFromExpr(expr: Expr): string | string[] {
         if (Utils.isString(expr.value) && expr.value.indexOf("[") > -1) {
             return JSON.parse(expr.value.replace(/`/g, '"'));
         } else {
@@ -281,7 +281,7 @@ export class AuditService {
         }
     }
 
-    private parseAuditTimestamp(timestamp: string | Date[]): AuditDatasetFilters {
+    private parseAuditTimestamp(timestamp: string | string[]): AuditDatasetFilters {
         const now = new Date();
         let previous: Date;
         let start: Date;
@@ -289,9 +289,11 @@ export class AuditService {
         if (!Utils.isString(timestamp)) {
             start = new Date(timestamp[0]);
             end = new Date(timestamp[1]);
-            end.setHours(end.getHours() + 23);
-            end.setMinutes(end.getMinutes() + 59);
-            end.setSeconds(end.getSeconds() + 59);
+            if(timestamp[1].length <= 10) { // If the timestamp misses the time information ("2020-01-01"), set it to the end of day (so it is included)
+              end.setHours(end.getHours() + 23);
+              end.setMinutes(end.getMinutes() + 59);
+              end.setSeconds(end.getSeconds() + 59);
+            }
             // One day in milliseconds
             const oneDay = 1000 * 60 * 60 * 24;
             // One month in milliseconds
