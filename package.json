@@ -61,6 +61,7 @@
     "lodash": "^4.17.15",
     "matchmedia-polyfill": "^0.3.2",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.34",
     "ng2-ui-auth": "^10.0.1",
     "@angular-slider/ngx-slider": "^2.0.4",
     "ngx-bootstrap": "^8.0.0",
