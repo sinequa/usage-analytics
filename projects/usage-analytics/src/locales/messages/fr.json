@@ -82,7 +82,7 @@
         },
         "userCountTotal": {
             "text": "Utilisateurs",
-            "info": "Nombre d'utilisateurs."
+            "info": "Nombre total d’identifiants d’utilisateur uniques ayant terminé une session avec recherche."
         },
         "sessionTotalTimeLine": {
             "text": "Sessions",
