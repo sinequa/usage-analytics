@@ -93,13 +93,17 @@ export class ExportService {
         this.saveToCsv(stats.filename, stats.tables.join('\n'));
       }
 
-      // export each timelines in a specific file
+      // export each timeline in a specific file
       const timelines = this.extractTimelines(filename, items);
       timelines.forEach(timeline => this.saveToCsv(timeline.filename, timeline.tables.join('\n')));
 
-      // export each charts in a specific file
+      // export each chart in a specific file
       const charts = this.extractCharts(filename, items);
       charts.forEach(chart => this.saveToCsv(chart.filename, chart.tables.join('\n')));
+      
+      // export each grid in a separate file
+      const grids = this.extractGrids(filename, items);
+      grids.forEach(grid => this.saveToCsv(grid.filename, grid.tables.join('\n')));
     }
 
   /**
@@ -114,11 +118,14 @@ export class ExportService {
     // export stats
     tables.push(this.extractStats(filename, items) || {} as ExtractModel);
 
-    // export each timelines
+    // export each timeline
     tables.push(...this.extractTimelines(filename, items));
 
-    // export each charts
+    // export each chart
     tables.push(...this.extractCharts(filename, items));
+
+    // export each grid
+    tables.push(...this.extractGrids(filename, items));
 
     // as csv files joined in a single array, split them in their own sheet
     this.csvToXML(tables, filename);
@@ -136,11 +143,14 @@ export class ExportService {
     const stats = this.extractStats(filename, items);
     if(stats) tables.push(stats);
 
-    // export each timelines
+    // export each timeline
     tables.push(...this.extractTimelines(filename, items).filter(timeline => timeline.tables.length > 0));
 
-    // export each charts
+    // export each chart
     tables.push(...this.extractCharts(filename, items).filter(chart => chart.tables.length > 0));
+
+    // export each grid
+    tables.push(...this.extractGrids(filename, items).filter(grid => grid.tables.length > 0));
 
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
@@ -327,6 +337,41 @@ export class ExportService {
       values.push({title: serie.title, filename: file, tables: this.objectToCsv(file, results)});
     });
     return values;
+  }
+
+  /**
+   * Extract, for each grid, all rows.
+   *
+   * @param filename name of the file
+   * @param items array of dashboard items
+  **/
+  private extractGrids(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+    const grids = items.filter(item => item.config.type === "grid").map(item => {
+      const title = this.translate.formatMessage(item.config.title);
+      return {title, rowData: item.rowData, columns: item.columnDefs}
+    });
+
+    return grids.length === 0
+      ? []
+      : grids.map(grid => {
+          const fields = grid.columns.map(x => x.field);
+
+          // initialize rows with header
+          let rows = [grid.columns.map(x => x.headerName).join(",")];
+
+          // append each row, if there is no rowData it will just concat an empty array
+          rows = rows.concat(
+            grid.rowData.map(row => {
+              return fields.map(x => !!x && !!row[x] ? row[x] : "").join(",");
+            })
+          );
+
+          return {
+            title: grid.title,
+            filename: `${filename}_${grid.title}_${this.date}.csv`,
+            tables: rows
+          } as ExtractModel;
+        });
   }
 
   /**
