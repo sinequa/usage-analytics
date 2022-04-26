@@ -11,6 +11,8 @@ import {
 } from "@sinequa/core/web-services";
 import { from, Observable, of, ReplaySubject } from "rxjs";
 import { catchError, mergeMap } from "rxjs/operators";
+import moment from "moment-timezone";
+import { SqTimeZone } from "./config";
 import { DashboardService } from "./dashboard/dashboard.service";
 
 export enum RelativeTimeRanges {
@@ -288,17 +290,22 @@ export class AuditService {
     }
 
     private parseAuditTimestamp(timestamp: string | string[]): AuditDatasetFilters {
-        const now = new Date();
         let previous: Date;
         let start: Date;
         let end: Date;
         if (!Utils.isString(timestamp)) {
+            // If the timestamp misses the time information ("2020-01-01"), set it to the beginning and the end of day (so it is included)
             start = new Date(timestamp[0]);
+            if(timestamp[0].length <= 10) {
+                start.setHours(0);
+                start.setMinutes(0);
+                start.setSeconds(0);
+            }
             end = new Date(timestamp[1]);
-            if(timestamp[1].length <= 10) { // If the timestamp misses the time information ("2020-01-01"), set it to the end of day (so it is included)
-              end.setHours(end.getHours() + 23);
-              end.setMinutes(end.getMinutes() + 59);
-              end.setSeconds(end.getSeconds() + 59);
+            if(timestamp[1].length <= 10) {
+                end.setHours(23);
+                end.setMinutes(59);
+                end.setSeconds(59);
             }
             // One day in milliseconds
             const oneDay = 1000 * 60 * 60 * 24;
@@ -325,9 +332,10 @@ export class AuditService {
                 }
             }
 
-            const temp = new Date(timestamp[0]); // Need to use different copy of start to not override it
+            const temp = Utils.copy(start); // Need to use different copy of start to not override it
             previous = new Date(temp.setDate(temp.getDate() - diffInDays));
         } else {
+            const now = new Date();
             end = new Date();
             switch (timestamp) {
                 case RelativeTimeRanges.Last3H:
@@ -395,12 +403,23 @@ export class AuditService {
         // Override the previous date if the previous range is set
         previous = this.previousRange?.[0] || previous;
         const previousEnd = this.previousRange?.[1] || start;
+
+        // Convert Dates to the given server timezone
+        const startToServerTimeZone = this.convertTimeZone(start);
+        const endToServerTimeZone = this.convertTimeZone(end);
+        const previousToServerTimeZone = this.convertTimeZone(previous);
+        const previousEndToServerTimeZone = this.convertTimeZone(previousEnd);
+
         return {
-            currentRange: this.exprBuilder.makeRangeExpr("timestamp", start, end),
-            previousRange: this.exprBuilder.makeRangeExpr("timestamp", previous, previousEnd),
-            previous: Utils.toSqlValue(previous),
-            start: Utils.toSqlValue(start),
-            end: Utils.toSqlValue(end)
+            currentRange: this.exprBuilder.makeRangeExpr("timestamp", startToServerTimeZone, endToServerTimeZone),
+            previousRange: this.exprBuilder.makeRangeExpr("timestamp", previousToServerTimeZone, previousEndToServerTimeZone),
+            previous: Utils.toSqlValue(previousToServerTimeZone),
+            start: Utils.toSqlValue(startToServerTimeZone),
+            end: Utils.toSqlValue(endToServerTimeZone)
         }
+    }
+
+    convertTimeZone(date: string | Date, tzName: string = SqTimeZone) {
+        return moment.tz(date, tzName).format('YYYY-MM-DD HH:mm:ss');
     }
 }
