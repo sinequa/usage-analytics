@@ -2,7 +2,7 @@ import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
 
 /** Server TimeZone */
-export const SqTimeZone = "CET";
+export const SqTimeZone = "UTC";
 
 /** Filters */
 export const FACETS: FacetConfig<FacetListParams>[] = [
