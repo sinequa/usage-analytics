@@ -81,7 +81,7 @@
         },
         "userCountTotal": {
             "text": "Users",
-            "info": "Number of unique user-id."
+            "info": "Total number of unique user-id having completed a session with search."
         },
         "sessionTotalTimeLine": {
             "text": "Sessions",
