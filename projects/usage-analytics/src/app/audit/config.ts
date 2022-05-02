@@ -2,7 +2,25 @@ import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
 
 /** Server TimeZone */
-export const SqTimeZone = "UTC";
+export const sq_timezone = "UTC";
+
+/** Minimum sessions count to be considered as "Active user" */
+export const session_count_threshold_per_month = 2;
+
+/** Potential current number of users interacting with the platform */
+export const potential_total_user_count = 200;
+
+/** Custom filters expression to be added in the WHERE clause of all datasets */
+export const custom_filters_expr = "";
+
+/** Default time period used on init */
+export const default_timestamp_filter = "";
+
+/** Default scope, on sba, used on init */
+export const default_app_filter = "";
+
+/** Default scope, on profile, used on init */
+export const default_profile_filter = "";
 
 /** Filters */
 export const FACETS: FacetConfig<FacetListParams>[] = [
@@ -411,19 +429,19 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     },
 
     topCollections: {
-      type: "chart",
-      query: "topCollections",
-      icon: "fas fa-chart-pie",
-      text: "msg#widgets.topCollections.text",
-      info: "msg#widgets.topCollections.info",
-      unique: true,
-      parameters: {
-          chartData: {
-              aggregation: "collections"
-          },
-          chartType: "Pie3D"
-      }
-  },
+        type: "chart",
+        query: "topCollections",
+        icon: "fas fa-chart-pie",
+        text: "msg#widgets.topCollections.text",
+        info: "msg#widgets.topCollections.info",
+        unique: true,
+        parameters: {
+            chartData: {
+                aggregation: "collections"
+            },
+            chartType: "Pie3D"
+        }
+    },
 
     topFacets: {
         type: "chart",

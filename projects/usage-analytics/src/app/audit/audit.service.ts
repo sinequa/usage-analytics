@@ -12,8 +12,16 @@ import {
 import { from, Observable, of, ReplaySubject } from "rxjs";
 import { catchError, mergeMap } from "rxjs/operators";
 import moment from "moment-timezone";
-import { SqTimeZone } from "./config";
 import { DashboardService } from "./dashboard/dashboard.service";
+import {
+    custom_filters_expr,
+    default_app_filter,
+    default_profile_filter,
+    default_timestamp_filter,
+    potential_total_user_count,
+    session_count_threshold_per_month,
+    sq_timezone
+} from "./config";
 
 export enum RelativeTimeRanges {
     Last3H = "msg#dateRange.last3H",
@@ -54,6 +62,7 @@ export class AuditService {
     public previousRange: Date[] | undefined;
 
     public mask: string = "YYYY-MM-DD";
+    public sessionCountParam: number;
 
     // used by stats component tooltip
     public currentFilter: string | undefined;
@@ -75,7 +84,7 @@ export class AuditService {
         this.intl.events.subscribe(() => this.convertRangeFilter())
     }
 
-    get webServiceName(): string | undefined{
+    get webServiceName(): string | undefined {
         if(this.appService.app && this.appService.app.webServices){
             for (const webService of Object.keys(this.appService.app.webServices)) {
                 if (this.appService.getWebService(webService)?.webServiceType === 'DataSet') {
@@ -84,6 +93,34 @@ export class AuditService {
             }
         }
         return undefined;
+    }
+
+    get defaultTimestampFilter(): string | Date[] {
+        return (this.appService.app?.data?.default_timestamp_filter || default_timestamp_filter) as string | Date[];
+    }
+
+    get defaultAppFilter(): string | string[] {
+        return (this.appService.app?.data?.default_app_filter || default_app_filter) as string | string[];
+    }
+
+    get defaultProfileFilter(): string | string[] {
+        return (this.appService.app?.data?.default_profile_filter || default_profile_filter) as string | string[];
+    }
+
+    get serverTimezone(): string {
+        return (this.appService.app?.data?.sq_timezone || sq_timezone) as string;
+    }
+
+    get totalUserCount(): number {
+        return (this.appService.app?.data?.potential_total_user_count || potential_total_user_count) as number;
+    }
+
+    get sessionCountThreshold(): number {
+        return (this.appService.app?.data?.session_count_threshold_per_month || session_count_threshold_per_month) as number;
+    }
+
+    get customFiltersExpr(): string {
+        return (this.appService.app?.data?.custom_filters_expr || custom_filters_expr) as string;
     }
 
     public updateAuditFilters() {
@@ -97,9 +134,22 @@ export class AuditService {
          * Programmatically handle the dummy search query with respect to audit requirements
          * This will bring the use of all searchService functionalities in a dataset web service context,
          * without the nightmare of rewriting a dedicated service for this purpose
+         *
+         * This will ensure a timestamp filter always in the query (default config value OR customized value in the application customization json)
          */
         if (!this.searchService.query.findSelect("audit_timestamp")) {
-            this.updateRangeFilter(RelativeTimeRanges.Last30Days);
+            this.updateRangeFilter(this.defaultTimestampFilter?.length > 0 ? this.defaultTimestampFilter : RelativeTimeRanges.Last30Days);
+        }
+
+        /**
+         * If the scope(s) of the analytics data needs to be pre-filtered by a default value(s),
+         * then update the query accordingly
+         */
+        if (!this.searchService.query.findSelect("SBA") && this.defaultAppFilter?.length > 0) {
+            this.updateRequestScope("app", this.defaultAppFilter, "SBA");
+        }
+        if (!this.searchService.query.findSelect("Profile") && this.defaultProfileFilter?.length > 0) {
+            this.updateRequestScope("profile", this.defaultProfileFilter, "Profile");
         }
 
         /**
@@ -127,19 +177,12 @@ export class AuditService {
         const profiles = this.getRequestScope("Profile");
 
         /** Update the audit dashboard data (previous and current period) */
-        let currentPeriodData = {};
-        let previousPeriodData = {};
+        let currentPeriodData = {"totalUsers": {"totalrecordcount": this.totalUserCount}} as any;
+        let previousPeriodData = {"totalUsers": {"totalrecordcount": this.totalUserCount}} as any;
+        this.data$.next(currentPeriodData);
+        this.previousPeriodData$.next(previousPeriodData);
 
-        this.principalService.list().subscribe(
-            (data: any) => {
-                currentPeriodData = {...currentPeriodData, "totalUsers": {"totalrecordcount": data?.pagination?.total}};
-                previousPeriodData = {...previousPeriodData, "totalUsers": {"totalrecordcount": data?.pagination?.total}};
-                this.data$.next(currentPeriodData);
-                this.previousPeriodData$.next(previousPeriodData);
-            }
-        )
-
-        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, this.mask, apps, profiles)
+        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, apps, profiles, this.customFiltersExpr)
             .subscribe(
                 (data) => {
                     currentPeriodData = {...currentPeriodData, ...data};
@@ -149,14 +192,15 @@ export class AuditService {
                 () => this.currentAuditDataLoading = false
             )
 
-        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, this.mask, apps, profiles).subscribe(
-            (data) => {
-                previousPeriodData = {...previousPeriodData, ...data};
-                this.previousPeriodData$.next(previousPeriodData);
-            },
-            () => {},
-            () => this.previousAuditDataLoading = false
-        )
+        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, apps, profiles, this.customFiltersExpr)
+            .subscribe(
+                (data) => {
+                    previousPeriodData = {...previousPeriodData, ...data};
+                    this.previousPeriodData$.next(previousPeriodData);
+                },
+                () => {},
+                () => this.previousAuditDataLoading = false
+            )
     }
 
     public getAuditTimestampFromUrl(): string | string[] | undefined {
@@ -206,35 +250,44 @@ export class AuditService {
         return datasets;
     }
 
-    private getParallelStreamAuditData(filters: string, start: string, end: string, mask: string, apps: string[], profiles: string[]): Observable<Dataset> {
-        const params = {
-            select: filters,
-            start,
-            end,
-            mask,
-            apps,
-            profiles
-        };
-        if (this.webServiceName) {
-            this.currentAuditDataLoading = true;
-            this.previousAuditDataLoading = true;
-            const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => datasetName !== "totalUsers"); // Exclude manual added datasets
-            return from(Array.from(new Set(datasets)))
-                    .pipe(
-                        mergeMap(
-                            (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params).pipe(
-                                catchError(err => { // Catch 500 errors thrown when a query does not exist...
-                                  const error = {};
-                                  error[datasetName] = {errorCode: 500, errorMessage: "Could not find query "+datasetName};
-                                  return of(error);
-                                })
+    private getParallelStreamAuditData(
+        filters: string,
+        start: string,
+        end: string,
+        apps: string[],
+        profiles: string[],
+        customFilters: string): Observable<Dataset> {
+
+            const params = {
+                select: filters + customFilters,
+                start,
+                end,
+                mask: this.mask,
+                apps,
+                profiles,
+                sessionCount: this.sessionCountParam
+            };
+
+            if (this.webServiceName) {
+                this.currentAuditDataLoading = true;
+                this.previousAuditDataLoading = true;
+                const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => datasetName !== "totalUsers"); // Exclude manual added datasets
+                return from(Array.from(new Set(datasets)))
+                        .pipe(
+                            mergeMap(
+                                (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params).pipe(
+                                    catchError(err => { // Catch 500 errors thrown when a query does not exist...
+                                    const error = {};
+                                    error[datasetName] = {errorCode: 500, errorMessage: "Could not find query "+datasetName};
+                                    return of(error);
+                                    })
+                                )
                             )
-                        )
-                    );
-        } else {
-            console.error("No DataSet found")
-            return of({} as Dataset)
-        }
+                        );
+            } else {
+                console.error("No DataSet found")
+                return of({} as Dataset)
+            }
     }
 
     public updateRangeFilter(timestamp: Date[] | string) {
@@ -249,6 +302,18 @@ export class AuditService {
         }
         this.searchService.query.removeSelect("audit_timestamp");
         this.searchService.query.addSelect(expr, "audit_timestamp");
+        this.searchService.search();
+    }
+
+    public updateRequestScope(field: string, value: string[] | string, facetName: string) {
+        let expr: string;
+        if (Utils.isString(value)) {
+            expr = this.exprBuilder.makeExpr(field, value);
+        } else {
+            expr = this.exprBuilder.makeListExpr(field, value);
+        }
+        this.searchService.query.removeSelect(facetName);
+        this.searchService.query.addSelect(expr, facetName);
         this.searchService.search();
     }
 
@@ -279,7 +344,6 @@ export class AuditService {
                                     ? `${this.intl.formatMessage('msg#dateRange.from')}  ${this.intl.formatDate(this.previousRange[0], {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(this.previousRange[1], {day: "numeric", month: "short", year: "numeric"})}`
                                     : `${this.intl.formatMessage('msg#dateRange.from')} ${this.intl.formatDate(parsedTimestamp.previous, {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.start, {day: "numeric", month: "short", year: "numeric"})}`;
     }
-
 
     private getTimestampValueFromExpr(expr: Expr): string | string[] {
         if (Utils.isString(expr.value) && expr.value.indexOf("[") > -1) {
@@ -317,9 +381,9 @@ export class AuditService {
             const diffInTime = end.getTime() - start.getTime();
             // Calculating the number of days between the two dates
             const diffInDays = Math.round(diffInTime / oneDay);
-            // Calculating the number of days between the two dates
+            // Calculating the number of months between the two dates
             const diffInMonths = Math.round(diffInTime / oneMonth);
-            // Calculating the number of days between the two dates
+            // Calculating the number of years between the two dates
             const diffInYears = Math.round(diffInTime / oneYear);
 
             if (diffInMonths <= 3) {
@@ -332,6 +396,8 @@ export class AuditService {
                 }
             }
 
+            this.sessionCountParam = (Math.round(this.sessionCountThreshold * diffInMonths) > 1) ? Math.round(this.sessionCountThreshold * diffInMonths) : 1;
+
             const temp = Utils.copy(start); // Need to use different copy of start to not override it
             previous = new Date(temp.setDate(temp.getDate() - diffInDays));
         } else {
@@ -342,61 +408,73 @@ export class AuditService {
                     start = new Date(now.setHours(now.getHours() - 3));
                     previous = new Date(now.setHours(now.getHours() - 3));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = 1;
                     break;
                 case RelativeTimeRanges.Last6H:
                     start = new Date(now.setHours(now.getHours() - 6));
                     previous = new Date(now.setHours(now.getHours() - 6));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = 1;
                     break;
                 case RelativeTimeRanges.Last12H:
                     start = new Date(now.setHours(now.getHours() - 12));
                     previous = new Date(now.setHours(now.getHours() - 12));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = 1;
                     break;
                 case RelativeTimeRanges.Last24H:
                     start = new Date(now.setHours(now.getHours() - 24));
                     previous = new Date(now.setHours(now.getHours() - 24));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = (Math.round(this.sessionCountThreshold / 30) > 1) ? Math.round(this.sessionCountThreshold / 30) : 1;
                     break;
                 case RelativeTimeRanges.Last7Days:
                     start = new Date(now.setDate(now.getDate() - 7));
                     previous = new Date(now.setDate(now.getDate() - 7));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = (Math.round(this.sessionCountThreshold / 4) > 1) ? Math.round(this.sessionCountThreshold / 4) : 1;
                     break;
                 case RelativeTimeRanges.Last30Days:
                     start = new Date(now.setDate(now.getDate() - 30));
                     previous = new Date(now.setDate(now.getDate() - 30));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = this.sessionCountThreshold;
                     break;
                 case RelativeTimeRanges.Last90Days:
                     start = new Date(now.setDate(now.getDate() - 90));
                     previous = new Date(now.setDate(now.getDate() - 90));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = this.sessionCountThreshold * 3;
                     break;
                 case RelativeTimeRanges.Last6M:
                     start = new Date(now.setMonth(now.getMonth() - 6));
                     previous = new Date(now.setMonth(now.getMonth() - 6));
                     this.mask = "YYYY-MM";
+                    this.sessionCountParam = this.sessionCountThreshold * 6;
                     break;
                 case RelativeTimeRanges.Last1Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 1));
                     previous = new Date(now.setFullYear(now.getFullYear() - 1));
                     this.mask = "YYYY-MM";
+                    this.sessionCountParam = this.sessionCountThreshold * 12;
                     break;
                 case RelativeTimeRanges.Last2Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 2));
                     previous = new Date(now.setFullYear(now.getFullYear() - 2));
                     this.mask = "YYYY-MM";
+                    this.sessionCountParam = this.sessionCountThreshold * 24;
                     break;
                 case RelativeTimeRanges.Last5Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 5));
                     previous = new Date(now.setFullYear(now.getFullYear() - 5));
                     this.mask = "YYYY";
+                    this.sessionCountParam = this.sessionCountThreshold * 60;
                     break;
                 default:
                     start = new Date(now.setDate(now.getDate() - 30));
                     previous = new Date(now.setDate(now.getDate() - 30));
                     this.mask = "YYYY-MM-DD";
+                    this.sessionCountParam = this.sessionCountThreshold;
                     break;
             }
         }
@@ -419,7 +497,7 @@ export class AuditService {
         }
     }
 
-    convertTimeZone(date: string | Date, tzName: string = SqTimeZone) {
+    convertTimeZone(date: string | Date, tzName = this.serverTimezone) {
         return moment.tz(date, tzName).format('YYYY-MM-DD HH:mm:ss');
     }
 }
