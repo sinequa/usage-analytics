@@ -259,13 +259,13 @@ export class AuditService {
         customFilters: string): Observable<Dataset> {
 
             const params = {
-                select: filters + customFilters,
+                select: filters + !!customFilters ? ("AND " + customFilters) : customFilters,
                 start,
                 end,
                 mask: this.mask,
                 apps,
                 profiles,
-                sessionCount: this.sessionCountParam
+                sessionCountThreshold: this.sessionCountParam
             };
 
             if (this.webServiceName) {
