@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { SearchService } from "@sinequa/components/search";
 import { AppService, Expr, ExprBuilder } from "@sinequa/core/app-utils";
-import { Utils } from "@sinequa/core/base";
+import { MapOf, Utils } from "@sinequa/core/base";
 import {IntlService} from "@sinequa/core/intl";
 import {
     Dataset,
@@ -14,13 +14,14 @@ import { catchError, mergeMap } from "rxjs/operators";
 import moment from "moment-timezone";
 import { DashboardService } from "./dashboard/dashboard.service";
 import {
-    custom_filters_expr,
+    static_filters_expr,
     default_app_filter,
     default_profile_filter,
     default_timestamp_filter,
     potential_total_user_count,
     session_count_threshold_per_month,
-    sq_timezone
+    sq_timezone,
+    custom_filters
 } from "./config";
 
 export enum RelativeTimeRanges {
@@ -119,8 +120,12 @@ export class AuditService {
         return (this.appService.app?.data?.session_count_threshold_per_month || session_count_threshold_per_month) as number;
     }
 
-    get customFiltersExpr(): string {
-        return (this.appService.app?.data?.custom_filters_expr || custom_filters_expr) as string;
+    get staticFiltersExpr(): string {
+        return (this.appService.app?.data?.static_filters_expr || static_filters_expr) as string;
+    }
+
+    get customFilters(): MapOf<string> {
+        return (this.appService.app?.data?.custom_filters || custom_filters) as MapOf<string>;
     }
 
     public updateAuditFilters() {
@@ -177,12 +182,19 @@ export class AuditService {
         const profiles = this.getRequestScope("Profile");
 
         /** Update the audit dashboard data (previous and current period) */
-        let currentPeriodData = {"totalUsers": {"totalrecordcount": this.totalUserCount}} as any;
-        let previousPeriodData = {"totalUsers": {"totalrecordcount": this.totalUserCount}} as any;
+        let currentPeriodData = {};
+        let previousPeriodData = {};
+
+        if (this.totalUserCount === 0) {
+            currentPeriodData["totalUsers"] = {errorCode: 500, errorMessage: "The parameter potential_total_user_count must be initialized"}
+        } else {
+            currentPeriodData["totalUsers"] = {"totalrecordcount": this.totalUserCount};
+            previousPeriodData["totalUsers"] = {"totalrecordcount": this.totalUserCount};
+        }
         this.data$.next(currentPeriodData);
         this.previousPeriodData$.next(previousPeriodData);
 
-        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, apps, profiles, this.customFiltersExpr)
+        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, apps, profiles)
             .subscribe(
                 (data) => {
                     currentPeriodData = {...currentPeriodData, ...data};
@@ -192,7 +204,7 @@ export class AuditService {
                 () => this.currentAuditDataLoading = false
             )
 
-        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, apps, profiles, this.customFiltersExpr)
+        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, apps, profiles)
             .subscribe(
                 (data) => {
                     previousPeriodData = {...previousPeriodData, ...data};
@@ -255,11 +267,10 @@ export class AuditService {
         start: string,
         end: string,
         apps: string[],
-        profiles: string[],
-        customFilters: string): Observable<Dataset> {
+        profiles: string[]): Observable<Dataset> {
 
-            const params = {
-                select: filters + !!customFilters ? (" AND " + customFilters) : "",
+            let params = {
+                select: filters + (!!this.staticFiltersExpr ? (" AND " + this.staticFiltersExpr) : ""),
                 start,
                 end,
                 mask: this.mask,
@@ -267,6 +278,10 @@ export class AuditService {
                 profiles,
                 sessionCountThreshold: this.sessionCountParam
             };
+            // IF a list of custom filters is provided, then include it to the params object
+            if (Object.keys(this.customFilters).length > 0) {
+                params = {...params, ...this.customFilters}
+            }
 
             if (this.webServiceName) {
                 this.currentAuditDataLoading = true;
@@ -277,9 +292,9 @@ export class AuditService {
                             mergeMap(
                                 (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params).pipe(
                                     catchError(err => { // Catch 500 errors thrown when a query does not exist...
-                                    const error = {};
-                                    error[datasetName] = {errorCode: 500, errorMessage: "Could not find query "+datasetName};
-                                    return of(error);
+                                        const error = {};
+                                        error[datasetName] = {errorCode: 500, errorMessage: "Could not find query "+datasetName};
+                                        return of(error);
                                     })
                                 )
                             )
