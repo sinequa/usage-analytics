@@ -259,7 +259,7 @@ export class AuditService {
         customFilters: string): Observable<Dataset> {
 
             const params = {
-                select: filters + !!customFilters ? ("AND " + customFilters) : "",
+                select: filters + !!customFilters ? (" AND " + customFilters) : "",
                 start,
                 end,
                 mask: this.mask,
