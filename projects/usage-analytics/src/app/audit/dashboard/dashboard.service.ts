@@ -268,13 +268,11 @@ export class DashboardService {
 
     /**
      * Returns the list of widgets from the configuration defined
-     * on the server (appService.app.data.widgets and appService.app.data.customWidgets)
+     * on the server (appService.app.data.widgets)
      * or in the config.ts file (WIDGETS)
      */
     public getWidgets(): {[key: string]: DashboardItemOption} {
-        const widgets = this.appService.app?.data?.widgets || WIDGETS;
-        const customWidgets = this.appService.app?.data?.customWidgets || {};
-        return Utils.extend(widgets, customWidgets);
+        return (this.appService.app?.data?.widgets || WIDGETS) as {[key: string]: DashboardItemOption};
     }
 
     /**
