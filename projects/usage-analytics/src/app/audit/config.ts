@@ -1,26 +1,30 @@
 import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
+import { MapOf } from "@sinequa/core/base";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
 
 /** Server TimeZone */
-export const sq_timezone = "UTC";
+export const sq_timezone: string = "UTC";
 
 /** Minimum sessions count to be considered as "Active user" */
-export const session_count_threshold_per_month = 2;
+export const session_count_threshold_per_month: number = 2;
 
 /** Potential current number of users interacting with the platform */
-export const potential_total_user_count = 200;
+export const potential_total_user_count: number = 0;
 
-/** Custom filters expression to be added in the WHERE clause of all datasets */
-export const custom_filters_expr = "";
+/** Filters expression to be added in the WHERE clause of ALL DATASETS */
+export const static_filters_expr: string = "";
+
+/** Set of filters expressions that could be added in the WHERE clause of A SPECIFIC DATASET */
+export const custom_filters: MapOf<string> = {};
 
 /** Default time period used on init */
-export const default_timestamp_filter = "";
+export const default_timestamp_filter: string = "";
 
 /** Default scope, on sba, used on init */
-export const default_app_filter = "";
+export const default_app_filter: string = "";
 
 /** Default scope, on profile, used on init */
-export const default_profile_filter = "";
+export const default_profile_filter: string = "";
 
 /** Filters */
 export const FACETS: FacetConfig<FacetListParams>[] = [
