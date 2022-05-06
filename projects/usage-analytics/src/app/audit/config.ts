@@ -604,22 +604,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
-    activeNewUsers: {
-        type: "chart",
-        query: "newUsers",
-        icon: "fas fa-chart-pie",
-        text: "msg#widgets.active_newUsers.text",
-        info: "msg#widgets.active_newUsers.info",
-        unique: true,
-        parameters: {
-            chartData: {
-                aggregation: "active-new-user"
-            },
-            chartType: "Pie3D",
-            relatedQuery: "activeUsers",
-        }
-    },
-
     firstClick: {
         type: "stat",
         query: "clickRank1Total",
@@ -986,8 +970,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "topQueries",
             "topFacets",
             "topNoResultsQueries",
-            "resultTypes",
-            "activeNewUsers"
+            "resultTypes"
         ]
     },
     {
