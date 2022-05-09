@@ -38,7 +38,6 @@
             </ag-grid-angular>
         </section>
 
-
         <!-- Statistic view -->
         <sq-audit-stat *ngSwitchCase="'stat'"
             [config]="config"
@@ -86,18 +85,6 @@
         >
         </ag-grid-angular>
 
-        <!-- Heatmap view -->
-        <sq-facet-heatmap *ngSwitchCase="'heatmap'"
-            #facet
-            [results]="results"
-            [fieldX]="'geo'"
-            [fieldY]="'company'"
-            [fieldsX]="['geo', 'company', 'person']"
-            [fieldsY]="['geo', 'company', 'person']"
-            [width]="innerwidth"
-            [height]="innerheight"
-            [allowResizeOption]="false">
-        </sq-facet-heatmap>
     </section>
 
     <div class="sq-loading" *ngIf="loading">
