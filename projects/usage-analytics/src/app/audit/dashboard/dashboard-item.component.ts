@@ -184,59 +184,41 @@ export class DashboardItemComponent implements OnChanges {
                     data = data as Results;
 
                     switch (this.config.type) {
-                      case "timeline":
-                          this.timeSeries = [];
-                          if (this.config.aggregationsTimeSeries) {
-                              this.timeSeries.push(
-                                  ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
-                              );
-                              this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
-                              this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
-                          }
-                          if (this.config.recordsTimeSeries) {
-                              this.timeSeries.push(
-                                  ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
-                              );
-                              this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
-                              this.rowData = data.records
-                          }
-                          break;
-                      case "chart":
-                          if (this.config.chartData) {
-                              if (this.config.title === 'msg#widgets.regular_newUsers.text') {
-                                  this.chartResults = {
-                                      records: [] as Record[],
-                                      aggregations: [
-                                          {
-                                              name: "regular-new-user",
-                                              column: "",
-                                              items: (this.dataset["newUsers"] && this.dataset["regularUsers"])
-                                                      ? [
-                                                          {value: "New users", count: this.dataset["newUsers"]["totalrecordcount"]},
-                                                          {value: "Regular users", count: this.dataset["regularUsers"]["totalrecordcount"]}
-                                                      ]
-                                                      : []
-                                          }
-                                      ] as Aggregation[]
-                                  } as  Results;
-                              } else {
-                                  this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
-                              }
-                              this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
-                              this.rowData = data?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
-                          }
-                          break;
-                      case "grid":
-                          this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
-                          if (this.config.aggregationName) {
-                              this.rowData = this.gridProvider.getAggregationRowData(data, this.config.aggregationName)
-                          } else {
-                              this.rowData = data.records
-                          }
-                          break;
-                      default:
-                          break;
-                  }
+                        case "timeline":
+                            this.timeSeries = [];
+                            if (this.config.aggregationsTimeSeries) {
+                                this.timeSeries.push(
+                                    ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
+                                );
+                                this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
+                                this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
+                            }
+                            if (this.config.recordsTimeSeries) {
+                                this.timeSeries.push(
+                                    ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
+                                );
+                                this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
+                                this.rowData = data.records
+                            }
+                            break;
+                        case "chart":
+                            if (this.config.chartData) {
+                                this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
+                                this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
+                                this.rowData = data?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
+                            }
+                            break;
+                        case "grid":
+                            this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
+                            if (this.config.aggregationName) {
+                                this.rowData = this.gridProvider.getAggregationRowData(data, this.config.aggregationName)
+                            } else {
+                                this.rowData = data.records
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             } else {
                 this.loading = true
