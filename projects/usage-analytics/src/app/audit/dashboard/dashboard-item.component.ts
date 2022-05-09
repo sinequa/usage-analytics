@@ -176,9 +176,12 @@ export class DashboardItemComponent implements OnChanges {
             if (this.dataset?.[this.config.query]) {
                 this.loading = false;
                 let data = this.dataset?.[this.config.query];
-
-                if((data as DatasetError).errorMessage) {
-                    this.errorMessage = (data as DatasetError).errorMessage;
+                let relatedData;
+                if (this.config?.relatedQuery) {
+                    relatedData = this.dataset?.[this.config?.relatedQuery];
+                }
+                if((data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage) {
+                    this.errorMessage = (data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage;
                 } else {
                     this.errorMessage = undefined;
                     data = data as Results;
