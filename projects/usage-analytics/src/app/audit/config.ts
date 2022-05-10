@@ -28,36 +28,36 @@ export const default_profile_filter: string = "";
 
 /** Filters */
 export const FACETS: FacetConfig<FacetListParams>[] = [
-  {
-      title: "SBA",
-      type: "list",
-      icon: "fas fa-globe-americas",
-      parameters: {
-          name: "SBA",
-          aggregation: "sba",
-          showCount: true,
-          searchable: true,
-          allowExclude: true,
-          allowOr: true,
-          allowAnd: false,
-          displayEmptyDistributionIntervals: false
-      }
-  },
-  {
-      title: "Profile",
-      type: "list",
-      icon: "fas fa-building",
-      parameters: {
-          name: "Profile",
-          aggregation: "profile",
-          showCount: true,
-          searchable: true,
-          allowExclude: true,
-          allowOr: true,
-          allowAnd: false,
-          displayEmptyDistributionIntervals: false
-      }
-  }
+    {
+        name: "SBA",
+        title: "SBA",
+        type: "list",
+        icon: "fas fa-globe-americas",
+        parameters: {
+            aggregation: "sba",
+            showCount: true,
+            searchable: true,
+            allowExclude: true,
+            allowOr: true,
+            allowAnd: false,
+            displayEmptyDistributionIntervals: false
+        }
+    },
+    {
+        name: "Profile",
+        title: "Profile",
+        type: "list",
+        icon: "fas fa-building",
+        parameters: {
+            aggregation: "profile",
+            showCount: true,
+            searchable: true,
+            allowExclude: true,
+            allowOr: true,
+            allowAnd: false,
+            displayEmptyDistributionIntervals: false
+        }
+    }
 ];
 
 /** Widgets */

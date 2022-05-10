@@ -250,6 +250,7 @@ export class DashboardItemComponent implements OnChanges {
             this.infoAction = new Action({
                 icon: "fas fa-info",
                 title: this.config.info,
+                fallbackPlacements: ["top", "bottom"],
                 disabled: true,
                 action: () => {}
             });
