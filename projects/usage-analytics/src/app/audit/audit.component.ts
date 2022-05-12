@@ -13,6 +13,7 @@ import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
+import { ImportService } from "./import.service";
 
 @Component({
     selector: "sq-audit",
@@ -41,7 +42,8 @@ export class AuditComponent implements OnDestroy {
         private searchService: SearchService,
         public loginService: LoginService,
         private appService: AppService,
-        private exportService: ExportService
+        private exportService: ExportService,
+        private importService: ImportService
     ) {
         // When the screen is resized, we resize the dashboard row height, so that items keep fitting the screen height
         this.ui.addResizeListener((event) => {
@@ -75,31 +77,71 @@ export class AuditComponent implements OnDestroy {
         });
 
         this.exportAction = new Action({
-            icon: "fas fa-file-export",
-            name: "exportAsXLSX",
-            action: () => this.exportXLSX(),
+            icon: "fas fa-file-alt",
+            name: "export/import",
+            children: [
+                this.getDataAction(),
+                new Action({separator: true}),
+                this.getLayoutAction(),
+                new Action({separator: true}),
+                ...this.getDashboardsDefAction()
+            ]
+        })
+
+    }
+
+    getDataAction(): Action {
+        return new Action({
+            name: "Export dashboard data",
+            title: "Export dashboard data",
+            text: "Export dashboard data",
             children: [
                 new Action({
-                    title: "msg#export.button.exportXLS",
-                    text: "msg#export.button.exportXLS",
+                    title: "As Excel",
+                    text: "As Excel",
                     name: "exportAsXLS",
                     action: () => this.exportXLSX()
                 }),
                 new Action({
-                    title: "msg#export.button.exportPNG",
-                    text: "msg#export.button.exportPNG",
+                    title: "As PNG image",
+                    text: "As PNG image",
                     name: "exportAsPNG",
                     action: () => this.exportPNG()
                 }),
                 new Action({
-                    title: "msg#export.button.tooltipCSV",
-                    text: "msg#export.button.exportCSV",
+                    title: "As CSV",
+                    text: "As CSV",
                     name: "exportAsCSV",
                     action: () => this.exportCSV()
                 })
             ]
         })
+    }
 
+    getLayoutAction(): Action {
+        return new Action({
+            name: "Export dashboards layout as JSON",
+            title: "Export dashboards layout as JSON",
+            text: "Export dashboards layout as JSON",
+            action: () => this.exportLayoutJson()
+        })
+    }
+
+    getDashboardsDefAction(): Action[] {
+        return [
+            new Action({
+                title: "Export dashboards definition as JSON",
+                text: "Export dashboards definition as JSON",
+                name: "Export dashboards definition as JSON",
+                action: () => this.exportDefJson()
+            }),
+            new Action({
+                title: "Import dashboards definition from JSON",
+                text: "Import dashboards definition from JSON",
+                name: "Import dashboards definition from JSON",
+                action: () => this.importDefJson()
+            })
+        ]
     }
 
     exportPNG() {
@@ -117,6 +159,18 @@ export class AuditComponent implements OnDestroy {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportXLSX(name, items);
+    }
+
+    exportLayoutJson() {
+        this.exportService.exportLayoutToJson("dashboards-layout", this.dashboardService.dashboards);
+    }
+
+    exportDefJson() {
+        this.exportService.exportDefToJson("dashboards-definition", this.dashboardService.dashboards);
+    }
+
+    importDefJson() {
+        this.importService.dashboardsDefFromJson();
     }
 
     /**
