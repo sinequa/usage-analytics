@@ -1,9 +1,8 @@
 import { Injectable } from "@angular/core";
-import { SearchService } from "@sinequa/components/search";
 import { ConfirmType, ModalButton, ModalResult, ModalService } from "@sinequa/core/modal";
 import { NotificationsService } from "@sinequa/core/notification";
-import { UserSettingsWebService } from "@sinequa/core/web-services";
 import { Subject } from "rxjs";
+import { DashboardService } from "./dashboard/dashboard.service";
 
 
 @Injectable({
@@ -15,51 +14,38 @@ export class ImportService {
 
     constructor(
         private modalService: ModalService,
-        private userSettingsService: UserSettingsWebService,
-        private searchService: SearchService,
+        private dashboardService: DashboardService,
         private notificationService: NotificationsService
     ) {}
 
     dashboardsDefFromJson() {
-        this.modalService.confirm({
-            title: "Import definition",
-            message: "You are about to reset ALL your dashboards definition. Do you want to continue?",
-            buttons: [
-                new ModalButton({result: ModalResult.OK, text: "Confirm"}),
-                new ModalButton({result: ModalResult.Cancel, primary: true})
-            ],
-            confirmType: ConfirmType.Warning
-        }).then(res => {
-            if(res === ModalResult.OK) {
-                this.importedData$.subscribe(
-                    (data) => {
-                        if (this.isValidJSON(data as string)) {
-                            const dashboards = JSON.parse(data as string);
-                            this.userSettingsService
-                            .patch({dashboards: dashboards})
-                            .subscribe(
-                                () => {
-                                    delete this.searchService.queryStringParams.dashboard;
-                                    this.searchService.navigate({skipSearch: true}).then(
-                                        () => window.location.reload()
-                                    )
-                                },
-                                (error) => {
-                                    this.notificationService.error("Could not update dashboards definition !");
-                                    console.error("Could not update dashboards definition !", error);
-                                },
-                                () => {
-                                }
-                            );
-                        } else {
-                            this.notificationService.error("Not a valid JSON file !");
-                        }
-                    },
-                    () => this.notificationService.error("Could not read dashboards definition !")
-                );
-                this.import("application/JSON");
-            }
-        });
+        this.modalService
+            .confirm({
+                title: "Import dashboards definition",
+                message: "You are about to loose ALL your current dashboards definition. Do you want to continue?",
+                buttons: [
+                    new ModalButton({result: ModalResult.OK, text: "Confirm"}),
+                    new ModalButton({result: ModalResult.Cancel, primary: true})
+                ],
+                confirmType: ConfirmType.Warning
+            }).then(res => {
+                if(res === ModalResult.OK) {
+
+                    this.importedData$.subscribe(
+                        (data) => {
+                            if (this.isValidJSON(data as string)) {
+                                const dashboards = JSON.parse(data as string);
+                                this.dashboardService.overrideDashboards(dashboards, "import");
+                            } else {
+                                this.notificationService.error("Not a valid JSON file !");
+                            }
+                        },
+                        () => this.notificationService.error("Could not import dashboards definition !")
+                    );
+
+                    this.import("application/JSON");
+                }
+            });
     }
 
     import(fileType: string) {

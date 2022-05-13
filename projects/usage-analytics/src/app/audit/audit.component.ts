@@ -14,6 +14,7 @@ import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
 import { ImportService } from "./import.service";
+import { ConfirmType, ModalButton, ModalResult, ModalService } from "@sinequa/core/modal";
 
 @Component({
     selector: "sq-audit",
@@ -43,7 +44,8 @@ export class AuditComponent implements OnDestroy {
         public loginService: LoginService,
         private appService: AppService,
         private exportService: ExportService,
-        private importService: ImportService
+        private importService: ImportService,
+        private modalService: ModalService
     ) {
         // When the screen is resized, we resize the dashboard row height, so that items keep fitting the screen height
         this.ui.addResizeListener((event) => {
@@ -173,6 +175,27 @@ export class AuditComponent implements OnDestroy {
         this.importService.dashboardsDefFromJson();
     }
 
+    resetDashboards() {
+        const dashboards = this.dashboardService.getStandardDashboards().map(
+            sd => this.dashboardService.createDashboard(sd.name, sd.items)
+        );
+
+        this.modalService
+            .confirm({
+                title: "Reset dashboards definition",
+                message: "You are about to loose ALL your current dashboards definition. Do you want to continue?",
+                buttons: [
+                    new ModalButton({result: ModalResult.OK, text: "Confirm"}),
+                    new ModalButton({result: ModalResult.Cancel, primary: true})
+                ],
+                confirmType: ConfirmType.Warning
+            }).then(res => {
+                if(res === ModalResult.OK) {
+                    this.dashboardService.overrideDashboards(dashboards, "reset");
+                }
+            });
+    }
+
     /**
      * Returns the configuration of the facets displayed.
      * The configuration from the config.ts file can be overriden by configuration from
@@ -227,4 +250,4 @@ export class AuditComponent implements OnDestroy {
     setFocus(index: number, event: MouseEvent) {
         this.focusElementIndex = index;
     }
-  }
+}

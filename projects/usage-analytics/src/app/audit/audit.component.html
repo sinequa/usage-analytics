@@ -56,6 +56,9 @@
     <div class="ml-auto">
         <sq-action-buttons [sq-action-buttons]="{items: [exportAction], style:'outline-primary', rightAligned: true}"></sq-action-buttons>
         <sq-widget-palette class="ml-2" *ngIf="loginService.complete"></sq-widget-palette>
+        <button type="button" class="btn btn-outline-primary reset-btn ml-2" (click)="resetDashboards()" [sqTooltip]="'Reset dashboards to default'">
+            <i class="fas fa-undo-alt"></i>
+        </button>
     </div>
 
 </ul>
