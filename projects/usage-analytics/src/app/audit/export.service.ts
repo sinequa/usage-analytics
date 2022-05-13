@@ -5,6 +5,7 @@ import domtoimage from "dom-to-image";
 import { saveAs } from "file-saver";
 
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
+import { Dashboard, DashboardItem, DashboardService } from './dashboard/dashboard.service';
 import {StatProvider} from './dashboard/providers/stat.provider';
 
 import {xlsx} from "./xlsx";
@@ -47,7 +48,8 @@ export class ExportService {
   constructor(
     private statProvider: StatProvider,
     private translate: IntlService,
-    private notificationService: NotificationsService
+    private notificationService: NotificationsService,
+    private dashboardService: DashboardService
     ) { }
 
   /**
@@ -100,7 +102,7 @@ export class ExportService {
       // export each chart in a specific file
       const charts = this.extractCharts(filename, items);
       charts.forEach(chart => this.saveToCsv(chart.filename, chart.tables.join('\n')));
-      
+
       // export each grid in a separate file
       const grids = this.extractGrids(filename, items);
       grids.forEach(grid => this.saveToCsv(grid.filename, grid.tables.join('\n')));
@@ -208,8 +210,55 @@ export class ExportService {
     return csvData.split('\n');
   }
 
+  /**
+   * Export layouts of given dashboards to JSON file
+   * @param filename json filename
+   * @param dashboards list of dashboards
+   */
+  exportLayoutToJson(filename: string, dashboards: Dashboard[]) {
+    const config = dashboards.map(d => (
+            {
+                name: d.name,
+                items: d.items.map(i => (
+                        {
+                            item: this.getWidgetKey(i),
+                            position: {
+                                x: i.x,
+                                y: i.y,
+                                rows: i.rows,
+                                cols: i.cols,
+                            }
+                        }
+                    )
+                )
+            }
+        )
+    );
+
+    const file = `${filename}_${this.date}.json`;
+    this.saveToJson(file, JSON.stringify(config, undefined, 2))
+  }
+
+  /**
+   * Export the complete definition of given dashboards to JSON file
+   * @param filename json filename
+   * @param dashboards list of dashboards
+   */
+   exportDefToJson(filename: string, dashboards: Dashboard[]) {
+    const file = `${filename}_${this.date}.json`;
+    this.saveToJson(file, JSON.stringify(dashboards, undefined, 2))
+  }
+
   private saveToCsv(filename: string, csvData: string) {
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    this.saveAs(filename, 'text/csv;charset=utf-8;', csvData);
+  }
+
+  private saveToJson(filename: string, jsonData: string) {
+    this.saveAs(filename, 'text/json', jsonData);
+  }
+
+  private saveAs(filename: string, fileType: string, data: string) {
+    const blob = new Blob([data], { type: fileType });
     if (navigator.msSaveBlob) { // IE 10+
       navigator.msSaveBlob(blob, filename);
     } else {
@@ -435,6 +484,12 @@ export class ExportService {
     document.body.removeChild(link);
 
     this.notifySuccess(filename);
+  }
+
+  private getWidgetKey(item: DashboardItem): string{
+    const widgets = this.dashboardService.getWidgets();
+    const element = Object.entries(widgets).find(element => item.query === element[1].query && item.title === element[1].text);
+    return element ? element[0] : "";
   }
 
   /**

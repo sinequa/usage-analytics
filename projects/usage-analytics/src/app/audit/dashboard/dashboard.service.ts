@@ -326,7 +326,7 @@ export class DashboardService {
         return this.dashboards.concat(this.draftDashboards);
     }
 
-    protected createDashboard(name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[] = []): Dashboard {
+    public createDashboard(name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[] = []): Dashboard {
         const dashboard = {
             name: name,
             items: []
@@ -576,6 +576,26 @@ export class DashboardService {
             this.changedDashboards.splice(index, 1);
             this.patchDashboards();
         }
+    }
+
+    public overrideDashboards(dashboards: Dashboard[], event: 'import' | 'reset') {
+        this.userSettingsService
+            .patch({dashboards: dashboards})
+            .subscribe(
+                () => {
+                    /**
+                     * Force app reload with none queryParams
+                     * It ensures then the reload of dashboards from updated user-settings
+                     */
+                    const url = (window.location.href.split('?'))[0];
+                    window.location.assign(url);
+                    window.location.reload();
+                },
+                (error) => {
+                    this.notificationService.error("Could not " + event + " dashboards definition !");
+                    console.error("Could not  " + event + "  dashboards definition !", error);
+                }
+            );
     }
 
     /**
