@@ -35,6 +35,7 @@ export class AuditComponent implements OnDestroy {
 
     private _querySubscription: Subscription;
     private _loginSubscription: Subscription;
+    private _dashboardChangesSubscription: Subscription;
 
     constructor(
         public auditService: AuditService,
@@ -78,6 +79,13 @@ export class AuditComponent implements OnDestroy {
             }
         });
 
+        // When adding a widget, layout could be broken unless we minimize any maximized widget
+        this._dashboardChangesSubscription = this.dashboardService.dashboardChanged.subscribe(event => {
+            if(event.type === 'ADD_WIDGET') {
+                this.toggleMaximized();
+            }
+        })
+
         this.exportAction = new Action({
             icon: "fas fa-file-alt",
             name: "export/import",
@@ -90,6 +98,21 @@ export class AuditComponent implements OnDestroy {
             ]
         })
 
+    }
+
+    ngOnDestroy() {
+        this._querySubscription?.unsubscribe();
+        this._loginSubscription?.unsubscribe();
+        this._dashboardChangesSubscription?.unsubscribe();
+    }
+
+    /**
+     * Returns the configuration of the facets displayed.
+     * The configuration from the config.ts file can be overriden by configuration from
+     * the app configuration on the server
+     */
+    public get facets(): FacetConfig<FacetListParams>[] {
+        return this.appService.app?.data?.facets as any || FACETS;
     }
 
     getDataAction(): Action {
@@ -196,20 +219,6 @@ export class AuditComponent implements OnDestroy {
             });
     }
 
-    /**
-     * Returns the configuration of the facets displayed.
-     * The configuration from the config.ts file can be overriden by configuration from
-     * the app configuration on the server
-     */
-    public get facets(): FacetConfig<FacetListParams>[] {
-        return this.appService.app?.data?.facets as any || FACETS;
-    }
-
-    ngOnDestroy() {
-        this._querySubscription?.unsubscribe();
-        this._loginSubscription?.unsubscribe();
-    }
-
     newDashboard(): void {
         this.dashboardService.newDashboard();
     }
@@ -249,5 +258,9 @@ export class AuditComponent implements OnDestroy {
     // unset previous gridster-item if any
     setFocus(index: number, event: MouseEvent) {
         this.focusElementIndex = index;
+    }
+
+    toggleMaximized() {
+        this.dashboardItems.find(item => item.isMaximized())?.toggleMaximizedView();
     }
 }
