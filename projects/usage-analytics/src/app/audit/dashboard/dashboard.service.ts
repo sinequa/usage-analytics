@@ -116,9 +116,22 @@ export interface DashboardItemPosition {
 }
 
 export interface DashboardChange {
+    type: changeType,
     dashboard: Dashboard;
     updateDatasets: boolean;
+    item?: DashboardItem;
 }
+
+export type changeType =
+                'LOAD_DASHBOARD' |
+                'LOAD_DEFAULT_DASHBOARD' |
+                'LOAD_SHARED_DASHBOARD' |
+                'OPEN_DASHBOARD' |
+                'NEW_DASHBOARD' |
+                'CHANGE_WIDGET_CONFIG' |
+                'ADD_WIDGET' |
+                'REMOVE_WIDGET' |
+                'PLAIN_CHANGE';
 
 // Name of the "default dashboard" (displayed prior to any user customization)
 export const defaultDashboardName = "msg#dashboards.newDashboard";
@@ -177,7 +190,7 @@ export class DashboardService {
             },
             resizable: {enabled: true},
             itemChangeCallback: (item, itemComponent) => {
-                this.notifyItemChange(item as DashboardItem);
+                this.notifyItemChange(item as DashboardItem, 'PLAIN_CHANGE');
             },
             itemResizeCallback: (item, itemComponent) => {
                 if (!document.fullscreenElement) { // Exclude the change detection on switch from/to full-screen mode
@@ -213,8 +226,8 @@ export class DashboardService {
 
         // Manage Auto-save dashboards.
         this.dashboardChanged.subscribe((changes: DashboardChange) => {
-            if (this.dashboard && this.defaultDashboard) {
-                const dashboard = changes.dashboard;
+            const dashboard = changes.dashboard;
+            if (['NEW_DASHBOARD', 'LOAD_SHARED_DASHBOARD', 'CHANGE_WIDGET_CONFIG', 'ADD_WIDGET', 'REMOVE_WIDGET'].includes(changes.type)) {
                 // If a saved dashboard is modified, then add it to the changed dashboards list
                 if (!dashboard.name.startsWith(this.formatMessage(defaultDashboardName))) {
                     const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
@@ -229,10 +242,11 @@ export class DashboardService {
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards[i] = dashboard;
                 }
-                // if needed, update datasets and trigger search in order to consider the changes
-                if (changes.updateDatasets) {
-                    this.searchService.navigate({skipSearch: true});
-                }
+            }
+
+            // if needed, update datasets and trigger search in order to consider the changes at data level
+            if (changes.updateDatasets) {
+                this.searchService.navigate({skipSearch: true});
             }
         });
     }
@@ -250,6 +264,7 @@ export class DashboardService {
             this.searchService.queryStringParams.dashboard = dashboard;
             if(this.hasDashboard(dashboard)) {
                 this.dashboard = this.getDashboard(dashboard)!;
+                this.dashboardChanged.next({type: 'LOAD_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
             } else {
                 this.notificationService.error("Could not find this dashboard...");
             }
@@ -373,6 +388,7 @@ export class DashboardService {
             const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
             const _blank = this.createDashboard(name);
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
+            this.dashboardChanged.next({type: 'LOAD_DEFAULT_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
         }
     }
 
@@ -385,7 +401,7 @@ export class DashboardService {
         const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
         this.dashboard = Utils.copy(_shared);
-        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: true});
+        this.dashboardChanged.next({type: 'LOAD_SHARED_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
     }
 
     /**
@@ -402,8 +418,8 @@ export class DashboardService {
      * Fire an event when a dashboard item changes
      * @param item
      */
-    public notifyItemChange(item: DashboardItem, notify = false) {
-        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: notify});
+    public notifyItemChange(item: DashboardItem, event: changeType, notify = false) {
+        this.dashboardChanged.next({type: event, dashboard: this.dashboard, updateDatasets: notify, item});
     }
 
     /**
@@ -451,7 +467,7 @@ export class DashboardService {
         }
         dashboard.items.push(item);
         if (notify) {
-            this.dashboardChanged.next({dashboard: dashboard, updateDatasets: true});
+            this.dashboardChanged.next({type: 'ADD_WIDGET', dashboard: dashboard, updateDatasets: true});
         }
         return dashboard.items[dashboard.items.length - 1];
     }
@@ -462,7 +478,7 @@ export class DashboardService {
      */
     public removeItem(item: DashboardItem) {
         this.dashboard.items.splice(this.dashboard.items.indexOf(item), 1);
-        this.notifyItemChange(item);
+        this.notifyItemChange(item, 'REMOVE_WIDGET');
     }
 
     /**
@@ -472,7 +488,7 @@ export class DashboardService {
      */
     public renameWidget(item: DashboardItem, newTitle: string) {
         item.title = newTitle;
-        this.notifyItemChange(item);
+        this.notifyItemChange(item, 'CHANGE_WIDGET_CONFIG');
     }
 
     /**
@@ -564,7 +580,7 @@ export class DashboardService {
     public openDashboard(dashboard: Dashboard) {
         this.dashboard = dashboard;
         this.searchService.queryStringParams.dashboard = dashboard.name;
-        this.searchService.navigate({skipSearch: true});
+        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
     }
 
     public saveDashboard(dashboard: Dashboard) {
@@ -607,7 +623,7 @@ export class DashboardService {
         this.draftDashboards.push(_blank);
         this.dashboard = Utils.copy(_blank);
         delete this.searchService.queryStringParams.dashboard;
-        this.searchService.navigate({skipSearch: true});
+        this.dashboardChanged.next({type: 'NEW_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
     }
 
     public deleteDashboard(dashboard: Dashboard) {
@@ -646,8 +662,10 @@ export class DashboardService {
                 // Open next/previous dashboard. If not existing, create new empty dashboard
                 if (this.allDashboards[index]) {
                     this.dashboard = Utils.copy(this.allDashboards[index]);
+                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
                 } else if (this.allDashboards[index - 1]) {
                     this.dashboard = Utils.copy(this.allDashboards[index - 1]);
+                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
                 } else {
                     this.newDashboard();
                 }
