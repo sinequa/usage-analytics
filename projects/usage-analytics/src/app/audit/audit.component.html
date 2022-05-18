@@ -8,6 +8,7 @@
         [startCollapsed]="true"
         [buttonsStyle]="isDark()? 'dark' : 'light'"
         [collapseOnClickOutside]="true"
+        (click)="$event.stopPropagation()"
         >
         <sq-facet-multi
             #facet
