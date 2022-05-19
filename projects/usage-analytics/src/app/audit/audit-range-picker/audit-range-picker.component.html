@@ -1,10 +1,10 @@
 <!-- Header with dropdown button-->
-<div class="d-flex align-items-center justify-content-between dateRange pl-3 pr-2 py-1" [sqTooltip]="'msg#dateRange.dateRangeTooltip' | sqMessage:{currentDate: auditService.infoCurrentFilter, trendRange: auditService.infoPreviousFilter}">
+<div (click)="$event.stopPropagation()" class="d-flex align-items-center justify-content-between dateRange pl-3 pr-2 py-1" [sqTooltip]="'msg#dateRange.dateRangeTooltip' | sqMessage:{currentDate: auditService.infoCurrentFilter, trendRange: auditService.infoPreviousFilter}">
     <span>
         <i class="far fa-clock mr-2"></i>
         {{auditService.currentFilter | sqMessage}}
     </span>
-    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions(); $event.stopPropagation()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage" placement="top">
+    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage" placement="top">
         <i class="fas fa-chevron-{{showDateRangeOptions ? 'up' : 'down'}}"></i>
     </button>
 </div>

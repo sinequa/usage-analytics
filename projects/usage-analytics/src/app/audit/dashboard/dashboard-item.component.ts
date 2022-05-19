@@ -136,14 +136,16 @@ export class DashboardItemComponent implements OnChanges {
         this.maximizeAction = new Action({
             icon: "fas fa-expand-alt",
             title: "msg#dashboard.maximizeTitle",
-            action: (action) => {
-                this.toggleMaximizedView();
-                action.icon = this.gridsterItemComponent.el.classList.contains('widget-maximized-view')
-                            ? "fas fa-compress-alt"
-                            : "fas fa-expand-alt";
-                action.title = this.gridsterItemComponent.el.classList.contains('widget-maximized-view')
-                            ? "msg#dashboard.minimizeTitle"
-                            : "msg#dashboard.maximizeTitle";
+            action: () => {
+                this.toggleMaximizedView()
+            },
+            updater: (action) => {
+                action.icon = this.isMaximized()
+                    ? "fas fa-compress-alt"
+                    : "fas fa-expand-alt";
+                action.title = this.isMaximized()
+                    ? "msg#dashboard.minimizeTitle"
+                    : "msg#dashboard.maximizeTitle";
             }
         });
 
@@ -303,7 +305,7 @@ export class DashboardItemComponent implements OnChanges {
             gridsterItem.classList.toggle('widget-maximized-view'); // allow container of gridsterItem to full-fill its direct parent dimensions
             gridsterContainer.classList.toggle('no-scroll');  // disable the gridster element's scroll
 
-            if (gridsterItem.classList.contains('widget-maximized-view')) { // update component defined in gridsterItem to full-fill its maximized space
+            if (this.isMaximized()) { // update component defined in gridsterItem to full-fill its maximized space
                 this.config.height = gridsterContainer.clientHeight!;
                 this.config.width = gridsterContainer.clientWidth!;
                 gridsterContainer.scrollTop = 0; // scroll up to view the full screen item
@@ -315,8 +317,9 @@ export class DashboardItemComponent implements OnChanges {
 
             // update related full-screen actions since they can not be performed in maximized mode
             if (this.fullScreenExpandable) {
-                this.fullScreenAction.disabled = gridsterItem.classList.contains('widget-maximized-view');
+                this.fullScreenAction.disabled = this.isMaximized();
             }
+            this.maximizeAction.update();
         }
     }
 
@@ -351,7 +354,7 @@ export class DashboardItemComponent implements OnChanges {
           this.config.icon = "fas fa-chart-pie";
         }
         this.config.chartType = type;
-        this.dashboardService.notifyItemChange(this.config);
+        this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
     }
 
     /**
@@ -382,5 +385,9 @@ export class DashboardItemComponent implements OnChanges {
         if (!!range) {
             this.auditService.updateRangeFilter(range);
         }
+    }
+
+    isMaximized(): boolean {
+        return this.gridsterItemComponent.el.classList.contains('widget-maximized-view');
     }
 }

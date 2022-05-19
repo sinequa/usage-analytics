@@ -270,7 +270,7 @@ export class AuditService {
         profiles: string[]): Observable<Dataset> {
 
             let params = {
-                select: filters + (!!this.staticFiltersExpr ? (" AND " + this.staticFiltersExpr) : ""),
+                select: !!this.staticFiltersExpr ? (`((${this.staticFiltersExpr})` + " AND " + `(${filters}))`) : filters,
                 start,
                 end,
                 mask: this.mask,
