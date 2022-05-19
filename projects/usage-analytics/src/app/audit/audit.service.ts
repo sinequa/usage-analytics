@@ -21,7 +21,8 @@ import {
     potential_total_user_count,
     session_count_threshold_per_month,
     sq_timezone,
-    custom_filters
+    custom_filters,
+    mono_scope_queries
 } from "./config";
 
 export enum RelativeTimeRanges {
@@ -128,6 +129,10 @@ export class AuditService {
         return (this.appService.app?.data?.custom_filters || custom_filters) as MapOf<string>;
     }
 
+    get monoScopeQueries(): string[] {
+        return (this.appService.app?.data?.mono_scope_queries || mono_scope_queries) as string[];
+    }
+
     public updateAuditFilters() {
         /**
          * Reset current dashboard data
@@ -198,7 +203,7 @@ export class AuditService {
         this.previousPeriodData$.next(previousPeriodData);
 
         // Specific widgets require a pre-filtering by a unique app in order to have relevant data. If not, an error message is displayed
-        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, apps, profiles, (apps.concat(profiles).length === 1) ? [] : ["newUsersTimeLine", "newUsers"])
+        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
             .subscribe(
                 (data) => {
                     currentPeriodData = {...currentPeriodData, ...data};
@@ -207,15 +212,16 @@ export class AuditService {
                 () => {},
                 () => {
                     if (apps.concat(profiles).length !== 1) {
-                        currentPeriodData["newUsersTimeLine"] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
-                        currentPeriodData["newUsers"] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
+                        for (const query of this.monoScopeQueries) {
+                            currentPeriodData[query] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
+                        }
                         this.data$.next(currentPeriodData);
                     }
                     this.currentAuditDataLoading = false;
                 }
             )
 
-        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, apps, profiles, (apps.concat(profiles).length === 1) ? [] : ["newUsersTimeLine", "newUsers"])
+        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
             .subscribe(
                 (data) => {
                     previousPeriodData = {...previousPeriodData, ...data};
@@ -224,8 +230,9 @@ export class AuditService {
                 () => {},
                 () => {
                     if (apps.concat(profiles).length !== 1) {
-                        previousPeriodData["newUsersTimeLine"] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
-                        previousPeriodData["newUsers"] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
+                        for (const query of this.monoScopeQueries) {
+                            previousPeriodData[query] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
+                        }
                         this.previousPeriodData$.next(previousPeriodData);
                     }
                     this.previousAuditDataLoading = false;
