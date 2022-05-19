@@ -74,7 +74,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             aggregationsTimeSeries: {
                 name: "QueryTotal",
                 dateField: "value",
-                valueFields: [{operatorResults: true, name: "sum", title: "Query Count Total", primary: true}]
+                valueFields: [{name: "count", title: "Query Count Total", primary: true}]
             }
         }
     },
@@ -499,7 +499,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         unique: true,
         parameters: {
             statLayout: 'standard',
-            valueLocation: "records",
+            valueLocation: "totalrecordcount",
             asc: true
         }
     },
