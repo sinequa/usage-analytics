@@ -19,6 +19,15 @@
     </sq-facet-card>
 </div>
 
+<div class="d-flex flex-row align-items-center flex-wrap">
+    <sq-facet-mysearch
+        [results]="(auditService.data$ | async)"
+        [displayFieldNames]="false"
+        [useBadges]="true"
+        [excludedFacets]="['audit_timestamp', 'SBA', 'Profile']"
+    ></sq-facet-mysearch>
+</div>
+
 <!-- Dashboard tabs -->
 <ul class="nav nav-tabs">
     <li class="nav-item" *ngFor="let dashboard of dashboardService.allDashboards; let i=index">
