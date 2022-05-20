@@ -26,6 +26,9 @@ export const default_app_filter: string = "";
 /** Default scope, on profile, used on init */
 export const default_profile_filter: string = "";
 
+/** Queries requiring filtering by a unique application to display correct data */
+export const mono_scope_queries: string[] = ["newUsersTimeLine", "newUsers"];
+
 /** Filters */
 export const FACETS: FacetConfig<FacetListParams>[] = [
     {

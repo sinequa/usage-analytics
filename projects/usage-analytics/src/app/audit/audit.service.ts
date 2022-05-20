@@ -21,7 +21,8 @@ import {
     potential_total_user_count,
     session_count_threshold_per_month,
     sq_timezone,
-    custom_filters
+    custom_filters,
+    mono_scope_queries
 } from "./config";
 
 export enum RelativeTimeRanges {
@@ -128,6 +129,10 @@ export class AuditService {
         return (this.appService.app?.data?.custom_filters || custom_filters) as MapOf<string>;
     }
 
+    get monoScopeQueries(): string[] {
+        return (this.appService.app?.data?.mono_scope_queries || mono_scope_queries) as string[];
+    }
+
     public updateAuditFilters() {
         /**
          * Reset current dashboard data
@@ -181,10 +186,13 @@ export class AuditService {
         const apps = this.getRequestScope("SBA");
         const profiles = this.getRequestScope("Profile");
 
-        /** Update the audit dashboard data (previous and current period) */
+        /**
+         *  Update the audit dashboard data (previous and current period)
+         */
         let currentPeriodData = {};
         let previousPeriodData = {};
 
+        // Ensure that admin provide the value of potential_total_user_count. If not, an error message is displayed into widgets using this information
         if (this.totalUserCount === 0) {
             currentPeriodData["totalUsers"] = {errorCode: 500, errorMessage: "The parameter potential_total_user_count must be initialized"}
         } else {
@@ -194,24 +202,41 @@ export class AuditService {
         this.data$.next(currentPeriodData);
         this.previousPeriodData$.next(previousPeriodData);
 
-        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, apps, profiles)
+        // Specific widgets require a pre-filtering by a unique app in order to have relevant data. If not, an error message is displayed
+        this.getParallelStreamAuditData(currentFilters, parsedTimestamp.start, parsedTimestamp.end, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
             .subscribe(
                 (data) => {
                     currentPeriodData = {...currentPeriodData, ...data};
                     this.data$.next(currentPeriodData);
                 },
                 () => {},
-                () => this.currentAuditDataLoading = false
+                () => {
+                    if (apps.concat(profiles).length !== 1) {
+                        for (const query of this.monoScopeQueries) {
+                            currentPeriodData[query] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
+                        }
+                        this.data$.next(currentPeriodData);
+                    }
+                    this.currentAuditDataLoading = false;
+                }
             )
 
-        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, apps, profiles)
+        this.getParallelStreamAuditData(previousFilters, parsedTimestamp.previous, parsedTimestamp.start, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
             .subscribe(
                 (data) => {
                     previousPeriodData = {...previousPeriodData, ...data};
                     this.previousPeriodData$.next(previousPeriodData);
                 },
                 () => {},
-                () => this.previousAuditDataLoading = false
+                () => {
+                    if (apps.concat(profiles).length !== 1) {
+                        for (const query of this.monoScopeQueries) {
+                            previousPeriodData[query] = {errorCode: 500, errorMessage: "This widget requires filtering by a unique application"};
+                        }
+                        this.previousPeriodData$.next(previousPeriodData);
+                    }
+                    this.previousAuditDataLoading = false;
+                }
             )
     }
 
@@ -267,7 +292,8 @@ export class AuditService {
         start: string,
         end: string,
         apps: string[],
-        profiles: string[]): Observable<Dataset> {
+        profiles: string[],
+        excludedDataset: string[] = []): Observable<Dataset> {
 
             let params = {
                 select: !!this.staticFiltersExpr ? (`((${this.staticFiltersExpr})` + " AND " + `(${filters}))`) : filters,
@@ -286,7 +312,7 @@ export class AuditService {
             if (this.webServiceName) {
                 this.currentAuditDataLoading = true;
                 this.previousAuditDataLoading = true;
-                const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => datasetName !== "totalUsers"); // Exclude manual added datasets
+                const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => (datasetName !== "totalUsers" && !excludedDataset.includes(datasetName))); // Exclude manual added datasets Or datasets pre-requiring extra input (a config param, an app filter ...)
                 return from(Array.from(new Set(datasets)))
                         .pipe(
                             mergeMap(
