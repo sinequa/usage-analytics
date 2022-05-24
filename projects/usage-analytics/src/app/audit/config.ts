@@ -14,8 +14,8 @@ export const potential_total_user_count: number = 0;
 /** Filters expression to be added in the WHERE clause of ALL DATASETS */
 export const static_filters_expr: string = "";
 
-/** Set of filters expressions that could be added in the WHERE clause of A SPECIFIC DATASET */
-export const custom_filters: MapOf<string> = {};
+/** Set of params that could be used as input in A SPECIFIC DATASET ( WHERE clause, FROM clause ...)*/
+export const custom_params: MapOf<string> = {};
 
 /** Default time period used on init */
 export const default_timestamp_filter: string = "";

@@ -21,7 +21,7 @@ import {
     potential_total_user_count,
     session_count_threshold_per_month,
     sq_timezone,
-    custom_filters,
+    custom_params,
     mono_scope_queries
 } from "./config";
 
@@ -125,8 +125,8 @@ export class AuditService {
         return (this.appService.app?.data?.static_filters_expr || static_filters_expr) as string;
     }
 
-    get customFilters(): MapOf<string> {
-        return (this.appService.app?.data?.custom_filters || custom_filters) as MapOf<string>;
+    get customParams(): MapOf<string> {
+        return (this.appService.app?.data?.custom_params || custom_params) as MapOf<string>;
     }
 
     get monoScopeQueries(): string[] {
@@ -305,8 +305,8 @@ export class AuditService {
                 sessionCountThreshold: this.sessionCountParam
             };
             // IF a list of custom filters is provided, then include it to the params object
-            if (Object.keys(this.customFilters).length > 0) {
-                params = {...params, ...this.customFilters}
+            if (Object.keys(this.customParams).length > 0) {
+                params = {...params, ...this.customParams}
             }
 
             if (this.webServiceName) {
