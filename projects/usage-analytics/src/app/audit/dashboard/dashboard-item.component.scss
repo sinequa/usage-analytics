@@ -20,16 +20,6 @@
     }
 }
 
-.chart ag-grid-angular ::ng-deep {
-    padding: 0;
-    .ag-header {
-      display: none !important;
-    }
-    .ag-root-wrapper {
-      border: none !important;
-    }
-}
-
 .sq-loading {
     display: flex;
     text-align: center;
