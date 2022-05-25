@@ -68,6 +68,7 @@ export class DashboardItemComponent implements OnChanges {
     renameAction: Action;
     fullScreenAction: Action;
     maximizeAction: Action;
+    timelineOrGridAction: Action;
     infoAction: Action;
 
     // Properties specific to certain types of dashboard items
@@ -89,8 +90,9 @@ export class DashboardItemComponent implements OnChanges {
 
     // Timeline
     timeSeries: TimelineSeries[] = [];
-
     gridView = false;
+
+    // Grid
     columnDefs: ColDef[] = []
     rowData: (Record | AggregationItem)[] = [];
     defaultColDef: ColDef = {
@@ -102,7 +104,6 @@ export class DashboardItemComponent implements OnChanges {
     gridApi: GridApi | null | undefined;
 
     errorMessage?: string;
-
     loading = true;
 
     constructor(
@@ -147,6 +148,26 @@ export class DashboardItemComponent implements OnChanges {
                     ? "msg#dashboard.minimizeTitle"
                     : "msg#dashboard.maximizeTitle";
             }
+        });
+
+        this.timelineOrGridAction = new Action({
+            text: "Timeline",
+            updater: (action) => {
+                action.children = ["Grid", "Timeline"]
+                    .filter((item) => item !== action.text)
+                    .map(
+                        (item) => new Action({
+                            text: item,
+                            action: (elem, event) => {
+                                this.gridView = !this.gridView;
+                                action.text = this.gridView ? "Grid" : "Timeline";
+                                this.timelineOrGridAction.update();
+
+                            }
+                        })
+                    )
+            }
+
         });
 
     }
@@ -258,7 +279,10 @@ export class DashboardItemComponent implements OnChanges {
             });
             this.actions = [this.infoAction, ...this.actions]
         }
-
+        if (this.config.type === "timeline") {
+            this.actions = [this.timelineOrGridAction, ...this.actions];
+            this.timelineOrGridAction.update();
+        }
     }
 
     toggleFullScreen(): void {
@@ -348,10 +372,10 @@ export class DashboardItemComponent implements OnChanges {
 
     onChartTypeChange(type: string) {
         if(type === 'grid') {
-          this.config.icon = "fas fa-th-list";
+            this.config.icon = "fas fa-th-list";
         }
         else {
-          this.config.icon = "fas fa-chart-pie";
+            this.config.icon = "fas fa-chart-pie";
         }
         this.config.chartType = type;
         this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');

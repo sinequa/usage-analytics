@@ -20,13 +20,16 @@
     }
 }
 
-.chart ag-grid-angular ::ng-deep {
+::ng-deep .gridster-item-resizable-handler.handle-e {
+    width: 8px;
+    right: -5px;
+}
+
+ag-grid-angular ::ng-deep {
     padding: 0;
-    .ag-header {
-      display: none !important;
-    }
+
     .ag-root-wrapper {
-      border: none !important;
+        border: none !important;
     }
 }
 
