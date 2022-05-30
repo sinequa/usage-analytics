@@ -256,7 +256,7 @@ export class AuditService {
      * @param facetName
      * @returns filtered values of a given facet
      */
-    private getRequestScope(facetName: string): string[] {
+    protected getRequestScope(facetName: string): string[] {
         const expression = this.searchService.query.findSelect(facetName)?.expression;
         if (expression) {
             const expr = this.appService.parseExpr(expression);
@@ -287,7 +287,7 @@ export class AuditService {
         return datasets;
     }
 
-    private getParallelStreamAuditData(
+    protected getParallelStreamAuditData(
         filters: string,
         start: string,
         end: string,
@@ -394,7 +394,7 @@ export class AuditService {
         }
     }
 
-    private parseAuditTimestamp(timestamp: string | string[]): AuditDatasetFilters {
+    protected parseAuditTimestamp(timestamp: string | string[]): AuditDatasetFilters {
         let previous: Date;
         let start: Date;
         let end: Date;
