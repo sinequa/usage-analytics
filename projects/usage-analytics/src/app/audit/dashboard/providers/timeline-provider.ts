@@ -180,7 +180,7 @@ export class TimelineProvider {
         return timeSeries;
     }
 
-    private _parseDate(value: any) : Date | undefined {
+    protected _parseDate(value: any) : Date | undefined {
         if (value instanceof Date) {
             return value;
         }

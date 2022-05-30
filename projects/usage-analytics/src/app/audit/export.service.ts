@@ -278,7 +278,7 @@ export class ExportService {
     this.notifySuccess(filename);
   }
 
-  private extractStatRow(item: DashboardItemComponent) : any {
+  protected extractStatRow(item: DashboardItemComponent) : any {
     // translate title with sqMessagePipe
     const title = this.translate.formatMessage(item.config.title);
     const {previousDataSet, dataset, config} = item;
@@ -299,7 +299,7 @@ export class ExportService {
    * @param items array of dashboard items
    * @returns a {@link ExtractModel} object with all stats data or undefined
    */
-  private extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
+   protected extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
     const stats = items.filter(item => item.config.type === "stat");
     if(stats.length === 0) return;
 
@@ -319,7 +319,7 @@ export class ExportService {
    * @param items array of dashboard items
    * @returns Array of charts data
    */
-  private extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+   protected extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     const charts = items.filter(item => item.config.type === "chart").map(item => {
       const title = this.translate.formatMessage(item.config.title);
 
@@ -346,7 +346,7 @@ export class ExportService {
    * @param filename name of the file
    * @param items array of dashboard items
    */
-  private extractTimelines(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+   protected extractTimelines(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     // timelines components extractions
     // a timeserie could contains one or more series
     // no needs of timeline-provider here as timeseries is the final results after timeline-provider works
@@ -394,7 +394,7 @@ export class ExportService {
    * @param filename name of the file
    * @param items array of dashboard items
   **/
-  private extractGrids(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+   protected extractGrids(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     const grids = items.filter(item => item.config.type === "grid").map(item => {
       const title = this.translate.formatMessage(item.config.title);
       return {title, rowData: item.rowData, columns: item.columnDefs}

@@ -301,7 +301,7 @@ export class DashboardService {
         return palette.map(p => ({
                 name: p.name,
                 items: p.items.filter(i => Utils.isString(i) && widgets[i])
-                              .map(i => widgets[i])
+                            .map(i => widgets[i])
             }));
     }
 
@@ -316,7 +316,7 @@ export class DashboardService {
         return dashboards.map(d => ({
                 name: d.name,
                 items: d.items.filter(i => Utils.isString(i.item) && widgets[i.item])
-                              .map(i => ({item: widgets[i.item], position: i.position}))
+                            .map(i => ({item: widgets[i.item], position: i.position}))
             }));
     }
 
