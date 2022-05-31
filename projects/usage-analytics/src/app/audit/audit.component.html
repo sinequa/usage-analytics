@@ -12,7 +12,7 @@
         >
         <sq-facet-multi
             #facet
-            class="card position-absolute"
+            class="card position-absolute overflow-hidden"
             [results]="(auditService.data$ | async)?.applications"
             [facets]="facets">
         </sq-facet-multi>
