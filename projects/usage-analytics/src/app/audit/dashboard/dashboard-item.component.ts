@@ -273,6 +273,15 @@ export class DashboardItemComponent implements OnChanges {
             this.infoAction = new Action({
                 icon: "fas fa-info",
                 title: this.config.info,
+                messageParams: {
+                    values: {
+                        // Params processed within the app code
+                        sessionCountThreshold: this.auditService.sessionCountParam,
+                        // Params retrieved from the app customization json
+                        ...this.auditService.params,
+                        ...this.auditService.customParams
+                    }
+                },
                 fallbackPlacements: ["top", "bottom"],
                 disabled: true,
                 action: () => {}

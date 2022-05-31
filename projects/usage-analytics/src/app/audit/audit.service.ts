@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { SearchService } from "@sinequa/components/search";
 import { AppService, Expr, ExprBuilder } from "@sinequa/core/app-utils";
-import { MapOf, Utils } from "@sinequa/core/base";
+import { JsonObject, MapOf, Utils } from "@sinequa/core/base";
 import {IntlService} from "@sinequa/core/intl";
 import {
     Dataset,
@@ -97,40 +97,44 @@ export class AuditService {
         return undefined;
     }
 
+    get params(): JsonObject {
+        return this.appService.app?.data?.params as JsonObject;
+    }
+
     get defaultTimestampFilter(): string | Date[] {
-        return (this.appService.app?.data?.default_timestamp_filter || default_timestamp_filter) as string | Date[];
+        return ((this.appService.app?.data?.params as JsonObject)?.default_timestamp_filter || default_timestamp_filter) as string | Date[];
     }
 
     get defaultAppFilter(): string | string[] {
-        return (this.appService.app?.data?.default_app_filter || default_app_filter) as string | string[];
+        return ((this.appService.app?.data?.params as JsonObject)?.default_app_filter || default_app_filter) as string | string[];
     }
 
     get defaultProfileFilter(): string | string[] {
-        return (this.appService.app?.data?.default_profile_filter || default_profile_filter) as string | string[];
+        return ((this.appService.app?.data?.params as JsonObject)?.default_profile_filter || default_profile_filter) as string | string[];
     }
 
     get serverTimezone(): string {
-        return (this.appService.app?.data?.sq_timezone || sq_timezone) as string;
+        return ((this.appService.app?.data?.params as JsonObject)?.sq_timezone || sq_timezone) as string;
     }
 
     get totalUserCount(): number {
-        return (this.appService.app?.data?.potential_total_user_count || potential_total_user_count) as number;
+        return ((this.appService.app?.data?.params as JsonObject)?.potential_total_user_count || potential_total_user_count) as number;
     }
 
     get sessionCountThreshold(): number {
-        return (this.appService.app?.data?.session_count_threshold_per_month || session_count_threshold_per_month) as number;
+        return ((this.appService.app?.data?.params as JsonObject)?.session_count_threshold_per_month || session_count_threshold_per_month) as number;
     }
 
     get staticFiltersExpr(): string {
-        return (this.appService.app?.data?.static_filters_expr || static_filters_expr) as string;
+        return ((this.appService.app?.data?.params as JsonObject)?.static_filters_expr || static_filters_expr) as string;
     }
 
     get customParams(): MapOf<string> {
-        return (this.appService.app?.data?.custom_params || custom_params) as MapOf<string>;
+        return ((this.appService.app?.data?.params as JsonObject)?.custom_params || custom_params) as MapOf<string>;
     }
 
     get monoScopeQueries(): string[] {
-        return (this.appService.app?.data?.mono_scope_queries || mono_scope_queries) as string[];
+        return ((this.appService.app?.data?.params as JsonObject)?.mono_scope_queries || mono_scope_queries) as string[];
     }
 
     public updateAuditFilters() {
