@@ -59,7 +59,7 @@ export class AuditStatComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
 
         if ((changes["previousDataSet"] || changes["dataset"]) && this.previousDataSet && this.dataset) {
-            const {value, previousValue, percentageChange, trend, trendEvaluation} = this.statProvider.getvalues(this.previousDataSet, this.dataset, this.config, this.decimalsPrecision);
+            const {value, previousValue, percentageChange, trend, trendEvaluation} = this.statProvider.getvalues(this.previousDataSet, this.dataset, this.config, this.config?.decimalsPrecision || this.decimalsPrecision);
             this.value = value;
             this.previousValue = previousValue;
             this.percentageChange = percentageChange;

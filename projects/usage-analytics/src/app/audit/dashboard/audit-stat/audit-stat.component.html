@@ -1,7 +1,7 @@
 <div class="stat p-1" *ngIf="value;else noData">
     <div class="stat-title h-30" [sqTooltip]="config?.title | sqMessage">{{config?.title | sqMessage}}</div>
     <div class="stat-wrapper">
-        <span class="stat-value">{{value}} {{config?.computation === 'percentage' ? '%' : ''}}</span>
+        <span class="stat-value">{{value | sqNumber}} {{config?.computation === 'percentage' ? '%' : ''}}</span>
     </div>
     <div class="d-flex h-30 align-items-end">
         <div [sqTooltip]="trendTooltip | sqMessage:{currentDate: currentRange, trendRange: previousRange, currentValue: value, previousValue: previousValue}" class="cursor-help">
@@ -12,7 +12,7 @@
             </span>
             <span *ngIf="percentageChange" class="ml-1 stat-percentage"
                 [ngClass]="{'green': trendEvaluation === 'ok', 'red': trendEvaluation === 'ko', 'stable': trendEvaluation === 'stable'}">
-                {{percentageChange}} %
+                {{percentageChange | sqNumber}} %
             </span>
         </div>
     </div>
