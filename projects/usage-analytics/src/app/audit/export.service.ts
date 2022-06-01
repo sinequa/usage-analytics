@@ -1,6 +1,5 @@
 import {ElementRef, Injectable} from '@angular/core';
 import {IntlService} from '@sinequa/core/intl';
-import {NotificationsService} from '@sinequa/core/notification';
 import domtoimage from "dom-to-image";
 import { saveAs } from "file-saver";
 
@@ -48,7 +47,6 @@ export class ExportService {
   constructor(
     private statProvider: StatProvider,
     private translate: IntlService,
-    private notificationService: NotificationsService,
     private dashboardService: DashboardService
     ) { }
 
@@ -76,9 +74,6 @@ export class ExportService {
             saveAs(blob,  `${filename}_${this.date}.png`);
             // do not forget to remove our previous height to allow gridster to adjust automatically his height
             element.nativeElement.style = undefined;
-
-            // notify user
-            this.notifySuccess(filename)
           } );
   }
 
@@ -146,13 +141,13 @@ export class ExportService {
     if(stats) tables.push(stats);
 
     // export each timeline
-    tables.push(...this.extractTimelines(filename, items).filter(timeline => timeline.tables.length > 0));
+    tables.push(...this.extractTimelines(filename, items).map(timeline => timeline.tables.length > 0 ? timeline : {...timeline, tables: ['']}));
 
     // export each chart
-    tables.push(...this.extractCharts(filename, items).filter(chart => chart.tables.length > 0));
+    tables.push(...this.extractCharts(filename, items).map(chart => chart.tables.length > 0 ? chart : {...chart, tables: ['']}));
 
     // export each grid
-    tables.push(...this.extractGrids(filename, items).filter(grid => grid.tables.length > 0));
+    tables.push(...this.extractGrids(filename, items).map(grid => grid.tables.length > 0 ? grid : {...grid, tables: ['']}));
 
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
@@ -170,7 +165,6 @@ export class ExportService {
       worksheets: worksheets
     }).then((content) => {
       saveAs(content, file);
-      this.notifySuccess(file);
     });
 
   }
@@ -183,11 +177,7 @@ export class ExportService {
    * @returns a csv string
    */
   objectToCsv(filename: string, rows: object[]): string[] {
-    const title = this.translate.formatMessage("msg#export.title");
-
     if (!rows || !rows.length) {
-      const msg = this.translate.formatMessage("msg#export.nothing", {filename});
-      this.notificationService.warning(msg, undefined, title);
       return [];
     }
     const separator = ',';
@@ -274,8 +264,6 @@ export class ExportService {
         document.body.removeChild(link);
       }
     }
-
-    this.notifySuccess(filename);
   }
 
   protected extractStatRow(item: DashboardItemComponent) : any {
@@ -483,23 +471,11 @@ export class ExportService {
     link.click();
     document.body.removeChild(link);
 
-    this.notifySuccess(filename);
   }
 
   private getWidgetKey(item: DashboardItem): string{
     const widgets = this.dashboardService.getWidgets();
     const element = Object.entries(widgets).find(element => item.query === element[1].query && item.title === element[1].text);
     return element ? element[0] : "";
-  }
-
-  /**
-   * Notify user about the download success
-   *
-   * @param filename name of the file downloaded with success
-   */
-  private notifySuccess(filename:string) {
-    const title = this.translate.formatMessage("msg#export.title");
-    const msg = this.translate.formatMessage("msg#export.success", {filename});
-    this.notificationService.success(msg,undefined, title);
   }
 }
