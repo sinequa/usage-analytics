@@ -128,16 +128,22 @@ export class AuditComponent implements OnDestroy {
                     action: () => this.exportXLSX()
                 }),
                 new Action({
-                    title: "As PNG image",
-                    text: "As PNG image",
-                    name: "exportAsPNG",
-                    action: () => this.exportPNG()
-                }),
-                new Action({
                     title: "As CSV",
                     text: "As CSV",
                     name: "exportAsCSV",
                     action: () => this.exportCSV()
+                }),
+                new Action({
+                    title: "As XML",
+                    text: "As XML",
+                    name: "exportAsXML",
+                    action: () => this.exportXML()
+                }),
+                new Action({
+                    title: "As PNG image",
+                    text: "As PNG image",
+                    name: "exportAsPNG",
+                    action: () => this.exportPNG()
                 })
             ]
         })
@@ -184,6 +190,12 @@ export class AuditComponent implements OnDestroy {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportXLSX(name, items);
+    }
+
+    exportXML() {
+        const items = this.dashboardItems.map(item => item);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
+        this.exportService.exportToXML(name, items);
     }
 
     exportLayoutJson() {
