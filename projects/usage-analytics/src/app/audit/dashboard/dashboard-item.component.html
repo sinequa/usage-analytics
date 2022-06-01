@@ -11,7 +11,7 @@
         <!-- Timeline view-->
         <section *ngSwitchCase="'timeline'">
             <sq-timeline
-                *ngIf="!gridView"
+                *ngIf="config.chartType !== 'Grid'"
                 [data]="timeSeries"
                 [width]="innerwidth"
                 [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
@@ -21,13 +21,13 @@
                 (selectionChange)="updateAuditRange($event)">
             </sq-timeline>
             <sq-timeline-legend
-                *ngIf="timeSeries?.length > 1 && !gridView"
+                *ngIf="timeSeries?.length > 1 && config.chartType !== 'Grid'"
                 [data]="timeSeries"
                 [yOffset]="8"
                 [legendStyles]="{'justify-content': 'center'}">
             </sq-timeline-legend>
             <ag-grid-angular
-                *ngIf="gridView"
+                *ngIf="config.chartType === 'Grid'"
                 [ngClass]="'ag-theme-alpine'"
                 [ngStyle]="{width: '100%', height: innerheight + 'px'}"
                 [rowData]="rowData"
