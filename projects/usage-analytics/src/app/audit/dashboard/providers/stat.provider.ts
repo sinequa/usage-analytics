@@ -147,7 +147,7 @@ export class StatProvider {
         }
     }
 
-    private getBasicValue(data: Results | DatasetError, operation: string | undefined, valueLocation: string | undefined): number | undefined {
+    protected getBasicValue(data: Results | DatasetError, operation: string | undefined, valueLocation: string | undefined): number | undefined {
         if (!operation) {
             return this.extractStatValue(data, valueLocation);
         } else {
@@ -160,7 +160,7 @@ export class StatProvider {
         }
     }
 
-    private computeBasicValue(value1: number | undefined, value2: number | undefined, computation: string): number | undefined {
+    protected computeBasicValue(value1: number | undefined, value2: number | undefined, computation: string): number | undefined {
         switch (computation) {
             case "division":
                 return this.divide(value1, value2);
@@ -171,7 +171,7 @@ export class StatProvider {
         }
     }
 
-    private roundValue(value: number | undefined): number | undefined {
+    protected roundValue(value: number | undefined): number | undefined {
         if (value) {
             const precision = Math.pow(10, this.decimalsPrecision);
             return Math.round(value * precision) / precision;

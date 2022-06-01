@@ -42,7 +42,7 @@ export interface DashboardItem extends GridsterItem {
     queryStr?: string; // For type === 'preview'
     aggregation?: string; // For type === 'chart'
     chartData?: ChartData; // For type === 'chart'
-    chartType?: string; // For type === 'chart'
+    chartType?: string; // For type === 'chart' && type === 'timeline'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
     columns?: GridColDef[]; // For type === 'grid'
@@ -88,6 +88,8 @@ export interface DashboardItemOption {
 
         // For type === 'chart'
         chartData?: ChartData,
+
+        // For type === 'chart' && type === 'timeline'
         chartType?: string,
 
         // For type === 'stat'
@@ -131,7 +133,7 @@ export type changeType =
                 'CHANGE_WIDGET_CONFIG' |
                 'ADD_WIDGET' |
                 'REMOVE_WIDGET' |
-                'PLAIN_CHANGE';
+                'PLAIN_UI_CHANGE';
 
 // Name of the "default dashboard" (displayed prior to any user customization)
 export const defaultDashboardName = "msg#dashboards.newDashboard";
@@ -190,7 +192,7 @@ export class DashboardService {
             },
             resizable: {enabled: true},
             itemChangeCallback: (item, itemComponent) => {
-                this.notifyItemChange(item as DashboardItem, 'PLAIN_CHANGE');
+                this.notifyItemChange(item as DashboardItem, 'PLAIN_UI_CHANGE');
             },
             itemResizeCallback: (item, itemComponent) => {
                 if (!document.fullscreenElement) { // Exclude the change detection on switch from/to full-screen mode
@@ -227,7 +229,7 @@ export class DashboardService {
         // Manage Auto-save dashboards.
         this.dashboardChanged.subscribe((changes: DashboardChange) => {
             const dashboard = changes.dashboard;
-            if (['NEW_DASHBOARD', 'LOAD_SHARED_DASHBOARD', 'CHANGE_WIDGET_CONFIG', 'ADD_WIDGET', 'REMOVE_WIDGET'].includes(changes.type)) {
+            if (['NEW_DASHBOARD', 'LOAD_SHARED_DASHBOARD', 'CHANGE_WIDGET_CONFIG', 'ADD_WIDGET', 'REMOVE_WIDGET', 'PLAIN_UI_CHANGE'].includes(changes.type)) {
                 // If a saved dashboard is modified, then add it to the changed dashboards list
                 if (!dashboard.name.startsWith(this.formatMessage(defaultDashboardName))) {
                     const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
@@ -301,7 +303,7 @@ export class DashboardService {
         return palette.map(p => ({
                 name: p.name,
                 items: p.items.filter(i => Utils.isString(i) && widgets[i])
-                              .map(i => widgets[i])
+                            .map(i => widgets[i])
             }));
     }
 
@@ -316,7 +318,7 @@ export class DashboardService {
         return dashboards.map(d => ({
                 name: d.name,
                 items: d.items.filter(i => Utils.isString(i.item) && widgets[i.item])
-                              .map(i => ({item: widgets[i.item], position: i.position}))
+                            .map(i => ({item: widgets[i.item], position: i.position}))
             }));
     }
 
@@ -385,7 +387,7 @@ export class DashboardService {
         }
         // If there is no dashboard explicitly opened currently, we open the default one if defined. If not open a new blank dashboard
         if(!this.dashboard) {
-            const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+            const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
             const _blank = this.createDashboard(name);
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
             this.dashboardChanged.next({type: 'LOAD_DEFAULT_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
@@ -397,7 +399,7 @@ export class DashboardService {
      * @param items
      */
     public setSharedDashboard(items: DashboardItem[]) {
-        const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+        const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
         const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
         this.dashboard = Utils.copy(_shared);
@@ -618,7 +620,7 @@ export class DashboardService {
      * Creates a new dashboard (from scratch)
      */
     public newDashboard() {
-        const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+        const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
         const _blank = this.createDashboard(name);
         this.draftDashboards.push(_blank);
         this.dashboard = Utils.copy(_blank);
@@ -662,9 +664,11 @@ export class DashboardService {
                 // Open next/previous dashboard. If not existing, create new empty dashboard
                 if (this.allDashboards[index]) {
                     this.dashboard = Utils.copy(this.allDashboards[index]);
+                    delete this.searchService.queryStringParams.dashboard;
                     this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
                 } else if (this.allDashboards[index - 1]) {
                     this.dashboard = Utils.copy(this.allDashboards[index - 1]);
+                    delete this.searchService.queryStringParams.dashboard;
                     this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
                 } else {
                     this.newDashboard();
@@ -768,7 +772,7 @@ export class DashboardService {
             title: 'msg#dashboard.saveAsModalTitle',
             message: 'msg#dashboard.saveAsModalMessage',
             buttons: [],
-            output: this.formatMessage(dashboard.name),
+            output: '',
             validators: [Validators.required, unique]
         };
 

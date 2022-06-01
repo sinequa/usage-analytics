@@ -90,7 +90,6 @@ export class DashboardItemComponent implements OnChanges {
 
     // Timeline
     timeSeries: TimelineSeries[] = [];
-    gridView = false;
 
     // Grid
     columnDefs: ColDef[] = []
@@ -148,26 +147,6 @@ export class DashboardItemComponent implements OnChanges {
                     ? "msg#dashboard.minimizeTitle"
                     : "msg#dashboard.maximizeTitle";
             }
-        });
-
-        this.timelineOrGridAction = new Action({
-            text: "Timeline",
-            updater: (action) => {
-                action.children = ["Grid", "Timeline"]
-                    .filter((item) => item !== action.text)
-                    .map(
-                        (item) => new Action({
-                            text: item,
-                            action: (elem, event) => {
-                                this.gridView = !this.gridView;
-                                action.text = this.gridView ? "Grid" : "Timeline";
-                                this.timelineOrGridAction.update();
-
-                            }
-                        })
-                    )
-            }
-
         });
 
     }
@@ -273,6 +252,15 @@ export class DashboardItemComponent implements OnChanges {
             this.infoAction = new Action({
                 icon: "fas fa-info",
                 title: this.config.info,
+                messageParams: {
+                    values: {
+                        // Params processed within the app code
+                        sessionCountThreshold: this.auditService.sessionCountParam,
+                        // Params retrieved from the app customization json
+                        ...this.auditService.params,
+                        ...this.auditService.customParams
+                    }
+                },
                 fallbackPlacements: ["top", "bottom"],
                 disabled: true,
                 action: () => {}
@@ -280,6 +268,27 @@ export class DashboardItemComponent implements OnChanges {
             this.actions = [this.infoAction, ...this.actions]
         }
         if (this.config.type === "timeline") {
+            this.timelineOrGridAction = new Action({
+                title: "Select field",
+                text: this.config.chartType,
+                updater: (action) => {
+                    action.children = ["Grid", "Timeline"]
+                        .filter((item) => item !== action.text)
+                        .map(
+                            (item) => new Action({
+                                text: item,
+                                action: (elem, event) => {
+                                    this.config.chartType = item;
+                                    action.text = item;
+                                    this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
+                                    this.timelineOrGridAction.update();
+
+                                }
+                            })
+                        )
+                }
+
+            });
             this.actions = [this.timelineOrGridAction, ...this.actions];
             this.timelineOrGridAction.update();
         }
