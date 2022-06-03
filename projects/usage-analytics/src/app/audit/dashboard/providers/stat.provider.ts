@@ -12,8 +12,6 @@ type MayBe<T> = T | undefined;
 @Injectable( { providedIn: 'root'})
 export class StatProvider {
 
-    decimalsPrecision: number = 1;
-
     constructor() {}
 
     extractStatValue(data: Results | DatasetError | undefined, valueLocation: MayBe<string>): MayBe<number> {
@@ -68,7 +66,7 @@ export class StatProvider {
             const sum = items.reduce((a, b) => a + b, 0);
             return (sum / items.length) || 0;
         }
-        return undefined
+        return undefined;
     }
 
     divide(dividend: number | undefined, divisor: number | undefined): number | undefined {
@@ -91,7 +89,7 @@ export class StatProvider {
     getvalues(
         previousDataSet: Dataset,
         dataset: Dataset,
-        config: DashboardItem, decimalsPrecision: number
+        config: DashboardItem,
         ): {value: MayBe<number>, previousValue: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
 
         const current: number | undefined = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation);
@@ -103,35 +101,35 @@ export class StatProvider {
         let value, previousValue, percentageChange, trend;
 
         if (!config.computation) {
-            value = this.roundValue(current);
-            previousValue = this.roundValue(previous);
+            value = current;
+            previousValue = previous;
             percentageChange = this.getPercentageChange(current, previous);
             trend = this.getTrend(current, previous)
         } else {
             relatedCurrent = this.getBasicValue(dataset[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
             relatedPrevious = this.getBasicValue(previousDataSet[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
-            value = this.roundValue(this.computeBasicValue(current, relatedCurrent, config.computation));
-            previousValue = this.roundValue(this.computeBasicValue(previous, relatedPrevious, config.computation));
+            value = this.computeBasicValue(current, relatedCurrent, config.computation);
+            previousValue = this.computeBasicValue(previous, relatedPrevious, config.computation);
             percentageChange = this.getPercentageChange(value, previousValue);
             trend = this.getTrend(value, previousValue);
         }
         const trendEvaluation = this.getTrendEvaluation(trend, config.asc);
 
-        return {value, previousValue, percentageChange, trend, trendEvaluation}
+        return {value, previousValue, percentageChange, trend, trendEvaluation};
     }
 
     getPercentageChange(newValue: number | undefined, oldValue: number | undefined): number | undefined {
         if (newValue && oldValue) {
-            return this.roundValue((newValue - oldValue) === 0 ? 0 : 100 * Math.abs(( newValue - oldValue ) / oldValue));
+            return (newValue - oldValue) === 0 ? 0 : Math.abs(( newValue - oldValue ) / oldValue);
         }
-        return undefined
+        return undefined;
     }
 
     getTrend(newValue: number | undefined, oldValue: number | undefined): Trend {
         if (newValue && oldValue) {
-            return (newValue - oldValue) === 0 ? "stable" : (newValue - oldValue) > 0 ? "increase" : "decrease"
+            return (newValue - oldValue) === 0 ? "stable" : (newValue - oldValue) > 0 ? "increase" : "decrease";
         }
-        return undefined
+        return undefined;
     }
 
     getTrendEvaluation(trend: Trend, asc: boolean | undefined): Evaluation {
@@ -165,17 +163,10 @@ export class StatProvider {
             case "division":
                 return this.divide(value1, value2);
             case "percentage":
-                return this.divide(value1, value2) ? (this.divide(value1, value2)! * 100) : undefined;
+                return this.divide(value1, value2) ? this.divide(value1, value2) : undefined;
             default:
                 return undefined;
         }
     }
 
-    protected roundValue(value: number | undefined): number | undefined {
-        if (value) {
-            const precision = Math.pow(10, this.decimalsPrecision);
-            return Math.round(value * precision) / precision;
-        }
-        return undefined;
-    }
 }
