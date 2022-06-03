@@ -56,6 +56,7 @@ export interface DashboardItem extends GridsterItem {
     computation?: StatOperation; // operation to get the global value of the stat
     asc?: boolean; // if the positive evaluation is at increase or decrease trend
     statLayout?: StatLayout; // the ui of displaying the stat
+    numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
 }
 
 /**
@@ -101,6 +102,7 @@ export interface DashboardItemOption {
         computation?: StatOperation, // operation to get the global value of the stat
         asc?: boolean, // if the positive evaluation is at increase or decrease trend
         statLayout?: StatLayout, // the ui of displaying the stat
+        numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
 
         // For type === 'grid'
         columns?: GridColDef[],
