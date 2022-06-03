@@ -16,7 +16,7 @@ export class AuditStatComponent implements OnChanges {
     @Input() config: DashboardItem;
     @Input() dataset: {[key: string]: Results | DatasetError};
     @Input() previousDataSet: {[key: string]: Results | DatasetError};
-    @Input() numberFormatOptions: Intl.NumberFormatOptions = {maximumFractionDigits: 1};
+    @Input() numberFormatOptions: Intl.NumberFormatOptions = {style: 'decimal', maximumFractionDigits: 1};
 
     value: number | undefined;
     previousValue: number | undefined;
@@ -54,13 +54,6 @@ export class AuditStatComponent implements OnChanges {
 
         // here previous is undefined
         return "msg#stat.trendTooltip";
-    }
-
-    getFormatOptions(style: string): Intl.NumberFormatOptions {
-        return {
-            style: style,
-            ...(this.config?.numberFormatOptions || this.numberFormatOptions)
-        }
     }
 
     ngOnChanges(changes: SimpleChanges) {
