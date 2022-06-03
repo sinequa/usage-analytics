@@ -273,7 +273,7 @@ export class ExportService {
 
     if(previousDataSet !== null && dataset !== null){
       // TODO: decimalsPrecision should be a parameter value
-      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config, config?.decimalsPrecision);
+      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config);
       return ({title, value, percentageChange, trend, trendEvaluation});
     }
 

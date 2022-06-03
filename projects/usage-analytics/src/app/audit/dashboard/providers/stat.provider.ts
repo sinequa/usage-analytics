@@ -12,8 +12,6 @@ type MayBe<T> = T | undefined;
 @Injectable( { providedIn: 'root'})
 export class StatProvider {
 
-    defaultDecimalsPrecision = 1;
-
     constructor() {}
 
     extractStatValue(data: Results | DatasetError | undefined, valueLocation: MayBe<string>): MayBe<number> {
@@ -92,7 +90,6 @@ export class StatProvider {
         previousDataSet: Dataset,
         dataset: Dataset,
         config: DashboardItem,
-        decimalsPrecision = this.defaultDecimalsPrecision
         ): {value: MayBe<number>, previousValue: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
 
         const current: number | undefined = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation);
@@ -104,15 +101,15 @@ export class StatProvider {
         let value, previousValue, percentageChange, trend;
 
         if (!config.computation) {
-            value = this.roundValue(current, decimalsPrecision);
-            previousValue = this.roundValue(previous, decimalsPrecision);
-            percentageChange = this.getPercentageChange(current, previous, decimalsPrecision);
+            value = current;
+            previousValue = previous;
+            percentageChange = this.getPercentageChange(current, previous);
             trend = this.getTrend(current, previous)
         } else {
             relatedCurrent = this.getBasicValue(dataset[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
             relatedPrevious = this.getBasicValue(previousDataSet[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
-            value = this.roundValue(this.computeBasicValue(current, relatedCurrent, config.computation), decimalsPrecision);
-            previousValue = this.roundValue(this.computeBasicValue(previous, relatedPrevious, config.computation), decimalsPrecision);
+            value = this.computeBasicValue(current, relatedCurrent, config.computation);
+            previousValue = this.computeBasicValue(previous, relatedPrevious, config.computation);
             percentageChange = this.getPercentageChange(value, previousValue);
             trend = this.getTrend(value, previousValue);
         }
@@ -121,9 +118,9 @@ export class StatProvider {
         return {value, previousValue, percentageChange, trend, trendEvaluation};
     }
 
-    getPercentageChange(newValue: number | undefined, oldValue: number | undefined, decimalsPrecision = this.defaultDecimalsPrecision): number | undefined {
+    getPercentageChange(newValue: number | undefined, oldValue: number | undefined): number | undefined {
         if (newValue && oldValue) {
-            return this.roundValue((newValue - oldValue) === 0 ? 0 : 100 * Math.abs(( newValue - oldValue ) / oldValue), decimalsPrecision);
+            return (newValue - oldValue) === 0 ? 0 : Math.abs(( newValue - oldValue ) / oldValue);
         }
         return undefined;
     }
@@ -166,17 +163,10 @@ export class StatProvider {
             case "division":
                 return this.divide(value1, value2);
             case "percentage":
-                return this.divide(value1, value2) ? (this.divide(value1, value2)! * 100) : undefined;
+                return this.divide(value1, value2) ? this.divide(value1, value2) : undefined;
             default:
                 return undefined;
         }
     }
 
-    protected roundValue(value: number | undefined, decimalsPrecision = this.defaultDecimalsPrecision): number | undefined {
-        if (value) {
-            const precision = Math.pow(10, decimalsPrecision);
-            return Math.round(value * precision) / precision;
-        }
-        return undefined;
-    }
 }
