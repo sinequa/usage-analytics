@@ -79,6 +79,9 @@
         },
         "userCoverage": {
             "info": "Active Users compared to total number of potential users (defined by the option: potential_total_user_count). Interpretation: Evaluation of user adoption. Adoption indicator. Calculation: Total number of active users / Total number of potential users ( set to {potential_total_user_count})"
+        },
+        "newUsersTimeline": {
+            "info": "Users that logged in for the first time displayed over time. Interpretation: Adoption indicator. Calculation: Addition of all user-ids where firstlogin > {start}"
         }
     },
 

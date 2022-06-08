@@ -256,6 +256,7 @@ export class DashboardItemComponent implements OnChanges {
                     values: {
                         // Params processed within the app code
                         sessionCountThreshold: this.auditService.sessionCountParam,
+                        start: this.auditService.startDate,
                         // Params retrieved from the app customization json
                         ...this.auditService.params,
                         ...this.auditService.customParams
