@@ -45,6 +45,9 @@ export interface AuditDatasetFilters {
     previous: string;
     start: string;
     end: string;
+    localPrevious: string;
+    localStart: string;
+    localEnd: string;
 }
 
 @Injectable({
@@ -73,6 +76,7 @@ export class AuditService {
     // used as tooltips
     public infoCurrentFilter: string | undefined;
     public infoPreviousFilter: string | undefined;
+    public startDate: string | undefined;
 
     constructor(
         public datasetWebService: DatasetWebService,
@@ -377,17 +381,19 @@ export class AuditService {
             this.currentFilter = `[${this.intl.formatDate(timestamp[0])} - ${this.intl.formatDate(timestamp[1])}]`;
             this.previousFilter =  this.previousRange
                                     ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
-                                    : `[${this.intl.formatDate(parsedTimestamp.previous)} - ${this.intl.formatDate(parsedTimestamp.start)}]`;
+                                    : `[${this.intl.formatDate(parsedTimestamp.localPrevious)} - ${this.intl.formatDate(parsedTimestamp.localStart)}]`;
         } else {
             this.currentFilter = timestamp;
             this.previousFilter =  this.previousRange
                                     ? `[${this.intl.formatDate(this.previousRange[0])} - ${this.intl.formatDate(this.previousRange[1])}]`
                                     : timestamp;
         }
-        this.infoCurrentFilter = `${this.intl.formatMessage('msg#dateRange.from')} ${this.intl.formatDate(parsedTimestamp.start, {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.end, {day: "numeric", month: "short", year: "numeric"})}`;
+
+        this.startDate = this.intl.formatDate(parsedTimestamp.localStart, {day: "numeric", month: "short", year: "numeric"});
+        this.infoCurrentFilter = `${this.intl.formatMessage('msg#dateRange.from')} ${this.startDate} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.localEnd, {day: "numeric", month: "short", year: "numeric"})}`;
         this.infoPreviousFilter =  this.previousRange
                                     ? `${this.intl.formatMessage('msg#dateRange.from')}  ${this.intl.formatDate(this.previousRange[0], {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(this.previousRange[1], {day: "numeric", month: "short", year: "numeric"})}`
-                                    : `${this.intl.formatMessage('msg#dateRange.from')} ${this.intl.formatDate(parsedTimestamp.previous, {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.start, {day: "numeric", month: "short", year: "numeric"})}`;
+                                    : `${this.intl.formatMessage('msg#dateRange.from')} ${this.intl.formatDate(parsedTimestamp.localPrevious, {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.localStart, {day: "numeric", month: "short", year: "numeric"})}`;
     }
 
     private getTimestampValueFromExpr(expr: Expr): string | string[] {
@@ -538,7 +544,10 @@ export class AuditService {
             previousRange: this.exprBuilder.makeRangeExpr("timestamp", previousToServerTimeZone, previousEndToServerTimeZone),
             previous: Utils.toSqlValue(previousToServerTimeZone),
             start: Utils.toSqlValue(startToServerTimeZone),
-            end: Utils.toSqlValue(endToServerTimeZone)
+            end: Utils.toSqlValue(endToServerTimeZone),
+            localPrevious: Utils.toSqlValue(previous),
+            localStart: Utils.toSqlValue(start),
+            localEnd: Utils.toSqlValue(end)
         }
     }
 
