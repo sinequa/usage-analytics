@@ -30,7 +30,7 @@ It allows getting information from indexes through multiple SQL queries. Thus, i
 However, using the dataset web service within native Sinequa libraries requires a few simple adjustments :
 
 - Deactivate Search for the route where you want to use Dataset web service.
-- Listen to Search events and send requests to the Dataset web service, using the Query object to store parameters.
+- Listen to Search events and send requests to the Dataset web service, using the Query object (where we used to store parameters).
 
 <span style="display:block;text-align:center">![DataSet Web Service](/docs/assets/dataset.PNG)</span>
 
@@ -44,31 +44,47 @@ This logic is implemented in the `audit.service.ts` :
 
     This method extracts the time range filter from the navigation URL.
 
+- `getRequestScope(facetName: string): string[]`
+
+    This method retrieves the scope of the dataset queries (i.e: list of applications we are interested in their analytics).
+
 - `updateDatasetsList(): string[]`
 
-    This method specifies the list of queries, part of the dataset, that we only want to execute.
+    This method specifies the list of queries, part of the dataset, that we want to execute among the whole list.
 
-- `getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError;}>`
+- `getParallelStreamAuditData(filters: string, start: string, end: string, apps: string[], profiles: string[], excludedDataset: string[] = []): Observable<Dataset>`
 
-    This method executes HTTP requests of the dataset web service.
+    This method triggers HTTP requests of the dataset web service.
 
 - `updateRangeFilter(timestamp: Date[] | string)`
 
     This method updates the query object with the provided time range filter.
 
+- `updateRequestScope(field: string, value: string[] | string, facetName: string)`
+
+    This method updates the query object with the selected list of targeted applications.
+
+- `convertRangeFilter(timestamp?: string[] | string, parsedTimestamp?: AuditDatasetFilters)`
+
+    This method converts date range filters to a more readable format.
+
 - `parseAuditTimestamp(timestamp: string | Date[]): AuditDatasetFilters`
 
-    This method converts the time range to request parameters.
+    This method converts the time range to the appropriate request parameter's format.
 
 ## Dashboards
 
+### Introduction
+
 Dashboards of *Usage Analytics* are based on the [**angular-gridster2**](https://tiberiuzuld.github.io/angular-gridster2/) library.
 
-The application is organized in multiple tabs. Each tab is a dashboard that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a palette of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
+The application is organized in multiple tabs. Each tab is a dashboard.
 
-Dashboards can be saved with a name, marked as default and shared with colleagues. Users can also manage their dashboards' settings.
+ <!-- that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a palette of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
 
-<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
+Dashboards can be saved with a name, marked as default and shared with colleagues. Users can also manage their dashboards' settings. -->
+
+<!-- <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span> -->
 
 
 A dashboard is basically defined by the following simplified piece of code :
@@ -93,7 +109,7 @@ There are three levels in the above snippet:
 - `<gridster-item>`: A component provided by the [angular-gridster2](https://tiberiuzuld.github.io/angular-gridster2/) library for wrapping each widget of the dashboard. This component will be responsible for managing the positioning, dragging and resizing of the widgets. The component takes in an **`item`** object (of type [`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts)).
 - `<sq-dashboard-item>`: A Sinequa component that is defined at the app level (`app/audit/dashboard/dashboard-item.component.ts`). This component is essentially a switch to display the right component in function of the widget type. The widget type is passed via the **`config`** input. Notice that the `item` input of `<gridster-item>` is also used for this `config` input. This is because we chose to use a single object to manage both the state of the widget ([`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts) interface) and its configuration (`DashboardItem` interface). The `DashboardItem` interface is in fact a direct extension of [`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts).
 
-Notice in the snippet above that the list of dashboard items, as well the options of the dashboard, are managed by a new `DashboardService`. This Angular service, which lives in the Usage Analytics app (`app/audit/dashboard/dashboard.service.ts`), manages the following tasks:
+Notice in the above snippet that the list of dashboard items, as well the options of the dashboard, are managed by a new `DashboardService`. This Angular service, which lives in the Usage Analytics app (`app/audit/dashboard/dashboard.service.ts`), manages the following tasks:
 
 - Generating dashboards.
 - Storing the state of the dashboard and its global options.
@@ -102,7 +118,7 @@ Notice in the snippet above that the list of dashboard items, as well the option
 - Editing the dashboard (adding or removing items).
 - Emitting events when the dashboard changes.
 
-## Configuration
+### Configuration principle
 
 *Usage Analytics* is designed to support 2 types of configuration :
 
@@ -110,15 +126,15 @@ Notice in the snippet above that the list of dashboard items, as well the option
 - Server side configuration: administrators can override the built-in configuration by providing their own configuration in the Sinequa administration.
 
 <span style="display:block;text-align:center">![Client side configuration](/docs/assets/client_side_architecture.png)
-*Client side configuration*
+<span style="display:block;text-align:center">*Client side configuration*</span>
 </span>
 
 <span style="display:block;text-align:center">![Server side configuration](/docs/assets/server_side_architecture.png)
-*Server side configuration*
+<span style="display:block;text-align:center">*Server side configuration*</span>
 </span>
 
-The configuration allows to define the list and settings of each widget, the content of the default dashboards and the content of the widget palettes.
-This can be done whether in local config file at app level ([`config.ts`](https://github.sinequa.com/CustomerSolutions/sba-sinequa-analytics-internal/blob/SBA-337-usage_analytics_doc/projects/usage-analytics/src/app/audit/config.ts)) or defined on the Sinequa server (Application > Customization (JSON)). The configuration defined on the server overrides the one defined locally.
+The configuration allows to define the list and settings of each widget, the content of the default dashboards and the content of the widgets palette.
+This can be done whether in local config file at app level ([`config.ts`](https://github.sinequa.com/CustomerSolutions/sba-sinequa-analytics-internal/blob/SBA-337-usage_analytics_doc/projects/usage-analytics/src/app/audit/config.ts)) or defined on the Sinequa server (Application > Customization (JSON)). **The configuration defined on the server overrides the one defined locally**.
 
 Typically the configuration in `config.ts` is stored in structures called `WIDGETS`, `PALETTES`, or `FACETS`. To override these structures on the server-side, simply add them to the "Customization (JSON)" object (with their name in lower case). For example:
 
@@ -130,21 +146,11 @@ Typically the configuration in `config.ts` is stored in structures called `WIDGE
 }
 ```
 
-In the case of the list of widgets, it would be cumbersome to redefine the (long) list of widgets on the server when overriding just one widget. So it's possible instead to define a `customWidgets` object, which is merged with the default list:
-
-```
-{
-  "customWidgets": {
-     "my-custom-widget": { ... }
-  }
-}
-```
-
 `DashboardService` handles those cases while initializing the application :
 
 - `getWidgets(): {[key: string]: DashboardItemOption}`
 
-    This method returns the list of widgets from the configuration defined on the server (appService.app.data.widgets and appService.app.data.customWidgets) or in the config.ts file (WIDGETS).
+    This method returns the list of widgets from the configuration defined on the server (appService.app.data.widgets) or in the config.ts file (WIDGETS).
 
 - `getPalette(): {name: string, items: DashboardItemOption[]}[]`
 
@@ -153,6 +159,44 @@ In the case of the list of widgets, it would be cumbersome to redefine the (long
 - `getStandardDashboards(): {name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[]}[]`
 
     This method returns the list of standard dashboard from the configuration defined on the server (appService.app.data.standardDashboards) or in the config.ts file (STANDARD_DASHBOARDS).
+
+### Customization
+
+Basically, tow different way of customization can be applied to the *Usage Analytics* application. All depends on the user rights.
+
+**1 - Ordinary user**
+
+Ordinary users have the ability to perform several modifications on both widgets and dashboards.
+
+On the first hand, they can:
+
+- Resize existing widgets
+- Rename widgets
+<span style="display:block">![Dashboard actions](/docs/assets/rename-widget.PNG)</span>
+
+- Remove widgets from the dashboard
+<span style="display:block">![Dashboard actions](/docs/assets/remove-widget.PNG)</span>
+
+- Add widgets from a palette of predefined ones
+<span style="display:block">![Dashboard actions](/docs/assets/add-widget.PNG)</span>
+
+- Change the display of widgets
+<span style="display:block">![Dashboard actions](/docs/assets/display-widget.PNG)</span>
+
+On the other hand, it is also possible to apply some actions to dashboards such as creating new dashboard, deleting dashboard, marking as default ...
+<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
+
+Notice that any saved modification leads to an update of the whole configuration in the **user settings** and, now on, it will be the version displayed to that specific user.
+Users can always reset their modifications and go back to the default configuration as defined at the application level.
+<span style="display:block">![Dashboard actions](/docs/assets/reset-dashboards.PNG)</span>
+
+**2 - Admin user**
+
+In addition to options already provided to an ordinary user, an admin modify several aspects from **Customization (JSON)** tab of the application. There, it is possible to override: 
+
+- `sq_timezone`: (**UTC** by default) Local time zone of Sinequa server to which time filters should be converted before being sent. Please refer to the [time zones database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+- `session_count_threshold_per_month`: (**2** by default) Used by “Active Users” related widgets. It allows to modify the calculation: a user is considered active when he did at least such sessions.
+
 
 ## Export
 Dashboards are exportable as Excel, CSV or image files. This feature is useful when data should be injected in other systems or visualized in demos.
