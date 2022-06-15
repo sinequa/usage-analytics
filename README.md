@@ -6,7 +6,27 @@
 
 For more information about Sinequa libraries, please refer to the [Sinequa documentation](https://doc.sinequa.com) and the [SBA framework documentation](https://sinequa.github.io/sba-angular).
 
-## Prerequisites
+## Table of contents
+
+* [Prerequisites](#prerequisites)
+* [Dataset Web service](#dataset_web_service)
+* [Dashboards](#dashboards)
+    * [Introduction](#introduction)
+    * [Configuration principle](#configuration_principle)
+    * [Customization](#customization)
+        * [Ordinary user](#ordinary_user)
+        * [Admin user](#admin_user)
+    * [Tips and tricks](#tips_tricks)
+        * [Widget display](#widget_display)
+        * [Widget creation / initialization](#widget_creation)
+        * [Widget synchronization](#widget_synchronization)
+        * [Widget persistence](#widget_persistence)
+        * [Widget sizing](#widget_sizing)
+        * [Widget tooltips](#widget_tooltips)
+        * [Formatting widget numbers](#widget_numbers)
+    * [Export / Import](#export_import)
+
+## <a name="prerequisites"></a> Prerequisites
 Similar to any Angular application, the first step to do is to install the project **dependencies**. The list of dependencies is defined in the `package.json`.
 
 To do so, open a **Terminal** and run 
@@ -23,14 +43,14 @@ In such case, we recommend the use of the following
 npm install --legacy-peer-deps
 ```
 
-## Dataset Web service
+## <a name="dataset_web_service"></a> Dataset Web service
 Behind the scenes, *Usage Analytics* uses the **Dataset Web Service** to retrieve the data.
 It allows getting information from indexes through multiple SQL queries. Thus, it is the best fit to build dashboard reports, 360 views and so on.
 
 However, using the dataset web service within native Sinequa libraries requires a few simple adjustments :
 
 - Deactivate Search for the route where you want to use Dataset web service.
-- Listen to Search events and send requests to the Dataset web service, using the Query object to store parameters.
+- Listen to Search events and send requests to the Dataset web service, using the Query object (where we used to store parameters).
 
 <span style="display:block;text-align:center">![DataSet Web Service](/docs/assets/dataset.PNG)</span>
 
@@ -44,31 +64,47 @@ This logic is implemented in the `audit.service.ts` :
 
     This method extracts the time range filter from the navigation URL.
 
+- `getRequestScope(facetName: string): string[]`
+
+    This method retrieves the scope of the dataset queries (i.e: list of applications we are interested in their analytics).
+
 - `updateDatasetsList(): string[]`
 
-    This method specifies the list of queries, part of the dataset, that we only want to execute.
+    This method specifies the list of queries, part of the dataset, that we want to execute among the whole list.
 
-- `getAuditData(filters: string, start: string, end: string, mask: string): Observable<{[key: string]: Results | DatasetError;}>`
+- `getParallelStreamAuditData(filters: string, start: string, end: string, apps: string[], profiles: string[], excludedDataset: string[] = []): Observable<Dataset>`
 
-    This method executes HTTP requests of the dataset web service.
+    This method triggers HTTP requests of the dataset web service.
 
 - `updateRangeFilter(timestamp: Date[] | string)`
 
     This method updates the query object with the provided time range filter.
 
+- `updateRequestScope(field: string, value: string[] | string, facetName: string)`
+
+    This method updates the query object with the selected list of targeted applications.
+
+- `convertRangeFilter(timestamp?: string[] | string, parsedTimestamp?: AuditDatasetFilters)`
+
+    This method converts date range filters to a more readable format.
+
 - `parseAuditTimestamp(timestamp: string | Date[]): AuditDatasetFilters`
 
-    This method converts the time range to request parameters.
+    This method converts the time range to the appropriate request parameter's format.
 
-## Dashboards
+## <a name="dashboards"></a> Dashboards
+
+### <a name="introduction"></a> Introduction
 
 Dashboards of *Usage Analytics* are based on the [**angular-gridster2**](https://tiberiuzuld.github.io/angular-gridster2/) library.
 
-The application is organized in multiple tabs. Each tab is a dashboard that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a palette of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
+The application is organized in multiple tabs. Each tab is a dashboard.
 
-Dashboards can be saved with a name, marked as default and shared with colleagues. Users can also manage their dashboards' settings.
+ <!-- that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a palette of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
 
-<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
+Dashboards can be saved with a name, marked as default and shared with colleagues. Users can also manage their dashboards' settings. -->
+
+<!-- <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span> -->
 
 
 A dashboard is basically defined by the following simplified piece of code :
@@ -93,7 +129,7 @@ There are three levels in the above snippet:
 - `<gridster-item>`: A component provided by the [angular-gridster2](https://tiberiuzuld.github.io/angular-gridster2/) library for wrapping each widget of the dashboard. This component will be responsible for managing the positioning, dragging and resizing of the widgets. The component takes in an **`item`** object (of type [`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts)).
 - `<sq-dashboard-item>`: A Sinequa component that is defined at the app level (`app/audit/dashboard/dashboard-item.component.ts`). This component is essentially a switch to display the right component in function of the widget type. The widget type is passed via the **`config`** input. Notice that the `item` input of `<gridster-item>` is also used for this `config` input. This is because we chose to use a single object to manage both the state of the widget ([`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts) interface) and its configuration (`DashboardItem` interface). The `DashboardItem` interface is in fact a direct extension of [`GridsterItem`](https://github.com/tiberiuzuld/angular-gridster2/blob/master/projects/angular-gridster2/src/lib/gridsterItem.interface.ts).
 
-Notice in the snippet above that the list of dashboard items, as well the options of the dashboard, are managed by a new `DashboardService`. This Angular service, which lives in the Usage Analytics app (`app/audit/dashboard/dashboard.service.ts`), manages the following tasks:
+Notice in the above snippet that the list of dashboard items, as well the options of the dashboard, are managed by a new `DashboardService`. This Angular service, which lives in the Usage Analytics app (`app/audit/dashboard/dashboard.service.ts`), manages the following tasks:
 
 - Generating dashboards.
 - Storing the state of the dashboard and its global options.
@@ -102,49 +138,30 @@ Notice in the snippet above that the list of dashboard items, as well the option
 - Editing the dashboard (adding or removing items).
 - Emitting events when the dashboard changes.
 
-## Configuration
+### <a name="configuration_principle"></a> Configuration principle
 
 *Usage Analytics* is designed to support 2 types of configuration :
 
 - Built-in configuration: the default configuration is defined in the source code of the app. It can be modified there, but it requires recompiling the application.
-- Server side configuration: administrators can override the built-in configuration by providing their own configuration in the Sinequa administration.
+- Server side configuration: administrators can override the built-in configuration by updating the **Customization tab** in the administration of the application.
 
 <span style="display:block;text-align:center">![Client side configuration](/docs/assets/client_side_architecture.png)
-*Client side configuration*
+<span style="display:block;text-align:center">*Client side configuration*</span>
 </span>
 
 <span style="display:block;text-align:center">![Server side configuration](/docs/assets/server_side_architecture.png)
-*Server side configuration*
+<span style="display:block;text-align:center">*Server side configuration*</span>
 </span>
 
-The configuration allows to define the list and settings of each widget, the content of the default dashboards and the content of the widget palettes.
-This can be done whether in local config file at app level ([`config.ts`](https://github.sinequa.com/CustomerSolutions/sba-sinequa-analytics-internal/blob/SBA-337-usage_analytics_doc/projects/usage-analytics/src/app/audit/config.ts)) or defined on the Sinequa server (Application > Customization (JSON)). The configuration defined on the server overrides the one defined locally.
+The configuration allows to set application's **params**, define the list and settings of each widget, the content of the default dashboards and the content of the widgets palette.
+This can be done whether in local config file at app level `config.ts` or defined on the Sinequa server (Application > Customization (JSON)). **The configuration defined on the server overrides the one defined locally**.
 
-Typically the configuration in `config.ts` is stored in structures called `WIDGETS`, `PALETTES`, or `FACETS`. To override these structures on the server-side, simply add them to the "Customization (JSON)" object (with their name in lower case). For example:
-
-```
-{
-  "widgets": {
-     "my-custom-widget": { ... }
-  }
-}
-```
-
-In the case of the list of widgets, it would be cumbersome to redefine the (long) list of widgets on the server when overriding just one widget. So it's possible instead to define a `customWidgets` object, which is merged with the default list:
-
-```
-{
-  "customWidgets": {
-     "my-custom-widget": { ... }
-  }
-}
-```
 
 `DashboardService` handles those cases while initializing the application :
 
 - `getWidgets(): {[key: string]: DashboardItemOption}`
 
-    This method returns the list of widgets from the configuration defined on the server (appService.app.data.widgets and appService.app.data.customWidgets) or in the config.ts file (WIDGETS).
+    This method returns the list of widgets from the configuration defined on the server (appService.app.data.widgets) or in the config.ts file (WIDGETS).
 
 - `getPalette(): {name: string, items: DashboardItemOption[]}[]`
 
@@ -154,55 +171,54 @@ In the case of the list of widgets, it would be cumbersome to redefine the (long
 
     This method returns the list of standard dashboard from the configuration defined on the server (appService.app.data.standardDashboards) or in the config.ts file (STANDARD_DASHBOARDS).
 
-## Export
-Dashboards are exportable as Excel, CSV or image files. This feature is useful when data should be injected in other systems or visualized in demos.
+### <a name="customization"></a> Customization
 
-<span style="display:block;text-align:center">![Export Dashboard](/docs/assets/export_dashboard.PNG)</span>
+Basically, tow different way of customization can be applied to the *Usage Analytics* application. All depends on the user rights.
 
-`ExportService` handles the export workflow from data extraction till file generation and its download :
+**1 - Ordinary user** <a name="ordinary_user"></a>
 
-- `exportToPNG(filename: string, element: ElementRef)`
+Ordinary users have the ability to perform several modifications on both widgets and dashboards.
 
-    This method creates an .png image from a specific HTML element and save it.
+On the first hand, they can:
 
-- `exportToCsv(filename:string, items: DashboardItemComponent[])`
+- Resize existing widgets
+- Rename widgets
+- Remove widgets from the dashboard
+- Change the display of widgets
 
-    This method exports all widgets of a given dashboard to a .csv file.
+<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/widget-actions.PNG)</span>
 
-- `exportToXML(filename:string, items: DashboardItemComponent[])`
+- Add widgets from a palette of predefined ones
+<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/add-widget.PNG)</span>
 
-    This method exports all widgets of a given dashboard to a Open XML format file.
+On the other hand, it is also possible to apply some actions to dashboards such as creating new dashboard, deleting dashboard, marking as default ...
+<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
 
-- `exportXLSX(filename:string, items: DashboardItemComponent[])`
+Notice that any saved modification leads to an update of the whole configuration in the **user settings** and, so on, it will be the version displayed to that specific user.
+Users can always reset their modifications and go back to the default configuration as defined in the customization of the application or in the config.ts file .
+<span style="display:block;text-align:center">![Dashboard actions](/docs/assets/reset-dashboards.PNG)</span>
 
-    This method exports all widgets of a given dashboard to a XLSX file.
+**2 - Admin user** <a name="admin_user"></a>
 
-- `objectToCsv(filename: string, rows: object[]): string[]`
+In addition to options already provided to an ordinary user, an admin can modify several aspects from **Customization (JSON)** tab of the application. There, it is possible to override: 
 
-    This method converts a array of object to csv rows.
+- `sq_timezone: string`: (**"UTC"** by default) Time zone name of Sinequa server to which time filters should be converted before being sent. Please refer to the [time zones database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+- `session_count_threshold_per_month: number`: (**2** by default) Used by “Active Users” related widgets. It allows to modify the calculation: a user is considered active when he did at least such sessions.
+- `potential_total_user_count: number`: (**0** by default) Used by “User Coverage” widget. It represents the total number of users who can use the platform within the company. Notice that this parameter **must be updated** by the admin. If not, the widget will display an error message.
+- `static_filters_expr: string`: (**""** by default) A filter expression appended to the **where clause** of **all queries in the dataset**. **A fielded search syntax is required**. Please refer to the [documentation](https://doc.sinequa.com/en.sinequa-es.v11/Content/en.sinequa-es.ui.searchOperators.html) for further information.
+- `custom_params: : MapOf<string>`: (**{}** by default) Set of params that could be declared and used in **a specific query statement (From clause, where clause …)**. A custom param is accessible at the query level using its key and the following syntax **{$.key}**.
+- `default_timestamp_filter: string | Date[]`: (**""** by default) Override the default time filter (initially set to 1 month at the application level). Possible values are :
+    - Members of `RelativeTimeRanges` enumeration (`["msg#dateRange.last3H", "msg#dateRange.last6H", "msg#dateRange.last12H", "msg#dateRange.last24H", "msg#dateRange.last7D", "msg#dateRange.last30D", "msg#dateRange.last90D", "msg#dateRange.last6M", "msg#dateRange.last1Y", "msg#dateRange.last2Y", "msg#dateRange.last5Y"]`).
+    - Array of start and end date (`[new Date("1/1/2021"), new Date("1/1/2022")]`).
+- `default_app_filter: string | string[]`: (**""** by default) Pre-filtering the scope of the queries in the dataset by the provided list of SBA applications.
+- `default_profile_filter: string | string[]`: (**""** by default) Pre-filtering the scope of the queries in the dataset by the provided list of PROFILE applications.
+- `mono_scope_queries: string[]`: (**["newUsersTimeLine", "newUsers"]** by default) List of widgets requiring a filter by a unique scope ( if not the case, an error message is displayed within the widget).
+- `facets: FacetConfig<FacetListParams>[]`: List of facet filter's configuration available on the top of dashboards. Please refer to this [documentation](https://sinequa.github.io/sba-angular/tutorial/facet-module.html) for more informations about facets.
+- `widgets: {[key: string]: DashboardItemOption}`: Configurations of available widgets in the application.
+- `standardDashboards: {name: string, items: {item: string, position: DashboardItemPosition}[]}[]`: Definition of default dashboards to be displayed for users if no customization is stored in their user settings (after saving modification(s)).
+- `palette: {name: string, items: string[]}[]`: List of available widgets that could be added to a dashboard.
 
-- `csvToXML(tables: {title:string, tables:string[]}[], filename: string)`
-
-    This method converts csv array in a XML Workbook representation.
-
-- `extractStatRow(item: DashboardItemComponent) : any`
-
-    This method extracts row data from a given stat widget.
-
-- `extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined`
-
-    This method creates a list of rows for stat widgets.
-
-- `extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[]`
-
-    This method extracts data from chart widgets.
-
-- `extractTimelines(filename: string, items: DashboardItemComponent[]): ExtractModel[]`
-
-    This method extracts data from timeline widgets.
-
-
-## Customizing dashboards
+### <a name="tips_tricks"></a> Tips and tricks
 
 *Usage Analytics* is meant to be customized easily, especially to let developers create new types of widgets, either generic or specific to their use cases.
 
@@ -214,7 +230,7 @@ Adding a widget will impact several parts of the code, and several aspects must 
 - The widget might have properties needing to be persisted.
 - The widget size must adapt to the dashboard grid.
 
-### Widget display
+**1 - Widget display** <a name="widget_display"></a>
 
 The widget's display must be implemented in the `sq-dashboard-item` component (`app/audit/dashboard/dashboard-item.component`). The template of this component is composed of a `sq-facet-card` (see [facets](https://sinequa.github.io/sba-angular/tutorial/facet-module.html)) wrapping a Switch-Case directive to display the desired component (either a chart, stat, timeline, etc.). Therefore, adding a new component means simply adding a new "case" such as:
 
@@ -225,37 +241,38 @@ The widget's display must be implemented in the `sq-dashboard-item` component (`
 
 Your widget might require other input parameters, that you can create and manage inside `dashboard-item.component.ts` (generally, binding the global `results`, `dataset` or `data` as an input of your component is needed to refresh the widget upon new dataset web service changes). The component might also generate events, which you will want to handle in the controller as well.
 
-### Widget creation / initialization
+**2 - Widget creation / initialization** <a name="widget_creation"></a>
 
 The creation of the widget can occur in different ways:
 
   1. By selecting a built-in widget from the palette.
   2. On initialization, when a dashboards are created / loaded.
-  3. Adding custom widget in `config.ts` or at Sinequa server level.
+  3. Adding custom widget in `config.ts` or at administration level.
 
 In any case, it is necessary to create a `DashboardItemOption`, an object consisting of a widget's `type`, `query`, `text`, `icon` and a `unique` property (that can prevent users from creating two components of this type). 
 
 For example, the configuration object to create a "Search by session timeline" widget is as follow:
 
 ```ts
-searchBySessionTimeline: {
-        type: "timeline",
-        query: "avgQueriesBySessionTimeLine",
-        text: "msg#widgets.avgQueriesBySessionTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.avgQueriesBySessionTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "AvgQueriesBySession",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "avg", title: "Average Search By Session", primary: true}]
-            }
+"searchBySessionTimeline": {
+        "type": "timeline",
+        "query": "avgQueriesBySessionTimeLine",
+        "text": "Average Queries By Session",
+        "icon": "fas fa-chart-line",
+        "info": "Average number of search queries per session displayed over time. Interpretation: Adoption indicator. Calculation: Addition of all searchcount / Total number of unique session-ids.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "AvgQueriesBySession",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Search By Session", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     }
 ```
 
-To include a new widget via the "Palette", simply add it to the list :
+To include this new widget to the "Palette", simply add it to the list :
 
 ```ts
 // Palette is classified by type of widget
@@ -294,7 +311,7 @@ this.dashboardService.addWidget(WIDGET);
 
 This method returns the `item` object (of type `DashboardItem`) that will be passed to the `sq-dashboard-item` component. You can add or modify properties of this `item`: This is useful if your widget expects specific types of inputs.
 
-### Widget synchronization
+**3 - Widget synchronization** <a name="widget_synchronization"></a>
 
 The way the built-in widgets are designed is actually to **avoid explicit synchronization**, that is: to do nothing and keep the components independent from each other.
 
@@ -302,11 +319,11 @@ However, it is clear when using *Usage Analytics* that *some form of synchroniza
 
 The way it works is that the widgets **respond only to an update of the global dataset web service response**. Widgets cannot talk to each other, but some user interactions (like selecting a portion on the chart) can trigger a refresh of the global dataset web service response (which itself triggers a refresh of the widgets).
 
-### Widget persistence
+**4 - Widget persistence** <a name="widget_persistence"></a>
 
 The *state* of your widget can be defined in three locations:
 
-- The internal state of the component (for example, switching to widget's grid view). This state is not persisted: If you refresh the page, or if you select another dashboard and come back, this internal state is reset to its defaults.
+- The internal state of the component. This state is not persisted: If you refresh the page, or if you select another dashboard and come back, this internal state is reset to its defaults.
 - The inputs passed to the component from its parent (`sq-dashboard-item`). These inputs often consist of the **`Results` / `dataset` ...** object (or a subset of these results, like a `Record` or an `Aggregation`). This state is not persisted either: If you refresh the page, new global dataset web service response is obtained, transformed and passed to your component.
 - The inputs stored in the `DashboardItem` object. These inputs *are* persisted, because (by definition) the state of the dashboard that is persisted is essentially the list of `DashboardItem`. When you refresh the page, the dashboard items are downloaded from the user settings, allowing to display the widgets in the same state as you left them. When you share a dashboard with a colleague, the URL contains the serialized list of items.
 
@@ -357,7 +374,7 @@ If your custom widget needs to have a part of the state persisted, a few things 
 
 Note that you can greatly simplify the above if your component directly has access to the `DashboardItem` and `DashboardService` (but that means your component won't be reusable outside of the context of a dashboard).
 
-### Widget sizing
+**5 - Widget sizing** <a name="widget_sizing"></a>
 
 One difficulty of building widgets is that their size is strongly constrained by the dashboard, so the components cannot take their ideal size: they must adapt to any size (for example by forcing a width and height of 100% or by scrolling vertically or horizontally) or conform to an explicit size provided by the parent (`sq-dashboard-item`).
 
@@ -389,3 +406,130 @@ The `width` and `height` inputs may also be used in the template. For example:
 ```
 
 Note that in the parent `sq-dashboard-item` component, the width and height of the item are inputs of the component and are automatically refreshed when the dashboard is modified. However, an `innerheight` parameter is computed in `ngOnChanges()` to account for the height of the facet header.
+
+**6 - Widget tooltips** <a name="widget_tooltips"></a>
+
+Tooltips in *Usage Analytics* use the feature provided by Sinequa libraries. It is mainly about the [tooltip directive](https://sinequa.github.io/sba-angular/components/directives/TooltipDirective.html) and the [pipe message](https://sinequa.github.io/sba-angular/core/pipes/MessagePipe.html).
+
+It is almost the common use case in different Sinequa's projects. What comes new with *Usage Analytics*, is the ability to dynamically map parameters and variables, at both level: application code and administration customization, to the tooltip text. 
+
+The tooltip of widget's info is a good example :
+
+- First, in `sq-dashboard-item.ts` check if the parameter already exists in `messageParams` of `infoAction`. By default, all the customization parameters are taken into account, so nothing to do in this case. If it is an attribute of the application code, then you need to define it :
+
+```ts
+messageParams: {
+    values: {
+                // Params processed within the app code
+                sessionCountThreshold: this.auditService.sessionCountParam,
+                myParam: myValue,
+                start: this.auditService.startDate,
+                // Params retrieved from the app customization json / config.ts file
+                ...this.auditService.params,
+                ...this.auditService.customParams
+            }
+}
+```
+
+- Next step is to define your tooltip text. For example, in `src/locales/messages/en.json`:
+
+```ts
+"widgets": {
+        "my-custom-widget": {
+            "info": "test myParam = {myParam}"
+        }
+    }
+```
+
+- Finally, thanks to the following syntax in the [action button template](https://sinequa.github.io/sba-angular/components/components/BsActionButtons.html):
+
+```html
+<a ... sqTooltip="{{item.title | sqMessage:item.messageParams}}"></a>
+```
+You should be able to display `myValue` in your tooltip text.
+
+**7 - Formatting widget numbers** <a name="widget_numbers"></a>
+
+Often in any analytics dashboards, you may need to display numbers in different format. Within *Usage Analytics*, this has been integrated with a very simple and customizable way :
+
+- In a widget configuration object which implement the `DashboardItemOption` interface, the optional property `numberFormatOptions` defines the format. For further informations about available formats, please refer to [Intl.NumberFormatOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat). For example : 
+
+```ts
+"my-custom-widget": {
+    ...,
+    "parameters": {
+        ...,
+        "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
+    }
+}
+```
+
+- The provided format is then used by `sq-audit-stat` template as inputs to [pipe number](https://sinequa.github.io/sba-angular/components/pipes/NumberPipe.html):
+```html
+<span class="stat-value">{{value | sqNumber: (config?.numberFormatOptions || numberFormatOptions)}}</span>
+```
+
+### <a name="export_import"></a> Export / Import
+
+<span style="display:block;text-align:center">![Export Dashboard](/docs/assets/export_import.PNG)</span>
+
+Dashboards are exportable as Excel, CSV, XML or image files. This feature is useful when data should be injected in other systems or visualized in demos.
+
+`ExportService` handles the export workflow from data extraction till file generation and its download :
+
+- `exportToPNG(filename: string, element: ElementRef)`
+
+    This method creates an .png image from a specific HTML element and save it.
+
+- `exportToCsv(filename:string, items: DashboardItemComponent[])`
+
+    This method exports all widgets of a given dashboard to a .csv file.
+
+- `exportToXML(filename:string, items: DashboardItemComponent[])`
+
+    This method exports all widgets of a given dashboard to a Open XML format file.
+
+- `exportXLSX(filename:string, items: DashboardItemComponent[])`
+
+    This method exports all widgets of a given dashboard to a XLSX file.
+
+- `objectToCsv(filename: string, rows: object[]): string[]`
+
+    This method converts a array of object to csv rows.
+
+- `csvToXML(tables: {title:string, tables:string[]}[], filename: string)`
+
+    This method converts csv array in a XML Workbook representation.
+
+- `extractStatRow(item: DashboardItemComponent) : any`
+
+    This method extracts row data from a given stat widget.
+
+- `extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined`
+
+    This method creates a list of rows for stat widgets.
+
+- `extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[]`
+
+    This method extracts data from chart widgets.
+
+- `extractTimelines(filename: string, items: DashboardItemComponent[]): ExtractModel[]`
+
+    This method extracts data from timeline widgets.
+
+- `extractGrids(filename: string, items: DashboardItemComponent[]): ExtractModel[]`
+
+    This method extracts data from grid widgets.
+
+Next to that, *Usage Analytics* offers utilities to manage the configuration of the application via input/output files : 
+
+- `Export layout as JSON`: Exports the layout of all dashboards. This is useful especially for admins if they need to adjust the list of **standardDashboards** with respect to their own version.
+
+- `Export definition as JSON`: Exports the whole configuration of all dashboards. It can be useful to share different dashboards with others.
+
+- `Import definition as JSON`: Overrides the current configuration with the one provided in the imported file.
+
+
+
+
+
