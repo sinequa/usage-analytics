@@ -6,7 +6,27 @@
 
 For more information about Sinequa libraries, please refer to the [Sinequa documentation](https://doc.sinequa.com) and the [SBA framework documentation](https://sinequa.github.io/sba-angular).
 
-## Prerequisites
+## Table of contents
+
+* [Prerequisites](#prerequisites)
+* [Dataset Web service](#dataset_web_service)
+* [Dashboards](#dashboards)
+    * [Introduction](#introduction)
+    * [Configuration principle](#configuration_principle)
+    * [Customization](#customization)
+        * [Ordinary user](#ordinary_user)
+        * [Admin user](#admin_user)
+    * [Tips and tricks](#tips_tricks)
+        * [Widget display](#widget_display)
+        * [Widget creation / initialization](#widget_creation)
+        * [Widget synchronization](#widget_synchronization)
+        * [Widget persistence](#widget_persistence)
+        * [Widget sizing](#widget_sizing)
+        * [Widget tooltips](#widget_tooltips)
+        * [Formatting widget numbers](#widget_numbers)
+    * [Export / Import](#export_import)
+
+## <a name="prerequisites"></a> Prerequisites
 Similar to any Angular application, the first step to do is to install the project **dependencies**. The list of dependencies is defined in the `package.json`.
 
 To do so, open a **Terminal** and run 
@@ -23,7 +43,7 @@ In such case, we recommend the use of the following
 npm install --legacy-peer-deps
 ```
 
-## Dataset Web service
+## <a name="dataset_web_service"></a> Dataset Web service
 Behind the scenes, *Usage Analytics* uses the **Dataset Web Service** to retrieve the data.
 It allows getting information from indexes through multiple SQL queries. Thus, it is the best fit to build dashboard reports, 360 views and so on.
 
@@ -72,9 +92,9 @@ This logic is implemented in the `audit.service.ts` :
 
     This method converts the time range to the appropriate request parameter's format.
 
-## Dashboards
+## <a name="dashboards"></a> Dashboards
 
-### Introduction
+### <a name="introduction"></a> Introduction
 
 Dashboards of *Usage Analytics* are based on the [**angular-gridster2**](https://tiberiuzuld.github.io/angular-gridster2/) library.
 
@@ -118,7 +138,7 @@ Notice in the above snippet that the list of dashboard items, as well the option
 - Editing the dashboard (adding or removing items).
 - Emitting events when the dashboard changes.
 
-### Configuration principle
+### <a name="configuration_principle"></a> Configuration principle
 
 *Usage Analytics* is designed to support 2 types of configuration :
 
@@ -151,11 +171,11 @@ This can be done whether in local config file at app level `config.ts` or define
 
     This method returns the list of standard dashboard from the configuration defined on the server (appService.app.data.standardDashboards) or in the config.ts file (STANDARD_DASHBOARDS).
 
-### Customization
+### <a name="customization"></a> Customization
 
 Basically, tow different way of customization can be applied to the *Usage Analytics* application. All depends on the user rights.
 
-**1 - Ordinary user**
+**1 - Ordinary user** <a name="ordinary_user"></a>
 
 Ordinary users have the ability to perform several modifications on both widgets and dashboards.
 
@@ -178,7 +198,7 @@ Notice that any saved modification leads to an update of the whole configuration
 Users can always reset their modifications and go back to the default configuration as defined in the customization of the application or in the config.ts file .
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/reset-dashboards.PNG)</span>
 
-**2 - Admin user**
+**2 - Admin user** <a name="admin_user"></a>
 
 In addition to options already provided to an ordinary user, an admin can modify several aspects from **Customization (JSON)** tab of the application. There, it is possible to override: 
 
@@ -198,7 +218,7 @@ In addition to options already provided to an ordinary user, an admin can modify
 - `standardDashboards: {name: string, items: {item: string, position: DashboardItemPosition}[]}[]`: Definition of default dashboards to be displayed for users if no customization is stored in their user settings (after saving modification(s)).
 - `palette: {name: string, items: string[]}[]`: List of available widgets that could be added to a dashboard.
 
-### Tips and tricks
+### <a name="tips_tricks"></a> Tips and tricks
 
 *Usage Analytics* is meant to be customized easily, especially to let developers create new types of widgets, either generic or specific to their use cases.
 
@@ -210,7 +230,7 @@ Adding a widget will impact several parts of the code, and several aspects must 
 - The widget might have properties needing to be persisted.
 - The widget size must adapt to the dashboard grid.
 
-**1 - Widget display**
+**1 - Widget display** <a name="widget_display"></a>
 
 The widget's display must be implemented in the `sq-dashboard-item` component (`app/audit/dashboard/dashboard-item.component`). The template of this component is composed of a `sq-facet-card` (see [facets](https://sinequa.github.io/sba-angular/tutorial/facet-module.html)) wrapping a Switch-Case directive to display the desired component (either a chart, stat, timeline, etc.). Therefore, adding a new component means simply adding a new "case" such as:
 
@@ -221,7 +241,7 @@ The widget's display must be implemented in the `sq-dashboard-item` component (`
 
 Your widget might require other input parameters, that you can create and manage inside `dashboard-item.component.ts` (generally, binding the global `results`, `dataset` or `data` as an input of your component is needed to refresh the widget upon new dataset web service changes). The component might also generate events, which you will want to handle in the controller as well.
 
-**2 - Widget creation / initialization**
+**2 - Widget creation / initialization** <a name="widget_creation"></a>
 
 The creation of the widget can occur in different ways:
 
@@ -291,7 +311,7 @@ this.dashboardService.addWidget(WIDGET);
 
 This method returns the `item` object (of type `DashboardItem`) that will be passed to the `sq-dashboard-item` component. You can add or modify properties of this `item`: This is useful if your widget expects specific types of inputs.
 
-**3 - Widget synchronization**
+**3 - Widget synchronization** <a name="widget_synchronization"></a>
 
 The way the built-in widgets are designed is actually to **avoid explicit synchronization**, that is: to do nothing and keep the components independent from each other.
 
@@ -299,7 +319,7 @@ However, it is clear when using *Usage Analytics* that *some form of synchroniza
 
 The way it works is that the widgets **respond only to an update of the global dataset web service response**. Widgets cannot talk to each other, but some user interactions (like selecting a portion on the chart) can trigger a refresh of the global dataset web service response (which itself triggers a refresh of the widgets).
 
-**4 - Widget persistence**
+**4 - Widget persistence** <a name="widget_persistence"></a>
 
 The *state* of your widget can be defined in three locations:
 
@@ -354,7 +374,7 @@ If your custom widget needs to have a part of the state persisted, a few things 
 
 Note that you can greatly simplify the above if your component directly has access to the `DashboardItem` and `DashboardService` (but that means your component won't be reusable outside of the context of a dashboard).
 
-**5 - Widget sizing**
+**5 - Widget sizing** <a name="widget_sizing"></a>
 
 One difficulty of building widgets is that their size is strongly constrained by the dashboard, so the components cannot take their ideal size: they must adapt to any size (for example by forcing a width and height of 100% or by scrolling vertically or horizontally) or conform to an explicit size provided by the parent (`sq-dashboard-item`).
 
@@ -387,7 +407,69 @@ The `width` and `height` inputs may also be used in the template. For example:
 
 Note that in the parent `sq-dashboard-item` component, the width and height of the item are inputs of the component and are automatically refreshed when the dashboard is modified. However, an `innerheight` parameter is computed in `ngOnChanges()` to account for the height of the facet header.
 
-## Export / Import
+**6 - Widget tooltips** <a name="widget_tooltips"></a>
+
+Tooltips in *Usage Analytics* use the feature provided by Sinequa libraries. It is mainly about the [tooltip directive](https://sinequa.github.io/sba-angular/components/directives/TooltipDirective.html) and the [pipe message](https://sinequa.github.io/sba-angular/core/pipes/MessagePipe.html).
+
+It is almost the common use case in different Sinequa's projects. What comes new with *Usage Analytics*, is the ability to dynamically map parameters and variables, at both level: application code and administration customization, to the tooltip text. 
+
+The tooltip of widget's info is a good example :
+
+- First, in `sq-dashboard-item.ts` check if the parameter already exists in `messageParams` of `infoAction`. By default, all the customization parameters are taken into account, so nothing to do in this case. If it is an attribute of the application code, then you need to define it :
+
+```ts
+messageParams: {
+    values: {
+                // Params processed within the app code
+                sessionCountThreshold: this.auditService.sessionCountParam,
+                myParam: myValue,
+                start: this.auditService.startDate,
+                // Params retrieved from the app customization json / config.ts file
+                ...this.auditService.params,
+                ...this.auditService.customParams
+            }
+}
+```
+
+- Next step is to define your tooltip text. For example, in `src/locales/messages/en.json`:
+
+```ts
+"widgets": {
+        "my-custom-widget": {
+            "info": "test myParam = {myParam}"
+        }
+    }
+```
+
+- Finally, thanks to the following syntax in the [action button template](https://sinequa.github.io/sba-angular/components/components/BsActionButtons.html):
+
+```html
+<a ... sqTooltip="{{item.title | sqMessage:item.messageParams}}"></a>
+```
+You should be able to display `myValue` in your tooltip text.
+
+**7 - Formatting widget numbers** <a name="widget_numbers"></a>
+
+Often in any analytics dashboards, you may need to display numbers in different format. Within *Usage Analytics*, this has been integrated with a very simple and customizable way :
+
+- In a widget configuration object which implement the `DashboardItemOption` interface, the optional property `numberFormatOptions` defines the format. For further informations about available formats, please refer to [Intl.NumberFormatOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat). For example : 
+
+```ts
+"my-custom-widget": {
+    ...,
+    "parameters": {
+        ...,
+        "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
+    }
+}
+```
+
+- The provided format is then used by `sq-audit-stat` template as inputs to [pipe number](https://sinequa.github.io/sba-angular/components/pipes/NumberPipe.html):
+```html
+<span class="stat-value">{{value | sqNumber: (config?.numberFormatOptions || numberFormatOptions)}}</span>
+```
+
+### <a name="export_import"></a> Export / Import
 
 <span style="display:block;text-align:center">![Export Dashboard](/docs/assets/export_import.PNG)</span>
 
