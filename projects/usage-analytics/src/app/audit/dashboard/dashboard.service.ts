@@ -19,6 +19,7 @@ import { PALETTE, STANDARD_DASHBOARDS, WIDGETS } from '../config';
 import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
 import { GridColDef } from './providers/grid-provider';
+import { StatLayout, StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -48,10 +49,12 @@ export interface DashboardItem extends GridsterItem {
     columns?: GridColDef[]; // For type === 'grid'
     aggregationName?: string; // For type === 'grid'
     showTooltip?: boolean; // For type === 'grid'
-    valueLocation?: StatValueLocation; // where to find field value
+    valueLocation?: StatValueLocation; // where to find value field
+    valueField?: StatValueField; // how to access value field
     operation?: StatOperation; // operation to compute the value
     relatedQuery?: string; // query containing the second leg of the stat operands
-    relatedValueLocation?: StatValueLocation; // where to find the field value of the second stat operands
+    relatedValueLocation?: StatValueLocation; // where to find the value field of the second stat operands
+    relatedValueField?: StatValueField; // how to access value field of the second stat operands
     relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
     computation?: StatOperation; // operation to get the global value of the stat
     asc?: boolean; // if the positive evaluation is at increase or decrease trend
@@ -67,9 +70,7 @@ export interface Dashboard {
     items: DashboardItem[];
 }
 
-export type StatValueLocation = "aggregations" | "records" | "totalrecordcount";
-export type StatLayout = "standard" | "chart";
-export type StatOperation = "avg" | "percentage" | "division";
+
 
 /**
  * An interface to define a type of widget that can be added to the dashboard. This basic information
@@ -94,10 +95,12 @@ export interface DashboardItemOption {
         chartType?: string,
 
         // For type === 'stat'
-        valueLocation?: StatValueLocation, // where to find field value
+        valueLocation?: StatValueLocation, // where to find value field
+        valueField?: StatValueField, // how to access value field
         operation?: StatOperation, // operation to compute the value
         relatedQuery?: string, // query containing the second leg of the stat operands
-        relatedValueLocation?: StatValueLocation, // where to find the field value of the second stat operands
+        relatedValueLocation?: StatValueLocation, // where to find the value field of the second stat operands
+        relatedValueField?: StatValueField, //how to access value field of the second stat operands
         relatedOperation?: StatOperation, // operation to compute the value of the second stat operands
         computation?: StatOperation, // operation to get the global value of the stat
         asc?: boolean, // if the positive evaluation is at increase or decrease trend
