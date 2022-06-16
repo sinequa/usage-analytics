@@ -71,7 +71,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryTotalTimeLine",
         "text": "Full-text Queries Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of full-text queries over time. Interpretation: An increase in the number of searches over time is an indicator of platform adoption. Calculation: Addition of all search.text, search.refine and search.didyoumean.correction",
+        "info": "Number of full-text queries over time. Interpretation: An increase in the number of full-text queries over time is an indicator of platform adoption. Calculation: Addition of all Full-text Queries",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -88,7 +88,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "userCountTotalTimeLine",
         "text": "Total Unique Users Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of unique user-ids logged in over time. Interpretation: Adoption indicator. Calculation: Addition of all unique user-ids",
+        "info": "Number of unique user-ids logged per day in over time. Interpretation: Adoption indicator. Calculation: Based on session-summary. Addition of all unique user-ids who did sessions during the day.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -105,7 +105,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "sessionTotalTimeLine",
         "text": "Sessions Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of unique sessions displayed over time. WARNING: If a user occurs between 11:49 pm to 0:10, we will consider these 2 different sessions. This simplifies the calculation by day. Interpretation: An increase in the number of sessions over time indicates better adoption of the platform.",
+        "info": "Number of unique sessions displayed over time. WARNING: If a user occurs between 11:49 pm to 0:10, we will consider these 2 different sessions. This simplifies the calculation by day. Interpretation: An increase in the number of sessions over time indicates better adoption of the platform. Calculation: Addition of all unique session-summary realized during a day over time.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -122,7 +122,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "avgClicksBySearchTimeLine",
         "text": "Average Document Clicks By Search-Summary",
         "icon": "fas fa-chart-line",
-        "info": "Average number of clicked documents by search displayed over time. Interpretation: Relevance indicator. Calculation: Addition of all clickcount / Total number of search-summaries",
+        "info": "Average number of clicked documents by search summary displayed over time. Interpretation: Relevance indicator. Calculation: Average number of clicked documents by search summary",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -139,7 +139,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "engineResponseTimeTimeLine",
         "text": "Average Engine Response Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Average engine response time (in ms) displayed over time. Interpretation: Performance indicator. Calculation: Average of all execution durations filtered on search.text.",
+        "info": "Average engine response time (in ms) displayed over time. Interpretation: Performance indicator. Calculation: Average of all durationExecution filtered on full-text queries.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -156,7 +156,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "engineResponseTimeTimeLine",
         "text": "Maximum Engine Response Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Maximum engine response time (in ms) displayed over time. Interpretation: Performance indicator. Calculation: Maximum value of all search.text execution durations",
+        "info": "Maximum engine response time (in ms) displayed over time. Interpretation: Performance indicator. Calculation: Maximum value of all durationExecution filtered on refinement events",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -171,9 +171,9 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "mrrTimeline": {
         "type": "timeline",
         "query": "avgMRRTimeLine",
-        "text": "Average Mean Reciprocal Rank (MRR) of Search-Summary Timeline",
+        "text": "Average Mean Reciprocal Rank (MRR) of Search Summary Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Captures the rank of docs clicked by users: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. Interpretation: Relevance indicator. Calculation: Average of all Mean Reciprocal Rank (MRR) events",
+        "info": "Captures the rank of clicked document by users: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. Interpretation: Relevance indicator. Calculation: Based on search-summary. Average of all Mean Reciprocal Rank (MRR) events.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -188,9 +188,9 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "searchBySessionTimeline": {
         "type": "timeline",
         "query": "avgQueriesBySessionTimeLine",
-        "text": "Average Full-Text Queries by Session-Summary Timeline",
+        "text": "Average Full-Text Queries by Session Summary Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Average number of search queries per session displayed over time. Interpretation: Adoption indicator. Calculation: Addition of all searchcount / Total number of unique session-ids.",
+        "info": "Average number of Full-Text Queries per session displayed over time. Interpretation: Adoption indicator. Calculation: Addition of all Full-Text Queries DIVIDED BY Total number of Session Summary.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -207,7 +207,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "responseTimeTimeLine",
         "text": "Average Web App Response Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Average WebApp Response time (in ms) incl. platform & engine displayed over time. Interpretation: Performance indicator. Calculation: Average of all duration filtered on search.text.",
+        "info": "Average WebApp Response time (in ms) incl. platform & engine displayed over time. Interpretation: Performance indicator. Calculation: Average of all duration event filtered on Full-Text Queries.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -222,9 +222,9 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "maxResponseTimeTimeline": {
         "type": "timeline",
         "query": "responseTimeTimeLine",
-        "text": "Maximum Web App Response Timeline",
+        "text": "Maximum Web App Response Time Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Maximum WebApp Response time (in ms) incl. platform & engine displayed over time. Interpretation: Performance indicator. Calculation: Maximum value of all search.text durations.",
+        "info": "Maximum Web App Response time (in ms) incl. platform & engine displayed over time. Interpretation: Performance indicator. Calculation: Maximum value of durations events filtered on full-text queries.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -243,7 +243,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "avgSessionDurationTimeLine",
         "text": "Average Session Duration (in sec) Timeline",
         "icon": "fas fa-chart-line",
-        "info": "The average session duration calculated in seconds. The duration of a session corresponds to the time between the first and the last action of the same session. If there is one user event then the session duration will be 0. Interpretation: Analysis of the time spent by a user to find a relevant result. Relevance indicator. Calculation: Addition of all durations (session is not null) / Total number of unique session-ids.",
+        "info": "The average session summary duration calculated in seconds. The duration corresponds to the time between the first and the last action of the same session. If there is one user event then the session duration will be 0. Interpretation: Analysis of the time spent by a user to find a relevant result. Relevance indicator. Calculation: Addition of all durations event of session summary DIVIDED BY Total number of session summary.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -260,7 +260,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "clickTotalTimeLine",
         "text": "Total Documents Clicked Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Total number of documents clicked displayed over time. Interpretation: Indicator to be compared with other information (number of users, searches, etc.). Relevance indicator. Calculation: Addition of all searchcount where result=search.with.click.",
+        "info": "Total number of clicked documents displayed over time. Interpretation: Indicator to be compared with other information (number of users, searches, etc.). Relevance indicator. Calculation: Addition of all clicked documents",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -294,7 +294,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryBounceTimeLine",
         "text": "Bounce Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of bounces displayed over time. A bounce is when a user opens a document and quickly comes back (<10s). Interpretation: This suggests that the result was irrelevant or incomplete. Relevance indicator. Calculation: Addition of all bounce events.",
+        "info": "Number of bounces displayed over time. A bounce is when a user opens a document and quickly comes back (<10s). Interpretation: This suggests that the result was irrelevant or incomplete. Relevance indicator. Calculation: Addition of all bounce events calculated on search summary. A bounce is generated with clicked document events.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -311,13 +311,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryRefineTimeLine",
         "text": "Refinement Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of search queries where the user has refined the search (through facets, for instance) displayed over time. Interpretation: This suggests that relevance can be improved. Relevance indicator. Calculation: Addition of all searchrefinement.",
+        "info": "Number of search summary where the user has refined displayed over time. Interpretation: This suggests that relevance can be improved. Relevance indicator. Calculation: Addition of all search summary where there are searchrefinements.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
                 "name": "QueryRefine",
                 "dateField": "value",
-                "valueFields": [{"operatorResults": true, "name": "sum", "title": "Refinement", "primary": true}]
+                "valueFields": [{"name": "count", "title": "Refinement", "primary": true}]
             },
             "chartType": "Timeline"
         }
@@ -328,7 +328,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryZeroTimeLine",
         "text": "Zero Result Search Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of search queries without any results displayed over time. Interpretation: Relevance indicator. Calculation: Addition of all searchcount where resultcount=0.",
+        "info": "Number of full-text queries without any results displayed over time. Interpretation: Relevance indicator. Calculation: Addition of all fullt-text queries where resultcount=0.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -343,9 +343,9 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "searchExitTimeline": {
         "type": "timeline",
         "query": "searchExitTimeLine",
-        "text": "Search Exit Timeline",
+        "text": "Search Session With Exit Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of search queries where the user does nothing after viewing the results page displayed over time. Interpretation: Suggests that a user does not consider the results provided to be relevant. Relevance indicator. Calculation: Addition of all search.exit.timeout and search.exit.logout result events.",
+        "info": "Number of search summary where the user does nothing after viewing the results page displayed over time. Interpretation: Suggests that a user does not consider the results provided to be relevant. Relevance indicator. Calculation: Based on search summary. Addition of all search.exit.timeout and search.exit.logout result events.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -357,29 +357,31 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
-    "queryCountPerUserTimeline": {
-        "type": "timeline",
-        "query": "QueryCountPerUser",
-        "text": "Average Number of Full-Text Per User",
-        "icon": "fas fa-chart-line",
-        "info": "Allows you to follow the adoption of the platform by monitoring usage over the concerned period. When a user conducts more and more searches, this suggests successful adoption. Interpretation: Adoption indicator. Calculation: Addition of all searchcount / Total number of unique user-ids.",
+    "queryCountPerUser": {
+        "type": "stat",
+        "query": "queryTotal",
+        "icon": "fas fa-balance-scale",
+        "text": "Average number of Full-Text queries per user",
+        "info": "Allows you to follow the adoption of the platform by monitoring usage over the concerned period. When a user conducts more and more Full-Text Queries, this suggests successful adoption. Interpretation: Adoption indicator. Calculation: Addition of all Full-Text Queries DIVIDED BY Total number of unique user-id.",
         "unique": true,
         "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "QueryTotal",
-                "dateField": "value",
-                "valueFields": [{"name": "count", "title": "Average number of searches per user", "primary": true}]
-            },
-            "chartType": "Timeline"
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "userCountTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "asc": true,
+            "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
         }
     },
+
 
     "topQueries": {
         "type": "chart",
         "query": "topQueries",
         "icon": "fas fa-th-list",
         "text": "Top Full-text Queries",
-        "info": "Most frequent full-text queries. Interpretation: Understanding user searches enables levers to be activated to provide them with more relevant results. Relevance indicator. Calculation: Distribution of the top 100 full-text queries from the most searched queries via search.text, search.refine and search.didyoumean.correction type events",
+        "info": "Most frequent full-text queries. Interpretation: Understanding user searches enables levers to be activated to provide them with more relevant results. Relevance indicator. Calculation: Distribution of the top 100 full-text queries",
         "unique": true,
         "parameters": {
             "chartData": {
@@ -394,7 +396,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "topNoResultQueries",
         "icon": "fas fa-th-list",
         "text": "Top No Result Full-text Queries",
-        "info": "Most frequent full-text queries without any results. Interpretation: Suggests action is needed to ensure that these searches return results. Relevance indicator. Calculation: Distribution of the top 100 full-text queries from the most searched queries via search.text, search.refine and search.didyoumean.correction type events that have a result-count =0.",
+        "info": "Most frequent full-text queries without any results. Interpretation: Suggests action is needed to ensure that these searches return results. Relevance indicator. Calculation: Distribution of the top 100 full-text queries that have a result-count=0",
         "unique": true,
         "parameters": {
             "chartData": {
@@ -409,7 +411,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "topSources",
         "icon": "fas fa-chart-pie",
         "text": "Top Sources",
-        "info": "Sources where the most clicked documents are found. Interpretation: May suggest review of the content-type weighting for the most clicked sources. Relevance indicator. Calculation: Distribution of the 100 most frequent sources generated by click events (doc.preview, click.resultlink, click.resultlink*).",
+        "info": "Sources where the most clicked documents are found. Interpretation: May suggest review of the content-type weighting for the most clicked sources. Relevance indicator. Calculation: Distribution of the 100 most frequent sources generated by clicked document events",
         "unique": true,
         "parameters": {
             "chartData": {
@@ -424,7 +426,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "topCollections",
         "icon": "fas fa-chart-pie",
         "text": "Top Collections",
-        "info": "Collections where most clicked documents are found. Interpretation: May suggest review of the content-type weighting for the most clicked collections. Relevance indicator. Calculation: Distribution of the 100 most frequent collections generated by click events (doc.preview, click.resultlink, click.resultlink*)",
+        "info": "Collections where most clicked documents are found. Interpretation: May suggest review of the content-type weighting for the most clicked collections. Relevance indicator. Calculation: Distribution of the 100 most frequent collections generated by clicked document events",
         "unique": true,
         "parameters": {
             "chartData": {
@@ -439,7 +441,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "topFacets",
         "icon": "fas fa-chart-pie",
         "text": "Most Used Facets",
-        "info": "Most used facets. Interpretation: Analysis of user behavior to identify actions to improve the relevance of search results. Relevance indicator. Calculation: Distribution of the 100 most frequent facets (i.e., itemboxes).",
+        "info": "Most used facets. Interpretation: Analysis of user behavior to identify actions to improve the relevance of search results. Relevance indicator. Calculation: Distribution of the 100 most frequent facets (all events where itemboxes is not null).",
         "unique": true,
         "parameters": {
             "chartData": {
@@ -453,8 +455,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "chart",
         "query": "queryByResult",
         "icon": "fas fa-chart-pie",
-        "text": "Last Action After A Search",
-        "info": "Last action after a search:\n - 'search.exit.logout': User runs a search and does not click on any document but instead logs out.\n - 'search.exit.timeout': User runs a search and does not click on a document but rather leaves the page.\n - 'search.with.click': User runs one or several searches and clicks on a document as a last action.\n - 'search.with.no.click': User runs one or several searches but does not click on any documents as a last action. Interpretation: Relevance indicator. Calculation: Distribution of values of “Results” event within search.summary.",
+        "text": "Last Event After A Search",
+        "info": "Last event after a search:\n - 'search.exit.logout': User runs a full-text query and does not click on any document but instead logs out.\n - 'search.exit.timeout': User runs a full-text query and does nothing before the timeout of the session.\n - 'search.with.click': User runs a full-text query, can do refinement and then clicks on a document. \n - 'search.with.no.click': User runs a full-text query, can do refinement but doesn't click on a document. Interpretation: Relevance indicator. Calculation: Distribution of values of “Results” event within search summary.",
         "unique": true,
         "parameters": {
             "chartData": {
@@ -469,7 +471,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "userCountTotal",
         "icon": "fas fa-balance-scale",
         "text": "Total Unique Users",
-        "info": "Number of unique users logged in during the selected time period. Interpretation: Adoption indicator. Calculation: Addition of all unique user-ids.",
+        "info": "Number of unique user-ids logged in over time. Interpretation: Adoption indicator. Calculation: Addition of all unique user-ids based on session summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -483,7 +485,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "sessionTotal",
         "icon": "fas fa-balance-scale",
         "text": "Sessions",
-        "info": "Number of sessions. Interpretation: Adoption indicator. Calculation: Addition of all unique session-ids.",
+        "info": "Number of unique sessions displayed over time. WARNING: If a user session occurs between 11:49 pm and 00:10 am, we will consider these 2 different sessions. This simplifies the calculation by day. Interpretation: Adoption indicator. Calculation: Addition of all session summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -497,7 +499,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryTotal",
         "icon": "fas fa-balance-scale",
         "text": "Full-text Queries",
-        "info": "Number of all full-text queries. Interpretation: Adoption indicator. Calculation: Addition of all search.text, search.refine and search.didyoumean.correction",
+        "info": "Number of all full-text queries. Interpretation: Adoption indicator. Calculation: Addition of all Full-Text Queries",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -511,7 +513,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "sessionsByUser",
         "icon": "fas fa-balance-scale",
         "text": "Average Sessions By User",
-        "info": "Average number of sessions per user. Interpretation: Adoption indicator. Calculation: Total number of sessions/total number of unique user_ids",
+        "info": "Average number of sessions per user. Interpretation: Adoption indicator. Calculation: Total number of session summary DIVIDED BY total number of unique user-ids",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -525,8 +527,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "avgQueriesBySession",
         "icon": "fas fa-balance-scale",
-        "text": "Average Search By Session",
-        "info": "Average number of searches per session. Interpretation: The more searches per session the greater the adoption. Adoption indicator. Be careful, if all searches are linked, this may demonstrate too many reformulations and, therefore, a problem with the relevance of the results. Relevance indicator. Calculation: Average of all searchcount within a session.summary",
+        "text": "Average Full-Text Queries By Session Summary",
+        "info": "Average number of Full-Text Queries per session summary. Interpretation: The more searches per session the greater the adoption. Adoption indicator. Be careful, if all the searches are linked, this may on the contrary demonstrate too many reformulations and therefore a problem of relevance of the results. Relevance indicator. Calculation: Average of all Full-Text Queries within a session summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -537,10 +539,10 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
     "clickBySearch": {
         "type": "stat",
-        "query": "avgClicksByQuery",
+        "query": "avgClicksBySearch",
         "icon": "fas fa-balance-scale",
-        "text": "Average Click By Search",
-        "info": "Average number of clicked documents per search. Interpretation: Clicking on several documents following a search may demonstrate a greater effort to access the expected result. Relevance indicator. It can also demonstrate that the user enjoys browsing the results (adoption indicator). Calculation: Average of all clickcount >0 within a session.summary",
+        "text": "Average Clicked Documents By Search Summary",
+        "info": "Average number of clicked documents per search summary. Interpretation: Clicking on several documents following a Full-Text Query may demonstrate a greater effort to access the expected result. Relevance indicator. It can also demonstrate that the user enjoys browsing the results (adoption indicator). Calculation: Average of all clicked documents within a search summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -554,7 +556,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "docViewsBySession",
         "icon": "fas fa-balance-scale",
         "text": "Average Viewed Documents Per Session",
-        "info": "Average number of viewed documents (Document Navigator) per session. Interpretation: Seeing fewer documents during a search suggests that the answer may have been found in the first results. Relevance indicator. Calculation: Addition of all click.* or doc.preview /Total number of sessions",
+        "info": "Average number of viewed documents (Document Navigator) per session. Interpretation: Seeing fewer documents during a search suggests that the answer may have been found in the first results. Relevance indicator. Calculation: Addition of all clicked documents DIVIDED BY Total number of sessions",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -569,7 +571,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "avgSessionDuration",
         "icon": "fas fa-balance-scale",
         "text": "Average Session Duration (in sec)",
-        "info": "The average session duration calculated in seconds. A session starts when a user logs into the platform and ends when he logs out or a timeout occurs. Interpretation: Analysis of the time spent by a user to find his result. Relevance Indicator. Calculation: Average of all durations within a session.summary",
+        "info": "The average session duration calculated in seconds. A session starts when a user logs into the platform and ends when he logs out or a timeout occurs. Interpretation: Analysis of the time spent by a user to find his result. Relevance Indicator. Calculation: Average of all durations within a session summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -583,7 +585,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "newUsers",
         "icon": "fas fa-balance-scale",
         "text": "New Users",
-        "info": "Users that have logged in for the first time during the current period. Interpretation: Adoption indicator. Calculation: Total number of users who completed their first login on a later date than the start of the range",
+        "info": "Users that have logged in for the first time during the current period. Interpretation: Adoption indicator. Calculation: Total number of users who completed their first login on a later date than the start of the range. Based on session summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -597,7 +599,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "newUsers",
         "icon": "fas fa-balance-scale",
         "text": "New Users Rate",
-        "info": "Percentage of new users among all users. Interpretation: Adoption indicator. Calculation: Total number of new users/Total number of unique users.",
+        "info": "Percentage of new users among all users. Interpretation: Adoption indicator. Calculation: Total number of new users DIVIDED BY Total number of unique users.",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -644,7 +646,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
     "userCoverage": {
         "type": "stat",
-        "query": "userCountTotal",
+        "query": "activeUsers",
         "icon": "fas fa-balance-scale",
         "text": "User Coverage",
         "info": "msg#widgets.userCoverage.info",
@@ -664,8 +666,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "clickRank1AfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Rate of First Document Clicked",
-        "info": "Number of searches where the user clicks on the first document out of the total number of searches. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. Calculation: Total number of search.summary where there are clicks of rank = 1 there is a rank 1 click / Total number of search.summary.",
+        "text": "First Clicked Document Rate",
+        "info": "Number of search summary where the user clicks on the first document out of the total number of search summary. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. Calculation: Total number of search summary where there are clicks of rank = 0 DIVIDED BY Total number of search summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -680,10 +682,10 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
     "clickRank1AfterSearchTimeline": {
         "type": "timeline",
-        "query": "clickRank1AfterSearchTimeLine",
-        "text": "First Document Clicked Timeline",
+        "query": "clickRank1AfterSearchTimeline",
+        "text": "First Clicked Document Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of searches where the user clicks on the first document displayed over time. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. Calculation: Addition of all search.summary where there are clicks of rank = 1.",
+        "info": "Number of search summary where the user clicks on the first document displayed over time. Interpretation: Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. Calculation: Addition of all search.summary where there are clicks of rank = 1.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -699,8 +701,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "clickRank3AfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Rate of First Three Documents Clicked",
-        "info": "Number of searches where the user clicks on the first three documents out of the total number of searches. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. Calculation: Total number of search.summary where there are clicks of rank = (1,2,3) / Total number of search.summary.",
+        "text": "First Three Clicked Documents Rate",
+        "info": "Number of search summary where the user clicks on the first three documents out of the total number of search summary. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. Calculation: Total number of search.summary where there are clicks of rank = (0,1,2) DIVIDED BY Total number of search summary",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -713,12 +715,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
-    "clickRank3AfterSearchTimeLine": {
+    "clickRank3AfterSearchTimeline": {
         "type": "timeline",
-        "query": "clickRank3AfterSearchTimeLine",
-        "text": "First Three Documents Clicked Timeline",
+        "query": "clickRank3AfterSearchTimeline",
+        "text": "First Three Clicked Documents Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of searches queries where the user clicks on the first three document displayed over time. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. Calculation: Addition of all search.summary where there are clicks of rank = (1,2,3).",
+        "info": "Number of search summary where the user clicks on the first three document displayed over time. Interpretation: Search summary results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. Calculation: Addition of all search summary where there are clicks of rank = (0,1,2).",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -734,8 +736,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "clickAfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Search With Clicks",
-        "info": "Total number of searches where the user has clicked on a document at least once. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search.summary where there are at least one click",
+        "text": "Search Session With Clicks",
+        "info": "Total number of search summary where the user has clicked on a document at least once. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search summary where there are at least one clicked documents",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -748,8 +750,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "clickAfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Rate of Search With Clicks",
-        "info": "Number of searches where the user clicks at least on one document out of the total number of searches. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search.summary where there are at least one click / Total number of search.summary.",
+        "text": "Search Session With Click(s) Rate",
+        "info": "Number of search summary where the user clicks at least on one document out of the total number of search summary. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search summary where there are at least one clicked document DIVIDED BY Total number of search summary",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -764,10 +766,10 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
     "clickAfterSearchTimeline": {
         "type": "timeline",
-        "query": "clickAfterSearchTimeLine",
-        "text": "Search With Clicks Timeline",
+        "query": "clickAfterSearchTimeline",
+        "text": "Search Session With Click(s) Timeline",
         "icon": "fas fa-chart-line",
-        "info": "Number of searches queries where the user clicks at least on one document displayed over time. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Addition of all search.summary where there are at least one click.",
+        "info": "Number of search summary where the user clicks at least on one document displayed over time. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Addition of all search summary where there are at least one click.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -784,7 +786,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "avgMRR",
         "icon": "fas fa-balance-scale",
         "text": "Mean Reciprocal Rank (MRR)",
-        "info": "Captures the rank of a doc clicked by users displayed over time: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. Interpretation: Evaluation of the relevance of the results page. MRR = 1 is the best. Relevance indicator. Calculation: Average of all mrr events",
+        "info": "Captures the rank of a clicked document by users displayed over time: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. Interpretation: Evaluation of the relevance of the results page. MRR = 1 is the best. Relevance indicator. Calculation: Based on search-summary. Average of all Mean Reciprocal Rank (MRR) events.",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -799,7 +801,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryRefine",
         "icon": "fas fa-balance-scale",
         "text": "Refinement",
-        "info": "Total number of search queries where the user has refined the search (through facets, for instance). Interpretation: After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. Calculation: Addition of all searchrefinements",
+        "info": "Total number of search summary where the user has refined the search. Interpretation: After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. Calculation: Addition of all search summary where there are searchrefinements",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -813,11 +815,11 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryRefine",
         "icon": "fas fa-balance-scale",
         "text": "Refinement Rate",
-        "info": "Number of search queries where the user has refined the search compared to the total number of searches. Interpretation: After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. Calculation: Addition of all searchrefinements/Total number of searches",
+        "info": "Number of search summary where the user has refined the search compared to the total number of search summary. Interpretation: After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. Calculation: Addition of all search summary where there are searchrefinements DIVIDED BY Total number of search summary",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
-            "relatedQuery": "queryTotal",
+            "relatedQuery": "searchSummaryTotal",
             "relatedValueLocation": "totalrecordcount",
             "computation": "percentage",
             "statLayout": "standard",
@@ -831,7 +833,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryZero",
         "icon": "fas fa-balance-scale",
         "text": "Zero Result Search",
-        "info": "Total number of search queries without any results. Interpretation: Detects searches that do not provide results in order to suggest solutions to solve this problem. Relevance indicator. Calculation: Addition of all searchcounts where resultcount=0",
+        "info": "Total number of Full-Text Queries without any results. Interpretation: Detects that the Full-Text Query does not provide results in order to suggest solutions to solve this problem. Relevance indicator. Calculation: Addition of all Full-Text Queries where resultcount=0",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -845,7 +847,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryZero",
         "icon": "fas fa-balance-scale",
         "text": "Zero Result Search Rate",
-        "info": "Number of search queries without any results compared to the total number of searches queries. Interpretation: Relevance indicator. Calculation: Total number of searchcounts where resultcount=0 / Total number of queries",
+        "info": "Number of Full-Text Queries without any results compared to the total number of searches queries. Interpretation: Relevance indicator. Calculation: Total number of Full-Text Queries where resultcount=0 DIVIDED BY Total number of Full-Text Queries",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -854,7 +856,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "computation": "percentage",
             "statLayout": "standard",
             "asc": false,
-            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
         }
     },
 
@@ -862,8 +864,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "searchExit",
         "icon": "fas fa-balance-scale",
-        "text": "Search Exit",
-        "info": "Total number of search queries where the user does nothing after viewing the results page. Interpretation: If the user does a search and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Addition of all searchcount within a search.summary where the result event values is search.exit.timeout or search.exit.logout",
+        "text": "Search Session With Exit",
+        "info": "Total number of search summary where the user does nothing after viewing the results page. Interpretation: If the user does a search and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Addition of all search summary where the result event values is search.exit.timeout or search.exit.logout",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -876,12 +878,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "searchExit",
         "icon": "fas fa-balance-scale",
-        "text": "Search Exit Rate",
-        "info": "Number of search queries where the user does nothing after viewing the results page compared to the total number of search queries. Interpretation: If the user does a search and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Total number of search exits (timeout and logout) / Total number of queries.",
+        "text": "Search Session With Exit Rate",
+        "info": "Number of search summary where the user does nothing after viewing the results page compared to the total number of search summary. Interpretation: If the user does a full-text query and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Total number of search exits (timeout and logout) DIVIDED BY Total number of search summary.",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
-            "relatedQuery": "queryTotal",
+            "relatedQuery": "searchSummaryTotal",
             "relatedValueLocation": "totalrecordcount",
             "computation": "percentage",
             "statLayout": "standard",
@@ -895,7 +897,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryBounce",
         "icon": "fas fa-balance-scale",
         "text": "Bounce",
-        "info": "Total number of bounces. A bounce is when a user opens a document and quickly returns back to where they started (<10s). Interpretation: This suggests that the result was irrelevant or incomplete. Relevance indicator. Calculation: Addition of all bounce event",
+        "info": "Total number of bounces. Interpretation: This suggests that the result was irrelevant or incomplete. Relevance indicator. Calculation: Addition of all bounce events",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -909,12 +911,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "queryBounce",
         "icon": "fas fa-balance-scale",
-        "text": "Bounce Rate",
-        "info": "Number of bounces compared to the total number of search queries. Interpretation: This suggests that the result was likely irrelevant or incomplete. Relevance indicator. Calculation: Total bounce/Total number of queries.",
+        "text": "Bounce By Search Summary",
+        "info": "Number of bounces compared to the total number of search summary. Interpretation: This suggests that the result was likely irrelevant or incomplete. Relevance indicator. Calculation: Total bounces DIVIDED BY Total number of search summary.",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
-            "relatedQuery": "queryTotal",
+            "relatedQuery": "searchSummaryTotal",
             "relatedValueLocation": "totalrecordcount",
             "computation": "percentage",
             "statLayout": "standard",
@@ -928,7 +930,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "avgResponseTime",
         "icon": "fas fa-balance-scale",
         "text": "Average Web App Response Time",
-        "info": "Average response time (in ms) incl. platform & engine. Interpretation: Evaluation of the response speed following a search. Performance indicator. Calculation: Average of all durations filtered on search.text",
+        "info": "Average response time (in ms) incl. platform & engine. Interpretation: Evaluation of the response speed following a full-text queries. Performance indicator. Calculation: Average of all durations filtered on Full Text Queries",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -946,7 +948,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "avgEngineResponseTime",
         "icon": "fas fa-balance-scale",
         "text": "Average Engine Response Time",
-        "info": "Average engine response time (in ms). Interpretation: Evaluation of the response speed following a search. Performance indicator. Calculation: Average of all duration executions filtered on search.text",
+        "info": "Average engine response time (in ms). Interpretation: Evaluation of the response speed following a full-text queries. Performance indicator. Calculation: Average of all duration executions filtered on full-text queries.",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -991,6 +993,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "showTooltip": true
         }
     }
+
 };
 
 /** Dashboards */
