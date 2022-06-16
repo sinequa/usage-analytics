@@ -2,6 +2,14 @@ import { Injectable } from "@angular/core";
 import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
 import {DashboardItem} from "../dashboard.service";
 
+export interface StatValueField {
+    name: string;
+    operatorResults?: boolean;
+}
+export type StatValueLocation = "aggregations" | "records" | "totalrecordcount";
+export type StatLayout = "standard" | "chart";
+export type StatOperation = "avg" | "percentage" | "division";
+
 export type Trend = "increase" | "decrease" | "stable" | undefined;
 export type Evaluation = "ok" | "ko" | "stable" | undefined;
 
@@ -14,17 +22,21 @@ export class StatProvider {
 
     constructor() {}
 
-    extractStatValue(data: Results | DatasetError | undefined, valueLocation: MayBe<string>): MayBe<number> {
+    extractStatValue(data:  MayBe<Results | DatasetError>, valueLocation: MayBe<string>, valueField: MayBe<StatValueField>): MayBe<number> {
         if (data && data as Results) {
             switch (valueLocation) {
                 case "aggregations":
                     if ((data as Results).aggregations && (data as Results).aggregations[0] && (data as Results).aggregations[0].items) {
-                        return (data as Results).aggregations[0].items![0]?.count;
+                        if (!valueField) {
+                            return (data as Results).aggregations[0].items![0]?.count;
+                        } else {
+                            return valueField.operatorResults ? (data as Results).aggregations[0].items![0].operatorResults?.[valueField.name] : (data as Results).aggregations[0].items![0][valueField.name];
+                        }
                     }
                     break;
                 case "records":
                     if ((data as Results).records && (data as Results).records[0]) {
-                        return (data as Results).records[0]["value"];
+                        return !valueField ? (data as Results).records[0]["value"] : (data as Results).records[0][valueField.name];
                     }
                     break;
                 case "totalrecordcount":
@@ -39,7 +51,7 @@ export class StatProvider {
         return undefined;
     }
 
-    aggregate(data: Results | DatasetError | undefined, valueLocation: string | undefined): number | undefined {
+    aggregate(data: MayBe<Results | DatasetError>, valueLocation: MayBe<string>): MayBe<number> {
         if (data && data as Results) {
             switch (valueLocation) {
                 case "aggregations":
@@ -61,7 +73,7 @@ export class StatProvider {
         return undefined;
     }
 
-    average(items: number[] | undefined): number | undefined {
+    average(items: MayBe<number[]>): MayBe<number> {
         if (items) {
             const sum = items.reduce((a, b) => a + b, 0);
             return (sum / items.length) || 0;
@@ -69,7 +81,7 @@ export class StatProvider {
         return undefined;
     }
 
-    divide(dividend: number | undefined, divisor: number | undefined): number | undefined {
+    divide(dividend: MayBe<number>, divisor: MayBe<number>): MayBe<number> {
         if (dividend && divisor) {
             return (dividend / divisor);
         }
@@ -92,11 +104,11 @@ export class StatProvider {
         config: DashboardItem,
         ): {value: MayBe<number>, previousValue: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
 
-        const current: number | undefined = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation);
-        const previous: number | undefined = this.getBasicValue(previousDataSet[config.query], config.operation, config.valueLocation);
+        const current: MayBe<number> = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation, config.valueField);
+        const previous: MayBe<number> = this.getBasicValue(previousDataSet[config.query], config.operation, config.valueLocation, config.valueField);
 
-        let relatedCurrent: number | undefined;
-        let relatedPrevious: number | undefined;
+        let relatedCurrent: MayBe<number>;
+        let relatedPrevious: MayBe<number>;
 
         let value, previousValue, percentageChange, trend;
 
@@ -106,8 +118,8 @@ export class StatProvider {
             percentageChange = this.getPercentageChange(current, previous);
             trend = this.getTrend(current, previous)
         } else {
-            relatedCurrent = this.getBasicValue(dataset[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
-            relatedPrevious = this.getBasicValue(previousDataSet[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation);
+            relatedCurrent = this.getBasicValue(dataset[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation, config.relatedValueField);
+            relatedPrevious = this.getBasicValue(previousDataSet[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation, config.relatedValueField);
             value = this.computeBasicValue(current, relatedCurrent, config.computation);
             previousValue = this.computeBasicValue(previous, relatedPrevious, config.computation);
             percentageChange = this.getPercentageChange(value, previousValue);
@@ -118,21 +130,21 @@ export class StatProvider {
         return {value, previousValue, percentageChange, trend, trendEvaluation};
     }
 
-    getPercentageChange(newValue: number | undefined, oldValue: number | undefined): number | undefined {
+    getPercentageChange(newValue: MayBe<number>, oldValue: MayBe<number>): MayBe<number> {
         if (newValue && oldValue) {
             return (newValue - oldValue) === 0 ? 0 : Math.abs(( newValue - oldValue ) / oldValue);
         }
         return undefined;
     }
 
-    getTrend(newValue: number | undefined, oldValue: number | undefined): Trend {
+    getTrend(newValue: MayBe<number>, oldValue: MayBe<number>): Trend {
         if (newValue && oldValue) {
             return (newValue - oldValue) === 0 ? "stable" : (newValue - oldValue) > 0 ? "increase" : "decrease";
         }
         return undefined;
     }
 
-    getTrendEvaluation(trend: Trend, asc: boolean | undefined): Evaluation {
+    getTrendEvaluation(trend: Trend, asc: MayBe<boolean>): Evaluation {
         switch (trend) {
             case "increase":
                 return asc && !!asc ? "ok" : "ko";
@@ -145,9 +157,9 @@ export class StatProvider {
         }
     }
 
-    protected getBasicValue(data: Results | DatasetError, operation: string | undefined, valueLocation: string | undefined): number | undefined {
+    protected getBasicValue(data: Results | DatasetError, operation: MayBe<string>, valueLocation: MayBe<string>, valueField: MayBe<StatValueField>): MayBe<number> {
         if (!operation) {
-            return this.extractStatValue(data, valueLocation);
+            return this.extractStatValue(data, valueLocation, valueField);
         } else {
             switch (operation) {
                 case "avg":
@@ -158,7 +170,7 @@ export class StatProvider {
         }
     }
 
-    protected computeBasicValue(value1: number | undefined, value2: number | undefined, computation: string): number | undefined {
+    protected computeBasicValue(value1: MayBe<number>, value2: MayBe<number>, computation: string): MayBe<number> {
         switch (computation) {
             case "division":
                 return this.divide(value1, value2);

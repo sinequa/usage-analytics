@@ -932,7 +932,11 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "unique": true,
         "parameters": {
             "statLayout": "standard",
-            "valueLocation": "records",
+            "valueLocation": "aggregations",
+            "valueField": {
+                "name": "avg",
+                "operatorResults": true
+            },
             "asc": false
         }
     },
@@ -946,7 +950,11 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "unique": true,
         "parameters": {
             "statLayout": "standard",
-            "valueLocation": "records",
+            "valueLocation": "aggregations",
+            "valueField": {
+                "name": "avg",
+                "operatorResults": true
+            },
             "asc": false
         }
     },
