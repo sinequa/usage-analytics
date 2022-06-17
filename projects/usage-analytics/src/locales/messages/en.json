@@ -72,22 +72,22 @@
 
     "widgets": {
         "activeUsers": {
-            "info": "Users that had at least the number of sessions (defined by a threshold: {sessionCountThreshold}) where search queries occured during the current period. Interpretation: The more users who return often to search the platform, the more adoption can be assumed. Adoption indicator. Calculation: Total number of users who made a number of session with search query > {sessionCountThreshold}"
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Users that had at least the number of sessions (defined by a threshold: {sessionCountThreshold}) where Full-Text Query occurred during the current period. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  The more users who return often to search the platform, the more adoption can be assumed. Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of users who made a number of session with Full-Text Query > {sessionCountThreshold}. Based on session summary"
         },
         "activeUsersRate": {
-            "info": "Users that had at least the number of sessions (defined by a threshold: {sessionCountThreshold}) where search queries occured during the current period in relation to the total number of unique users. Interpretation: The more users who return often to search the platform, the more adoption can be assessed in relation to the total number of uniques users. Adoption indicator. Calculation: Total active users/Total unique users"
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Users that had at least the number of sessions (defined by a threshold: {sessionCountThreshold}) where Full-Text Query occurred during the current period in relation to the total number of unique users. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  The more users who return often to search the platform, the more adoption can be assessed in relation to the total number of unique users. Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total active users / Total unique users."
         },
         "userCoverage": {
-            "info": "Active Users compared to total number of potential users (defined by the option: potential_total_user_count). Interpretation: Evaluation of user adoption. Adoption indicator. Calculation: Total number of active users / Total number of potential users ( set to {potential_total_user_count})"
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Active Users compared to total number of potential users (defined by the required option: potential_total_user_count). <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of user adoption. Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of active users / Total number of potential users ( set to {potential_total_user_count})"
         },
         "newUsersTimeline": {
-            "info": "Users that logged in for the first time displayed over time. Interpretation: Adoption indicator. Calculation: Addition of all user-ids where firstlogin > {start}"
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Users that logged in for the first time displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>    Addition of all user-ids where firstlogin > {start}"
         }
     },
 
     "stat": {
-        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}",
-        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}"
+        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}. <br> <b>Current value =</b> {currentValue}. <br> <b> Previous value =</b> {previousValue}",
+        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}. <br> <b>Current value =</b> {currentValue}. <br> <b> Previous value =</b> {previousValue}"
     },
 
     "dashboards": {
