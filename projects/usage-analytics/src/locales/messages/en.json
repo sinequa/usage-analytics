@@ -71,227 +71,23 @@
     },
 
     "widgets": {
-        "queryTotalTimeLine": {
-            "text": "Search Queries",
-            "info": "Number of search queries."
+        "activeUsers": {
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Users that had at least the number of sessions (defined by a threshold: {sessionCountThreshold}) where Full-Text Query occurred during the current period. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  The more users who return often to search the platform, the more adoption can be assumed. Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of users who made a number of session with Full-Text Query > {sessionCountThreshold}. Based on session summary"
         },
-        "userTotalTimeLine": {
-            "text": "Users",
-            "info": "Number of users."
+        "activeUsersRate": {
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Users that had at least the number of sessions (defined by a threshold: {sessionCountThreshold}) where Full-Text Query occurred during the current period in relation to the total number of unique users. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  The more users who return often to search the platform, the more adoption can be assessed in relation to the total number of unique users. Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total active users / Total unique users."
         },
-        "userCountTotal": {
-            "text": "Users",
-            "info": "Number of users."
+        "userCoverage": {
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Active Users compared to total number of potential users (defined by the required option: potential_total_user_count). <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of user adoption. Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of active users / Total number of potential users ( set to {potential_total_user_count})"
         },
-        "sessionTotalTimeLine": {
-            "text": "Sessions",
-            "info": "Number of sessions."
-        },
-        "avgClicksByQueryTimeLine": {
-            "text": "Average Document Clicks By Search Query",
-            "info": "Average number of click for a search query."
-        },
-        "avgEngineResponseTimeTimeLine": {
-            "text": "Average Engine Response (in ms)",
-            "info": "Average engine response time (in ms)."
-        },
-        "avgEngineResponseTime": {
-            "text": "Average Engine Response Time",
-            "info": "Average engine response time (in ms)."
-        },
-        "avgQueriesBySessionTimeLine": {
-            "text": "Average Search By Session (in ms)",
-            "info": "Average number of search queries per session."
-        },
-        "avgResponseTimeTimeLine": {
-            "text": "Average Response Time (in ms)",
-            "info": "Average response time (in ms). It includes backend and engine."
-        },
-        "avgResponseTime": {
-            "text": "Average Response Time",
-            "info": "Average response time (in ms). It includes backend and engine."
-        },
-        "responseTimeTimeLine": {
-            "text": "Response Time (in ms)",
-            "info": "Response time (in ms). It includes backend and engine."
-        },
-        "avgSessionDurationTimeLine": {
-            "text": "Average Session Duration (in ms)",
-            "info": "Average session duration (in ms)."
-        },
-        "avgMRRTimeLine": {
-            "text": "Mean reciprocal rank (MRR)",
-            "info": "Mean reciprocal rank. MRR is an average on result rank clicked. The closer to 1, the more relevant the results are. The value 1 is obtained when rank #1 (first result) is clicked for a given query."
-        },
-        "avgMRR": {
-            "text": "Average MRR",
-            "info": "Mean reciprocal rank. MRR is an average on result rank clicked. The closer to 1, the more relevant the results are. The value 1 is obtained when rank #1 (first result) is clicked for a given query."
-        },
-        "clickRank1TotalTimeLine": {
-            "text": "First Document Clicked",
-            "info": "Number of searches where the user clicks on the first document."
-        },
-        "clickRank1TotalRate": {
-            "text": "First Document Clicked",
-            "info": "Number of searches where the user clicks on the first document out of the total number of searches."
-        },
-        "clickRank3TimeLine": {
-            "text": "Click On First 3 Documents",
-            "info": "Number of searches where the user clicks on the first 3 documents."
-        },
-        "clickRank3": {
-            "text": "Click On First 3 Documents",
-            "info": "Number of searches where the user clicks on the first 3 documents."
-        },
-        "clickTotalTimeLine": {
-            "text": "Document Clicked Total",
-            "info": "Number of documents clicked for a search."
-        },
-        "newUsersTimeLine": {
-            "text": "New Users",
-            "info": "Users that have logged in for the first time."
-        },
-        "newUsers": {
-            "text": "New Users",
-            "info": "Users that have loggedin for the first time."
-        },
-        "queryBounceTimeLine": {
-            "text": "Bounce",
-            "info": "Number of bounces for a search query. A bounce is when a user clicks on a document without reading its content (based on dwell time)."
-        },
-        "queryBounce": {
-            "text": "Bounce",
-            "info": "Number of bounces for a search query. A bounce is when a user clicks on a document without reading its content (based on dwell time)."
-        },
-        "queryBounceRate": {
-            "text": "Bounce Rate",
-            "info": "Number of bounces for a search query compared to the total number of searches."
-        },
-        "queryClickTimeLine": {
-            "text": "Search Query With Clicks",
-            "info": "Number of search queries where the user has clicked on a document at least one time."
-        },
-        "queryClick": {
-            "text": "Search With Clicks",
-            "info": "Number of search queries where the user has clicked on a document at least once."
-        },
-        "queryClickRate": {
-            "text": "Search With Clicks Rate",
-            "info": "Number of search queries where the user has clicked on a document at least once compared to the total number of searches."
-        },
-        "queryRefineTimeLine": {
-            "text": "Refinement",
-            "info": "Number of search queries where the user has refined the search (through facets for instance)."
-        },
-        "queryRefine": {
-            "text": "Refinement",
-            "info": "Number of search queries where the user has refined the search (through facets for instance)."
-        },
-        "queryRefineRate": {
-            "text": "Refinement Rate",
-            "info": "Number of search queries where the user has refined the search compared to the total number of searches."
-        },
-        "queryZeroTimeLine": {
-            "text": "Zero Result Search",
-            "info": "Number of search queries without any results."
-        },
-        "queryZero": {
-            "text": "Zero Result Search",
-            "info": "Number of search queries without any results."
-        },
-        "queryZeroRate": {
-            "text": "Zero Result Search Rate",
-            "info": "Number of search queries without any results compared to the total number of search."
-        },
-        "regularUsersTimeLine": {
-            "text": "Regular Users",
-            "info": "Number of users for whom this is not the first use."
-        },
-        "regularUsers": {
-            "text": "Regular Users",
-            "info": "Number of users for whom this is not the first use."
-        },
-        "adoptionRate": {
-            "text": "Adoption Rate",
-            "info": "Number of new users compared to the total number of potential users."
-        },
-        "regularUsersRate": {
-            "text": "Regular User Rate",
-            "info": "Number of users compared to the total number of potential users."
-        },
-        "regular_newUsers": {
-            "text": "New/Regular Users",
-            "info": "Number of new users compared to the total number of regular users."
-        },
-        "searchExitTimeLine": {
-            "text": "Search Exit",
-            "info": "Number of searches where the user does nothing after viewing the results page."
-        },
-        "searchExit": {
-            "text": "Search Exit",
-            "info": "Number of searches where the user does nothing after viewing the results page."
-        },
-        "searchExitRate": {
-            "text": "Search Exit Rate",
-            "info": "Number of search where the user does nothing after viewing the results page compared to the total number of searches."
-        },
-        "queryByResult": {
-            "text": "Last Action",
-            "info": "Last action after a search:\n - 'search.exit.logout': Runs a search, does not click on any document, logs out.\n - 'search.exit.timeout': Runs a search, does not click on a document, leaves the page.\n - 'search.with.click': Runs one or several searches, clicks on a document as a last action.\n - 'search.with.no.click':  Runs one or several searches, does not click on any document as a last action."
-        },
-        "topQueries": {
-            "text": "Top Queries",
-            "info": "Most frequently queries asked."
-        },
-        "topNoResultQueries": {
-            "text": "Top No Result Queries",
-            "info": "Most frequently queries asked without any results."
-        },
-        "topSources": {
-            "text": "Top Sources",
-            "info": "Sources of most clicked documents."
-        },
-        "topFacets": {
-            "text": "Most Used Filters",
-            "info": "Most used filters."
-        },
-        "sessionTotal": {
-            "text": "Sessions",
-            "info": "Number of sessions."
-        },
-        "queryTotal": {
-            "text": "Queries",
-            "info": "Number of search queries."
-        },
-        "sessionsByUser": {
-            "text": "Average Sessions By User",
-            "info": "Average number of sessions per user."
-        },
-        "avgQueriesBySession": {
-            "text": "Average Search By Session",
-            "info": "Average number of searches per session."
-        },
-        "avgClicksByQuery": {
-            "text": "Average Click By Search",
-            "info": "Average number of clicked documents per search."
-        },
-        "docViewsBySession": {
-            "text": "Average Viewed Documents Per Search",
-            "info": "Average number of viewed documents (Document Navigator) per search."
-        },
-        "avgSessionDuration": {
-            "text": "Average Session Duration",
-            "info": "Average session duration."
-        },
-        "userFeedbackGrid": {
-            "text": "User feedback",
-            "info": "User feedback."
+        "newUsersTimeline": {
+            "info": "<span class='text-decoration-underline'><b>Description:</b></span> Users that logged in for the first time displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>    Addition of all user-ids where firstlogin > {start}"
         }
     },
 
     "stat": {
-        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}",
-        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}. \n Current value = {currentValue}. \n Previous value = {previousValue}"
+        "trendTooltip": "This trend has been calculated between the {currentDate} and the previous {trendRange}. <br> <b>Current value =</b> {currentValue}. <br> <b> Previous value =</b> {previousValue}",
+        "trendTooltipPrevDates": "This trend has been calculated between the {currentDate} and {trendRange}. <br> <b>Current value =</b> {currentValue}. <br> <b> Previous value =</b> {previousValue}"
     },
 
     "dashboards": {

@@ -1,941 +1,1046 @@
-import { FacetConfig } from "@sinequa/components/facet";
+import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
+import { MapOf } from "@sinequa/core/base";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
 
+/** Server TimeZone */
+export const sq_timezone: string = "UTC";
+
+/** Minimum sessions count to be considered as "Active user" */
+export const session_count_threshold_per_month: number = 2;
+
+/** Potential current number of users interacting with the platform */
+export const potential_total_user_count: number = 0;
+
+/** Filters expression to be added in the WHERE clause of ALL DATASETS */
+export const static_filters_expr: string = "";
+
+/** Set of params that could be used as input in A SPECIFIC DATASET ( WHERE clause, FROM clause ...)*/
+export const custom_params: MapOf<string> = {};
+
+/** Default time period used on init */
+export const default_timestamp_filter: string | Date[] = "";
+
+/** Default scope, on sba, used on init */
+export const default_app_filter: string | string[] = "";
+
+/** Default scope, on profile, used on init */
+export const default_profile_filter: string | string[] = "";
+
+/** Queries requiring filtering by a unique application to display correct data */
+export const mono_scope_queries: string[] = ["newUsersTimeLine", "newUsers"];
+
 /** Filters */
-export const FACETS: FacetConfig[] = [
-  {
-      name: "SBA",
-      title: "SBA",
-      type: "list",
-      aggregation: "sba",
-      icon: "fas fa-globe-americas",
-      showCount: true,
-      searchable: true,
-      allowExclude: true,
-      allowOr: true,
-      allowAnd: false,
-      displayEmptyDistributionIntervals: false,
-  },
-  {
-      name: "Profile",
-      title: "Profile",
-      type: "list",
-      aggregation: "profile",
-      icon: "fas fa-building",
-      showCount: true,
-      searchable: true,
-      allowExclude: true,
-      allowOr: true,
-      allowAnd: false,
-      displayEmptyDistributionIntervals: false,
-  }
+export const FACETS: FacetConfig<FacetListParams>[] = [
+    {
+        name: "SBA",
+        title: "SBA",
+        type: "list",
+        icon: "fas fa-globe-americas",
+        parameters: {
+            aggregation: "sba",
+            showCount: true,
+            searchable: false,
+            allowExclude: true,
+            allowOr: true,
+            allowAnd: false,
+            displayEmptyDistributionIntervals: false
+        }
+    },
+    {
+        name: "Profile",
+        title: "Profile",
+        type: "list",
+        icon: "fas fa-building",
+        parameters: {
+            aggregation: "profile",
+            showCount: true,
+            searchable: false,
+            allowExclude: true,
+            allowOr: true,
+            allowAnd: false,
+            displayEmptyDistributionIntervals: false
+        }
+    }
 ];
 
 /** Widgets */
 export const WIDGETS: {[key: string]: DashboardItemOption} = {
 
-    queryCountTotalTimeline: {
-        type: "timeline",
-        query: "queryTotalTimeLine",
-        text: "msg#widgets.queryTotalTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.queryTotalTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "QueryTotal",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "sum", title: "Query Count Total", primary: true}]
-            }
+    "queryCountTotalTimeline": {
+        "type": "timeline",
+        "query": "queryTotalTimeLine",
+        "text": "Full-text Queries Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of full-text queries over time. Interpretation: An increase in the number of full-text queries over time is an indicator of platform adoption. Calculation: Addition of all Full-text Queries",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "QueryTotal",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Query Count Total", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    userCountTotalTimeline: {
-        type: "timeline",
-        query: "userCountTotalTimeLine",
-        text: "msg#widgets.userTotalTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.userTotalTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "UserCountTotal",
-                dateField: "value",
-                valueFields: [{name: "count", title: "User Count Total", primary: true}]
-            }
+    "userCountTotalTimeline": {
+        "type": "timeline",
+        "query": "userCountTotalTimeLine",
+        "text": "Total Unique Users Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of unique user-ids logged per day in over time. Interpretation: Adoption indicator. Calculation: Based on session-summary. Addition of all unique user-ids who did sessions during the day.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "UserCountTotal",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "User Count Total", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    sessionCountTotalTimeline: {
-        type: "timeline",
-        query: "sessionTotalTimeLine",
-        text: "msg#widgets.sessionTotalTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.sessionTotalTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "SessionTotal",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Session Count Total", primary: true}]
-            }
+    "sessionCountTotalTimeline": {
+        "type": "timeline",
+        "query": "sessionTotalTimeLine",
+        "text": "Sessions Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of unique sessions displayed over time. WARNING: If a user occurs between 11:49 pm to 0:10, we will consider these 2 different sessions. This simplifies the calculation by day. Interpretation: An increase in the number of sessions over time indicates better adoption of the platform. Calculation: Addition of all unique session-summary realized during a day over time.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "SessionTotal",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Session Count Total", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    clickBySearchTimeline: {
-        type: "timeline",
-        query: "avgClicksByQueryTimeLine",
-        text: "msg#widgets.avgClicksByQueryTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.avgClicksByQueryTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "AvgClicksByQuery",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "avg", title: "Average Click By Search", primary: true}]
-            }
+    "clickBySearchTimeline": {
+        "type": "timeline",
+        "query": "avgClicksBySearchTimeLine",
+        "text": "Average Document Clicks By Search-Summary",
+        "icon": "fas fa-chart-line",
+        "info": "Average number of clicked documents by search summary displayed over time. Interpretation: Relevance indicator. Calculation: Average number of clicked documents by search summary",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "AvgClicksByQuery",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Click By Search", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    avgEngineResponseTimeline: {
-        type: "timeline",
-        query: "avgEngineResponseTimeTimeLine",
-        text: "msg#widgets.avgEngineResponseTimeTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.avgEngineResponseTimeTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "engineresponsetime",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "avg", title: "Average Engine Response", primary: true}]
-            }
+    "avgEngineResponseTimeline": {
+        "type": "timeline",
+        "query": "engineResponseTimeTimeLine",
+        "text": "Average Engine Response Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Average engine response time (in ms) displayed over time. Interpretation: Performance indicator. Calculation: Average of all durationExecution filtered on full-text queries.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "EngineResponseTime",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Engine Response", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    mrrTimeline: {
-        type: "timeline",
-        query: "avgMRRTimeLine",
-        text: "msg#widgets.avgMRRTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.avgMRRTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "AvgMRR",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "avg", title: "Average MRR", primary: true}]
-            }
+    "maxEngineResponseTimeline": {
+        "type": "timeline",
+        "query": "engineResponseTimeTimeLine",
+        "text": "Maximum Engine Response Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Maximum engine response time (in ms) displayed over time. Interpretation: Performance indicator. Calculation: Maximum value of all durationExecution filtered on refinement events",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "EngineResponseTime",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "max", "title": "Maximum Engine Response", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    searchBySessionTimeline: {
-        type: "timeline",
-        query: "avgQueriesBySessionTimeLine",
-        text: "msg#widgets.avgQueriesBySessionTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.avgQueriesBySessionTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "AvgQueriesBySession",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "avg", title: "Average Search By Session", primary: true}]
-            }
+    "mrrTimeline": {
+        "type": "timeline",
+        "query": "avgMRRTimeLine",
+        "text": "Average Mean Reciprocal Rank (MRR) of Search Summary Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Captures the rank of clicked document by users: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. Interpretation: Relevance indicator. Calculation: Based on search-summary. Average of all Mean Reciprocal Rank (MRR) events.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "AvgMRR",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average MRR", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    avgResponseTimeTimeline: {
-        type: "timeline",
-        query: "avgResponseTimeTimeLine",
-        text: "msg#widgets.avgResponseTimeTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.avgResponseTimeTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "engineresponsetime",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "avg", title: "Average Response Time", primary: true}]
-            }
+    "searchBySessionTimeline": {
+        "type": "timeline",
+        "query": "avgQueriesBySessionTimeLine",
+        "text": "Average Full-Text Queries by Session Summary Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Average number of Full-Text Queries per session displayed over time. Interpretation: Adoption indicator. Calculation: Addition of all Full-Text Queries DIVIDED BY Total number of Session Summary.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "AvgQueriesBySession",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Search By Session", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    responseTimeTimeline: {
-        type: "timeline",
-        query: "responseTimeTimeLine",
-        text: "msg#widgets.responseTimeTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.responseTimeTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "ResponseTime",
-                dateField: "value",
-                valueFields: [
-                    {operatorResults: true, name: "avg", title: "Average", primary: true},
-                    {operatorResults: true, name: "max", title: "Maximum", primary: true},
-                    {operatorResults: true, name: "min", title: "Minimum", primary: false}
+    "avgResponseTimeTimeline": {
+        "type": "timeline",
+        "query": "responseTimeTimeLine",
+        "text": "Average Web App Response Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Average WebApp Response time (in ms) incl. platform & engine displayed over time. Interpretation: Performance indicator. Calculation: Average of all duration event filtered on Full-Text Queries.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "ResponseTime",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Response Time", "primary": true}]
+            },
+            "chartType": "Timeline"
+        }
+    },
+
+    "maxResponseTimeTimeline": {
+        "type": "timeline",
+        "query": "responseTimeTimeLine",
+        "text": "Maximum Web App Response Time Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Maximum Web App Response time (in ms) incl. platform & engine displayed over time. Interpretation: Performance indicator. Calculation: Maximum value of durations events filtered on full-text queries.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "ResponseTime",
+                "dateField": "value",
+                "valueFields": [
+                    {"operatorResults": true, "name": "max", "title": "Maximum Response Time", "primary": true}
                 ]
-            }
-        }
-    },
-
-    sessionDurationTimeline: {
-        type: "timeline",
-        query: "avgSessionDurationTimeLine",
-        text: "msg#widgets.avgSessionDurationTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.avgSessionDurationTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "AvgSessionDuration",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "avg", title: "Average Session Duration", primary: true}]
-            }
-        }
-    },
-
-    firstClickTimeline: {
-        type: "timeline",
-        query: "clickRank1TotalTimeLine",
-        text: "msg#widgets.clickRank1TotalTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.clickRank1TotalTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "ClickRank1Total",
-                dateField: "value",
-                valueFields: [{name: "count", title: "First Click", primary: true}]
-            }
-        }
-    },
-
-    clickFirstDocsTimeline: {
-        type: "timeline",
-        query: "clickRank3TimeLine",
-        text: "msg#widgets.clickRank3TimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.clickRank3TimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "ClickRank3",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Click On First 3 Documents", primary: true}]
-            }
-        }
-    },
-
-    clickTotalTimeline: {
-        type: "timeline",
-        query: "clickTotalTimeLine",
-        text: "msg#widgets.clickTotalTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.clickTotalTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "ClickTotal",
-                dateField: "value",
-                valueFields: [{operatorResults: true, name: "sum", title: "Click Total", primary: true}]
-            }
-        }
-    },
-
-    newUsersTimeline: {
-        type: "timeline",
-        query: "newUsersTimeLine",
-        text: "msg#widgets.newUsersTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.newUsersTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "NewUsers",
-                dateField: "value",
-                valueFields: [{name: "count", title: "New Users", primary: true}]
-            }
-        }
-    },
-
-    queryBounceTimeline: {
-        type: "timeline",
-        query: "queryBounceTimeLine",
-        text: "msg#widgets.queryBounceTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.queryBounceTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "QueryBounc",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Query Bounce", primary: true}]
-            }
-        }
-    },
-
-    searchWithClicksTimeline: {
-        type: "timeline",
-        query: "queryClickTimeLine",
-        text: "msg#widgets.queryClickTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.queryClickTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "QueryClick",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Search With Clicks", primary: true}]
-            }
-        }
-    },
-
-    refinementTimeline: {
-        type: "timeline",
-        query: "queryRefineTimeLine",
-        text: "msg#widgets.queryRefineTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.queryRefineTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "QueryRefine",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Refinement", primary: true}]
-            }
-        }
-    },
-
-    zeroSearchTimeline: {
-        type: "timeline",
-        query: "queryZeroTimeLine",
-        text: "msg#widgets.queryZeroTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.queryZeroTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "QueryZero",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Zero Search", primary: true}]
-            }
-        }
-    },
-
-    regularUsersTimeline: {
-        type: "timeline",
-        query: "regularUsersTimeLine",
-        text: "msg#widgets.regularUsersTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.regularUsersTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "RegularUsers",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Regular Users", primary: true}]
-            }
-        }
-    },
-
-    searchExitTimeline: {
-        type: "timeline",
-        query: "searchExitTimeLine",
-        text: "msg#widgets.searchExitTimeLine.text",
-        icon: "fas fa-chart-line",
-        info: "msg#widgets.searchExitTimeLine.info",
-        unique: true,
-        parameters: {
-            aggregationsTimeSeries: {
-                name: "SearchExit",
-                dateField: "value",
-                valueFields: [{name: "count", title: "Search Exit", primary: true}]
-            }
-        }
-    },
-
-    topQueries: {
-        type: "chart",
-        query: "topQueries",
-        icon: "fas fa-chart-pie",
-        text: "msg#widgets.topQueries.text",
-        info: "msg#widgets.topQueries.info",
-        unique: true,
-        parameters: {
-            chartData: {
-                aggregation: "query"
             },
-            chartType: "Bar2D"
+            "chartType": "Timeline"
         }
     },
 
-    topNoResultsQueries: {
-        type: "chart",
-        query: "topNoResultQueries",
-        icon: "fas fa-chart-pie",
-        text: "msg#widgets.topNoResultQueries.text",
-        info: "msg#widgets.topNoResultQueries.info",
-        unique: true,
-        parameters: {
-            chartData: {
-                aggregation: "query"
+    "sessionDurationTimeline": {
+        "type": "timeline",
+        "query": "avgSessionDurationTimeLine",
+        "text": "Average Session Duration (in sec) Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "The average session summary duration calculated in seconds. The duration corresponds to the time between the first and the last action of the same session. If there is one user event then the session duration will be 0. Interpretation: Analysis of the time spent by a user to find a relevant result. Relevance indicator. Calculation: Addition of all durations event of session summary DIVIDED BY Total number of session summary.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "AvgSessionDuration",
+                "dateField": "value",
+                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Session Duration", "primary": true}]
             },
-            chartType: "Bar2D"
+            "chartType": "Timeline"
         }
     },
 
-    topSources: {
-        type: "chart",
-        query: "topSources",
-        icon: "fas fa-chart-pie",
-        text: "msg#widgets.topSources.text",
-        info: "msg#widgets.topSources.info",
-        unique: true,
-        parameters: {
-            chartData: {
-                aggregation: "source"
+    "clickTotalTimeline": {
+        "type": "timeline",
+        "query": "clickTotalTimeLine",
+        "text": "Total Documents Clicked Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Total number of clicked documents displayed over time. Interpretation: Indicator to be compared with other information (number of users, searches, etc.). Relevance indicator. Calculation: Addition of all clicked documents",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "ClickTotal",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Click Total", "primary": true}]
             },
-            chartType: "Pie3D"
+            "chartType": "Timeline"
         }
     },
 
-    topFacets: {
-        type: "chart",
-        query: "topFacets",
-        icon: "fas fa-chart-pie",
-        text: "msg#widgets.topFacets.text",
-        info: "msg#widgets.topFacets.info",
-        unique: true,
-        parameters: {
-            chartData: {
-                aggregation: "box"
+    "newUsersTimeline": {
+        "type": "timeline",
+        "query": "newUsersTimeLine",
+        "text": "New Users Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "msg#widgets.newUsersTimeline.info",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "NewUsers",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "New Users", "primary": true}]
             },
-            chartType: "Pie3D"
+            "chartType": "Timeline"
         }
     },
 
-    userCountTotal: {
-        type: "stat",
-        query: "userCountTotal",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.userCountTotal.text",
-        info: "msg#widgets.userCountTotal.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            asc: true
-        }
-    },
-
-    sessionCountTotal: {
-        type: "stat",
-        query: "sessionTotal",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.sessionTotal.text",
-        info: "msg#widgets.sessionTotal.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            asc: true
-        }
-    },
-
-    queryCountTotal: {
-        type: "stat",
-        query: "queryTotal",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryTotal.text",
-        info: "msg#widgets.queryTotal.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "records",
-            asc: true
-        }
-    },
-
-    sessionsByUser: {
-        type: "stat",
-        query: "sessionsByUser",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.sessionsByUser.text",
-        info: "msg#widgets.sessionsByUser.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "aggregations",
-            operation: "avg",
-            asc: true
-        }
-    },
-
-    searchBySession: {
-        type: "stat",
-        query: "avgQueriesBySession",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.avgQueriesBySession.text",
-        info: "msg#widgets.avgQueriesBySession.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "records",
-            asc: true
-        }
-    },
-
-    clickBySearch: {
-        type: "stat",
-        query: "avgClicksByQuery",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.avgClicksByQuery.text",
-        info: "msg#widgets.avgClicksByQuery.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "records",
-            asc: true
-        }
-    },
-
-    viewedDocPerSearch: {
-        type: "stat",
-        query: "docViewsBySession",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.docViewsBySession.text",
-        info: "msg#widgets.docViewsBySession.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "aggregations",
-            operation: "avg",
-            asc: true
-        }
-    },
-
-    sessionDuration: {
-        type: "stat",
-        query: "avgSessionDuration",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.avgSessionDuration.text",
-        info: "msg#widgets.avgSessionDuration.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "records",
-            asc: true
-        }
-    },
-
-    newUsers: {
-        type: "stat",
-        query: "newUsers",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.newUsers.text",
-        info: "msg#widgets.newUsers.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            asc: true
-        }
-    },
-
-    regularUsers: {
-        type: "stat",
-        query: "regularUsers",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.regularUsers.text",
-        info: "msg#widgets.regularUsers.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            asc: true
-        }
-    },
-
-    adoptionRate: {
-        type: "stat",
-        query: "newUsers",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.adoptionRate.text",
-        info: "msg#widgets.adoptionRate.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            relatedQuery: "totalUsers",
-            relatedValueLocation: "totalrecordcount",
-            computation: "percentage",
-            asc: true
-        }
-    },
-
-    regularUserRate: {
-        type: "stat",
-        query: "regularUsers",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.regularUsersRate.text",
-        info: "msg#widgets.regularUsersRate.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            relatedQuery: "totalUsers",
-            relatedValueLocation: "totalrecordcount",
-            computation: "percentage",
-            asc: true
-        }
-    },
-
-    regularNewUsers: {
-        type: "chart",
-        query: "newUsers",
-        icon: "fas fa-chart-pie",
-        text: "msg#widgets.regular_newUsers.text",
-        info: "msg#widgets.regular_newUsers.info",
-        unique: true,
-        parameters: {
-            chartData: {
-                aggregation: "regular-new-user"
+    "queryBounceTimeline": {
+        "type": "timeline",
+        "query": "queryBounceTimeLine",
+        "text": "Bounce Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of bounces displayed over time. A bounce is when a user opens a document and quickly comes back (<10s). Interpretation: This suggests that the result was irrelevant or incomplete. Relevance indicator. Calculation: Addition of all bounce events calculated on search summary. A bounce is generated with clicked document events.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "QueryBounce",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Query Bounce", "primary": true}]
             },
-            chartType: "Pie3D",
-            relatedQuery: "regularUsers",
+            "chartType": "Timeline"
         }
     },
 
-    firstClick: {
-        type: "stat",
-        query: "clickRank1Total",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.clickRank1TotalRate.text",
-        info: "msg#widgets.clickRank1TotalRate.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            relatedQuery: "clickTotal",
-            relatedValueLocation: "records",
-            computation: "percentage",
-            asc: true
-        }
-    },
-
-    mrr: {
-        type: "stat",
-        query: "avgMRR",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.avgMRR.text",
-        info: "msg#widgets.avgMRR.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "records",
-            asc: true
-        }
-    },
-
-    refinement: {
-        type: "stat",
-        query: "queryRefine",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryRefine.text",
-        info: "msg#widgets.queryRefine.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            statLayout: 'standard',
-            asc: true
-        }
-    },
-
-    refinementRate: {
-        type: "stat",
-        query: "queryRefine",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryRefineRate.text",
-        info: "msg#widgets.queryRefineRate.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            relatedQuery: "queryTotal",
-            relatedValueLocation: "records",
-            computation: "percentage",
-            statLayout: 'standard',
-            asc: true
-        }
-    },
-
-    searchWithClicks: {
-        type: "stat",
-        query: "queryClick",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryClick.text",
-        info: "msg#widgets.queryClick.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            asc: true
-        }
-    },
-
-    searchWithClicksRate: {
-        type: "stat",
-        query: "queryClick",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryClickRate.text",
-        info: "msg#widgets.queryClickRate.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            relatedQuery: "queryTotal",
-            relatedValueLocation: "records",
-            computation: "percentage",
-            statLayout: 'standard',
-            asc: true
-        }
-    },
-
-    zeroSearch: {
-        type: "stat",
-        query: "queryZero",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryZero.text",
-        info: "msg#widgets.queryZero.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            statLayout: 'standard',
-            asc: false
-        }
-    },
-
-    zeroSearchRate: {
-        type: "stat",
-        query: "queryZero",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryZeroRate.text",
-        info: "msg#widgets.queryZeroRate.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            relatedQuery: "queryTotal",
-            relatedValueLocation: "records",
-            computation: "percentage",
-            statLayout: 'standard',
-            asc: false
-        }
-    },
-
-    searchExit: {
-        type: "stat",
-        query: "searchExit",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.searchExit.text",
-        info: "msg#widgets.searchExit.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "totalrecordcount",
-            asc: false
-        }
-    },
-
-    searchExitRate: {
-        type: "stat",
-        query: "searchExit",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.searchExitRate.text",
-        info: "msg#widgets.searchExitRate.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            relatedQuery: "queryTotal",
-            relatedValueLocation: "records",
-            computation: "percentage",
-            statLayout: 'standard',
-            asc: false
-        }
-    },
-
-    clickFirstDocs: {
-        type: "stat",
-        query: "clickRank3",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.clickRank3.text",
-        info: "msg#widgets.clickRank3.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            relatedQuery: "queryTotal",
-            relatedValueLocation: "records",
-            computation: "percentage",
-            statLayout: 'standard',
-            asc: true
-        }
-    },
-
-    queryBounce: {
-        type: "stat",
-        query: "queryBounce",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryBounce.text",
-        info: "msg#widgets.queryBounce.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            statLayout: 'standard',
-            asc: true
-        }
-    },
-
-    queryBounceRate: {
-        type: "stat",
-        query: "queryBounce",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.queryBounceRate.text",
-        info: "msg#widgets.queryBounceRate.info",
-        unique: true,
-        parameters: {
-            valueLocation: "totalrecordcount",
-            relatedQuery: "queryTotal",
-            relatedValueLocation: "records",
-            computation: "percentage",
-            statLayout: 'standard',
-            asc: true
-        }
-    },
-
-    resultTypes: {
-        type: "chart",
-        query: "queryByResult",
-        icon: "fas fa-chart-pie",
-        text: "msg#widgets.queryByResult.text",
-        info: "msg#widgets.queryByResult.info",
-        unique: true,
-        parameters: {
-            chartData: {
-                aggregation: "result"
+    "refinementTimeline": {
+        "type": "timeline",
+        "query": "queryRefineTimeLine",
+        "text": "Refinement Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of search summary where the user has refined displayed over time. Interpretation: This suggests that relevance can be improved. Relevance indicator. Calculation: Addition of all search summary where there are searchrefinements.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "QueryRefine",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Refinement", "primary": true}]
             },
-            chartType: "Pie3D"
+            "chartType": "Timeline"
         }
     },
 
-    avgResponseTime: {
-        type: "stat",
-        query: "avgResponseTime",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.avgResponseTime.text",
-        info: "msg#widgets.avgResponseTime.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "records",
-            asc: false
+    "zeroSearchTimeline": {
+        "type": "timeline",
+        "query": "queryZeroTimeLine",
+        "text": "Zero Result Search Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of full-text queries without any results displayed over time. Interpretation: Relevance indicator. Calculation: Addition of all fullt-text queries where resultcount=0.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "QueryZero",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Zero Search", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    avgEngineResponseTime: {
-        type: "stat",
-        query: "avgEngineResponseTime",
-        icon: "fas fa-balance-scale",
-        text: "msg#widgets.avgEngineResponseTime.text",
-        info: "msg#widgets.avgEngineResponseTime.info",
-        unique: true,
-        parameters: {
-            statLayout: 'standard',
-            valueLocation: "records",
-            asc: false
+    "searchExitTimeline": {
+        "type": "timeline",
+        "query": "searchExitTimeLine",
+        "text": "Search Session With Exit Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of search summary where the user does nothing after viewing the results page displayed over time. Interpretation: Suggests that a user does not consider the results provided to be relevant. Relevance indicator. Calculation: Based on search summary. Addition of all search.exit.timeout and search.exit.logout result events.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "SearchExit",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Search Exit", "primary": true}]
+            },
+            "chartType": "Timeline"
         }
     },
 
-    userFeedbackGrid: {
-        type: "grid",
-        query: "userFeedback",
-        text: "msg#widgets.userFeedbackGrid.text",
-        icon: "fas fa-th-list",
-        info: "msg#widgets.userFeedbackGrid.info",
-        unique: true,
-        parameters: {
-            columns: [
+    "queryCountPerUser": {
+        "type": "stat",
+        "query": "queryTotal",
+        "icon": "fas fa-balance-scale",
+        "text": "Average number of Full-Text queries per user",
+        "info": "Allows you to follow the adoption of the platform by monitoring usage over the concerned period. When a user conducts more and more Full-Text Queries, this suggests successful adoption. Interpretation: Adoption indicator. Calculation: Addition of all Full-Text Queries DIVIDED BY Total number of unique user-id.",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "userCountTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "asc": true,
+            "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
+        }
+    },
+
+
+    "topQueries": {
+        "type": "chart",
+        "query": "topQueries",
+        "icon": "fas fa-th-list",
+        "text": "Top Full-text Queries",
+        "info": "Most frequent full-text queries. Interpretation: Understanding user searches enables levers to be activated to provide them with more relevant results. Relevance indicator. Calculation: Distribution of the top 100 full-text queries",
+        "unique": true,
+        "parameters": {
+            "chartData": {
+                "aggregation": "query"
+            },
+            "chartType": "grid"
+        }
+    },
+
+    "topNoResultsQueries": {
+        "type": "chart",
+        "query": "topNoResultQueries",
+        "icon": "fas fa-th-list",
+        "text": "Top No Result Full-text Queries",
+        "info": "Most frequent full-text queries without any results. Interpretation: Suggests action is needed to ensure that these searches return results. Relevance indicator. Calculation: Distribution of the top 100 full-text queries that have a result-count=0",
+        "unique": true,
+        "parameters": {
+            "chartData": {
+                "aggregation": "query"
+            },
+            "chartType": "grid"
+        }
+    },
+
+    "topSources": {
+        "type": "chart",
+        "query": "topSources",
+        "icon": "fas fa-chart-pie",
+        "text": "Top Sources",
+        "info": "Sources where the most clicked documents are found. Interpretation: May suggest review of the content-type weighting for the most clicked sources. Relevance indicator. Calculation: Distribution of the 100 most frequent sources generated by clicked document events",
+        "unique": true,
+        "parameters": {
+            "chartData": {
+                "aggregation": "source"
+            },
+            "chartType": "Pie3D"
+        }
+    },
+
+    "topCollections": {
+        "type": "chart",
+        "query": "topCollections",
+        "icon": "fas fa-chart-pie",
+        "text": "Top Collections",
+        "info": "Collections where most clicked documents are found. Interpretation: May suggest review of the content-type weighting for the most clicked collections. Relevance indicator. Calculation: Distribution of the 100 most frequent collections generated by clicked document events",
+        "unique": true,
+        "parameters": {
+            "chartData": {
+                "aggregation": "collection"
+            },
+            "chartType": "Pie3D"
+        }
+    },
+
+    "topFacets": {
+        "type": "chart",
+        "query": "topFacets",
+        "icon": "fas fa-chart-pie",
+        "text": "Most Used Facets",
+        "info": "Most used facets. Interpretation: Analysis of user behavior to identify actions to improve the relevance of search results. Relevance indicator. Calculation: Distribution of the 100 most frequent facets (all events where itemboxes is not null).",
+        "unique": true,
+        "parameters": {
+            "chartData": {
+                "aggregation": "box"
+            },
+            "chartType": "Pie3D"
+        }
+    },
+
+    "resultTypes": {
+        "type": "chart",
+        "query": "queryByResult",
+        "icon": "fas fa-chart-pie",
+        "text": "Last Event After A Search",
+        "info": "Last event after a search:\n - 'search.exit.logout': User runs a full-text query and does not click on any document but instead logs out.\n - 'search.exit.timeout': User runs a full-text query and does nothing before the timeout of the session.\n - 'search.with.click': User runs a full-text query, can do refinement and then clicks on a document. \n - 'search.with.no.click': User runs a full-text query, can do refinement but doesn't click on a document. Interpretation: Relevance indicator. Calculation: Distribution of values of “Results” event within search summary.",
+        "unique": true,
+        "parameters": {
+            "chartData": {
+                "aggregation": "result"
+            },
+            "chartType": "Pie3D"
+        }
+    },
+
+    "userCountTotal": {
+        "type": "stat",
+        "query": "userCountTotal",
+        "icon": "fas fa-balance-scale",
+        "text": "Total Unique Users",
+        "info": "Number of unique user-ids logged in over time. Interpretation: Adoption indicator. Calculation: Addition of all unique user-ids based on session summary",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": true
+        }
+    },
+
+    "sessionCountTotal": {
+        "type": "stat",
+        "query": "sessionTotal",
+        "icon": "fas fa-balance-scale",
+        "text": "Sessions",
+        "info": "Number of unique sessions displayed over time. WARNING: If a user session occurs between 11:49 pm and 00:10 am, we will consider these 2 different sessions. This simplifies the calculation by day. Interpretation: Adoption indicator. Calculation: Addition of all session summary",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": true
+        }
+    },
+
+    "queryCountTotal": {
+        "type": "stat",
+        "query": "queryTotal",
+        "icon": "fas fa-balance-scale",
+        "text": "Full-text Queries",
+        "info": "Number of all full-text queries. Interpretation: Adoption indicator. Calculation: Addition of all Full-Text Queries",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": true
+        }
+    },
+
+    "sessionsByUser": {
+        "type": "stat",
+        "query": "sessionsByUser",
+        "icon": "fas fa-balance-scale",
+        "text": "Average Sessions By User",
+        "info": "Average number of sessions per user. Interpretation: Adoption indicator. Calculation: Total number of session summary DIVIDED BY total number of unique user-ids",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "aggregations",
+            "operation": "avg",
+            "asc": true
+        }
+    },
+
+    "searchBySession": {
+        "type": "stat",
+        "query": "avgQueriesBySession",
+        "icon": "fas fa-balance-scale",
+        "text": "Average Full-Text Queries By Session Summary",
+        "info": "Average number of Full-Text Queries per session summary. Interpretation: The more searches per session the greater the adoption. Adoption indicator. Be careful, if all the searches are linked, this may on the contrary demonstrate too many reformulations and therefore a problem of relevance of the results. Relevance indicator. Calculation: Average of all Full-Text Queries within a session summary",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "records",
+            "asc": true
+        }
+    },
+
+    "clickBySearch": {
+        "type": "stat",
+        "query": "avgClicksBySearch",
+        "icon": "fas fa-balance-scale",
+        "text": "Average Clicked Documents By Search Summary",
+        "info": "Average number of clicked documents per search summary. Interpretation: Clicking on several documents following a Full-Text Query may demonstrate a greater effort to access the expected result. Relevance indicator. It can also demonstrate that the user enjoys browsing the results (adoption indicator). Calculation: Average of all clicked documents within a search summary",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "records",
+            "asc": true
+        }
+    },
+
+    "viewedDocPerSearch": {
+        "type": "stat",
+        "query": "docViewsBySession",
+        "icon": "fas fa-balance-scale",
+        "text": "Average Viewed Documents Per Session",
+        "info": "Average number of viewed documents (Document Navigator) per session. Interpretation: Seeing fewer documents during a search suggests that the answer may have been found in the first results. Relevance indicator. Calculation: Addition of all clicked documents DIVIDED BY Total number of sessions",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "aggregations",
+            "operation": "avg",
+            "asc": true
+        }
+    },
+
+    "sessionDuration": {
+        "type": "stat",
+        "query": "avgSessionDuration",
+        "icon": "fas fa-balance-scale",
+        "text": "Average Session Duration (in sec)",
+        "info": "The average session duration calculated in seconds. A session starts when a user logs into the platform and ends when he logs out or a timeout occurs. Interpretation: Analysis of the time spent by a user to find his result. Relevance Indicator. Calculation: Average of all durations within a session summary",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "records",
+            "asc": true
+        }
+    },
+
+    "newUsers": {
+        "type": "stat",
+        "query": "newUsers",
+        "icon": "fas fa-balance-scale",
+        "text": "New Users",
+        "info": "Users that have logged in for the first time during the current period. Interpretation: Adoption indicator. Calculation: Total number of users who completed their first login on a later date than the start of the range. Based on session summary",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": true
+        }
+    },
+
+    "newUsersRate": {
+        "type": "stat",
+        "query": "newUsers",
+        "icon": "fas fa-balance-scale",
+        "text": "New Users Rate",
+        "info": "Percentage of new users among all users. Interpretation: Adoption indicator. Calculation: Total number of new users DIVIDED BY Total number of unique users.",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "userCountTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
+        }
+    },
+
+    "activeUsers": {
+        "type": "stat",
+        "query": "activeUsers",
+        "icon": "fas fa-balance-scale",
+        "text": "Active Users",
+        "info": "msg#widgets.activeUsers.info",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": true
+        }
+    },
+
+    "activeUsersRate": {
+        "type": "stat",
+        "query": "activeUsers",
+        "icon": "fas fa-balance-scale",
+        "text": "Active Users Rate",
+        "info": "msg#widgets.activeUsersRate.info",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "userCountTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
+        }
+    },
+
+    "userCoverage": {
+        "type": "stat",
+        "query": "activeUsers",
+        "icon": "fas fa-balance-scale",
+        "text": "User Coverage",
+        "info": "msg#widgets.userCoverage.info",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "totalUsers",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
+        }
+    },
+
+    "clickRank1AfterSearchRate": {
+        "type": "stat",
+        "query": "clickRank1AfterSearch",
+        "icon": "fas fa-balance-scale",
+        "text": "First Clicked Document Rate",
+        "info": "Number of search summary where the user clicks on the first document out of the total number of search summary. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. Calculation: Total number of search summary where there are clicks of rank = 0 DIVIDED BY Total number of search summary",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "searchSummaryTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
+        }
+    },
+
+    "clickRank1AfterSearchTimeline": {
+        "type": "timeline",
+        "query": "clickRank1AfterSearchTimeline",
+        "text": "First Clicked Document Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of search summary where the user clicks on the first document displayed over time. Interpretation: Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. Calculation: Addition of all search.summary where there are clicks of rank = 1.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "ClickRank1Timeline",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "First Click", "primary": true}]
+            },
+            "chartType": "Timeline"
+        }
+    },
+
+    "clickRank3AfterSearchRate": {
+        "type": "stat",
+        "query": "clickRank3AfterSearch",
+        "icon": "fas fa-balance-scale",
+        "text": "First Three Clicked Documents Rate",
+        "info": "Number of search summary where the user clicks on the first three documents out of the total number of search summary. Interpretation: Search results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. Calculation: Total number of search.summary where there are clicks of rank = (0,1,2) DIVIDED BY Total number of search summary",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "searchSummaryTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "statLayout": "standard",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
+        }
+    },
+
+    "clickRank3AfterSearchTimeline": {
+        "type": "timeline",
+        "query": "clickRank3AfterSearchTimeline",
+        "text": "First Three Clicked Documents Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of search summary where the user clicks on the first three document displayed over time. Interpretation: Search summary results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. Calculation: Addition of all search summary where there are clicks of rank = (0,1,2).",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "ClickRank3Timeline",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "First Three Documents Clicked Timeline", "primary": true}]
+            },
+            "chartType": "Timeline"
+        }
+    },
+
+    "clickAfterSearch": {
+        "type": "stat",
+        "query": "clickAfterSearch",
+        "icon": "fas fa-balance-scale",
+        "text": "Search Session With Clicks",
+        "info": "Total number of search summary where the user has clicked on a document at least once. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search summary where there are at least one clicked documents",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": true
+        }
+    },
+
+    "clickAfterSearchRate": {
+        "type": "stat",
+        "query": "clickAfterSearch",
+        "icon": "fas fa-balance-scale",
+        "text": "Search Session With Click(s) Rate",
+        "info": "Number of search summary where the user clicks at least on one document out of the total number of search summary. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search summary where there are at least one clicked document DIVIDED BY Total number of search summary",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "searchSummaryTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "statLayout": "standard",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
+        }
+    },
+
+    "clickAfterSearchTimeline": {
+        "type": "timeline",
+        "query": "clickAfterSearchTimeline",
+        "text": "Search Session With Click(s) Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "Number of search summary where the user clicks at least on one document displayed over time. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Addition of all search summary where there are at least one click.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "ClickTimeline",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Search With Clicks Timeline", "primary": true}]
+            },
+            "chartType": "Timeline"
+        }
+    },
+
+    "mrr": {
+        "type": "stat",
+        "query": "avgMRR",
+        "icon": "fas fa-balance-scale",
+        "text": "Mean Reciprocal Rank (MRR)",
+        "info": "Captures the rank of a clicked document by users displayed over time: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. Interpretation: Evaluation of the relevance of the results page. MRR = 1 is the best. Relevance indicator. Calculation: Based on search-summary. Average of all Mean Reciprocal Rank (MRR) events.",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "records",
+            "asc": true,
+            "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
+        }
+    },
+
+    "refinement": {
+        "type": "stat",
+        "query": "queryRefine",
+        "icon": "fas fa-balance-scale",
+        "text": "Refinement",
+        "info": "Total number of search summary where the user has refined the search. Interpretation: After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. Calculation: Addition of all search summary where there are searchrefinements",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "statLayout": "standard",
+            "asc": true
+        }
+    },
+
+    "refinementRate": {
+        "type": "stat",
+        "query": "queryRefine",
+        "icon": "fas fa-balance-scale",
+        "text": "Refinement Rate",
+        "info": "Number of search summary where the user has refined the search compared to the total number of search summary. Interpretation: After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. Calculation: Addition of all search summary where there are searchrefinements DIVIDED BY Total number of search summary",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "searchSummaryTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "statLayout": "standard",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
+        }
+    },
+
+    "zeroSearch": {
+        "type": "stat",
+        "query": "queryZero",
+        "icon": "fas fa-balance-scale",
+        "text": "Zero Result Search",
+        "info": "Total number of Full-Text Queries without any results. Interpretation: Detects that the Full-Text Query does not provide results in order to suggest solutions to solve this problem. Relevance indicator. Calculation: Addition of all Full-Text Queries where resultcount=0",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "statLayout": "standard",
+            "asc": false
+        }
+    },
+
+    "zeroSearchRate": {
+        "type": "stat",
+        "query": "queryZero",
+        "icon": "fas fa-balance-scale",
+        "text": "Zero Result Search Rate",
+        "info": "Number of Full-Text Queries without any results compared to the total number of searches queries. Interpretation: Relevance indicator. Calculation: Total number of Full-Text Queries where resultcount=0 DIVIDED BY Total number of Full-Text Queries",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "queryTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "statLayout": "standard",
+            "asc": false,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
+        }
+    },
+
+    "searchExit": {
+        "type": "stat",
+        "query": "searchExit",
+        "icon": "fas fa-balance-scale",
+        "text": "Search Session With Exit",
+        "info": "Total number of search summary where the user does nothing after viewing the results page. Interpretation: If the user does a search and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Addition of all search summary where the result event values is search.exit.timeout or search.exit.logout",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": false
+        }
+    },
+
+    "searchExitRate": {
+        "type": "stat",
+        "query": "searchExit",
+        "icon": "fas fa-balance-scale",
+        "text": "Search Session With Exit Rate",
+        "info": "Number of search summary where the user does nothing after viewing the results page compared to the total number of search summary. Interpretation: If the user does a full-text query and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Total number of search exits (timeout and logout) DIVIDED BY Total number of search summary.",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "searchSummaryTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "statLayout": "standard",
+            "asc": false,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
+        }
+    },
+
+    "queryBounce": {
+        "type": "stat",
+        "query": "queryBounce",
+        "icon": "fas fa-balance-scale",
+        "text": "Bounce",
+        "info": "Total number of bounces. Interpretation: This suggests that the result was irrelevant or incomplete. Relevance indicator. Calculation: Addition of all bounce events",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "statLayout": "standard",
+            "asc": true,
+            "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
+        }
+    },
+
+    "queryBounceRate": {
+        "type": "stat",
+        "query": "queryBounce",
+        "icon": "fas fa-balance-scale",
+        "text": "Bounce By Search Summary",
+        "info": "Number of bounces compared to the total number of search summary. Interpretation: This suggests that the result was likely irrelevant or incomplete. Relevance indicator. Calculation: Total bounces DIVIDED BY Total number of search summary.",
+        "unique": true,
+        "parameters": {
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "searchSummaryTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "statLayout": "standard",
+            "asc": true,
+            "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
+        }
+    },
+
+    "avgResponseTime": {
+        "type": "stat",
+        "query": "avgResponseTime",
+        "icon": "fas fa-balance-scale",
+        "text": "Average Web App Response Time",
+        "info": "Average response time (in ms) incl. platform & engine. Interpretation: Evaluation of the response speed following a full-text queries. Performance indicator. Calculation: Average of all durations filtered on Full Text Queries",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "aggregations",
+            "valueField": {
+                "name": "avg",
+                "operatorResults": true
+            },
+            "asc": false
+        }
+    },
+
+    "avgEngineResponseTime": {
+        "type": "stat",
+        "query": "avgEngineResponseTime",
+        "icon": "fas fa-balance-scale",
+        "text": "Average Engine Response Time",
+        "info": "Average engine response time (in ms). Interpretation: Evaluation of the response speed following a full-text queries. Performance indicator. Calculation: Average of all duration executions filtered on full-text queries.",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "aggregations",
+            "valueField": {
+                "name": "avg",
+                "operatorResults": true
+            },
+            "asc": false
+        }
+    },
+
+    "userFeedbackGrid": {
+        "type": "grid",
+        "query": "userFeedback",
+        "text": "User Feedback",
+        "icon": "fas fa-th-list",
+        "info": "User messages sent via the Feedback widget",
+        "unique": true,
+        "parameters": {
+            "columns": [
                 {
-                    field: "app",
-                    headerName: "App",
-                    filterType: "text",
-                    formatterType: "text"
+                    "field": "app",
+                    "headerName": "App",
+                    "filterType": "text",
+                    "formatterType": "text"
                 },
                 {
-                    field: "message",
-                    headerName: "Message",
-                    filterType: "text",
-                    formatterType: "text"
+                    "field": "message",
+                    "headerName": "Message",
+                    "filterType": "text",
+                    "formatterType": "text"
                 },
                 {
-                    field: "detail",
-                    headerName: "Detail",
-                    filterType: "text",
-                    formatterType: "text",
-                    multiLineCell: true
+                    "field": "detail",
+                    "headerName": "Detail",
+                    "filterType": "text",
+                    "formatterType": "text",
+                    "multiLineCell": true
                 }
             ],
-            showTooltip: true
+            "showTooltip": true
         }
-    },
+    }
 
 };
 
 /** Dashboards */
 export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position: DashboardItemPosition}[]}[] = [
     {
-        name: "msg#dashboards.userAdoption",
-        items: [
-            {item: "userCountTotalTimeline", position: {x: 0, y: 0}},
-            {item: "newUsers", position: {x: 3, y: 0}},
-            {item: "regularUsers", position: {x: 4, y: 0}},
-            {item: "userCountTotal", position: {x: 3, y: 6}},
-            {item: "sessionsByUser", position: {x: 4, y: 8}},
-            {item: "sessionCountTotal", position: {x: 4, y: 2}},
-            {item: "searchBySession", position: {x: 6, y: 8}},
-            {item: "queryCountTotal", position: {x: 4, y: 6}},
-            {item: "viewedDocPerSearch", position: {x: 5, y: 8}},
-            {item: "queryCountTotalTimeline", position: {x: 0, y: 4}},
-            {item: "sessionCountTotalTimeline", position: {x: 0, y: 8}},
-            {item: "clickBySearch", position: {x: 4, y: 4}},
-            {item: "adoptionRate", position: {x : 3, y : 2, rows : 4}},
-            {item: "sessionDuration", position: {x : 3, y : 8}},
-            {item: "topSources", position: {x: 5, y: 0}},
-            {item: "topFacets", position: {x: 5, y: 4}}
+        "name": "User Adoption",
+        "items": [
+            {"item": "userCountTotalTimeline", "position": {"x": 0, "y": 0}},
+            {"item": "newUsers", "position": {"x": 3, "y": 0}},
+            {"item": "activeUsers", "position": {"x": 4, "y": 0}},
+            {"item": "userCountTotal", "position": {"x": 3, "y": 6}},
+            {"item": "sessionsByUser", "position": {"x": 4, "y": 8}},
+            {"item": "sessionCountTotal", "position": {"x": 4, "y": 2}},
+            {"item": "searchBySession", "position": {"x": 6, "y": 8}},
+            {"item": "queryCountTotal", "position": {"x": 4, "y": 6}},
+            {"item": "viewedDocPerSearch", "position": {"x": 5, "y": 8}},
+            {"item": "queryCountTotalTimeline", "position": {"x": 0, "y": 4}},
+            {"item": "sessionCountTotalTimeline", "position": {"x": 0, "y": 8}},
+            {"item": "clickBySearch", "position": {"x": 4, "y": 4}},
+            {"item": "userCoverage", "position": {"x" : 3, "y" : 2, "rows" : 4}},
+            {"item": "sessionDuration", "position": {"x" : 3, "y" : 8}},
+            {"item": "topCollections", "position": {"x": 5, "y": 0}},
+            {"item": "topFacets", "position": {"x": 5, "y": 4}},
+            {"item": "userFeedbackGrid", "position": {"x": 3, "y": 10, "rows" : 6,"cols" : 5}}
         ]
     },
     {
-        name: "msg#dashboards.relevancy",
-        items: [
-            {item: "topQueries", position: {x: 0, y: 0}},
-            {item: "topNoResultsQueries", position: {x: 0, y: 4}},
-            {item: "clickFirstDocs", position: {x: 4, y: 0}},
-            {item: "queryBounceRate", position: {x: 4, y: 4}},
-            {item: "searchExitRate", position: {x: 5, y: 4, rows : 4}},
-            {item: "zeroSearch", position: {x: 3, y: 4}},
-            {item: "refinement", position: {x: 3, y: 6}},
-            {item: "mrr", position: {x: 3, y: 2}},
-            {item: "firstClick", position: {x: 3, y: 0}},
-            {item: "resultTypes", position: {x: 5, y: 0}},
-            {item: "searchWithClicksRate", position: {x: 4, y: 2}},
+        "name": "Relevancy",
+        "items": [
+            {"item": "topQueries", "position": {"x": 0, "y": 0}},
+            {"item": "topNoResultsQueries", "position": {"x": 0, "y": 4}},
+            {"item": "clickRank3AfterSearchRate", "position": {"x": 4, "y": 0}},
+            {"item": "queryBounceRate", "position": {"x": 4, "y": 4}},
+            {"item": "searchExitRate", "position": {"x": 5, "y": 4, "rows" : 4}},
+            {"item": "zeroSearchRate", "position": {"x": 3, "y": 4}},
+            {"item": "refinementRate", "position": {"x": 3, "y": 6}},
+            {"item": "mrr", "position": {"x": 3, "y": 2}},
+            {"item": "clickRank1AfterSearchRate", "position": {"x": 3, "y": 0}},
+            {"item": "resultTypes", "position": {"x": 5, "y": 0}},
+            {"item": "clickAfterSearchRate", "position": {"x": 4, "y": 2}}
         ]
     },
     {
-        name: "msg#dashboards.performance",
-        items: [
-            {item: "avgResponseTimeTimeline", position: {x: 0, y: 0}},
-            {item: "responseTimeTimeline", position: {x: 3, y: 0}},
-            {item: "avgEngineResponseTimeline", position: {x: 0, y: 4}}
+        "name": "Performance",
+        "items": [
+            {"item": "avgResponseTimeTimeline", "position": {"x": 0, "y": 0}},
+            {"item": "avgEngineResponseTimeline", "position": {"x": 0, "y": 4}}
         ]
     }
 ]
@@ -943,8 +1048,8 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
 /** Palette */
 export const PALETTE: {name: string, items: string[]}[] = [
     {
-        name: "msg#palette.timelines",
-        items: [
+        "name": "Timelines",
+        "items": [
             "queryCountTotalTimeline",
             "userCountTotalTimeline",
             "sessionCountTotalTimeline",
@@ -952,42 +1057,41 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "clickBySearchTimeline",
             "sessionDurationTimeline",
             "newUsersTimeline",
-            "regularUsersTimeline",
-            "firstClickTimeline",
+            "clickRank1AfterSearchTimeline",
             "mrrTimeline",
             "refinementTimeline",
-            "searchWithClicksTimeline",
+            "clickAfterSearchTimeline",
             "searchExitTimeline",
             "zeroSearchTimeline",
-            "clickFirstDocsTimeline",
+            "clickRank3AfterSearchTimeLine",
             "queryBounceTimeline",
             "clickTotalTimeline",
-            "responseTimeTimeline",
             "avgResponseTimeTimeline",
-            "avgEngineResponseTimeline"
-
+            "avgEngineResponseTimeline",
+            "maxEngineResponseTimeline",
+            "maxResponseTimeTimeline"
         ]
     },
     {
-        name: "msg#palette.charts",
-        items: [
+        "name": "Charts",
+        "items": [
             "topSources",
-            "topQueries",
             "topFacets",
+            "topCollections",
+            "topQueries",
             "topNoResultsQueries",
-            "resultTypes",
-            "regularNewUsers"
+            "resultTypes"
         ]
     },
     {
-        name: "msg#palette.grid",
-        items: [
+        "name": "Grid",
+        "items": [
             "userFeedbackGrid"
         ]
     },
     {
-        name: "msg#palette.statistics",
-        items: [
+        "name": "Statistics",
+        "items": [
             "queryCountTotal",
             "userCountTotal",
             "sessionCountTotal",
@@ -997,23 +1101,24 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "clickBySearch",
             "sessionDuration",
             "newUsers",
-            "regularUsers",
-            "adoptionRate",
-            "regularUserRate",
-            "firstClick",
+            "newUsersRate",
+            "activeUsers",
+            "activeUsersRate",
+            "userCoverage",
+            "clickRank1AfterSearchRate",
             "mrr",
-            "refinement",
             "refinementRate",
-            "searchWithClicks",
-            "searchWithClicksRate",
+            "refinement",
+            "clickAfterSearch",
+            "clickAfterSearchRate",
             "zeroSearch",
-            "zeroSearchRate",
             "searchExit",
             "searchExitRate",
-            "clickFirstDocs",
+            "clickRank3AfterSearchRate",
             "queryBounce",
             "queryBounceRate",
             "avgResponseTime",
+            "zeroSearchRate",
             "avgEngineResponseTime"
         ]
     }

@@ -19,6 +19,7 @@ import { PALETTE, STANDARD_DASHBOARDS, WIDGETS } from '../config';
 import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
 import { GridColDef } from './providers/grid-provider';
+import { StatLayout, StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -42,20 +43,23 @@ export interface DashboardItem extends GridsterItem {
     queryStr?: string; // For type === 'preview'
     aggregation?: string; // For type === 'chart'
     chartData?: ChartData; // For type === 'chart'
-    chartType?: string; // For type === 'chart'
+    chartType?: string; // For type === 'chart' && type === 'timeline'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
     columns?: GridColDef[]; // For type === 'grid'
     aggregationName?: string; // For type === 'grid'
     showTooltip?: boolean; // For type === 'grid'
-    valueLocation?: StatValueLocation; // where to find field value
+    valueLocation?: StatValueLocation; // where to find value field
+    valueField?: StatValueField; // how to access value field
     operation?: StatOperation; // operation to compute the value
     relatedQuery?: string; // query containing the second leg of the stat operands
-    relatedValueLocation?: StatValueLocation; // where to find the field value of the second stat operands
+    relatedValueLocation?: StatValueLocation; // where to find the value field of the second stat operands
+    relatedValueField?: StatValueField; // how to access value field of the second stat operands
     relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
     computation?: StatOperation; // operation to get the global value of the stat
     asc?: boolean; // if the positive evaluation is at increase or decrease trend
     statLayout?: StatLayout; // the ui of displaying the stat
+    numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
 }
 
 /**
@@ -66,9 +70,7 @@ export interface Dashboard {
     items: DashboardItem[];
 }
 
-export type StatValueLocation = "aggregations" | "records" | "totalrecordcount";
-export type StatLayout = "standard" | "chart";
-export type StatOperation = "avg" | "percentage" | "division";
+
 
 /**
  * An interface to define a type of widget that can be added to the dashboard. This basic information
@@ -88,17 +90,22 @@ export interface DashboardItemOption {
 
         // For type === 'chart'
         chartData?: ChartData,
+
+        // For type === 'chart' && type === 'timeline'
         chartType?: string,
 
         // For type === 'stat'
-        valueLocation?: StatValueLocation, // where to find field value
+        valueLocation?: StatValueLocation, // where to find value field
+        valueField?: StatValueField, // how to access value field
         operation?: StatOperation, // operation to compute the value
         relatedQuery?: string, // query containing the second leg of the stat operands
-        relatedValueLocation?: StatValueLocation, // where to find the field value of the second stat operands
+        relatedValueLocation?: StatValueLocation, // where to find the value field of the second stat operands
+        relatedValueField?: StatValueField, //how to access value field of the second stat operands
         relatedOperation?: StatOperation, // operation to compute the value of the second stat operands
         computation?: StatOperation, // operation to get the global value of the stat
         asc?: boolean, // if the positive evaluation is at increase or decrease trend
         statLayout?: StatLayout, // the ui of displaying the stat
+        numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
 
         // For type === 'grid'
         columns?: GridColDef[],
@@ -116,9 +123,22 @@ export interface DashboardItemPosition {
 }
 
 export interface DashboardChange {
+    type: changeType,
     dashboard: Dashboard;
     updateDatasets: boolean;
+    item?: DashboardItem;
 }
+
+export type changeType =
+                'LOAD_DASHBOARD' |
+                'LOAD_DEFAULT_DASHBOARD' |
+                'LOAD_SHARED_DASHBOARD' |
+                'OPEN_DASHBOARD' |
+                'NEW_DASHBOARD' |
+                'CHANGE_WIDGET_CONFIG' |
+                'ADD_WIDGET' |
+                'REMOVE_WIDGET' |
+                'PLAIN_UI_CHANGE';
 
 // Name of the "default dashboard" (displayed prior to any user customization)
 export const defaultDashboardName = "msg#dashboards.newDashboard";
@@ -177,7 +197,7 @@ export class DashboardService {
             },
             resizable: {enabled: true},
             itemChangeCallback: (item, itemComponent) => {
-                this.notifyItemChange(item as DashboardItem);
+                this.notifyItemChange(item as DashboardItem, 'PLAIN_UI_CHANGE');
             },
             itemResizeCallback: (item, itemComponent) => {
                 if (!document.fullscreenElement) { // Exclude the change detection on switch from/to full-screen mode
@@ -213,8 +233,8 @@ export class DashboardService {
 
         // Manage Auto-save dashboards.
         this.dashboardChanged.subscribe((changes: DashboardChange) => {
-            if (this.dashboard && this.defaultDashboard) {
-                const dashboard = changes.dashboard;
+            const dashboard = changes.dashboard;
+            if (['NEW_DASHBOARD', 'LOAD_SHARED_DASHBOARD', 'CHANGE_WIDGET_CONFIG', 'ADD_WIDGET', 'REMOVE_WIDGET', 'PLAIN_UI_CHANGE'].includes(changes.type)) {
                 // If a saved dashboard is modified, then add it to the changed dashboards list
                 if (!dashboard.name.startsWith(this.formatMessage(defaultDashboardName))) {
                     const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
@@ -229,10 +249,11 @@ export class DashboardService {
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards[i] = dashboard;
                 }
-                // if needed, update datasets and trigger search in order to consider the changes
-                if (changes.updateDatasets) {
-                    this.searchService.navigate({skipSearch: true});
-                }
+            }
+
+            // if needed, update datasets and trigger search in order to consider the changes at data level
+            if (changes.updateDatasets) {
+                this.searchService.navigate({skipSearch: true});
             }
         });
     }
@@ -250,6 +271,7 @@ export class DashboardService {
             this.searchService.queryStringParams.dashboard = dashboard;
             if(this.hasDashboard(dashboard)) {
                 this.dashboard = this.getDashboard(dashboard)!;
+                this.dashboardChanged.next({type: 'LOAD_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
             } else {
                 this.notificationService.error("Could not find this dashboard...");
             }
@@ -268,13 +290,11 @@ export class DashboardService {
 
     /**
      * Returns the list of widgets from the configuration defined
-     * on the server (appService.app.data.widgets and appService.app.data.customWidgets)
+     * on the server (appService.app.data.widgets)
      * or in the config.ts file (WIDGETS)
      */
     public getWidgets(): {[key: string]: DashboardItemOption} {
-        const widgets = this.appService.app?.data?.widgets || WIDGETS;
-        const customWidgets = this.appService.app?.data?.customWidgets || {};
-        return Utils.extend(widgets, customWidgets);
+        return (this.appService.app?.data?.widgets || WIDGETS) as {[key: string]: DashboardItemOption};
     }
 
     /**
@@ -288,7 +308,7 @@ export class DashboardService {
         return palette.map(p => ({
                 name: p.name,
                 items: p.items.filter(i => Utils.isString(i) && widgets[i])
-                              .map(i => widgets[i])
+                            .map(i => widgets[i])
             }));
     }
 
@@ -303,7 +323,7 @@ export class DashboardService {
         return dashboards.map(d => ({
                 name: d.name,
                 items: d.items.filter(i => Utils.isString(i.item) && widgets[i.item])
-                              .map(i => ({item: widgets[i.item], position: i.position}))
+                            .map(i => ({item: widgets[i.item], position: i.position}))
             }));
     }
 
@@ -328,7 +348,7 @@ export class DashboardService {
         return this.dashboards.concat(this.draftDashboards);
     }
 
-    protected createDashboard(name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[] = []): Dashboard {
+    public createDashboard(name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[] = []): Dashboard {
         const dashboard = {
             name: name,
             items: []
@@ -372,9 +392,10 @@ export class DashboardService {
         }
         // If there is no dashboard explicitly opened currently, we open the default one if defined. If not open a new blank dashboard
         if(!this.dashboard) {
-            const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+            const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
             const _blank = this.createDashboard(name);
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
+            this.dashboardChanged.next({type: 'LOAD_DEFAULT_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
         }
     }
 
@@ -383,11 +404,11 @@ export class DashboardService {
      * @param items
      */
     public setSharedDashboard(items: DashboardItem[]) {
-        const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+        const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
         const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
         this.dashboard = Utils.copy(_shared);
-        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: true});
+        this.dashboardChanged.next({type: 'LOAD_SHARED_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
     }
 
     /**
@@ -404,8 +425,8 @@ export class DashboardService {
      * Fire an event when a dashboard item changes
      * @param item
      */
-    public notifyItemChange(item: DashboardItem, notify = false) {
-        this.dashboardChanged.next({dashboard: this.dashboard, updateDatasets: notify});
+    public notifyItemChange(item: DashboardItem, event: changeType, notify = false) {
+        this.dashboardChanged.next({type: event, dashboard: this.dashboard, updateDatasets: notify, item});
     }
 
     /**
@@ -453,7 +474,7 @@ export class DashboardService {
         }
         dashboard.items.push(item);
         if (notify) {
-            this.dashboardChanged.next({dashboard: dashboard, updateDatasets: true});
+            this.dashboardChanged.next({type: 'ADD_WIDGET', dashboard: dashboard, updateDatasets: true});
         }
         return dashboard.items[dashboard.items.length - 1];
     }
@@ -464,7 +485,7 @@ export class DashboardService {
      */
     public removeItem(item: DashboardItem) {
         this.dashboard.items.splice(this.dashboard.items.indexOf(item), 1);
-        this.notifyItemChange(item);
+        this.notifyItemChange(item, 'REMOVE_WIDGET');
     }
 
     /**
@@ -474,7 +495,7 @@ export class DashboardService {
      */
     public renameWidget(item: DashboardItem, newTitle: string) {
         item.title = newTitle;
-        this.notifyItemChange(item);
+        this.notifyItemChange(item, 'CHANGE_WIDGET_CONFIG');
     }
 
     /**
@@ -566,7 +587,7 @@ export class DashboardService {
     public openDashboard(dashboard: Dashboard) {
         this.dashboard = dashboard;
         this.searchService.queryStringParams.dashboard = dashboard.name;
-        this.searchService.navigate({skipSearch: true});
+        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
     }
 
     public saveDashboard(dashboard: Dashboard) {
@@ -580,16 +601,36 @@ export class DashboardService {
         }
     }
 
+    public overrideDashboards(dashboards: Dashboard[], event: 'import' | 'reset') {
+        this.userSettingsService
+            .patch({dashboards: dashboards})
+            .subscribe(
+                () => {
+                    /**
+                     * Force app reload with none queryParams
+                     * It ensures then the reload of dashboards from updated user-settings
+                     */
+                    const url = (window.location.href.split('?'))[0];
+                    window.location.assign(url);
+                    window.location.reload();
+                },
+                (error) => {
+                    this.notificationService.error("Could not " + event + " dashboards definition !");
+                    console.error("Could not  " + event + "  dashboards definition !", error);
+                }
+            );
+    }
+
     /**
      * Creates a new dashboard (from scratch)
      */
     public newDashboard() {
-        const name = this.formatMessage(defaultDashboardName) + (this.draftDashboards.length+1);
+        const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
         const _blank = this.createDashboard(name);
         this.draftDashboards.push(_blank);
         this.dashboard = Utils.copy(_blank);
         delete this.searchService.queryStringParams.dashboard;
-        this.searchService.navigate({skipSearch: true});
+        this.dashboardChanged.next({type: 'NEW_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
     }
 
     public deleteDashboard(dashboard: Dashboard) {
@@ -628,8 +669,12 @@ export class DashboardService {
                 // Open next/previous dashboard. If not existing, create new empty dashboard
                 if (this.allDashboards[index]) {
                     this.dashboard = Utils.copy(this.allDashboards[index]);
+                    delete this.searchService.queryStringParams.dashboard;
+                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
                 } else if (this.allDashboards[index - 1]) {
                     this.dashboard = Utils.copy(this.allDashboards[index - 1]);
+                    delete this.searchService.queryStringParams.dashboard;
+                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
                 } else {
                     this.newDashboard();
                 }
@@ -732,7 +777,7 @@ export class DashboardService {
             title: 'msg#dashboard.saveAsModalTitle',
             message: 'msg#dashboard.saveAsModalMessage',
             buttons: [],
-            output: this.formatMessage(dashboard.name),
+            output: '',
             validators: [Validators.required, unique]
         };
 

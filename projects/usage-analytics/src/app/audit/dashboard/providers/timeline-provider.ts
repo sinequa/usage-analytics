@@ -137,7 +137,8 @@ export class TimelineProvider {
                 timeSeries.push({
                     name: valueField.title ? valueField.title : valueField.name,
                     dates,
-                    primary: !!valueField.primary ? true : false
+                    primary: !!valueField.primary ? true : false,
+                    showDatapoints: true
                 });
             }
         }
@@ -160,7 +161,8 @@ export class TimelineProvider {
             timeSeries.push({
                 name: valueField.title ? valueField.title : valueField.name,
                 dates: (dates.filter(item => !!item.date) as TimelineDate[]).sort((a,b)=>a.date.getTime()- b.date.getTime()),
-                primary: !!valueField.primary ? true : false
+                primary: !!valueField.primary ? true : false,
+                showDatapoints: true
             })
         }
         return timeSeries;
@@ -180,7 +182,7 @@ export class TimelineProvider {
         return timeSeries;
     }
 
-    private _parseDate(value: any) : Date | undefined {
+    protected _parseDate(value: any) : Date | undefined {
         if (value instanceof Date) {
             return value;
         }

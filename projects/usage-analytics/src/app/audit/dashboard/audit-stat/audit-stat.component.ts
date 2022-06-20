@@ -16,7 +16,7 @@ export class AuditStatComponent implements OnChanges {
     @Input() config: DashboardItem;
     @Input() dataset: {[key: string]: Results | DatasetError};
     @Input() previousDataSet: {[key: string]: Results | DatasetError};
-    @Input() decimalsPrecision: number = 1;
+    @Input() numberFormatOptions: Intl.NumberFormatOptions = {style: 'decimal', maximumFractionDigits: 1};
 
     value: number | undefined;
     previousValue: number | undefined;
@@ -59,7 +59,7 @@ export class AuditStatComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
 
         if ((changes["previousDataSet"] || changes["dataset"]) && this.previousDataSet && this.dataset) {
-            const {value, previousValue, percentageChange, trend, trendEvaluation} = this.statProvider.getvalues(this.previousDataSet, this.dataset, this.config, this.decimalsPrecision);
+            const {value, previousValue, percentageChange, trend, trendEvaluation} = this.statProvider.getvalues(this.previousDataSet, this.dataset, this.config);
             this.value = value;
             this.previousValue = previousValue;
             this.percentageChange = percentageChange;

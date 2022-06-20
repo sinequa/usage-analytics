@@ -1,10 +1,10 @@
 import {ElementRef, Injectable} from '@angular/core';
 import {IntlService} from '@sinequa/core/intl';
-import {NotificationsService} from '@sinequa/core/notification';
 import domtoimage from "dom-to-image";
 import { saveAs } from "file-saver";
 
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
+import { Dashboard, DashboardItem, DashboardService } from './dashboard/dashboard.service';
 import {StatProvider} from './dashboard/providers/stat.provider';
 
 import {xlsx} from "./xlsx";
@@ -47,7 +47,7 @@ export class ExportService {
   constructor(
     private statProvider: StatProvider,
     private translate: IntlService,
-    private notificationService: NotificationsService
+    private dashboardService: DashboardService
     ) { }
 
   /**
@@ -74,9 +74,6 @@ export class ExportService {
             saveAs(blob,  `${filename}_${this.date}.png`);
             // do not forget to remove our previous height to allow gridster to adjust automatically his height
             element.nativeElement.style = undefined;
-
-            // notify user
-            this.notifySuccess(filename)
           } );
   }
 
@@ -93,13 +90,17 @@ export class ExportService {
         this.saveToCsv(stats.filename, stats.tables.join('\n'));
       }
 
-      // export each timelines in a specific file
+      // export each timeline in a specific file
       const timelines = this.extractTimelines(filename, items);
       timelines.forEach(timeline => this.saveToCsv(timeline.filename, timeline.tables.join('\n')));
 
-      // export each charts in a specific file
+      // export each chart in a specific file
       const charts = this.extractCharts(filename, items);
       charts.forEach(chart => this.saveToCsv(chart.filename, chart.tables.join('\n')));
+
+      // export each grid in a separate file
+      const grids = this.extractGrids(filename, items);
+      grids.forEach(grid => this.saveToCsv(grid.filename, grid.tables.join('\n')));
     }
 
   /**
@@ -114,11 +115,14 @@ export class ExportService {
     // export stats
     tables.push(this.extractStats(filename, items) || {} as ExtractModel);
 
-    // export each timelines
+    // export each timeline
     tables.push(...this.extractTimelines(filename, items));
 
-    // export each charts
+    // export each chart
     tables.push(...this.extractCharts(filename, items));
+
+    // export each grid
+    tables.push(...this.extractGrids(filename, items));
 
     // as csv files joined in a single array, split them in their own sheet
     this.csvToXML(tables, filename);
@@ -136,11 +140,14 @@ export class ExportService {
     const stats = this.extractStats(filename, items);
     if(stats) tables.push(stats);
 
-    // export each timelines
-    tables.push(...this.extractTimelines(filename, items).filter(timeline => timeline.tables.length > 0));
+    // export each timeline
+    tables.push(...this.extractTimelines(filename, items).map(timeline => timeline.tables.length > 0 ? timeline : {...timeline, tables: ['']}));
 
-    // export each charts
-    tables.push(...this.extractCharts(filename, items).filter(chart => chart.tables.length > 0));
+    // export each chart
+    tables.push(...this.extractCharts(filename, items).map(chart => chart.tables.length > 0 ? chart : {...chart, tables: ['']}));
+
+    // export each grid
+    tables.push(...this.extractGrids(filename, items).map(grid => grid.tables.length > 0 ? grid : {...grid, tables: ['']}));
 
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
@@ -158,7 +165,6 @@ export class ExportService {
       worksheets: worksheets
     }).then((content) => {
       saveAs(content, file);
-      this.notifySuccess(file);
     });
 
   }
@@ -171,11 +177,7 @@ export class ExportService {
    * @returns a csv string
    */
   objectToCsv(filename: string, rows: object[]): string[] {
-    const title = this.translate.formatMessage("msg#export.title");
-
     if (!rows || !rows.length) {
-      const msg = this.translate.formatMessage("msg#export.nothing", {filename});
-      this.notificationService.warning(msg, undefined, title);
       return [];
     }
     const separator = ',';
@@ -198,8 +200,55 @@ export class ExportService {
     return csvData.split('\n');
   }
 
+  /**
+   * Export layouts of given dashboards to JSON file
+   * @param filename json filename
+   * @param dashboards list of dashboards
+   */
+  exportLayoutToJson(filename: string, dashboards: Dashboard[]) {
+    const config = dashboards.map(d => (
+            {
+                name: d.name,
+                items: d.items.map(i => (
+                        {
+                            item: this.getWidgetKey(i),
+                            position: {
+                                x: i.x,
+                                y: i.y,
+                                rows: i.rows,
+                                cols: i.cols,
+                            }
+                        }
+                    )
+                )
+            }
+        )
+    );
+
+    const file = `${filename}_${this.date}.json`;
+    this.saveToJson(file, JSON.stringify(config, undefined, 2))
+  }
+
+  /**
+   * Export the complete definition of given dashboards to JSON file
+   * @param filename json filename
+   * @param dashboards list of dashboards
+   */
+   exportDefToJson(filename: string, dashboards: Dashboard[]) {
+    const file = `${filename}_${this.date}.json`;
+    this.saveToJson(file, JSON.stringify(dashboards, undefined, 2))
+  }
+
   private saveToCsv(filename: string, csvData: string) {
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    this.saveAs(filename, 'text/csv;charset=utf-8;', csvData);
+  }
+
+  private saveToJson(filename: string, jsonData: string) {
+    this.saveAs(filename, 'text/json', jsonData);
+  }
+
+  private saveAs(filename: string, fileType: string, data: string) {
+    const blob = new Blob([data], { type: fileType });
     if (navigator.msSaveBlob) { // IE 10+
       navigator.msSaveBlob(blob, filename);
     } else {
@@ -215,18 +264,16 @@ export class ExportService {
         document.body.removeChild(link);
       }
     }
-
-    this.notifySuccess(filename);
   }
 
-  private extractStatRow(item: DashboardItemComponent) : any {
+  protected extractStatRow(item: DashboardItemComponent) : any {
     // translate title with sqMessagePipe
     const title = this.translate.formatMessage(item.config.title);
     const {previousDataSet, dataset, config} = item;
 
     if(previousDataSet !== null && dataset !== null){
       // TODO: decimalsPrecision should be a parameter value
-      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config, 1);
+      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config);
       return ({title, value, percentageChange, trend, trendEvaluation});
     }
 
@@ -240,7 +287,7 @@ export class ExportService {
    * @param items array of dashboard items
    * @returns a {@link ExtractModel} object with all stats data or undefined
    */
-  private extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
+   protected extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
     const stats = items.filter(item => item.config.type === "stat");
     if(stats.length === 0) return;
 
@@ -260,7 +307,7 @@ export class ExportService {
    * @param items array of dashboard items
    * @returns Array of charts data
    */
-  private extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+   protected extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     const charts = items.filter(item => item.config.type === "chart").map(item => {
       const title = this.translate.formatMessage(item.config.title);
 
@@ -287,7 +334,7 @@ export class ExportService {
    * @param filename name of the file
    * @param items array of dashboard items
    */
-  private extractTimelines(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+   protected extractTimelines(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
     // timelines components extractions
     // a timeserie could contains one or more series
     // no needs of timeline-provider here as timeseries is the final results after timeline-provider works
@@ -327,6 +374,41 @@ export class ExportService {
       values.push({title: serie.title, filename: file, tables: this.objectToCsv(file, results)});
     });
     return values;
+  }
+
+  /**
+   * Extract, for each grid, all rows.
+   *
+   * @param filename name of the file
+   * @param items array of dashboard items
+  **/
+   protected extractGrids(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+    const grids = items.filter(item => item.config.type === "grid").map(item => {
+      const title = this.translate.formatMessage(item.config.title);
+      return {title, rowData: item.rowData, columns: item.columnDefs}
+    });
+
+    return grids.length === 0
+      ? []
+      : grids.map(grid => {
+          const fields = grid.columns.map(x => x.field);
+
+          // initialize rows with header
+          let rows = [grid.columns.map(x => x.headerName).join(",")];
+
+          // append each row, if there is no rowData it will just concat an empty array
+          rows = rows.concat(
+            grid.rowData.map(row => {
+              return fields.map(x => !!x && !!row[x] ? row[x] : "").join(",");
+            })
+          );
+
+          return {
+            title: grid.title,
+            filename: `${filename}_${grid.title}_${this.date}.csv`,
+            tables: rows
+          } as ExtractModel;
+        });
   }
 
   /**
@@ -389,17 +471,11 @@ export class ExportService {
     link.click();
     document.body.removeChild(link);
 
-    this.notifySuccess(filename);
   }
 
-  /**
-   * Notify user about the download success
-   *
-   * @param filename name of the file downloaded with success
-   */
-  private notifySuccess(filename:string) {
-    const title = this.translate.formatMessage("msg#export.title");
-    const msg = this.translate.formatMessage("msg#export.success", {filename});
-    this.notificationService.success(msg,undefined, title);
+  private getWidgetKey(item: DashboardItem): string{
+    const widgets = this.dashboardService.getWidgets();
+    const element = Object.entries(widgets).find(element => item.query === element[1].query && item.title === element[1].text);
+    return element ? element[0] : "";
   }
 }

@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { Action } from "@sinequa/components/action";
-import { FacetConfig } from "@sinequa/components/facet";
+import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
 import { UIService } from "@sinequa/components/utils";
 import { AppService } from "@sinequa/core/app-utils";
@@ -13,6 +13,8 @@ import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
+import { ImportService } from "./import.service";
+import { ConfirmType, ModalButton, ModalResult, ModalService } from "@sinequa/core/modal";
 
 @Component({
     selector: "sq-audit",
@@ -33,6 +35,7 @@ export class AuditComponent implements OnDestroy {
 
     private _querySubscription: Subscription;
     private _loginSubscription: Subscription;
+    private _dashboardChangesSubscription: Subscription;
 
     constructor(
         public auditService: AuditService,
@@ -41,7 +44,9 @@ export class AuditComponent implements OnDestroy {
         private searchService: SearchService,
         public loginService: LoginService,
         private appService: AppService,
-        private exportService: ExportService
+        private exportService: ExportService,
+        private importService: ImportService,
+        private modalService: ModalService
     ) {
         // When the screen is resized, we resize the dashboard row height, so that items keep fitting the screen height
         this.ui.addResizeListener((event) => {
@@ -74,32 +79,100 @@ export class AuditComponent implements OnDestroy {
             }
         });
 
+        // When adding a widget, layout could be broken unless we minimize any maximized widget
+        this._dashboardChangesSubscription = this.dashboardService.dashboardChanged.subscribe(event => {
+            if(event.type === 'ADD_WIDGET') {
+                this.toggleMaximized();
+            }
+        })
+
         this.exportAction = new Action({
-            icon: "fas fa-file-export",
-            name: "exportAsXLSX",
-            action: () => this.exportXLSX(),
+            icon: "fas fa-file-alt",
+            name: "export/import",
+            children: [
+                this.getDataAction(),
+                new Action({separator: true}),
+                this.getLayoutAction(),
+                new Action({separator: true}),
+                ...this.getDashboardsDefAction()
+            ]
+        })
+
+    }
+
+    ngOnDestroy() {
+        this._querySubscription?.unsubscribe();
+        this._loginSubscription?.unsubscribe();
+        this._dashboardChangesSubscription?.unsubscribe();
+    }
+
+    /**
+     * Returns the configuration of the facets displayed.
+     * The configuration from the config.ts file can be overriden by configuration from
+     * the app configuration on the server
+     */
+    public get facets(): FacetConfig<FacetListParams>[] {
+        return this.appService.app?.data?.facets as any || FACETS;
+    }
+
+    getDataAction(): Action {
+        return new Action({
+            name: "Export dashboard data",
+            title: "Export dashboard data",
+            text: "Export dashboard data",
             children: [
                 new Action({
-                    title: "msg#export.button.exportXLS",
-                    text: "msg#export.button.exportXLS",
+                    title: "As Excel",
+                    text: "As Excel",
                     name: "exportAsXLS",
                     action: () => this.exportXLSX()
                 }),
                 new Action({
-                    title: "msg#export.button.exportPNG",
-                    text: "msg#export.button.exportPNG",
-                    name: "exportAsPNG",
-                    action: () => this.exportPNG()
-                }),
-                new Action({
-                    title: "msg#export.button.tooltipCSV",
-                    text: "msg#export.button.exportCSV",
+                    title: "As CSV",
+                    text: "As CSV",
                     name: "exportAsCSV",
                     action: () => this.exportCSV()
+                }),
+                new Action({
+                    title: "As XML",
+                    text: "As XML",
+                    name: "exportAsXML",
+                    action: () => this.exportXML()
+                }),
+                new Action({
+                    title: "As PNG image",
+                    text: "As PNG image",
+                    name: "exportAsPNG",
+                    action: () => this.exportPNG()
                 })
             ]
         })
+    }
 
+    getLayoutAction(): Action {
+        return new Action({
+            name: "Export dashboards layout as JSON",
+            title: "Export dashboards layout as JSON",
+            text: "Export dashboards layout as JSON",
+            action: () => this.exportLayoutJson()
+        })
+    }
+
+    getDashboardsDefAction(): Action[] {
+        return [
+            new Action({
+                title: "Export dashboards definition as JSON",
+                text: "Export dashboards definition as JSON",
+                name: "Export dashboards definition as JSON",
+                action: () => this.exportDefJson()
+            }),
+            new Action({
+                title: "Import dashboards definition from JSON",
+                text: "Import dashboards definition from JSON",
+                name: "Import dashboards definition from JSON",
+                action: () => this.importDefJson()
+            })
+        ]
     }
 
     exportPNG() {
@@ -119,18 +192,43 @@ export class AuditComponent implements OnDestroy {
         this.exportService.exportXLSX(name, items);
     }
 
-    /**
-     * Returns the configuration of the facets displayed.
-     * The configuration from the config.ts file can be overriden by configuration from
-     * the app configuration on the server
-     */
-    public get facets(): FacetConfig[] {
-        return this.appService.app?.data?.facets as any || FACETS;
+    exportXML() {
+        const items = this.dashboardItems.map(item => item);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
+        this.exportService.exportToXML(name, items);
     }
 
-    ngOnDestroy() {
-        this._querySubscription?.unsubscribe();
-        this._loginSubscription?.unsubscribe();
+    exportLayoutJson() {
+        this.exportService.exportLayoutToJson("dashboards-layout", this.dashboardService.dashboards);
+    }
+
+    exportDefJson() {
+        this.exportService.exportDefToJson("dashboards-definition", this.dashboardService.dashboards);
+    }
+
+    importDefJson() {
+        this.importService.dashboardsDefFromJson();
+    }
+
+    resetDashboards() {
+        const dashboards = this.dashboardService.getStandardDashboards().map(
+            sd => this.dashboardService.createDashboard(sd.name, sd.items)
+        );
+
+        this.modalService
+            .confirm({
+                title: "Reset dashboards definition",
+                message: "You are about to loose ALL your current dashboards definition. Do you want to continue?",
+                buttons: [
+                    new ModalButton({result: ModalResult.OK, text: "Confirm"}),
+                    new ModalButton({result: ModalResult.Cancel, primary: true})
+                ],
+                confirmType: ConfirmType.Warning
+            }).then(res => {
+                if(res === ModalResult.OK) {
+                    this.dashboardService.overrideDashboards(dashboards, "reset");
+                }
+            });
     }
 
     newDashboard(): void {
@@ -173,4 +271,8 @@ export class AuditComponent implements OnDestroy {
     setFocus(index: number, event: MouseEvent) {
         this.focusElementIndex = index;
     }
-  }
+
+    toggleMaximized() {
+        this.dashboardItems.find(item => item.isMaximized())?.toggleMaximizedView();
+    }
+}

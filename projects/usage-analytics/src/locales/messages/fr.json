@@ -82,7 +82,7 @@
         },
         "userCountTotal": {
             "text": "Utilisateurs",
-            "info": "Nombre d'utilisateurs."
+            "info": "Nombre total d’identifiants d’utilisateur uniques ayant terminé une session avec recherche."
         },
         "sessionTotalTimeLine": {
             "text": "Sessions",
@@ -251,6 +251,10 @@
         "topSources": {
             "text": "Principales sources",
             "info": "Sources des documents les plus cliqués."
+        },
+        "topCollections": {
+            "text": "Principales Collections",
+            "info": "Collections des documents les plus cliqués."
         },
         "topFacets": {
             "text": "Filtres les plus utilisés",
