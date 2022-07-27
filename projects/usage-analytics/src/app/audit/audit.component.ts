@@ -57,7 +57,7 @@ export class AuditComponent implements OnDestroy {
 
         // Upon login (ie access to user settings) initialize the dashboard widgets and actions
         this._loginSubscription = this.loginService.events.subscribe((event) => {
-            if (event.type === "session-start") {
+            if (event.type === "login-complete" || event.type === "session-start") {
 
                 // Hack to fake a CCQuery so the search service works even if no query is attached to the app. (SBA-320)
                 if(!this.appService.defaultCCQuery) {
