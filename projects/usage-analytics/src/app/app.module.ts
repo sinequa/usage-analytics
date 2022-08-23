@@ -53,9 +53,9 @@ import enLocale from "../locales/en";
 
 // Initialization of @sinequa/core
 export const startConfig: StartConfig = {
-    app: "training",
+    // app: "_usage-analytics",
     production: environment.production,
-    autoSAMLProvider: environment.autoSAMLProvider,
+    // autoSAMLProvider: environment.autoSAMLProvider,
     auditEnabled: true
 };
 
