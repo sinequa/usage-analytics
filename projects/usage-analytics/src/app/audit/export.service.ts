@@ -394,12 +394,12 @@ export class ExportService {
           const fields = grid.columns.map(x => x.field);
 
           // initialize rows with header
-          let rows = [grid.columns.map(x => x.headerName).join(",")];
+          let rows = [grid.columns.map(x => '\"' + x.headerName + '\"').join(",")];
 
           // append each row, if there is no rowData it will just concat an empty array
           rows = rows.concat(
             grid.rowData.map(row => {
-              return fields.map(x => !!x && !!row[x] ? row[x] : "").join(",");
+              return fields.map(x => !!x && !!row[x] ? '\"' + row[x] + '\"' : "").join(",");
             })
           );
 
