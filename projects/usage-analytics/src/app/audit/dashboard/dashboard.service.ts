@@ -34,6 +34,7 @@ export interface DashboardItem extends GridsterItem {
     icon: string;
     title: string;
     query: string;
+    unique: boolean;
     info?: string;
     width?: number;
     height?: number;
@@ -465,6 +466,7 @@ export class DashboardService {
             type: option.type,
             query: option.query,
             icon: option.icon,
+            unique: option.unique,
             title: option.text,
             closable: closable,
             info: option.info
