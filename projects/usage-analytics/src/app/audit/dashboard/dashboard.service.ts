@@ -34,7 +34,7 @@ export interface DashboardItem extends GridsterItem {
     icon: string;
     title: string;
     query: string;
-    unique: boolean;
+    unique?: boolean;
     info?: string;
     width?: number;
     height?: number;
@@ -82,7 +82,7 @@ export interface DashboardItemOption {
     query: string;
     icon: string;
     text: string;
-    unique: boolean;
+    unique?: boolean;
     info?: string;
     parameters?: {
         // For type === 'timeline'
