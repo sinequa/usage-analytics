@@ -410,13 +410,13 @@ export class AuditService {
         let end: Date;
         if (!Utils.isString(timestamp)) {
             // If the timestamp misses the time information ("2020-01-01"), set it to the beginning and the end of day (so it is included)
-            start = new Date(timestamp[0]);
+            start = moment(timestamp[0]).toDate();
             if(timestamp[0].length <= 10) {
                 start.setHours(0);
                 start.setMinutes(0);
                 start.setSeconds(0);
             }
-            end = new Date(timestamp[1]);
+            end = moment(timestamp[1]).toDate();
             if(timestamp[1].length <= 10) {
                 end.setHours(23);
                 end.setMinutes(59);
