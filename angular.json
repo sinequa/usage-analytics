@@ -47,7 +47,15 @@
               "intl-pluralrules",
               "jstz",
               "atomicjs",
-              "vis-timeline"
+              "vis-timeline",
+              "fusioncharts",
+              "fusioncharts/fusioncharts.charts",
+              "moment-timezone",
+              "dom-to-image",
+              "file-saver",
+              "diacritics",
+              "fast-text-encoding",
+              "ag-grid-community"
             ]
           },
           "configurations": {
@@ -70,7 +78,10 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "stylePreprocessorOptions": {
+                "includePaths": ["./node_modules"]
+              }
             },
             "development" : {
               "outputPath": "dist-debug/usage-analytics",
@@ -79,7 +90,10 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true
+              "namedChunks": true,
+              "stylePreprocessorOptions": {
+                "includePaths": ["./node_modules"]
+              }
             }
           },
           "defaultConfiguration": "production"
@@ -141,6 +155,5 @@
         }
       }
     }
-  },
-  "defaultProject": "usage-analytics"
+  }
 }
