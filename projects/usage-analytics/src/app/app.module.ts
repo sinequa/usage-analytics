@@ -32,7 +32,16 @@ import {SelectionOptions, SELECTION_OPTIONS} from "@sinequa/components/selection
 // @sinequa/analytics library
 import { BsTimelineModule } from "@sinequa/analytics/timeline";
 import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
-import { FusionChartsModule } from "@sinequa/analytics/fusioncharts";
+import { FusionChartsModule } from '@sinequa/analytics/fusioncharts'
+import { AngularFusionChartsModule } from "@sinequa/analytics/fusioncharts";
+
+import * as FusionCharts from "fusioncharts";
+import * as charts from "fusioncharts/fusioncharts.charts";
+import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
+import * as CandyTheme from "fusioncharts/themes/fusioncharts.theme.candy";
+FusionCharts.options.creditLabel = false;
+AngularFusionChartsModule.fcRoot(FusionCharts, charts, FusionTheme, CandyTheme);
+
 
 // Components
 import { AppComponent } from "./app.component";
@@ -116,7 +125,10 @@ const selectionOptions: SelectionOptions = {
         BsSearchModule.forRoot(searchOptions),
         BsNotificationModule,
         UtilsModule,
+
+        AngularFusionChartsModule,
         FusionChartsModule,
+
         BsUserSettingsModule,
         BsFeedbackModule,
         BsFacetModule,

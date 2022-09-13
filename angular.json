@@ -71,7 +71,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "2mb",
-                  "maximumError": "7mb"
+                  "maximumError": "8mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -101,7 +101,9 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "usage-analytics:build:development"
+            "browserTarget": "usage-analytics:build:development",
+            "ssl": true,
+            "proxyConfig": "projects/usage-analytics/src/proxy.conf.json"
           },
           "configurations": {
             "production": {
