@@ -24,6 +24,7 @@
     "@angular/router": "14.2.1",
     "@formatjs/intl-relativetimeformat": "^4.5.12",
     "@fortawesome/fontawesome-free": "^6.2.0",
+    "@microsoft/teams-js": "^2.3.0",
     "@popperjs/core": "^2.10.2",
     "@sinequa/analytics": "rel_11.8.2",
     "@sinequa/components": "rel_11.8.2",
