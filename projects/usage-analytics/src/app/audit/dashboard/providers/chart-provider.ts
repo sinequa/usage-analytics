@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Utils } from "@sinequa/core/base";
 import { Aggregation, DatasetError, Record, Results } from "@sinequa/core/web-services";
 import { ColDef } from "ag-grid-community";
+import { customComparator } from "./grid-provider";
 
 export interface ChartData {
     aggregation: string;
@@ -39,6 +40,7 @@ export class ChartProvider {
             {
                 headerName: config.displayedValueName || 'Label',
                 field: config.valueField || 'value',
+                comparator: customComparator
             },
             {
                 headerName: config.displayedWeightName || 'Count',
