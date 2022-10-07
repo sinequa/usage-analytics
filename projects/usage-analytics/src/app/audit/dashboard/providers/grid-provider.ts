@@ -11,6 +11,10 @@ export interface GridColDef extends ColDef {
     operatorResults?: boolean;
 }
 
+export const customComparator = (valueA, valueB) => {
+  return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+};
+
 @Injectable()
 export class GridProvider {
 
@@ -79,6 +83,10 @@ export class GridProvider {
                     colDef.wrapText = true;
                     colDef.autoHeight = true;
                     colDef.cellStyle = {'white-space': 'normal', wordBreak: "normal"};
+                }
+
+                if (config.formatterType === 'text' || config.filterType === 'text') {
+                  colDef.comparator = customComparator;
                 }
 
                 columnDefs.push(colDef);
