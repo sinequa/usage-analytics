@@ -3,6 +3,7 @@ import { Utils } from "@sinequa/core/base";
 import { IntlService } from "@sinequa/core/intl";
 import { Aggregation, AggregationItem, DatasetError, Record, Results } from "@sinequa/core/web-services";
 import { ColDef, ValueGetterParams } from "ag-grid-community";
+import { customComparator } from "./grid-provider";
 
 export interface ChartData {
     aggregation: string;
@@ -44,7 +45,8 @@ export class ChartProvider {
         const columnDefs = [{
             headerName: config.displayedValueName || 'Label',
             field: config.valueField || 'value',
-            filter: 'agTextColumnFilter'
+            filter: 'agTextColumnFilter',
+            comparator: customComparator
         }] as ColDef[];
 
         const colDef: ColDef = {
