@@ -19,6 +19,8 @@
         "noUnusedLocals": true,
         "strictFunctionTypes": true,
         "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "typeRoots": [
             "node_modules/@types",
             "node_modules/@sinequa/core/@types"
