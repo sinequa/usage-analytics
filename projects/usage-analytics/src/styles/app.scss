@@ -66,6 +66,10 @@ ag-grid-angular {
     padding: 10px;
 }
 
+sq-facet-card:has(sq-audit-stat) {
+  display: unset !important;
+}
+
 // Flex basis classes
 .flex-basis-0 {
   flex-basis: 0;
