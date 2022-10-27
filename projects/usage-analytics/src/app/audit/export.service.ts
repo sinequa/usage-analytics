@@ -185,8 +185,7 @@ export class ExportService {
     const universalBOM = "\uFEFF"; // Byte Order Mark forcing Excel to use UTF-8 for CSV files
     const keys = Object.keys(rows[0]);
     const csvData = universalBOM +
-      (Utils.isArray(rows[0]) ? '' : keys.join(separator)) +
-      '\n' +
+      (Utils.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
       rows.map(row => keys.map(k => {
           let cell = (row[k] === null || row[k] === undefined) ? '' : row[k];
           cell = cell instanceof Date
