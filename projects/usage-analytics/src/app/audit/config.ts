@@ -343,7 +343,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "searchExitTimeline": {
         "type": "timeline",
         "query": "searchExitTimeLine",
-        "text": "Search Session With Exit Timeline",
+        "text": "Search Summary With Exit Timeline",
         "icon": "fas fa-chart-line",
         "info": "Number of search summary where the user does nothing after viewing the results page displayed over time. Interpretation: Suggests that a user does not consider the results provided to be relevant. Relevance indicator. Calculation: Based on search summary. Addition of all search.exit.timeout and search.exit.logout result events.",
         "unique": true,
@@ -736,7 +736,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "clickAfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Search Session With Clicks",
+        "text": "Search Summary With Clicks",
         "info": "Total number of search summary where the user has clicked on a document at least once. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search summary where there are at least one clicked documents",
         "unique": true,
         "parameters": {
@@ -750,7 +750,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "clickAfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Search Session With Click(s) Rate",
+        "text": "Search Summary With Click(s) Rate",
         "info": "Number of search summary where the user clicks at least on one document out of the total number of search summary. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Total number of search summary where there are at least one clicked document DIVIDED BY Total number of search summary",
         "unique": true,
         "parameters": {
@@ -767,7 +767,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "clickAfterSearchTimeline": {
         "type": "timeline",
         "query": "clickAfterSearchTimeline",
-        "text": "Search Session With Click(s) Timeline",
+        "text": "Search Summary With Click(s) Timeline",
         "icon": "fas fa-chart-line",
         "info": "Number of search summary where the user clicks at least on one document displayed over time. Interpretation: Measures the likely success of a search. Relevance indicator. Calculation: Addition of all search summary where there are at least one click.",
         "unique": true,
@@ -864,7 +864,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "searchExit",
         "icon": "fas fa-balance-scale",
-        "text": "Search Session With Exit",
+        "text": "Search Summary With Exit",
         "info": "Total number of search summary where the user does nothing after viewing the results page. Interpretation: If the user does a search and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Addition of all search summary where the result event values is search.exit.timeout or search.exit.logout",
         "unique": true,
         "parameters": {
@@ -878,7 +878,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "searchExit",
         "icon": "fas fa-balance-scale",
-        "text": "Search Session With Exit Rate",
+        "text": "Search Summary With Exit Rate",
         "info": "Number of search summary where the user does nothing after viewing the results page compared to the total number of search summary. Interpretation: If the user does a full-text query and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. Calculation: Total number of search exits (timeout and logout) DIVIDED BY Total number of search summary.",
         "unique": true,
         "parameters": {
@@ -1048,77 +1048,92 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
 /** Palette */
 export const PALETTE: {name: string, items: string[]}[] = [
     {
-        "name": "Timelines",
+        "name": "Search",
         "items": [
-            "queryCountTotalTimeline",
-            "userCountTotalTimeline",
-            "sessionCountTotalTimeline",
-            "searchBySessionTimeline",
             "clickBySearchTimeline",
-            "sessionDurationTimeline",
-            "newUsersTimeline",
-            "clickRank1AfterSearchTimeline",
             "mrrTimeline",
-            "refinementTimeline",
+            "searchExitTimeline",
+            "clickBySearch",
+            "clickAfterSearch",
+            "clickAfterSearchRate",
             "clickAfterSearchTimeline",
             "searchExitTimeline",
-            "zeroSearchTimeline",
-            "clickRank3AfterSearchTimeLine",
-            "queryBounceTimeline",
-            "clickTotalTimeline",
-            "avgResponseTimeTimeline",
-            "avgEngineResponseTimeline",
-            "maxEngineResponseTimeline",
-            "maxResponseTimeTimeline"
+            "searchExitRate",
+            "queryBounceRate"
         ]
     },
     {
-        "name": "Charts",
+        "name": "Search/Click",
         "items": [
+            "clickRank1AfterSearchRate",
+            "clickTotalTimeline",
             "topSources",
-            "topFacets",
             "topCollections",
+            "clickRank1AfterSearchTimeline",
+            "clickRank3AfterSearchRate",
+            "clickRank3AfterSearchTimeline",
+            "mrr",
+            "queryBounceTimeline",
+            "queryBounce"
+        ]
+    },
+    {
+        "name": "Search/Refinement",
+        "items": [
+            "refinementTimeline",
+            "topFacets",
+            "refinement",
+            "refinementRate"
+        ]
+    },
+    {
+        "name": "Session",
+        "items": [
+            "sessionCountTotalTimeline",
+            "searchBySessionTimeline",
+            "sessionDurationTimeline",
+            "sessionCountTotal",
+            "searchBySession",
+            "viewedDocPerSearch",
+            "sessionDuration"
+        ]
+    },
+    {
+        "name": "Query",
+        "items": [
+            "queryCountTotalTimeline",
+            "queryCountPerUser",
             "topQueries",
             "topNoResultsQueries",
+            "queryCountTotal",
+            "zeroSearchTimeline",
+            "zeroSearch",
+            "zeroSearchRate",
             "resultTypes"
         ]
     },
     {
-        "name": "Grid",
+        "name": "User",
         "items": [
-            "userFeedbackGrid"
-        ]
-    },
-    {
-        "name": "Statistics",
-        "items": [
-            "queryCountTotal",
+            "userCountTotalTimeline",
+            "newUsersTimeline",
             "userCountTotal",
-            "sessionCountTotal",
             "sessionsByUser",
-            "viewedDocPerSearch",
-            "searchBySession",
-            "clickBySearch",
-            "sessionDuration",
             "newUsers",
             "newUsersRate",
             "activeUsers",
             "activeUsersRate",
-            "userCoverage",
-            "clickRank1AfterSearchRate",
-            "mrr",
-            "refinementRate",
-            "refinement",
-            "clickAfterSearch",
-            "clickAfterSearchRate",
-            "zeroSearch",
-            "searchExit",
-            "searchExitRate",
-            "clickRank3AfterSearchRate",
-            "queryBounce",
-            "queryBounceRate",
+            "userCoverage"
+        ]
+    },
+    {
+        "name": "Response time",
+        "items": [
+            "avgEngineResponseTimeline",
+            "maxEngineResponseTimeline",
+            "avgResponseTimeTimeline",
+            "maxResponseTimeTimeline",
             "avgResponseTime",
-            "zeroSearchRate",
             "avgEngineResponseTime"
         ]
     }
