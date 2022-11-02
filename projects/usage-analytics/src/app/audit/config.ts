@@ -375,7 +375,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         }
     },
 
-
     "topQueries": {
         "type": "chart",
         "query": "topQueries",
@@ -993,7 +992,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "showTooltip": true
         }
     }
-
 };
 
 /** Dashboards */
@@ -1057,7 +1055,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "clickAfterSearch",
             "clickAfterSearchRate",
             "clickAfterSearchTimeline",
-            "searchExitTimeline",
+            "searchExit",
             "searchExitRate",
             "queryBounceRate"
         ]
@@ -1123,7 +1121,8 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "newUsersRate",
             "activeUsers",
             "activeUsersRate",
-            "userCoverage"
+            "userCoverage",
+            "userFeedbackGrid"
         ]
     },
     {
