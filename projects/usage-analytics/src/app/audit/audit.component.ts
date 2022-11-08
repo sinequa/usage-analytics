@@ -36,6 +36,9 @@ export class AuditComponent implements OnDestroy {
     private _querySubscription: Subscription;
     private _loginSubscription: Subscription;
     private _dashboardChangesSubscription: Subscription;
+    private _dashboardInitSubscription: Subscription;
+
+    ready = false
 
     constructor(
         public auditService: AuditService,
@@ -55,6 +58,23 @@ export class AuditComponent implements OnDestroy {
             this.dashboardService.updateOptions(this.dashboardService.options);
         });
 
+        this._dashboardInitSubscription = this.dashboardService.dashboardsInit.subscribe(
+            () => {
+                // Properly display dashboards (default, opened ...)
+                this.dashboardService.handleNavigation();
+                this.dashboardService.setDefaultDashboard();
+                this.dashboardActions = this.dashboardService.createDashboardActions();
+
+                // Request data upon login
+                this.auditService.updateAuditFilters();
+                this._querySubscription = this.searchService.queryStream
+                                            .pipe(skip(1))
+                                            .subscribe(() => this.auditService.updateAuditFilters());
+
+                this.ready = true
+            }
+        )
+
         // Upon login (ie access to user settings) initialize the dashboard widgets and actions
         this._loginSubscription = this.loginService.events.subscribe((event) => {
             if (event.type === "login-complete" || event.type === "session-start") {
@@ -68,14 +88,7 @@ export class AuditComponent implements OnDestroy {
                 this.searchService.setQuery(this.searchService.getQueryFromUrl());
 
                 // Note: available dashboards and the default dashboard must be set post-login so that it can be overridden by the user settings
-                this.dashboardService.setDefaultDashboard();
-                this.dashboardActions = this.dashboardService.createDashboardActions();
-
-                // Request data upon login
-                this.auditService.updateAuditFilters();
-                this._querySubscription = this.searchService.queryStream
-                                            .pipe(skip(1))
-                                            .subscribe(() => this.auditService.updateAuditFilters());
+                this.dashboardService.initDashboards();
             }
         });
 
@@ -104,6 +117,7 @@ export class AuditComponent implements OnDestroy {
         this._querySubscription?.unsubscribe();
         this._loginSubscription?.unsubscribe();
         this._dashboardChangesSubscription?.unsubscribe();
+        this._dashboardInitSubscription?.unsubscribe();
     }
 
     /**
@@ -220,8 +234,8 @@ export class AuditComponent implements OnDestroy {
                 title: "Reset dashboards definition",
                 message: "You are about to loose ALL your current dashboards definition. Do you want to continue?",
                 buttons: [
-                    new ModalButton({result: ModalResult.OK, text: "Confirm"}),
-                    new ModalButton({result: ModalResult.Cancel, primary: true})
+                    new ModalButton({result: ModalResult.Cancel}),
+                    new ModalButton({result: ModalResult.OK, text: "Confirm", primary: true})
                 ],
                 confirmType: ConfirmType.Warning
             }).then(res => {
