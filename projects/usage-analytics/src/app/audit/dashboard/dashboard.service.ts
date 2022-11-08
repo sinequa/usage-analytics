@@ -379,11 +379,13 @@ export class DashboardService {
                     }).then(res => {
                         if(res === ModalResult.OK) {
                             this.userSettingsService.patch({dashboards: standardDashboards}).subscribe(
+                                () => {},
+                                () => {},
                                 () => {
                                     this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
                                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
                                     this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
-                                    this.dashboards = this.userSettingsService.userSettings!["dashboards"];
+                                    this.dashboards = standardDashboards;
                                     this.dashboardsInit.next(true);
                                 }
                             )
