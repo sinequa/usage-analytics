@@ -13,6 +13,7 @@ For more information about Sinequa libraries, please refer to the [Sinequa docum
 * [Dashboards](#dashboards)
     * [Introduction](#introduction)
     * [Configuration principle](#configuration_principle)
+    * [Initialization of dashboards](#initialization_of_dashboards)
     * [Customization](#customization)
         * [Ordinary user](#ordinary_user)
         * [Admin user](#admin_user)
@@ -24,6 +25,7 @@ For more information about Sinequa libraries, please refer to the [Sinequa docum
         * [Widget sizing](#widget_sizing)
         * [Widget tooltips](#widget_tooltips)
         * [Formatting widget numbers](#widget_numbers)
+        * [Display multiple time series in a single timeline](#plot_multiple_timeseries)
     * [Export / Import](#export_import)
 
 ## <a name="prerequisites"></a> Prerequisites
@@ -131,9 +133,9 @@ There are three levels in the above snippet:
 
 Notice in the above snippet that the list of dashboard items, as well the options of the dashboard, are managed by a new `DashboardService`. This Angular service, which lives in the Usage Analytics app (`app/audit/dashboard/dashboard.service.ts`), manages the following tasks:
 
-- Generating dashboards.
+- Initializing dashboards.
 - Storing the state of the dashboard and its global options.
-- Saving, opening, deleting and sharing dashboards. The list of dashboards is persisted in the [User Settings](https://sinequa.github.io/sba-angular/tutorial/user-settings.html).
+- Saving, opening, deleting and sharing dashboards. Once the user saves its own customized version of dashboards, it is then persisted in the [User Settings](https://sinequa.github.io/sba-angular/tutorial/user-settings.html).
 - Managing URL changes / navigation, when a dashboard is opened, saved, deleted or imported.
 - Editing the dashboard (adding or removing items).
 - Emitting events when the dashboard changes.
@@ -142,16 +144,13 @@ Notice in the above snippet that the list of dashboard items, as well the option
 
 *Usage Analytics* is designed to support 2 types of configuration :
 
-- Built-in configuration: the default configuration is defined in the source code of the app. It can be modified there, but it requires recompiling the application.
-- Server side configuration: administrators can override the built-in configuration by updating the **Customization tab** in the administration of the application.
+- Server side configuration: This is the principle way. Administrators can override the built-in configuration by updating the **Customization tab** in the administration of the application.
 
-<span style="display:block;text-align:center">![Client side configuration](/docs/assets/client_side_architecture.png)
-<span style="display:block;text-align:center">*Client side configuration*</span>
-</span>
+<span style="display:block;text-align:center">![Server side configuration](/docs/assets/server_side_architecture.png)</span>
 
-<span style="display:block;text-align:center">![Server side configuration](/docs/assets/server_side_architecture.png)
-<span style="display:block;text-align:center">*Server side configuration*</span>
-</span>
+- Built-in configuration: This is a fallback if the server side configuration is omitted. The default server side configuration is copied in the source code of the app. It can be modified there, but it requires recompiling the application.
+
+<span style="display:block;text-align:center">![Client side configuration](/docs/assets/client_side_architecture.png)</span>
 
 The configuration allows to set application's **params**, define the list and settings of each widget, the content of the default dashboards and the content of the widgets palette.
 This can be done whether in local config file at app level `config.ts` or defined on the Sinequa server (Application > Customization (JSON)). **The configuration defined on the server overrides the one defined locally**.
@@ -170,6 +169,18 @@ This can be done whether in local config file at app level `config.ts` or define
 - `getStandardDashboards(): {name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[]}[]`
 
     This method returns the list of standard dashboard from the configuration defined on the server (appService.app.data.standardDashboards) or in the config.ts file (STANDARD_DASHBOARDS).
+
+### <a name="initialization_of_dashboards"></a> Initialization of dashboards
+
+Starting from the 11.9.0, the application includes a smart behavior when loading dashboards. It consists of notifying users, having customized their dashboards, of potential changes made by admins to the default configuration.
+
+<span style="display:block;text-align:center">![Notification](/docs/assets/updates-notification.PNG)</span>
+
+Behind the scenes, a sequence of comparisons is performed between several *Hash keys* of the default, current and local configuration of all users. The logic is implemented in the `initDashboards()` of the `DashboardService`.
+
+<span style="display:block;text-align:center">![Initialization of dashboards](/docs/assets/dashboards_initialization.PNG)</span>
+
+
 
 ### <a name="customization"></a> Customization
 
@@ -249,7 +260,7 @@ The creation of the widget can occur in different ways:
   2. On initialization, when a dashboards are created / loaded.
   3. Adding custom widget in `config.ts` or at administration level.
 
-In any case, it is necessary to create a `DashboardItemOption`, an object consisting of a widget's `type`, `query`, `text`, `icon` and a `unique` property (that can prevent users from creating two components of this type). 
+In any case, it is necessary to create a `DashboardItemOption`, an object consisting of a widget's `type`, `query`, `text`, `icon` and a `unique` property (that can prevent users from using same widget multiple times in the same dashboard). 
 
 For example, the configuration object to create a "Search by session timeline" widget is as follow:
 
@@ -275,10 +286,10 @@ For example, the configuration object to create a "Search by session timeline" w
 To include this new widget to the "Palette", simply add it to the list :
 
 ```ts
-// Palette is classified by type of widget
+
 export const PALETTE: {name: string, items: string[]}[] = [
   {
-      name: "msg#palette.timelines",
+      name: "Timelines",
       items: [
           ...
           "searchBySessionTimeline",
@@ -330,8 +341,8 @@ The *state* of your widget can be defined in three locations:
 In the standard components, the items that are persisted are for example:
 
 - For all widgets: Widget query, size and position in the dashboard.
-- For the **timeline** widget: aggregationsTimeSeries.
-- For the **chart** widget: chart data and chart type.
+- For the **timeline** widget: aggregationsTimeSeries...
+- For the **chart** widget: chart data and chart type...
 - For the **stat** widget: valueLocation, operation, relatedQuery...
 
 If your custom widget needs to have a part of the state persisted, a few things need to be considered:
@@ -468,6 +479,80 @@ Often in any analytics dashboards, you may need to display numbers in different 
 ```html
 <span class="stat-value">{{value | sqNumber: (config?.numberFormatOptions || numberFormatOptions)}}</span>
 ```
+
+**8 - Display multiple time series in a single timeline** <a name="plot_multiple_timeseries"></a>
+
+Displaying multiple time series is a common use case in analytics dashboards and it is handled by the application. The question is whether it is doable via customization tab only Or need extra code at application level.
+
+This depends on the data itself. For example, assuming you want to plot 2 time series related to 2 different aggregations: "Toto" and "Foo".
+
+- **a) Both aggregations are returned within the same query**
+
+In this case you just need to provide the correct configuration of the widget. It would be something like 
+
+```ts
+{
+  "type": "timeline",
+  "query": "....",
+  "text": "my-custom-timeline",
+  "icon": "fas fa-chart-line",
+  "info": "....",
+  "unique": true,
+  "parameters": {
+      "aggregationsTimeSeries": [
+          {
+              "name": "Toto",
+              "dateField": "....",
+              "valueFields": [{"name": "...", "title": "....", "primary": true}]
+          },
+          {
+              "name": "Foo",
+              "dateField": "....",
+              "valueFields": [{"name": "...", "title": "....", "primary": true}]
+          }
+      ],
+      "chartType": "Timeline"
+  }
+}
+```
+
+- **b) A merge of 2 queries is needed to retrieve both aggregations**
+
+In this case, you need to programmatically merge both aggregations in a single Results object. So, in `dashboard-item.component.ts`, once their respective queries are available (in the onChange()). Your custom code should looks like the following
+
+```ts
+switch (this.config.type) {
+    case "timeline":
+        this.timeSeries = [];
+        if (this.config.title === 'my-custom-timeline') {
+            data = {
+            records: [] as Record[],
+                aggregations: [
+                    (this.dataset?.["query 1"] as Results).aggregations[0], // assuming this is the aggregation "Toto"
+                    (this.dataset?.["query 2"] as Results).aggregations[0], // assuming this is the aggregation "Foo"
+                ] as Aggregation[]
+            } as Results
+        }
+        if (this.config.aggregationsTimeSeries) {
+            this.timeSeries.push(
+                ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
+            );
+            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
+            this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
+        }
+        if (this.config.recordsTimeSeries) {
+            this.timeSeries.push(
+                ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
+            );
+            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
+            this.rowData = data.records
+        }
+        break;
+
+    ....
+}
+```
+Then, use the customization as shown in a).
 
 ### <a name="export_import"></a> Export / Import
 
