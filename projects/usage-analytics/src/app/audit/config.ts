@@ -1090,12 +1090,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "searchExitRate",
             "queryBounceRate",
             "searchCountTotalTimeline",
-            "searchCountTotal"
-        ]
-    },
-    {
-        "name": "Search/Click",
-        "items": [
+            "searchCountTotal",
             "clickRank1AfterSearchRate",
             "clickTotalTimeline",
             "topSources",
@@ -1105,12 +1100,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "clickRank3AfterSearchTimeline",
             "mrr",
             "queryBounceTimeline",
-            "queryBounce"
-        ]
-    },
-    {
-        "name": "Search/Refinement",
-        "items": [
+            "queryBounce",
             "refinementTimeline",
             "topFacets",
             "refinement",
