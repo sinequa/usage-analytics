@@ -16,8 +16,7 @@
                 [width]="innerwidth"
                 [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
                 [showTooltip]="true"
-                [curveType]="'curveLinear'"
-                (rangeChange)="updateAuditRange($event)"
+                [curveType]="'curveStep'"
                 (selectionChange)="updateAuditRange($event)">
             </sq-timeline>
             <sq-timeline-legend
