@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --ssl=true --proxy-config=./projects/usage-analytics/src/proxy.conf.json",
-    "buildprod": "ng build --configuration production",
+    "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
