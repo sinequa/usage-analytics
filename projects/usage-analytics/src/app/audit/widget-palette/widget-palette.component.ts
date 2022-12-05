@@ -42,7 +42,9 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
         return this.dashboardService.getPalette().map(
             (p: {name: string, items: DashboardItemOption[]}) => ({
                 name: p.name,
-                items: p.items.filter((widget) => !this.dashboardService.dashboard.items.find((item) => item.title === widget.text))
+                items: p.items.filter(
+                  (widget) => !this.dashboardService.dashboard.items.find((item) => (item.title === widget.text) && !!widget.unique)
+                )
             })
         )
     }

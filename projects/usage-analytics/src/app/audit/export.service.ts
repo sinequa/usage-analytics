@@ -1,4 +1,5 @@
 import {ElementRef, Injectable} from '@angular/core';
+import { Utils } from '@sinequa/core/base';
 import {IntlService} from '@sinequa/core/intl';
 import domtoimage from "dom-to-image";
 import { saveAs } from "file-saver";
@@ -29,7 +30,7 @@ type XLWorkbookType = {
 type ExtractModel = {
   title:string,
   filename: string,
-  tables:string[]
+  tables: Object[]
 }
 
 @Injectable({
@@ -87,20 +88,20 @@ export class ExportService {
       // export stats in one file
       const stats = this.extractStats(filename, items);
       if (stats) {
-        this.saveToCsv(stats.filename, stats.tables.join('\n'));
+        this.saveToCsv(stats.filename, this.objectToCsv(stats.tables).join('\n'));
       }
 
       // export each timeline in a specific file
       const timelines = this.extractTimelines(filename, items);
-      timelines.forEach(timeline => this.saveToCsv(timeline.filename, timeline.tables.join('\n')));
+      timelines.forEach(timeline => this.saveToCsv(timeline.filename, this.objectToCsv(timeline.tables).join('\n')));
 
       // export each chart in a specific file
       const charts = this.extractCharts(filename, items);
-      charts.forEach(chart => this.saveToCsv(chart.filename, chart.tables.join('\n')));
+      charts.forEach(chart => this.saveToCsv(chart.filename, this.objectToCsv(chart.tables).join('\n')));
 
       // export each grid in a separate file
       const grids = this.extractGrids(filename, items);
-      grids.forEach(grid => this.saveToCsv(grid.filename, grid.tables.join('\n')));
+      grids.forEach(grid => this.saveToCsv(grid.filename, this.objectToCsv(grid.tables).join('\n')));
     }
 
   /**
@@ -151,7 +152,7 @@ export class ExportService {
 
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
-      data: [...worksheet.tables.map(it => it.split(","))],
+      data: [...(Utils.isArray(worksheet.tables[0]) ? worksheet.tables : this.objectToCsv(worksheet.tables).map(it => it.split(',')))],
       name: worksheet.title.slice(0,30)
     }));
 
@@ -176,17 +177,17 @@ export class ExportService {
    * @param rows array of object to convert into csv
    * @returns a csv string
    */
-  objectToCsv(filename: string, rows: object[]): string[] {
+  objectToCsv(rows: object[]): string[] {
     if (!rows || !rows.length) {
       return [];
     }
     const separator = ',';
+    const universalBOM = "\uFEFF"; // Byte Order Mark forcing Excel to use UTF-8 for CSV files
     const keys = Object.keys(rows[0]);
-    const csvData =
-      keys.join(separator) +
-      '\n' +
+    const csvData = universalBOM +
+      (Utils.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
       rows.map(row => keys.map(k => {
-          let cell = row[k] === null || row[k] === undefined ? '' : row[k];
+          let cell = (row[k] === null || row[k] === undefined) ? '' : row[k];
           cell = cell instanceof Date
             ? cell.toLocaleString()
             : cell.toString().replace(/"/g, '""');
@@ -297,7 +298,7 @@ export class ExportService {
     }, <any>[])
 
     const file = `${filename}_${this.date}.csv`;
-    return {title: "stats", filename: file, tables: this.objectToCsv(file, results)};
+    return {title: "stats", filename: file, tables: results};
   }
 
   /**
@@ -320,8 +321,7 @@ export class ExportService {
     charts.forEach(chart => {
       const results = chart.data?.map(item => item);
       const file = `${filename}_${chart.title}_${this.date}.csv`;
-      const r:string[] = this.objectToCsv(file, results!);
-      if(r) values.push({title: chart.title, filename: file, tables: r});
+      values.push({title: chart.title, filename: file, tables: results!});
     });
     return values;
 
@@ -371,7 +371,7 @@ export class ExportService {
       // we only need each V
       const results = Array.from(resultsMap.entries()).map(it => it[1]);
       const file = `${filename}_${serie.title}_${this.date}.csv`;
-      values.push({title: serie.title, filename: file, tables: this.objectToCsv(file, results)});
+      values.push({title: serie.title, filename: file, tables: results});
     });
     return values;
   }
@@ -394,18 +394,23 @@ export class ExportService {
           const fields = grid.columns.map(x => x.field);
 
           // initialize rows with header
-          let rows = [grid.columns.map(x => x.headerName).join(",")];
+          let rows = [
+            grid.columns.map(
+              x => x.headerName
+            )
+          ];
 
           // append each row, if there is no rowData it will just concat an empty array
           rows = rows.concat(
             grid.rowData.map(row => {
-              return fields.map(x => !!x && !!row[x] ? row[x] : "").join(",");
+              return fields.map(x => !!x && !!row[x] ? row[x] : "");
             })
           );
 
+          const file = `${filename}_${grid.title}_${this.date}.csv`;
           return {
             title: grid.title,
-            filename: `${filename}_${grid.title}_${this.date}.csv`,
+            filename: file,
             tables: rows
           } as ExtractModel;
         });
@@ -417,7 +422,7 @@ export class ExportService {
    * @param tables contains data per worksheet
    * @param filename
    */
-  private csvToXML(tables: {title:string, tables:string[]}[], filename: string) {
+  private csvToXML(tables: {title:string, tables:any[]}[], filename: string) {
     const uri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
     const tmplWorkbookXML = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:excel"  xmlns:html="https://www.w3.org/TR/html401/">'
       + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>Sinequa R&amp;D</Author><Created>{created}</Created></DocumentProperties>'
@@ -437,9 +442,10 @@ export class ExportService {
 
     for(const [index, values] of tables.entries()) {
       if(values.tables){
-        for(const row of values.tables) {
+        const data = Utils.isArray(values.tables[0]) ? values.tables : this.objectToCsv(values.tables).map(it => it.split(','))
+        for(const row of data) {
           rowsXML += '<Row>';
-          for(const cell of row.split(',')) {
+          for(const cell of row) {
               const ctx_: XLRowType = {
                 attributeStyleID: '',
                 nameType: 'String',

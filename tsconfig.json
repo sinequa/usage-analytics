@@ -7,10 +7,10 @@
         "declaration": false,
         "downlevelIteration": true,
         "experimentalDecorators": true,
-        "module": "esnext",
+        "module": "es2020",
         "moduleResolution": "node",
         "importHelpers": true,
-        "target": "es2015",
+        "target": "es2020",
         "allowSyntheticDefaultImports": true,
         "preserveSymlinks": true,
         "noFallthroughCasesInSwitch": true,
@@ -19,12 +19,15 @@
         "noUnusedLocals": true,
         "strictFunctionTypes": true,
         "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "typeRoots": [
             "node_modules/@types",
             "node_modules/@sinequa/core/@types"
         ],
         "lib": [
-            "es2018",
+            "es2020",
+            "ES2020.Intl",
             "dom"
         ],
     },

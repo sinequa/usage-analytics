@@ -11,7 +11,7 @@ import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
 import { GridsterConfig, GridsterItem } from 'angular-gridster2';
 import { NotificationsService } from '@sinequa/core/notification';
-import { Subject } from 'rxjs';
+import { skip, Subject } from 'rxjs';
 import { UserPreferences } from '@sinequa/components/user-settings';
 import { IntlService } from '@sinequa/core/intl';
 import { AggregationTimeSeries, RecordsTimeSeries } from './providers/timeline-provider';
@@ -34,6 +34,7 @@ export interface DashboardItem extends GridsterItem {
     icon: string;
     title: string;
     query: string;
+    unique?: boolean;
     info?: string;
     width?: number;
     height?: number;
@@ -70,8 +71,6 @@ export interface Dashboard {
     items: DashboardItem[];
 }
 
-
-
 /**
  * An interface to define a type of widget that can be added to the dashboard. This basic information
  * is used to create a button to select a type of widget among a list.
@@ -81,7 +80,7 @@ export interface DashboardItemOption {
     query: string;
     icon: string;
     text: string;
-    unique: boolean;
+    unique?: boolean;
     info?: string;
     parameters?: {
         // For type === 'timeline'
@@ -148,6 +147,8 @@ export const defaultDashboardName = "msg#dashboards.newDashboard";
 })
 export class DashboardService {
 
+    dashboards: Dashboard[] = [];
+
     /** Current active dashboard */
     dashboard: Dashboard;
 
@@ -171,6 +172,9 @@ export class DashboardService {
 
     /** A subject firing events when the dashboard changes */
     dashboardChanged = new Subject<DashboardChange>();
+
+    /** A subject informing when dashboards list are initialized properly and ready to use */
+    dashboardsInit = new Subject<boolean>();
 
     constructor(
         public modalService: ModalService,
@@ -220,7 +224,9 @@ export class DashboardService {
         };
 
         // Manage URL (query) changes (which may include dashboard name or config to be imported)
-        this.searchService.queryStream.subscribe(() => {
+        // First detection === application load, must be ignored because dashboards are not yet available
+        // It will be programmatically triggered once the init of dashboards is done
+        this.searchService.queryStream.pipe(skip(1)).subscribe(() => {
             this.handleNavigation();
         })
 
@@ -262,7 +268,7 @@ export class DashboardService {
      * Handle URL changes. Retrieve a dashboard name or configuration if any, depending on
      * the params contained in the URL.
      */
-    protected handleNavigation() {
+    public handleNavigation() {
         const url = Utils.makeURL(this.router.url);
         const dashboard = url.searchParams.get("dashboard");
         const dashboardShared = url.searchParams.get("dashboardShared");
@@ -318,7 +324,7 @@ export class DashboardService {
      */
     public getStandardDashboards(): {name: string, items: {item: DashboardItemOption, position: DashboardItemPosition}[]}[] {
         const dashboards = this.appService.app?.data?.standardDashboards as any as {name: string, items: {item: string, position: DashboardItemPosition}[]}[]
-            || STANDARD_DASHBOARDS;
+                            || STANDARD_DASHBOARDS;
         const widgets = this.getWidgets();
         return dashboards.map(d => ({
                 name: d.name,
@@ -331,17 +337,72 @@ export class DashboardService {
      * Returns the list of this user's dashboards.
      * The list is stored in the user settings (this is a redirection).
      * It creates the list of dashboards if it does not already exist.
+     * It takes care of notifying the user of new available updates comparing to its own version
      */
-    public get dashboards() : Dashboard[] {
-        if(!this.userSettingsService.userSettings)
+    initDashboards(): void {
+        /** Create a hash of the last used standard dashboards */
+        const standardDashboards = this.getStandardDashboards().map(
+            sd => this.createDashboard(sd.name, sd.items)
+        );
+        const standardDashboardsHash = Utils.sha512(JSON.stringify(standardDashboards));
+
+        /** Create a hash of the last used widgets' version */
+        const standardWidgetsHash = Utils.sha512(JSON.stringify(this.getWidgets()));
+
+        if(!this.userSettingsService.userSettings) {
             this.userSettingsService.userSettings = {};
-        if(!this.userSettingsService.userSettings["dashboards"]) {
-            this.userSettingsService.userSettings["dashboards"] =
-                this.getStandardDashboards().map(
-                    sd => this.createDashboard(sd.name, sd.items)
-                );
         }
-        return this.userSettingsService.userSettings["dashboards"];
+
+        // If nothing is stored in the user settings, then we just use the standard dashboards
+        if(!this.userSettingsService.userSettings["dashboards"]) {
+            this.userSettingsService.userSettings["dashboards"] = standardDashboards;
+            this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Store the hash of the last used standard dashboards' version
+            this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Store the hash of the last used standard widgets' version
+            this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
+            this.dashboards = this.userSettingsService.userSettings["dashboards"];
+            this.dashboardsInit.next(true);
+        } else { // If the user has its own version, then we need to check for potential updates and how he wants to manage them
+            const condition = ( standardDashboardsHash !== this.prefs.get("standard-dashboards-hash") ||
+                                standardWidgetsHash !== this.prefs.get("standard-widgets-hash") )
+                            && standardDashboardsHash !== this.prefs.get("skipped-hash")
+            if (condition) { // updates are detected, user should decide what to do
+                this.modalService
+                    .confirm({
+                        title: "Available updates !",
+                        message: "Changes have been made to default dashboards/widgets. Do you want to update your own version ?",
+                        buttons: [
+                            new ModalButton({result: ModalResult.No, text: "See no more"}),
+                            new ModalButton({result: ModalResult.Ignore, text: "Remind me later"}),
+                            new ModalButton({result: ModalResult.OK, text: "Update", primary: true})
+                        ],
+                        confirmType: ConfirmType.Warning
+                    }).then(res => {
+                        if(res === ModalResult.OK) {
+                            this.userSettingsService.patch({dashboards: standardDashboards}).subscribe(
+                                () => {},
+                                () => {},
+                                () => {
+                                    this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
+                                    this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
+                                    this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
+                                    this.dashboards = standardDashboards;
+                                    this.dashboardsInit.next(true);
+                                }
+                            )
+                        } else if(res === ModalResult.No) {
+                            this.prefs.set("skipped-hash", standardDashboardsHash); // Do not notify the user about changes while this skipped version is not updated
+                            this.dashboards = this.userSettingsService.userSettings!["dashboards"];
+                            this.dashboardsInit.next(true);
+                        } else {
+                            this.dashboards = this.userSettingsService.userSettings!["dashboards"];
+                            this.dashboardsInit.next(true);
+                        }
+                    });
+            } else { // No updates Or updates are skipped, then just pick the version in the user settings
+                this.dashboards = this.userSettingsService.userSettings!["dashboards"];
+                this.dashboardsInit.next(true);
+            }
+        }
     }
 
     public get allDashboards(): Dashboard[] {
@@ -465,6 +526,7 @@ export class DashboardService {
             type: option.type,
             query: option.query,
             icon: option.icon,
+            unique: option.unique,
             title: option.text,
             closable: closable,
             info: option.info
@@ -606,6 +668,15 @@ export class DashboardService {
             .patch({dashboards: dashboards})
             .subscribe(
                 () => {
+                    /**
+                     * Update Hashes
+                     */
+                    const standardDashboardsHash = Utils.sha512(JSON.stringify(dashboards));
+                    const standardWidgetsHash = Utils.sha512(JSON.stringify(this.getWidgets()));
+                    this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
+                    this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
+                    this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
+
                     /**
                      * Force app reload with none queryParams
                      * It ensures then the reload of dashboards from updated user-settings
@@ -803,8 +874,8 @@ export class DashboardService {
      * Updates the list of dashboards in the user settings
      * @param notify
      */
-    protected patchDashboards(notify = true) {
-        this.userSettingsService.patch({dashboards: this.dashboards})
+    protected patchDashboards(notify = true, dashboards?: Dashboard[]) {
+        this.userSettingsService.patch({dashboards: dashboards || this.dashboards})
             .subscribe(
                 next => {
                     if(notify) {

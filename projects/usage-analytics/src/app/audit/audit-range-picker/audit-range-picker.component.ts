@@ -1,5 +1,5 @@
 import { Component, HostListener } from "@angular/core";
-import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { AuditService, RelativeTimeRanges } from "../audit.service";
 
 @Component({
@@ -16,19 +16,19 @@ export class AuditRangePickerComponent {
     showDateRangeOptions = false;
 
     /** Form for the date pickers */
-    form: FormGroup;
-    dateRangeControl: FormControl;
-    applySamePeriodForTrendsControl: FormControl;
-    customRangeForTrendsControl: FormControl;
+    form: UntypedFormGroup;
+    dateRangeControl: UntypedFormControl;
+    applySamePeriodForTrendsControl: UntypedFormControl;
+    customRangeForTrendsControl: UntypedFormControl;
 
     constructor(
-        private formBuilder: FormBuilder,
+        private formBuilder: UntypedFormBuilder,
         public auditService: AuditService
     ) {
         // Create the form
-        this.dateRangeControl = new FormControl([undefined, undefined]);
-        this.applySamePeriodForTrendsControl = new FormControl(true);
-        this.customRangeForTrendsControl = new FormControl([undefined, undefined]);
+        this.dateRangeControl = new UntypedFormControl([undefined, undefined]);
+        this.applySamePeriodForTrendsControl = new UntypedFormControl(true);
+        this.customRangeForTrendsControl = new UntypedFormControl([undefined, undefined]);
 
         this.form = this.formBuilder.group({
             dateRange: this.dateRangeControl,

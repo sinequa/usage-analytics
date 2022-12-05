@@ -13,7 +13,8 @@
                     class="btn btn-outline-secondary mx-1 my-1"
                     *ngFor="let item of element.items"
                     (click)="addWidget(item)"
-                    [sqTooltip]="item?.info | sqMessage">
+                    [sqTooltip]="item?.info | sqMessage"
+                    [fallbackPlacements]="['bottom','top']">
                     <div class="button-text">{{item.text | sqMessage}}</div>
                 </button>
             </div>

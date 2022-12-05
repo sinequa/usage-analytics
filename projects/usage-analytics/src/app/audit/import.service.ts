@@ -24,8 +24,8 @@ export class ImportService {
                 title: "Import dashboards definition",
                 message: "You are about to loose ALL your current dashboards definition. Do you want to continue?",
                 buttons: [
-                    new ModalButton({result: ModalResult.OK, text: "Confirm"}),
-                    new ModalButton({result: ModalResult.Cancel, primary: true})
+                    new ModalButton({result: ModalResult.Cancel}),
+                    new ModalButton({result: ModalResult.OK, text: "Confirm", primary: true})
                 ],
                 confirmType: ConfirmType.Warning
             }).then(res => {

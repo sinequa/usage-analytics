@@ -24,12 +24,12 @@
         [results]="(auditService.data$ | async)"
         [displayFieldNames]="false"
         [useBadges]="true"
-        [excludedFacets]="['audit_timestamp', 'SBA', 'Profile']"
+        [excludedFacets]="['audit_timestamp']"
     ></sq-facet-mysearch>
 </div>
 
 <!-- Dashboard tabs -->
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs" *ngIf="ready">
     <li class="nav-item" *ngFor="let dashboard of dashboardService.allDashboards; let i=index">
         <a
             class="nav-link"
@@ -70,9 +70,8 @@
             <i class="fas fa-undo-alt"></i>
         </button>
     </div>
-
 </ul>
-<gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete">
+<gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete && ready">
     <div #content>
         <gridster-item [item]="item" *ngFor="let item of dashboardService.dashboard.items; index as i" [attr.focus]="i === focusElementIndex">
             <sq-dashboard-item

@@ -7,6 +7,7 @@ import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { GridsterModule } from "angular-gridster2";
 import { AgGridModule } from 'ag-grid-angular';
+import { firstValueFrom } from "rxjs";
 
 // @sinequa/core library
 import { WebServicesModule, StartConfigWebService, StartConfig } from "@sinequa/core/web-services";
@@ -31,7 +32,13 @@ import {SelectionOptions, SELECTION_OPTIONS} from "@sinequa/components/selection
 // @sinequa/analytics library
 import { BsTimelineModule } from "@sinequa/analytics/timeline";
 import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
-import { FusionChartsModule } from "@sinequa/analytics/fusioncharts";
+import { FusionChartsModule } from '@sinequa/analytics/fusioncharts'
+
+import * as FusionCharts from "fusioncharts";
+import * as charts from "fusioncharts/fusioncharts.charts";
+import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
+import * as CandyTheme from "fusioncharts/themes/fusioncharts.theme.candy";
+FusionCharts.options.creditLabel = false;
 
 // Components
 import { AppComponent } from "./app.component";
@@ -61,7 +68,7 @@ export const startConfig: StartConfig = {
 
 // @sinequa/core config initializer
 export function StartConfigInitializer(startConfigWebService: StartConfigWebService): () => Promise<StartConfig> {
-    const init = () => startConfigWebService.fetchPreLoginAppConfig().toPromise();
+    const init = () =>  firstValueFrom(startConfigWebService.fetchPreLoginAppConfig());
     return init;
 }
 
@@ -115,7 +122,9 @@ const selectionOptions: SelectionOptions = {
         BsSearchModule.forRoot(searchOptions),
         BsNotificationModule,
         UtilsModule,
-        FusionChartsModule,
+
+        FusionChartsModule.forRoot(FusionCharts, charts, FusionTheme, CandyTheme),
+
         BsUserSettingsModule,
         BsFeedbackModule,
         BsFacetModule,
