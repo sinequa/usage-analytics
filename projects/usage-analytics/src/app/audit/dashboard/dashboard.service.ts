@@ -45,6 +45,7 @@ export interface DashboardItem extends GridsterItem {
     aggregation?: string; // For type === 'chart'
     chartData?: ChartData; // For type === 'chart'
     chartType?: string; // For type === 'chart' && type === 'timeline'
+    timelineQueries?: string[]; // For type === 'timeline'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
     columns?: GridColDef[]; // For type === 'grid'
@@ -386,6 +387,8 @@ export class DashboardService {
                                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
                                     this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
                                     this.dashboards = standardDashboards;
+                                    delete this.searchService.queryStringParams.dashboard;
+                                    this.searchService.navigate({skipSearch: true});
                                     this.dashboardsInit.next(true);
                                 }
                             )

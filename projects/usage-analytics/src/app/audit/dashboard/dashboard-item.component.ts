@@ -181,8 +181,13 @@ export class DashboardItemComponent implements OnChanges {
                 if (this.config?.relatedQuery) {
                     relatedData = this.dataset?.[this.config?.relatedQuery];
                 }
-                if((data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage) {
-                    this.errorMessage = (data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage;
+                let timelineDatas: Array<Results | DatasetError | undefined> = [];
+                if (this.config?.timelineQueries) {
+                    timelineDatas = this.config?.timelineQueries.map((query) => this.dataset?.[query])
+                }
+
+                if((data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage || timelineDatas.some((data) => !!(data as DatasetError).errorMessage)) {
+                    this.errorMessage = (data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage || (timelineDatas.find((data) => !!(data as DatasetError).errorMessage) as DatasetError).errorMessage;
                 } else {
                     this.errorMessage = undefined;
                     data = data as Results;
@@ -190,19 +195,44 @@ export class DashboardItemComponent implements OnChanges {
                     switch (this.config.type) {
                         case "timeline":
                             this.timeSeries = [];
-                            if (this.config.aggregationsTimeSeries) {
-                                this.timeSeries.push(
-                                    ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
-                                );
-                                this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
-                                this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
-                            }
-                            if (this.config.recordsTimeSeries) {
-                                this.timeSeries.push(
-                                    ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
-                                );
-                                this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
-                                this.rowData = data.records
+                            if (this.config?.timelineQueries && this.config?.timelineQueries.length > 0) {
+                                if (data && timelineDatas.every((data) => !!data)) {
+                                    data = {
+                                        records: [] as Record[],
+                                        aggregations: [data, ...timelineDatas].flatMap((result) => (result as Results).aggregations)
+                                    } as Results;
+                                }
+
+                                if (this.config.aggregationsTimeSeries) {
+                                    this.timeSeries.push(
+                                        ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
+                                    );
+                                    this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
+                                    this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
+                                }
+                                if (this.config.recordsTimeSeries) {
+                                    this.timeSeries.push(
+                                        ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
+                                    );
+                                    this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
+                                    this.rowData = data.records
+                                }
+
+                            } else {
+                                if (this.config.aggregationsTimeSeries) {
+                                    this.timeSeries.push(
+                                        ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
+                                    );
+                                    this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
+                                    this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
+                                }
+                                if (this.config.recordsTimeSeries) {
+                                    this.timeSeries.push(
+                                        ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
+                                    );
+                                    this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
+                                    this.rowData = data.records
+                                }
                             }
                             break;
                         case "chart":
