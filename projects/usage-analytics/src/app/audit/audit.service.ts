@@ -290,6 +290,9 @@ export class AuditService {
                 if (item.relatedQuery) {
                     datasets.push(item.relatedQuery);
                 }
+                if (item.timelineQueries) {
+                    datasets.push(...item.timelineQueries);
+                }
             }
         );
         return datasets;

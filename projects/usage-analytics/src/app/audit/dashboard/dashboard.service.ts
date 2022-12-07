@@ -94,6 +94,9 @@ export interface DashboardItemOption {
         // For type === 'chart' && type === 'timeline'
         chartType?: string,
 
+        // For type === 'timeline'
+        timelineQueries?: string[];
+
         // For type === 'stat'
         valueLocation?: StatValueLocation, // where to find value field
         valueField?: StatValueField, // how to access value field
@@ -383,13 +386,21 @@ export class DashboardService {
                                 () => {},
                                 () => {},
                                 () => {
+                                    /**
+                                     * Update Hashes
+                                     */
                                     this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
                                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
-                                    this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
-                                    this.dashboards = standardDashboards;
-                                    delete this.searchService.queryStringParams.dashboard;
-                                    this.searchService.navigate({skipSearch: true});
-                                    this.dashboardsInit.next(true);
+                                    this.prefs.delete("skipped-hash") // Once hashes are updated, "skipped hash" must be cleared
+                                    this.prefs.delete("dashboard-default") // Previous default dashboard may not be present in the new version. Thus, need to clear this information
+
+                                    /**
+                                     * Redraw the UI
+                                     */
+                                    this.dashboards = standardDashboards; // Assign the new value to dashboards
+                                    this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
+                                    this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
+                                    this.searchService.navigate({skipSearch: true}).then(() => this.dashboardsInit.next(true)); // Trigger the local refreshing of the UI
                                 }
                             )
                         } else if(res === ModalResult.No) {
@@ -670,6 +681,11 @@ export class DashboardService {
         this.userSettingsService
             .patch({dashboards: dashboards})
             .subscribe(
+                () => {},
+                (error) => {
+                    this.notificationService.error("Could not " + event + " dashboards definition !");
+                    console.error("Could not  " + event + "  dashboards definition !", error);
+                },
                 () => {
                     /**
                      * Update Hashes
@@ -679,18 +695,15 @@ export class DashboardService {
                     this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
                     this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
+                    this.prefs.delete("dashboard-default") // Previous default dashboard may not be present in the new version. Thus, need to clear this information
 
                     /**
-                     * Force app reload with none queryParams
-                     * It ensures then the reload of dashboards from updated user-settings
+                     * Redraw the UI
                      */
-                    const url = (window.location.href.split('?'))[0];
-                    window.location.assign(url);
-                    window.location.reload();
-                },
-                (error) => {
-                    this.notificationService.error("Could not " + event + " dashboards definition !");
-                    console.error("Could not  " + event + "  dashboards definition !", error);
+                    this.dashboards = dashboards; // Assign the new value to dashboards
+                    this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
+                    this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
+                    this.searchService.navigate({skipSearch: true}).then(() => this.dashboardsInit.next(true)); // Trigger the local refreshing of the UI
                 }
             );
     }
