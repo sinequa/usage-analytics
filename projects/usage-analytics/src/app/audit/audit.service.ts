@@ -78,6 +78,9 @@ export class AuditService {
     public infoPreviousFilter: string | undefined;
     public startDate: string | undefined;
 
+    // Calculate the diff between previous & start dates (in millisecond), used by Timeline component
+    public diffPreviousAndStart: number;
+
     constructor(
         public datasetWebService: DatasetWebService,
         public searchService: SearchService,
@@ -290,8 +293,8 @@ export class AuditService {
                 if (item.relatedQuery) {
                     datasets.push(item.relatedQuery);
                 }
-                if (item.timelineQueries) {
-                    datasets.push(...item.timelineQueries);
+                if (item.extraTimelineQueries) {
+                    datasets.push(...item.extraTimelineQueries);
                 }
             }
         );
@@ -534,6 +537,7 @@ export class AuditService {
                     break;
             }
         }
+
         // Override the previous date if the previous range is set
         previous = this.previousRange?.[0] || previous;
         const previousEnd = this.previousRange?.[1] || start;
@@ -543,6 +547,9 @@ export class AuditService {
         const endToServerTimeZone = this.convertTimeZone(end);
         const previousToServerTimeZone = this.convertTimeZone(previous);
         const previousEndToServerTimeZone = this.convertTimeZone(previousEnd);
+
+        // Calculate the diff between previous & start dates (in millisecond)
+        this.diffPreviousAndStart = start.getTime() - previous.getTime();
 
         return {
             currentRange: this.exprBuilder.makeRangeExpr("timestamp", startToServerTimeZone, endToServerTimeZone),

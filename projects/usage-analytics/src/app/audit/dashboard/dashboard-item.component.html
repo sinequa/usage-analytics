@@ -14,7 +14,7 @@
                 *ngIf="config.chartType !== 'Grid'"
                 [data]="timeSeries"
                 [width]="innerwidth"
-                [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
+                [height]="(timeSeries?.length > 1) ? (innerheight - 50) : innerheight"
                 [showTooltip]="true"
                 [curveType]="'curveStep'"
                 (selectionChange)="updateAuditRange($event)">
@@ -23,7 +23,7 @@
                 *ngIf="timeSeries?.length > 1 && config.chartType !== 'Grid'"
                 [data]="timeSeries"
                 [yOffset]="8"
-                [legendStyles]="{'justify-content': 'center'}">
+                [legendStyles]="{'justify-content': 'center',' max-height': '50px', 'overflow-y': 'auto', 'width': '98%'}">
             </sq-timeline-legend>
             <ag-grid-angular
                 *ngIf="config.chartType === 'Grid'"

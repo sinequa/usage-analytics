@@ -45,7 +45,8 @@ export interface DashboardItem extends GridsterItem {
     aggregation?: string; // For type === 'chart'
     chartData?: ChartData; // For type === 'chart'
     chartType?: string; // For type === 'chart' && type === 'timeline'
-    timelineQueries?: string[]; // For type === 'timeline'
+    extraTimelineQueries?: string[]; // For type === 'timeline'
+    showPreviousPeriod?: boolean; // For type === 'timeline'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
     columns?: GridColDef[]; // For type === 'grid'
@@ -95,7 +96,8 @@ export interface DashboardItemOption {
         chartType?: string,
 
         // For type === 'timeline'
-        timelineQueries?: string[];
+        extraTimelineQueries?: string[];
+        showPreviousPeriod?: boolean;
 
         // For type === 'stat'
         valueLocation?: StatValueLocation, // where to find value field

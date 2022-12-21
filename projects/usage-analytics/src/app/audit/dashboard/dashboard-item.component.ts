@@ -69,6 +69,7 @@ export class DashboardItemComponent implements OnChanges {
     fullScreenAction: Action;
     maximizeAction: Action;
     timelineOrGridAction: Action;
+    toggleShowPreviousTimelineAction: Action;
     infoAction: Action;
 
     // Properties specific to certain types of dashboard items
@@ -173,63 +174,48 @@ export class DashboardItemComponent implements OnChanges {
             this.innerwidth = this.width - 2;
         }
 
-        if (changes.dataset) {
-            if (this.dataset?.[this.config.query]) {
-                this.loading = false;
-                let data = this.dataset?.[this.config.query];
-                let relatedData;
-                if (this.config?.relatedQuery) {
-                    relatedData = this.dataset?.[this.config?.relatedQuery];
-                }
-                let timelineDatas: Array<Results | DatasetError | undefined> = [];
-                if (this.config?.timelineQueries) {
-                    timelineDatas = this.config?.timelineQueries.map((query) => this.dataset?.[query])
-                }
-
-                if((data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage || timelineDatas.some((data) => !!(data as DatasetError)?.errorMessage)) {
-                    this.errorMessage = (data as DatasetError)?.errorMessage || (relatedData as DatasetError)?.errorMessage || (timelineDatas.find((data) => !!(data as DatasetError)?.errorMessage) as DatasetError)?.errorMessage;
-                } else {
-                    this.errorMessage = undefined;
-                    data = data as Results;
-
-                    switch (this.config.type) {
-                        case "timeline":
-                            this.timeSeries = [];
-                            if (this.config?.timelineQueries && this.config?.timelineQueries.length > 0) {
-                                if (data && timelineDatas.every((data) => !!data)) {
-                                    data = {
-                                        records: [] as Record[],
-                                        aggregations: [data, ...timelineDatas].flatMap((result) => (result as Results).aggregations)
-                                    } as Results;
-                                    this._updateTimeSeriesData(data);
-                                }
-                            } else {
-                                this._updateTimeSeriesData(data);
-                            }
-                            break;
-                        case "chart":
-                            if (this.config.chartData) {
-                                this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
-                                this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
-                                this.rowData = data?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
-                            }
-                            break;
-                        case "grid":
-                            this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
-                            if (this.config.aggregationName) {
-                                this.rowData = this.gridProvider.getAggregationRowData(data, this.config.aggregationName)
-                            } else {
-                                this.rowData = data.records
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            } else {
-                this.loading = true
+        // Handle dataSets updates
+        if (this.config.type === "timeline") {
+            if (changes.dataset || changes.previousDataSet) {
+                this._updateTimelineData();
             }
-
+        } else {
+            if (changes.dataset) {
+                if (this.dataset?.[this.config.query]) {
+                    this.loading = false;
+                    const data = this.dataset?.[this.config.query];
+                    let relatedData;
+                    if (this.config?.relatedQuery) {
+                        relatedData = this.dataset?.[this.config?.relatedQuery];
+                    }
+                    if ((data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage) {
+                        this.errorMessage = (data as DatasetError)?.errorMessage || (relatedData as DatasetError)?.errorMessage
+                    } else {
+                        this.errorMessage = undefined;
+                        switch (this.config.type) {
+                            case "chart":
+                                if (this.config.chartData) {
+                                    this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
+                                    this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
+                                    this.rowData = (data as Results)?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
+                                }
+                                break;
+                            case "grid":
+                                this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
+                                if (this.config.aggregationName) {
+                                    this.rowData = this.gridProvider.getAggregationRowData(data, this.config.aggregationName)
+                                } else {
+                                    this.rowData = (data as Results).records
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                } else {
+                    this.loading = true;
+                }
+            }
         }
 
         // Update the actions
@@ -271,6 +257,8 @@ export class DashboardItemComponent implements OnChanges {
         }
 
         if (this.config.type === "timeline") {
+
+            // Action to switch between Grid/Timeline view
             this.timelineOrGridAction = new Action({
                 title: "Select field",
                 text: this.config.chartType,
@@ -292,26 +280,90 @@ export class DashboardItemComponent implements OnChanges {
                 }
 
             });
-            this.actions = [this.timelineOrGridAction, ...this.actions];
             this.timelineOrGridAction.update();
+
+            // Action to Show/Hide previous period timeline
+            this.toggleShowPreviousTimelineAction = new Action({
+                icon: this.config.showPreviousPeriod ? "fas fa-compress-alt" : "fas fa-expand-alt",
+                title: this.config.showPreviousPeriod ? "Hide Previous Period" : "Show Previous Period",
+                action: () => {
+                    this.toggleShowPreviousTimeline();
+                },
+                updater: (action) => {
+                    action.icon = this.config.showPreviousPeriod
+                        ? "fas fa-compress-alt"
+                        : "fas fa-expand-alt";
+                    action.title = this.config.showPreviousPeriod
+                        ? "Hide Previous Period"
+                        : "Show Previous Period";
+                }
+            });
+
+            this.actions = [this.toggleShowPreviousTimelineAction, this.timelineOrGridAction, ...this.actions];
         }
     }
 
-    private _updateTimeSeriesData(data: Results) {
+    toggleShowPreviousTimeline() {
+        this.config.showPreviousPeriod = !this.config.showPreviousPeriod;
+        this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
+        this.toggleShowPreviousTimelineAction.update();
+
+        this._updateTimelineData();
+    }
+
+    private _updateTimelineData() {
+        const queries = [this.config.query, ...(this.config.extraTimelineQueries || [])];
+
+        if (queries.every((query) => this.dataset?.[query]) && queries.every((query) => this.previousDataSet?.[query])) {
+            this.loading = false;
+            const currentDatas = queries.map((query) => this.dataset?.[query]);
+            const previousDatas = queries.map((query) => this.previousDataSet?.[query]);
+
+            if (currentDatas.some((data) => (data as DatasetError)?.errorMessage) || previousDatas.some((data) => (data as DatasetError)?.errorMessage)) {
+                this.errorMessage = (currentDatas.find((data) => (data as DatasetError)?.errorMessage) as DatasetError)?.errorMessage || (previousDatas.find((data) => (data as DatasetError)?.errorMessage) as DatasetError)?.errorMessage
+            } else {
+                this.errorMessage = undefined;
+                this.timeSeries = [];
+
+                if (!this.config.showPreviousPeriod) {
+                    const {timeSeries, columnDefs, rowData} = this._getTimelineData(currentDatas as Results[], true);
+                    this.timeSeries = this.timelineProvider.applyStyleRules(timeSeries);
+                    this.columnDefs = columnDefs;
+                    this.rowData = rowData;
+                } else {
+                    const current = this._getTimelineData(currentDatas as Results[], true);
+                    const previous = this._getTimelineData(previousDatas as Results[], false);
+                    this.timeSeries = this.timelineProvider.applyStyleRules(current.timeSeries, previous.timeSeries);
+                }
+            }
+        } else {
+            this.loading = true;
+        }
+
+    }
+
+    private _getTimelineData(datas: Array<Results>, isCurrent: boolean): {timeSeries: TimelineSeries[]; columnDefs: ColDef[]; rowData: (Record | AggregationItem)[];} {
+        const data = {
+            records: [] as Record[],
+            aggregations: datas.flatMap((result) => (result as Results).aggregations)
+        } as Results;
+
+        let timeSeries: TimelineSeries[] = [];
+        let columnDefs: ColDef[] = [];
+        let rowData: (Record | AggregationItem)[] = [];
+
         if (this.config.aggregationsTimeSeries) {
-            this.timeSeries.push(
-                ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
-            );
-            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
-            this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
+            timeSeries = this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask, isCurrent, this.auditService.diffPreviousAndStart);
+            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries, isCurrent);
+            rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries, isCurrent);
         }
         if (this.config.recordsTimeSeries) {
-            this.timeSeries.push(
-                ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
-            );
-            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
-            this.rowData = data.records
+            timeSeries = this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries, isCurrent, this.auditService.diffPreviousAndStart);
+            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries, isCurrent);
+            rowData = data.records;
         }
+
+        return {timeSeries, columnDefs, rowData};
     }
 
     toggleFullScreen(): void {
