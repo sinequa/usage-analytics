@@ -59,44 +59,93 @@ export class TimelineProvider {
         if (!Utils.isArray(aggregationsTimeSeries)) {
             aggregationsTimeSeries = [aggregationsTimeSeries];
         }
-        const items: AggregationItem[] = [];
         if (data && !(data as DatasetError).errorMessage && (data as Results).aggregations) {
-            for (const aggregationTimeSeries of aggregationsTimeSeries) {
-                const aggregation = (data as Results).aggregations.find((aggr: Aggregation) => Utils.eqNC(aggr.name, aggregationTimeSeries.name));
-                if (aggregation?.items) {
-                    items.push(...aggregation.items);
-                }
+            switch (aggregationsTimeSeries.length) {
+                case 0:
+                    return [];
+                case 1:
+                    const aggregation = (data as Results).aggregations.find((aggr: Aggregation) => Utils.eqNC(aggr.name, aggregationsTimeSeries[0].name));
+                    return aggregation?.items || [];
+                default:
+                    const items: AggregationItem[] = [];
+                    const aggregations = aggregationsTimeSeries.map((config) => (data as Results).aggregations.find((aggr: Aggregation) => Utils.eqNC(aggr.name, config.name)));
+                    const dates = aggregations
+                                        .flatMap((agg, index) => (agg?.items || []).map((el) => el[aggregationsTimeSeries[index].dateField || 'value']))
+                                        .filter((val) => this._parseDate(val));
+
+                    Array.from(new Set(dates)).forEach(
+                        (date) => {
+                            let item = {value: date};
+                            (<Array<AggregationTimeSeries>>aggregationsTimeSeries).forEach(
+                                (aggregationTimeSeries, index) => {
+                                    for (const valueField of aggregationTimeSeries.valueFields) {
+                                        item[aggregationTimeSeries.name+valueField.name] = aggregations[index]?.items?.find((el) => el[aggregationTimeSeries.dateField || 'value'] === date)?.[valueField.name]
+                                    }
+                                }
+                            );
+                            items.push(item as AggregationItem);
+                        }
+                    );
+
+                    return items.sort((a,b) => this._parseDate(a.value)!.getTime()- this._parseDate(b.value)!.getTime());
             }
         }
-        return items;
+        return [];
     }
 
     public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[], isCurrent: boolean = true): ColDef[] {
-        const columnDefs = [{
-            headerName: 'Date',
-            field: 'value',
-            filter: 'agDateColumnFilter',
-            cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(new Date(params.value))
-        }] as ColDef[];
         if (!Utils.isArray(configs)) {
             configs = [configs];
         }
-        for (const config of configs) {
-            for (const valueField of config.valueFields) {
-                const colDef: ColDef = {
-                    headerName: valueField.displayedName || valueField.name,
-                    filter: "agNumberColumnFilter",
-                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
+        let columnDefs: ColDef[];
+        switch (configs.length) {
+            case 0:
+                return [];
+            case 1:
+                columnDefs = [{
+                    headerName: 'Date',
+                    field: configs[0].dateField || 'value',
+                    filter: 'agDateColumnFilter',
+                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(new Date(params.value))
+                }] as ColDef[];
+                for (const valueField of configs[0].valueFields) {
+                    const colDef: ColDef = {
+                        headerName: valueField.displayedName || valueField.name,
+                        filter: "agNumberColumnFilter",
+                        cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
+                    }
+                    if (valueField.operatorResults) {
+                        colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[valueField.name]
+                    } else {
+                        colDef.field = valueField.name
+                    }
+                    columnDefs.push(colDef);
                 }
-                if (valueField.operatorResults) {
-                    colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[valueField.name]
-                } else {
-                    colDef.field = valueField.name
+                return columnDefs;
+            default:
+                columnDefs = [{
+                    headerName: 'Date',
+                    field: 'value',
+                    filter: 'agDateColumnFilter',
+                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(new Date(params.value))
+                }] as ColDef[];
+                for (const config of configs) {
+                    for (const valueField of config.valueFields) {
+                        const colDef: ColDef = {
+                            headerName: valueField.displayedName || valueField.name,
+                            filter: "agNumberColumnFilter",
+                            cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
+                        }
+                        if (valueField.operatorResults) {
+                            colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[(config['name'] || '') + valueField.name];
+                        } else {
+                            colDef.field = (config['name'] || '') + valueField.name;
+                        }
+                        columnDefs.push(colDef);
+                    }
                 }
-                columnDefs.push(colDef);
-            }
+                return columnDefs;
         }
-        return columnDefs;
     }
 
     protected makeAggregationSeries(aggregation: Aggregation, aggregationTimeSeries: AggregationTimeSeries, mask: string, isCurrent: boolean = true, scale: number = 0): TimelineSeries[] {
@@ -136,7 +185,7 @@ export class TimelineProvider {
 
                 // if it is a trend timeSerie, scale all dates by the diffPreviousAndStart
                 if (!isCurrent) {
-                    rawDates.forEach((item) => {
+                    dates.forEach((item) => {
                             item.displayedDate = Utils.copy(item.date)
                             item.date = new Date(item.date.getTime() + scale)
                         }
@@ -187,13 +236,13 @@ export class TimelineProvider {
         currentTimeSeries = currentTimeSeries.map(
             (serie: TimelineSeries, index: number) => ({
                     ...serie,
-                    lineStyles: {'stroke-width': 1, 'stroke': colors[index]}
+                    lineStyles: {'stroke-width': 2, 'stroke': colors[index]}
                 })
         );
         previousTimeSeries = previousTimeSeries.map(
             (serie: TimelineSeries, index: number) => ({
                     ...serie,
-                    lineStyles: {'stroke-width': 1, 'stroke': colors[index], 'stroke-dasharray': 5}
+                    lineStyles: {'stroke-width': 2, 'stroke': colors[index], 'stroke-dasharray': 5}
                 })
         );
 

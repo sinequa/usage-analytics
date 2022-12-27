@@ -258,6 +258,23 @@ export class DashboardItemComponent implements OnChanges {
 
         if (this.config.type === "timeline") {
 
+            // Action to Show/Hide previous period timeline
+            this.toggleShowPreviousTimelineAction = new Action({
+                icon: this.config.showPreviousPeriod ? "fas fa-compress-alt" : "fas fa-expand-alt",
+                title: this.config.showPreviousPeriod ? "Hide Trend" : "Show Trend",
+                action: () => {
+                    this.toggleShowPreviousTimeline();
+                },
+                updater: (action) => {
+                    action.icon = this.config.showPreviousPeriod
+                        ? "fas fa-compress-alt"
+                        : "fas fa-expand-alt";
+                    action.title = this.config.showPreviousPeriod
+                        ? "Hide Trend"
+                        : "Show Trend";
+                }
+            });
+
             // Action to switch between Grid/Timeline view
             this.timelineOrGridAction = new Action({
                 title: "Select field",
@@ -273,33 +290,21 @@ export class DashboardItemComponent implements OnChanges {
                                     action.text = item;
                                     this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
                                     this.timelineOrGridAction.update();
-
                                 }
                             })
-                        )
+                        );
+                    if (action.text === "Grid") {
+                        const idx = this.actions.findIndex(action => action === this.toggleShowPreviousTimelineAction);
+                        this.actions.splice(idx, 1);
+                    } else {
+                        this.actions = [this.toggleShowPreviousTimelineAction, ...this.actions];
+                    }
                 }
-
             });
+
+            // Add actions
+            this.actions = [this.timelineOrGridAction, ...this.actions];
             this.timelineOrGridAction.update();
-
-            // Action to Show/Hide previous period timeline
-            this.toggleShowPreviousTimelineAction = new Action({
-                icon: this.config.showPreviousPeriod ? "fas fa-compress-alt" : "fas fa-expand-alt",
-                title: this.config.showPreviousPeriod ? "Hide Previous Period" : "Show Previous Period",
-                action: () => {
-                    this.toggleShowPreviousTimeline();
-                },
-                updater: (action) => {
-                    action.icon = this.config.showPreviousPeriod
-                        ? "fas fa-compress-alt"
-                        : "fas fa-expand-alt";
-                    action.title = this.config.showPreviousPeriod
-                        ? "Hide Previous Period"
-                        : "Show Previous Period";
-                }
-            });
-
-            this.actions = [this.toggleShowPreviousTimelineAction, this.timelineOrGridAction, ...this.actions];
         }
     }
 
@@ -334,6 +339,8 @@ export class DashboardItemComponent implements OnChanges {
                     const current = this._getTimelineData(currentDatas as Results[], true);
                     const previous = this._getTimelineData(previousDatas as Results[], false);
                     this.timeSeries = this.timelineProvider.applyStyleRules(current.timeSeries, previous.timeSeries);
+                    this.columnDefs = current.columnDefs;
+                    this.rowData = current.rowData;
                 }
             }
         } else {
