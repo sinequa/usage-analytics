@@ -295,7 +295,9 @@ export class DashboardItemComponent implements OnChanges {
                         );
                     if (action.text === "Grid") {
                         const idx = this.actions.findIndex(action => action === this.toggleShowPreviousTimelineAction);
-                        this.actions.splice(idx, 1);
+                        if (idx !== -1) {
+                            this.actions.splice(idx, 1);
+                        }
                     } else {
                         this.actions = [this.toggleShowPreviousTimelineAction, ...this.actions];
                     }

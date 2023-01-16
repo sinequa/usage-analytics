@@ -106,7 +106,7 @@ export class TimelineProvider {
                     headerName: 'Date',
                     field: configs[0].dateField || 'value',
                     filter: 'agDateColumnFilter',
-                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(new Date(params.value))
+                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(params.value)
                 }] as ColDef[];
                 for (const valueField of configs[0].valueFields) {
                     const colDef: ColDef = {
@@ -127,7 +127,7 @@ export class TimelineProvider {
                     headerName: 'Date',
                     field: 'value',
                     filter: 'agDateColumnFilter',
-                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(new Date(params.value))
+                    cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(params.value)
                 }] as ColDef[];
                 for (const config of configs) {
                     for (const valueField of config.valueFields) {
