@@ -121,13 +121,13 @@ export class TimelineProvider {
 
                 rawDates.forEach((item,i) => {
                     const date = item.date;
-                    if(i === 0 || timeInterval.offset(dates[dates.length-1].date, 1) < date) {
+                    if(i > 0 && timeInterval.offset(dates[dates.length-1].date, 1) < date) {
                         dates.push({date: timeInterval.offset(date, -1), value: 0});
                     }
 
                     dates.push(item);
 
-                    if(i === rawDates.length-1 || timeInterval.offset(date, 1) < rawDates[i+1].date){
+                    if(i < rawDates.length-1 && timeInterval.offset(date, 1) < rawDates[i+1].date){
                         dates.push({date: timeInterval.offset(date, 1), value: 0});
                     }
                 });
