@@ -15,10 +15,11 @@ import {frNotification} from "@sinequa/components/notification";
 import {frUserSettings} from "@sinequa/components/user-settings";
 import { frModal } from "@sinequa/core/modal";
 import { frHeatmap } from "@sinequa/analytics/heatmap";
+import { frTimeline } from "@sinequa/analytics/timeline";
 
 d3Format.thousands = " "; // consistency with intl-number-format
 
-const messages = Utils.merge({}, frCore, frUtils, frNotification, frUserSettings, frFeedback, frFacet, frModal, frAdvanced, frHeatmap, appMessages);
+const messages = Utils.merge({}, frCore, frUtils, frNotification, frUserSettings, frFeedback, frFacet, frModal, frAdvanced, frHeatmap, frTimeline, appMessages);
 
 export default <LocaleData>{
     intl: {
