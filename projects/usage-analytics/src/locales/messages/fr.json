@@ -52,6 +52,8 @@
         "saveTitle": "Enregistrer le tableau de bord",
         "saveSuccess": "Tableau de bord enregistré",
         "saveFailure": "Le tableau de bord n'a pas pu être enregistré !",
+        "renameModalTitle": "Renommer le tableau de bord",
+        "renameTitle": "Renommer ce tableau de bord",
         "autoSave": "Enregistrement auto",
         "autoSaveTitle": "Enregistrement automatique du tableau de bord",
         "setDefault": "Dashboard par défaut",

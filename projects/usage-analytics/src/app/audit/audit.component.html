@@ -46,6 +46,9 @@
             <!-- Button to save tab modifications-->
             <button [sqIcon]="'fas fa-save'" [sqTooltip]="'msg#dashboard.saveTitle' | sqMessage" *ngIf="!dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ml-1" (click)="saveDashboard(dashboard, $event)"></button>
 
+             <!-- Button to rename tab modifications-->
+             <button [sqIcon]="'far fa-edit'" [sqTooltip]="'msg#dashboard.renameTitle' | sqMessage" *ngIf="dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ml-1" (click)="renameDashboard(dashboard, $event)"></button>
+
             <!-- Button to bookmark a tab -->
             <button [sqIcon]="'far fa-bookmark'" [sqTooltip]="'msg#dashboard.setDefaultTitle' | sqMessage" *ngIf="!dashboardService.isDefaultDashboard(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1" (click)="markAsDefaultDashboard(dashboard, $event)"></button>
 

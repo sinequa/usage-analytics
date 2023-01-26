@@ -258,6 +258,11 @@ export class AuditComponent implements OnDestroy {
         this.dashboardService.saveDashboard(dashboard);
     }
 
+    renameDashboard(dashboard, $event): void {
+        $event.stopPropagation();
+        this.dashboardService.renameDashboard(dashboard);
+    }
+
     shareDashboard(dashboard: Dashboard, $event): void {
         $event.stopPropagation();
         this.dashboardService.shareDashboard(dashboard);

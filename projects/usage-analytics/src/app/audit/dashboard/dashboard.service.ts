@@ -673,9 +673,11 @@ export class DashboardService {
             this.saveAs(dashboard);
         }
         else {
-            const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
-            this.changedDashboards.splice(index, 1);
-            this.patchDashboards();
+            const callback = () => {
+                const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
+                this.changedDashboards.splice(index, 1);
+            }
+            this.patchDashboards(true, undefined, callback);
         }
     }
 
@@ -722,6 +724,37 @@ export class DashboardService {
         this.dashboardChanged.next({type: 'NEW_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
     }
 
+    public renameDashboard(dashboard: Dashboard) {
+        const originalName = dashboard.name;
+        const unique : ValidatorFn = (control) => {
+            const checkUnique = !control.value?.startsWith(this.formatMessage(defaultDashboardName)) && (!this.getDashboard(control.value) || control.value === originalName);
+            if(!checkUnique) return {unique: true};
+            return null;
+        };
+
+        const model: PromptOptions = {
+            title: 'msg#dashboard.renameModalTitle',
+            message: 'msg#dashboard.saveAsModalMessage',
+            buttons: [],
+            output: '',
+            validators: [Validators.required, unique]
+        };
+
+        this.modalService.prompt(model).then(res => {
+            if(res === ModalResult.OK) {
+                dashboard.name = model.output;
+                // Update User settings
+                const callback = () => {
+                    // Update URL (store dashboard name in the queryParams) and navigate to the newly renamed dashboard
+                    this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
+                    this.searchService.navigate({skipSearch: true});
+                }
+                this.patchDashboards(true, undefined, callback);
+
+            }
+        });
+    }
+
     public deleteDashboard(dashboard: Dashboard) {
         this.modalService.confirm({
             title: "msg#dashboard.deleteConfirmTitle",
@@ -740,12 +773,26 @@ export class DashboardService {
         }).then(value => {
             if(value === ModalResult.OK) {
                 const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
+                const callback = () => {
+                    // Open next/previous dashboard. If not existing, create new empty dashboard
+                    if (this.allDashboards[index]) {
+                        this.dashboard = Utils.copy(this.allDashboards[index]);
+                        delete this.searchService.queryStringParams.dashboard;
+                        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+                    } else if (this.allDashboards[index - 1]) {
+                        this.dashboard = Utils.copy(this.allDashboards[index - 1]);
+                        delete this.searchService.queryStringParams.dashboard;
+                        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+                    } else {
+                        this.newDashboard();
+                    }
+                }
 
                 // Delete the dashboard
                 if (this.isDashboardSaved(dashboard)) {
                     const i = this.dashboards.findIndex(d => d.name === dashboard.name);
                     this.dashboards.splice(i, 1);
-                    this.patchDashboards(false);
+                    this.patchDashboards(false, undefined, callback);
                     if(this.prefs.get("dashboard-default") === dashboard.name) {
                         this.prefs.delete("dashboard-default");
                     }
@@ -753,19 +800,7 @@ export class DashboardService {
                 else {
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards.splice(i, 1);
-                }
-
-                // Open next/previous dashboard. If not existing, create new empty dashboard
-                if (this.allDashboards[index]) {
-                    this.dashboard = Utils.copy(this.allDashboards[index]);
-                    delete this.searchService.queryStringParams.dashboard;
-                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
-                } else if (this.allDashboards[index - 1]) {
-                    this.dashboard = Utils.copy(this.allDashboards[index - 1]);
-                    delete this.searchService.queryStringParams.dashboard;
-                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
-                } else {
-                    this.newDashboard();
+                    callback();
                 }
             }
         });
@@ -874,15 +909,19 @@ export class DashboardService {
             if(res === ModalResult.OK) {
                 const db = Utils.copy(dashboard);
                 db.name = model.output;
+
                 // Update User settings
                 this.dashboards.push(db);
-                this.patchDashboards();
-                // Delete the saved dashboard from the draftDashboards
-                const index = this.draftDashboards.findIndex(d => d.name === originalName);
-                this.draftDashboards.splice(index, 1);
-                // Update URL (store dashboard name in the queryParams)
-                this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
-                this.searchService.navigate({skipSearch: true});
+                const callback = () => {
+                    // Delete the saved dashboard from the draftDashboards
+                    const index = this.draftDashboards.findIndex(d => d.name === originalName);
+                    this.draftDashboards.splice(index, 1);
+                    // Update URL (store dashboard name in the queryParams)
+                    this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
+                    this.searchService.navigate({skipSearch: true});
+                }
+                this.patchDashboards(true, undefined, callback);
+
             }
         });
 
@@ -892,10 +931,11 @@ export class DashboardService {
      * Updates the list of dashboards in the user settings
      * @param notify
      */
-    protected patchDashboards(notify = true, dashboards?: Dashboard[]) {
+    protected patchDashboards(notify = true, dashboards?: Dashboard[], successCallback = (): any => {}) {
         this.userSettingsService.patch({dashboards: dashboards || this.dashboards})
             .subscribe(
                 next => {
+                    successCallback();
                     if(notify) {
                         this.notificationService.success("msg#dashboard.saveSuccess");
                     }

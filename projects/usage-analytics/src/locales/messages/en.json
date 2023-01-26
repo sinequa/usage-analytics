@@ -51,6 +51,8 @@
         "saveTitle": "Save this dashboard",
         "saveSuccess": "Dashboard saved",
         "saveFailure": "Dashboard could not be saved!",
+        "renameModalTitle": "Rename dashboard",
+        "renameTitle": "Rename this dashboard",
         "autoSave": "Auto-save",
         "autoSaveTitle": "Automatically save your dashboard",
         "setDefault": "Default dashboard",
