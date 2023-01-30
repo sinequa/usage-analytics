@@ -287,7 +287,7 @@ export class AuditService {
      */
     private updateDatasetsList(): string[] {
         const datasets: string[] = [];
-        this.dashboardService.dashboard.items.forEach(
+        this.dashboardService.dashboard!.items.forEach(
             (item) => {
                 datasets.push(item.query);
                 if (item.relatedQuery) {

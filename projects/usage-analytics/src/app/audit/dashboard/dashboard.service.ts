@@ -156,7 +156,7 @@ export class DashboardService {
     dashboards: Dashboard[] = [];
 
     /** Current active dashboard */
-    dashboard: Dashboard;
+    dashboard: Dashboard | undefined;
 
     /** Default dashboard (active by default or if the user re-initializes the dashboard) */
     defaultDashboard: Dashboard;
@@ -493,7 +493,7 @@ export class DashboardService {
      */
     public isDashboardSaved(dashboard = this.dashboard): boolean {
         return this.defaultDashboard
-                && dashboard
+                && !!dashboard
                 && !dashboard.name.startsWith(this.formatMessage(defaultDashboardName))
                 && !this.changedDashboards.find(d => d.name === dashboard.name);
     }
@@ -503,7 +503,7 @@ export class DashboardService {
      * @param item
      */
     public notifyItemChange(item: DashboardItem, event: changeType, notify = false) {
-        this.dashboardChanged.next({type: event, dashboard: this.dashboard, updateDatasets: notify, item});
+        this.dashboardChanged.next({type: event, dashboard: this.dashboard!, updateDatasets: notify, item});
     }
 
     /**
@@ -526,7 +526,7 @@ export class DashboardService {
      */
     public addWidget(
             option: DashboardItemOption,
-            dashboard: Dashboard = this.dashboard,
+            dashboard: Dashboard = this.dashboard!,
             notify = true,
             rows = (option.type === "stat" ? 2 : 4),
             cols = (option.type === "stat" ? 1 : 3),
@@ -562,7 +562,7 @@ export class DashboardService {
      * @param item
      */
     public removeItem(item: DashboardItem) {
-        this.dashboard.items.splice(this.dashboard.items.indexOf(item), 1);
+        this.dashboard!.items.splice(this.dashboard!.items.indexOf(item), 1);
         this.notifyItemChange(item, 'REMOVE_WIDGET');
     }
 
@@ -707,7 +707,10 @@ export class DashboardService {
                     this.dashboards = dashboards; // Assign the new value to dashboards
                     this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
                     this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
-                    this.searchService.navigate({skipSearch: true}).then(() => this.dashboardsInit.next(true)); // Trigger the local refreshing of the UI
+                    this.searchService.navigate({skipSearch: true}).then(() => { // Trigger the local refreshing of the UI
+                        this.dashboard = undefined; // Needed to force redraw the displayed dashboard based on new overriding dashboards
+                        this.dashboardsInit.next(true);
+                    });
                 }
             );
     }
@@ -772,8 +775,8 @@ export class DashboardService {
             ]
         }).then(value => {
             if(value === ModalResult.OK) {
-                const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
                 const callback = () => {
+                    const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
                     // Open next/previous dashboard. If not existing, create new empty dashboard
                     if (this.allDashboards[index]) {
                         this.dashboard = Utils.copy(this.allDashboards[index]);
