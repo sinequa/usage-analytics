@@ -52,7 +52,7 @@
               "fusioncharts/fusioncharts.charts",
               "moment-timezone",
               "dom-to-image",
-              "file-saver",
+              "xml-formatter",
               "diacritics",
               "fast-text-encoding",
               "ag-grid-community"
