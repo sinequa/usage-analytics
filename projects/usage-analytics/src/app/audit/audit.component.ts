@@ -81,7 +81,7 @@ export class AuditComponent implements OnDestroy {
 
                 // Hack to fake a CCQuery so the search service works even if no query is attached to the app. (SBA-320)
                 if(!this.appService.defaultCCQuery) {
-                    this.appService['_defaultCCQuery'] = {};
+                    this.appService['_defaultCCQuery'] = {name : ""};
                 }
 
                 // searchService.query is not yet defined from url, need to force its value

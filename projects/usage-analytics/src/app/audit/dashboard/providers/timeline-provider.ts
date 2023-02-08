@@ -32,7 +32,7 @@ export class TimelineProvider {
     constructor(public intlService: IntlService) {}
 
     public getAggregationsTimeSeries(data: Results | DatasetError, aggregationsTimeSeries: AggregationTimeSeries | AggregationTimeSeries[], mask: string, isCurrent: boolean = true, scale: number = 0): TimelineSeries[] {
-        if (!Utils.isArray(aggregationsTimeSeries)) {
+        if (!Array.isArray(aggregationsTimeSeries)) {
             aggregationsTimeSeries = [aggregationsTimeSeries];
         }
         const timeSeries: TimelineSeries[] = [];
@@ -56,7 +56,7 @@ export class TimelineProvider {
     }
 
     public getAggregationsRowData(data: Results | DatasetError, aggregationsTimeSeries: AggregationTimeSeries | AggregationTimeSeries[], isCurrent: boolean = true): AggregationItem[] {
-        if (!Utils.isArray(aggregationsTimeSeries)) {
+        if (!Array.isArray(aggregationsTimeSeries)) {
             aggregationsTimeSeries = [aggregationsTimeSeries];
         }
         if (data && !(data as DatasetError).errorMessage && (data as Results).aggregations) {
@@ -94,7 +94,7 @@ export class TimelineProvider {
     }
 
     public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[], isCurrent: boolean = true): ColDef[] {
-        if (!Utils.isArray(configs)) {
+        if (!Array.isArray(configs)) {
             configs = [configs];
         }
         let columnDefs: ColDef[];

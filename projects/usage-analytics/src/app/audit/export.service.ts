@@ -1,5 +1,4 @@
 import {ElementRef, Injectable} from '@angular/core';
-import { Utils } from '@sinequa/core/base';
 import {IntlService} from '@sinequa/core/intl';
 import domtoimage from "dom-to-image";
 import format from "xml-formatter";
@@ -153,7 +152,7 @@ export class ExportService {
 
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
-      data: [...(Utils.isArray(worksheet.tables[0]) ? worksheet.tables : this.objectToCsv(worksheet.tables).map(it => it.split(',')))],
+      data: [...(Array.isArray(worksheet.tables[0]) ? worksheet.tables : this.objectToCsv(worksheet.tables).map(it => it.split(',')))],
       name: worksheet.title.slice(0,30)
     }));
 
@@ -186,7 +185,7 @@ export class ExportService {
     const universalBOM = "\uFEFF"; // Byte Order Mark forcing Excel to use UTF-8 for CSV files
     const keys = Object.keys(rows[0]);
     const csvData = universalBOM +
-      (Utils.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
+      (Array.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
       rows.map(row => keys.map(k => {
           let cell = (row[k] === null || row[k] === undefined) ? '' : row[k];
           cell = cell instanceof Date
@@ -441,7 +440,7 @@ export class ExportService {
 
     for(const [index, values] of tables.entries()) {
       if(values.tables){
-        const data = Utils.isArray(values.tables[0]) ? values.tables : this.objectToCsv(values.tables).map(it => it.split(','))
+        const data = Array.isArray(values.tables[0]) ? values.tables : this.objectToCsv(values.tables).map(it => it.split(','))
         for(const row of data) {
           rowsXML += '<Row>';
           for(const cell of row) {

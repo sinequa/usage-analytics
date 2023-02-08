@@ -3,8 +3,6 @@ import { GridsterItemComponent } from 'angular-gridster2';
 import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent } from "ag-grid-community";
 
 import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError } from '@sinequa/core/web-services';
-import { ExprBuilder } from '@sinequa/core/app-utils'
-
 import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
 import { TimelineSeries } from '@sinequa/analytics/timeline';
@@ -110,7 +108,6 @@ export class DashboardItemComponent implements OnChanges {
         public gridsterItemComponent: GridsterItemComponent,
         public searchService: SearchService,
         public dashboardService: DashboardService,
-        public exprBuilder: ExprBuilder,
         public auditService: AuditService,
         public timelineProvider: TimelineProvider,
         public chartProvider: ChartProvider,

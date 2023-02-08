@@ -13,7 +13,7 @@ export class AppComponent extends ComponentWithLogin {
         public loginService: LoginService,
         cdRef: ChangeDetectorRef
     ){
-        super(loginService, cdRef);
+        super();
 
     }
 
