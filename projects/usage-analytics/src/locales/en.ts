@@ -14,8 +14,9 @@ import { enAdvanced } from "@sinequa/components/advanced";
 import { enUtils } from "@sinequa/components/utils";
 import { enHeatmap } from "@sinequa/analytics/heatmap";
 import { enTimeline } from "@sinequa/analytics/timeline";
+import { enFilters } from "@sinequa/components/filters";
 
-const messages = Utils.merge({}, enCore, enUtils, enNotification, enUserSettings, enFeedback, enFacet, enModal, enAdvanced, enHeatmap, enTimeline, appMessages);
+const messages = Utils.merge({}, enCore, enUtils, enNotification, enUserSettings, enFeedback, enFacet, enModal, enAdvanced, enHeatmap, enTimeline, enFilters, appMessages);
 
 export default <LocaleData>{
     intl: {

@@ -19,14 +19,16 @@
     </sq-facet-card>
 </div>
 
-<!-- <div class="d-flex flex-row align-items-center flex-wrap">
-    <sq-facet-mysearch
-        [results]="(auditService.data$ | async)"
-        [displayFieldNames]="false"
-        [useBadges]="true"
-        [excludedFacets]="['audit_timestamp']"
-    ></sq-facet-mysearch>
-</div> -->
+<div class="d-flex flex-row align-items-center flex-wrap">
+    <sq-filters
+        [query]="searchService.query"
+        [filter]="searchService.query.filters"
+        [showField]="false"
+        [allowRemove]="true"
+        (filterEdit)="searchService.search()">
+    </sq-filters>
+</div>
+
 
 <!-- Dashboard tabs -->
 <ul class="nav nav-tabs" *ngIf="ready">

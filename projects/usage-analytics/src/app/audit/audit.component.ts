@@ -44,7 +44,7 @@ export class AuditComponent implements OnDestroy {
         public auditService: AuditService,
         public dashboardService: DashboardService,
         private ui: UIService,
-        private searchService: SearchService,
+        public searchService: SearchService,
         public loginService: LoginService,
         private appService: AppService,
         private exportService: ExportService,
