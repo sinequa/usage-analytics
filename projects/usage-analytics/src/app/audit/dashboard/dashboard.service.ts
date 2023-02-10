@@ -775,8 +775,8 @@ export class DashboardService {
             ]
         }).then(value => {
             if(value === ModalResult.OK) {
+                const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
                 const callback = () => {
-                    const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
                     // Open next/previous dashboard. If not existing, create new empty dashboard
                     if (this.allDashboards[index]) {
                         this.dashboard = Utils.copy(this.allDashboards[index]);
@@ -913,17 +913,29 @@ export class DashboardService {
                 const db = Utils.copy(dashboard);
                 db.name = model.output;
 
-                // Update User settings
+                // Update the list of dashboards
                 this.dashboards.push(db);
-                const callback = () => {
-                    // Delete the saved dashboard from the draftDashboards
-                    const index = this.draftDashboards.findIndex(d => d.name === originalName);
-                    this.draftDashboards.splice(index, 1);
+
+                // Store a copy of draft dashboards
+                const copyDraft = [...this.draftDashboards];
+
+                // Delete the saved dashboard from the draftDashboards at this point of time in order to avoid flickering on successful patch
+                const index = this.draftDashboards.findIndex(d => d.name === originalName);
+                this.draftDashboards.splice(index, 1);
+
+                const successCallback = () => {
                     // Update URL (store dashboard name in the queryParams)
                     this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
                     this.searchService.navigate({skipSearch: true});
                 }
-                this.patchDashboards(true, undefined, callback);
+
+                const errorCallback = () => {
+                    // If the patch fails, restore the list of draft dashboards
+                    this.draftDashboards = copyDraft;
+                }
+
+                // Update User settings
+                this.patchDashboards(true, undefined, successCallback, errorCallback);
 
             }
         });
@@ -934,7 +946,7 @@ export class DashboardService {
      * Updates the list of dashboards in the user settings
      * @param notify
      */
-    protected patchDashboards(notify = true, dashboards?: Dashboard[], successCallback = (): any => {}) {
+    protected patchDashboards(notify = true, dashboards?: Dashboard[], successCallback = (): any => {}, errorCallback = (): any => {}) {
         this.userSettingsService.patch({dashboards: dashboards || this.dashboards})
             .subscribe(
                 next => {
@@ -944,6 +956,7 @@ export class DashboardService {
                     }
                 },
                 error => {
+                    errorCallback();
                     if(notify) {
                         this.notificationService.error("msg#dashboard.saveFailure");
                     }

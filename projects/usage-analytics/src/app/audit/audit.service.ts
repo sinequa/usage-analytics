@@ -332,7 +332,10 @@ export class AuditService {
                         .pipe(
                             mergeMap(
                                 (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params).pipe(
-                                    map((res: Results) => ({[datasetName]: res} as Dataset)),
+                                    map((res: Results) => {
+                                        this.searchService.initializeResults(this.searchService.query, res)
+                                        return {[datasetName]: res} as Dataset
+                                    }),
                                     // Catch 500 errors thrown when a query does not exist or error parsing sql query ...
                                     catchError((err) => of({[datasetName]: {errorCode: 500, errorMessage: "Could not find the query "+datasetName + " Or error occurs on executing it"}} as Dataset))
                                 )
