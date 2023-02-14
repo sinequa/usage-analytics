@@ -45,6 +45,8 @@ export interface DashboardItem extends GridsterItem {
     aggregation?: string; // For type === 'chart'
     chartData?: ChartData; // For type === 'chart'
     chartType?: string; // For type === 'chart' && type === 'timeline'
+    extraTimelineQueries?: string[]; // For type === 'timeline'
+    showPreviousPeriod?: boolean; // For type === 'timeline'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
     columns?: GridColDef[]; // For type === 'grid'
@@ -92,6 +94,10 @@ export interface DashboardItemOption {
 
         // For type === 'chart' && type === 'timeline'
         chartType?: string,
+
+        // For type === 'timeline'
+        extraTimelineQueries?: string[];
+        showPreviousPeriod?: boolean;
 
         // For type === 'stat'
         valueLocation?: StatValueLocation, // where to find value field
@@ -175,6 +181,8 @@ export class DashboardService {
 
     /** A subject informing when dashboards list are initialized properly and ready to use */
     dashboardsInit = new Subject<boolean>();
+
+    private forceReloadDefaultDashboard = false;
 
     constructor(
         public modalService: ModalService,
@@ -382,11 +390,21 @@ export class DashboardService {
                                 () => {},
                                 () => {},
                                 () => {
+                                    /**
+                                     * Update Hashes
+                                     */
                                     this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
                                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
-                                    this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
-                                    this.dashboards = standardDashboards;
-                                    this.dashboardsInit.next(true);
+                                    this.prefs.delete("skipped-hash") // Once hashes are updated, "skipped hash" must be cleared
+                                    this.prefs.delete("dashboard-default") // Previous default dashboard may not be present in the new version. Thus, need to clear this information
+
+                                    /**
+                                     * Redraw the UI
+                                     */
+                                    this.dashboards = standardDashboards; // Assign the new value to dashboards
+                                    this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
+                                    this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
+                                    this.searchService.navigate({skipSearch: true}).then(() => this.dashboardsInit.next(true)); // Trigger the local refreshing of the UI
                                 }
                             )
                         } else if(res === ModalResult.No) {
@@ -452,11 +470,12 @@ export class DashboardService {
             this.prefs.set("dashboard-default", this.defaultDashboard.name);
         }
         // If there is no dashboard explicitly opened currently, we open the default one if defined. If not open a new blank dashboard
-        if(!this.dashboard) {
+        if(!this.dashboard || this.forceReloadDefaultDashboard) {
             const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
             const _blank = this.createDashboard(name);
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
             this.dashboardChanged.next({type: 'LOAD_DEFAULT_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
+            this.forceReloadDefaultDashboard = false;
         }
     }
 
@@ -477,7 +496,7 @@ export class DashboardService {
      */
     public isDashboardSaved(dashboard = this.dashboard): boolean {
         return this.defaultDashboard
-                && dashboard
+                && !!dashboard
                 && !dashboard.name.startsWith(this.formatMessage(defaultDashboardName))
                 && !this.changedDashboards.find(d => d.name === dashboard.name);
     }
@@ -546,7 +565,7 @@ export class DashboardService {
      * @param item
      */
     public removeItem(item: DashboardItem) {
-        this.dashboard.items.splice(this.dashboard.items.indexOf(item), 1);
+        this.dashboard!.items.splice(this.dashboard.items.indexOf(item), 1);
         this.notifyItemChange(item, 'REMOVE_WIDGET');
     }
 
@@ -657,9 +676,11 @@ export class DashboardService {
             this.saveAs(dashboard);
         }
         else {
-            const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
-            this.changedDashboards.splice(index, 1);
-            this.patchDashboards();
+            const callback = () => {
+                const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
+                this.changedDashboards.splice(index, 1);
+            }
+            this.patchDashboards(true, undefined, callback);
         }
     }
 
@@ -667,6 +688,11 @@ export class DashboardService {
         this.userSettingsService
             .patch({dashboards: dashboards})
             .subscribe(
+                () => {},
+                (error) => {
+                    this.notificationService.error("Could not " + event + " dashboards definition !");
+                    console.error("Could not  " + event + "  dashboards definition !", error);
+                },
                 () => {
                     /**
                      * Update Hashes
@@ -676,18 +702,18 @@ export class DashboardService {
                     this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
                     this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
+                    this.prefs.delete("dashboard-default") // Previous default dashboard may not be present in the new version. Thus, need to clear this information
 
                     /**
-                     * Force app reload with none queryParams
-                     * It ensures then the reload of dashboards from updated user-settings
+                     * Redraw the UI
                      */
-                    const url = (window.location.href.split('?'))[0];
-                    window.location.assign(url);
-                    window.location.reload();
-                },
-                (error) => {
-                    this.notificationService.error("Could not " + event + " dashboards definition !");
-                    console.error("Could not  " + event + "  dashboards definition !", error);
+                    this.dashboards = dashboards; // Assign the new value to dashboards
+                    this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
+                    this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
+                    this.searchService.navigate({skipSearch: true}).then(() => { // Trigger the local refreshing of the UI
+                        this.forceReloadDefaultDashboard = true; // Needed to force redraw the displayed dashboard based on new overriding dashboards
+                        this.dashboardsInit.next(true);
+                    });
                 }
             );
     }
@@ -702,6 +728,37 @@ export class DashboardService {
         this.dashboard = Utils.copy(_blank);
         delete this.searchService.queryStringParams.dashboard;
         this.dashboardChanged.next({type: 'NEW_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+    }
+
+    public renameDashboard(dashboard: Dashboard) {
+        const originalName = dashboard.name;
+        const unique : ValidatorFn = (control) => {
+            const checkUnique = !control.value?.startsWith(this.formatMessage(defaultDashboardName)) && (!this.getDashboard(control.value) || control.value === originalName);
+            if(!checkUnique) return {unique: true};
+            return null;
+        };
+
+        const model: PromptOptions = {
+            title: 'msg#dashboard.renameModalTitle',
+            message: 'msg#dashboard.saveAsModalMessage',
+            buttons: [],
+            output: '',
+            validators: [Validators.required, unique]
+        };
+
+        this.modalService.prompt(model).then(res => {
+            if(res === ModalResult.OK) {
+                dashboard.name = model.output;
+                // Update User settings
+                const callback = () => {
+                    // Update URL (store dashboard name in the queryParams) and navigate to the newly renamed dashboard
+                    this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
+                    this.searchService.navigate({skipSearch: true});
+                }
+                this.patchDashboards(true, undefined, callback);
+
+            }
+        });
     }
 
     public deleteDashboard(dashboard: Dashboard) {
@@ -722,12 +779,26 @@ export class DashboardService {
         }).then(value => {
             if(value === ModalResult.OK) {
                 const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
+                const callback = () => {
+                    // Open next/previous dashboard. If not existing, create new empty dashboard
+                    if (this.allDashboards[index]) {
+                        this.dashboard = Utils.copy(this.allDashboards[index]);
+                        delete this.searchService.queryStringParams.dashboard;
+                        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+                    } else if (this.allDashboards[index - 1]) {
+                        this.dashboard = Utils.copy(this.allDashboards[index - 1]);
+                        delete this.searchService.queryStringParams.dashboard;
+                        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+                    } else {
+                        this.newDashboard();
+                    }
+                }
 
                 // Delete the dashboard
                 if (this.isDashboardSaved(dashboard)) {
                     const i = this.dashboards.findIndex(d => d.name === dashboard.name);
                     this.dashboards.splice(i, 1);
-                    this.patchDashboards(false);
+                    this.patchDashboards(false, undefined, callback);
                     if(this.prefs.get("dashboard-default") === dashboard.name) {
                         this.prefs.delete("dashboard-default");
                     }
@@ -735,19 +806,7 @@ export class DashboardService {
                 else {
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards.splice(i, 1);
-                }
-
-                // Open next/previous dashboard. If not existing, create new empty dashboard
-                if (this.allDashboards[index]) {
-                    this.dashboard = Utils.copy(this.allDashboards[index]);
-                    delete this.searchService.queryStringParams.dashboard;
-                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
-                } else if (this.allDashboards[index - 1]) {
-                    this.dashboard = Utils.copy(this.allDashboards[index - 1]);
-                    delete this.searchService.queryStringParams.dashboard;
-                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
-                } else {
-                    this.newDashboard();
+                    callback();
                 }
             }
         });
@@ -856,15 +915,31 @@ export class DashboardService {
             if(res === ModalResult.OK) {
                 const db = Utils.copy(dashboard);
                 db.name = model.output;
-                // Update User settings
+
+                // Update the list of dashboards
                 this.dashboards.push(db);
-                this.patchDashboards();
-                // Delete the saved dashboard from the draftDashboards
+
+                // Store a copy of draft dashboards
+                const copyDraft = [...this.draftDashboards];
+
+                // Delete the saved dashboard from the draftDashboards at this point of time in order to avoid flickering on successful patch
                 const index = this.draftDashboards.findIndex(d => d.name === originalName);
                 this.draftDashboards.splice(index, 1);
-                // Update URL (store dashboard name in the queryParams)
-                this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
-                this.searchService.navigate({skipSearch: true});
+
+                const successCallback = () => {
+                    // Update URL (store dashboard name in the queryParams)
+                    this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
+                    this.searchService.navigate({skipSearch: true});
+                }
+
+                const errorCallback = () => {
+                    // If the patch fails, restore the list of draft dashboards
+                    this.draftDashboards = copyDraft;
+                }
+
+                // Update User settings
+                this.patchDashboards(true, undefined, successCallback, errorCallback);
+
             }
         });
 
@@ -874,15 +949,17 @@ export class DashboardService {
      * Updates the list of dashboards in the user settings
      * @param notify
      */
-    protected patchDashboards(notify = true, dashboards?: Dashboard[]) {
+    protected patchDashboards(notify = true, dashboards?: Dashboard[], successCallback = (): any => {}, errorCallback = (): any => {}) {
         this.userSettingsService.patch({dashboards: dashboards || this.dashboards})
             .subscribe(
                 next => {
+                    successCallback();
                     if(notify) {
                         this.notificationService.success("msg#dashboard.saveSuccess");
                     }
                 },
                 error => {
+                    errorCallback();
                     if(notify) {
                         this.notificationService.error("msg#dashboard.saveFailure");
                     }

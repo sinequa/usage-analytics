@@ -44,7 +44,7 @@ export class AuditComponent implements OnDestroy {
         public auditService: AuditService,
         public dashboardService: DashboardService,
         private ui: UIService,
-        private searchService: SearchService,
+        public searchService: SearchService,
         public loginService: LoginService,
         private appService: AppService,
         private exportService: ExportService,
@@ -71,7 +71,7 @@ export class AuditComponent implements OnDestroy {
                                             .pipe(skip(1))
                                             .subscribe(() => this.auditService.updateAuditFilters());
 
-                this.ready = true
+                this.ready = true;
             }
         )
 
@@ -81,7 +81,7 @@ export class AuditComponent implements OnDestroy {
 
                 // Hack to fake a CCQuery so the search service works even if no query is attached to the app. (SBA-320)
                 if(!this.appService.defaultCCQuery) {
-                    this.appService['_defaultCCQuery'] = {};
+                    this.appService['_defaultCCQuery'] = {name : ""};
                 }
 
                 // searchService.query is not yet defined from url, need to force its value
@@ -256,6 +256,11 @@ export class AuditComponent implements OnDestroy {
     saveDashboard(dashboard, $event): void {
         $event.stopPropagation();
         this.dashboardService.saveDashboard(dashboard);
+    }
+
+    renameDashboard(dashboard, $event): void {
+        $event.stopPropagation();
+        this.dashboardService.renameDashboard(dashboard);
     }
 
     shareDashboard(dashboard: Dashboard, $event): void {

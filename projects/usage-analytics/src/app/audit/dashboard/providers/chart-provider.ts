@@ -14,8 +14,8 @@ export interface ChartData {
 }
 
 export interface ChartWeightField {
-  name: string;
-  operatorResults?: boolean;
+    name: string;
+    operatorResults?: boolean;
 }
 
 @Injectable()
@@ -36,7 +36,7 @@ export class ChartProvider {
         }
         return {
             records: [] as Record[],
-            aggregations: [{name: config.aggregation, column: "", items: []}] as Aggregation[]
+            aggregations: [{name: config.aggregation, column: "", items: [] as AggregationItem[]}] as Aggregation[]
         } as  Results;
 
     }

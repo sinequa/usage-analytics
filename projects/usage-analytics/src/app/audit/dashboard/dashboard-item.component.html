@@ -14,18 +14,15 @@
                 *ngIf="config.chartType !== 'Grid'"
                 [data]="timeSeries"
                 [width]="innerwidth"
-                [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
+                [height]="innerheight"
                 [showTooltip]="true"
-                [curveType]="'curveLinear'"
-                (rangeChange)="updateAuditRange($event)"
+                [curveType]="'curveStep'"
+                [showLegend]="timeSeries?.length > 1"
+                [legendHeight]="50"
+                [legendYOffset]="8"
+                [legendStyles]="{'justify-content': 'center', 'overflow-y': 'auto', 'width': '98%'}"
                 (selectionChange)="updateAuditRange($event)">
             </sq-timeline>
-            <sq-timeline-legend
-                *ngIf="timeSeries?.length > 1 && config.chartType !== 'Grid'"
-                [data]="timeSeries"
-                [yOffset]="8"
-                [legendStyles]="{'justify-content': 'center'}">
-            </sq-timeline-legend>
             <ag-grid-angular
                 *ngIf="config.chartType === 'Grid'"
                 [ngClass]="'ag-theme-alpine'"
@@ -33,8 +30,7 @@
                 [rowData]="rowData"
                 [columnDefs]="columnDefs"
                 [defaultColDef]="defaultColDef"
-                (gridReady)="onGridReady($event)"
-            >
+                (gridReady)="onGridReady($event)">
             </ag-grid-angular>
         </section>
 

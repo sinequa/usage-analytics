@@ -1,8 +1,7 @@
 import {ElementRef, Injectable} from '@angular/core';
-import { Utils } from '@sinequa/core/base';
 import {IntlService} from '@sinequa/core/intl';
 import domtoimage from "dom-to-image";
-import { saveAs } from "file-saver";
+import format from "xml-formatter";
 
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
 import { Dashboard, DashboardItem, DashboardService } from './dashboard/dashboard.service';
@@ -72,7 +71,7 @@ export class ExportService {
 
         // lib used to create image from specific HTML element
         domtoimage.toBlob(element.nativeElement).then(blob => {
-            saveAs(blob,  `${filename}_${this.date}.png`);
+            this.saveAs(`${filename}_${this.date}.png`, "image/png", blob)
             // do not forget to remove our previous height to allow gridster to adjust automatically his height
             element.nativeElement.style = undefined;
           } );
@@ -126,7 +125,8 @@ export class ExportService {
     tables.push(...this.extractGrids(filename, items));
 
     // as csv files joined in a single array, split them in their own sheet
-    this.csvToXML(tables, filename);
+    const file = `${filename}_${this.date}.xml`;
+    this.saveAs(file, "text/xml;charset=utf-8", format(this.csvToXML(tables))) // Here format() is used to beautify the xml file
   }
 
   /**
@@ -152,7 +152,7 @@ export class ExportService {
 
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
-      data: [...(Utils.isArray(worksheet.tables[0]) ? worksheet.tables : this.objectToCsv(worksheet.tables).map(it => it.split(',')))],
+      data: [...(Array.isArray(worksheet.tables[0]) ? worksheet.tables : this.objectToCsv(worksheet.tables).map(it => it.split(',')))],
       name: worksheet.title.slice(0,30)
     }));
 
@@ -165,7 +165,7 @@ export class ExportService {
       lastModifiedBy: '',
       worksheets: worksheets
     }).then((content) => {
-      saveAs(content, file);
+      this.saveAs(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", content);
     });
 
   }
@@ -185,7 +185,7 @@ export class ExportService {
     const universalBOM = "\uFEFF"; // Byte Order Mark forcing Excel to use UTF-8 for CSV files
     const keys = Object.keys(rows[0]);
     const csvData = universalBOM +
-      (Utils.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
+      (Array.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
       rows.map(row => keys.map(k => {
           let cell = (row[k] === null || row[k] === undefined) ? '' : row[k];
           cell = cell instanceof Date
@@ -248,7 +248,7 @@ export class ExportService {
     this.saveAs(filename, 'text/json', jsonData);
   }
 
-  private saveAs(filename: string, fileType: string, data: string) {
+  private saveAs(filename: string, fileType: string, data: string | Blob) {
     const blob = new Blob([data], { type: fileType });
     if (navigator.msSaveBlob) { // IE 10+
       navigator.msSaveBlob(blob, filename);
@@ -422,8 +422,7 @@ export class ExportService {
    * @param tables contains data per worksheet
    * @param filename
    */
-  private csvToXML(tables: {title:string, tables:any[]}[], filename: string) {
-    const uri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
+  private csvToXML(tables: {title:string, tables:any[]}[]): string {
     const tmplWorkbookXML = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:excel"  xmlns:html="https://www.w3.org/TR/html401/">'
       + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>Sinequa R&amp;D</Author><Created>{created}</Created></DocumentProperties>'
       + '<Styles>'
@@ -433,7 +432,6 @@ export class ExportService {
       + '{worksheets}</Workbook>'
     const tmplWorksheetXML = '<Worksheet ss:Name="{nameWS}"><Table>{rows}</Table></Worksheet>'
     const tmplCellXML = '<Cell{attributeStyleID}{attributeFormula}><Data ss:Type="{nameType}">{data}</Data></Cell>'
-    const base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
     const format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
 
     let workbookXML = "";
@@ -442,7 +440,7 @@ export class ExportService {
 
     for(const [index, values] of tables.entries()) {
       if(values.tables){
-        const data = Utils.isArray(values.tables[0]) ? values.tables : this.objectToCsv(values.tables).map(it => it.split(','))
+        const data = Array.isArray(values.tables[0]) ? values.tables : this.objectToCsv(values.tables).map(it => it.split(','))
         for(const row of data) {
           rowsXML += '<Row>';
           for(const cell of row) {
@@ -468,15 +466,7 @@ export class ExportService {
     const ctx: XLWorkbookType = {created: (new Date()).getTime(), worksheets: worksheetsXML};
     workbookXML = format(tmplWorkbookXML, ctx);
 
-    // saveAs()
-    const link = document.createElement("a");
-    link.href = uri + base64(workbookXML);
-    link.download = `${filename}_${this.date}.xls` || 'Workbook.xls';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
+    return workbookXML;
   }
 
   private getWidgetKey(item: DashboardItem): string{

@@ -1,16 +1,20 @@
 import { Injectable } from "@angular/core";
 import { SearchService } from "@sinequa/components/search";
-import { AppService, Expr, ExprBuilder } from "@sinequa/core/app-utils";
+import { AppService } from "@sinequa/core/app-utils";
 import { JsonObject, MapOf, Utils } from "@sinequa/core/base";
 import {IntlService} from "@sinequa/core/intl";
 import {
+    BetweenFilter,
+    BooleanFilter,
     Dataset,
     DatasetWebService,
+    InFilter,
+    isFieldFilter,
     PrincipalWebService,
     Results,
 } from "@sinequa/core/web-services";
 import { from, Observable, of, ReplaySubject } from "rxjs";
-import { catchError, mergeMap } from "rxjs/operators";
+import { catchError, map, mergeMap } from "rxjs/operators";
 import moment from "moment-timezone";
 import { DashboardService } from "./dashboard/dashboard.service";
 import {
@@ -40,8 +44,8 @@ export enum RelativeTimeRanges {
 }
 
 export interface AuditDatasetFilters {
-    currentRange: string;
-    previousRange: string;
+    currentRangeFilter: BetweenFilter;
+    previousRangeFilter: BetweenFilter;
     previous: string;
     start: string;
     end: string;
@@ -78,10 +82,12 @@ export class AuditService {
     public infoPreviousFilter: string | undefined;
     public startDate: string | undefined;
 
+    // Calculate the diff between previous & start dates (in millisecond), used by Timeline component
+    public diffPreviousAndStart: number;
+
     constructor(
         public datasetWebService: DatasetWebService,
         public searchService: SearchService,
-        public exprBuilder: ExprBuilder,
         public appService: AppService,
         public principalService: PrincipalWebService,
         private intl: IntlService,
@@ -155,7 +161,7 @@ export class AuditService {
          *
          * This will ensure a timestamp filter always in the query (default config value OR customized value in the application customization json)
          */
-        if (!this.searchService.query.findSelect("audit_timestamp")) {
+        if (!(this.searchService.query.findFieldFilters("timestamp").length > 0)) {
             this.updateRangeFilter(this.defaultTimestampFilter?.length > 0 ? this.defaultTimestampFilter : RelativeTimeRanges.Last30Days);
         }
 
@@ -163,36 +169,42 @@ export class AuditService {
          * If the scope(s) of the analytics data needs to be pre-filtered by a default value(s),
          * then update the query accordingly
          */
-        if (!this.searchService.query.findSelect("SBA") && this.defaultAppFilter?.length > 0) {
-            this.updateRequestScope("app", this.defaultAppFilter, "SBA");
+        if (!(this.searchService.query.findFieldFilters("app").length > 0) && this.defaultAppFilter?.length > 0) {
+            this.updateRequestScope("app", this.defaultAppFilter);
         }
-        if (!this.searchService.query.findSelect("Profile") && this.defaultProfileFilter?.length > 0) {
-            this.updateRequestScope("profile", this.defaultProfileFilter, "Profile");
+        if (!(this.searchService.query.findFieldFilters("profile").length > 0) && this.defaultProfileFilter?.length > 0) {
+            this.updateRequestScope("profile", this.defaultProfileFilter);
         }
 
         /**
          * Trigger the update of breadcrumbs to allow widgets have the same behavior as for query web services
          */
-        this.searchService.updateBreadcrumbs({} as Results, {})
+        //this.searchService.updateBreadcrumbs({} as Results, {})
 
-        /** Extract audit filters from the query in the URL and build the whole audit WHERE clause*/
-        const exprs = this.searchService.query
-            .select!.filter((item) => item.facet !== "audit_timestamp")
-            .map((item) => item.expression);
+        /**
+         * Rebuild the query corresponding to current/previous period. Filters on that query will be used in the WHERE clause of datasets
+         */
         const timestamp = this.getAuditTimestampFromUrl();
-
         const parsedTimestamp = this.parseAuditTimestamp(timestamp!);
 
-        const currentFilters = this.exprBuilder.concatAndExpr([...exprs, parsedTimestamp.currentRange]);
-        const previousFilters = this.exprBuilder.concatAndExpr([...exprs, parsedTimestamp.previousRange]);
+        const query = this.searchService.query.copy();
+        query.removeFieldFilters("timestamp");
+
+        const currentQuery = query.copy();
+        currentQuery.addFilter(parsedTimestamp.currentRangeFilter);
+        const currentFilters = JSON.stringify(currentQuery.filters);
+
+        const previousQuery = query.copy();
+        previousQuery.addFilter(parsedTimestamp.previousRangeFilter);
+        const previousFilters = JSON.stringify(previousQuery.filters);
 
         // convert range filters to something more readable
         // used by stats component tooltip
         this.convertRangeFilter(timestamp!, parsedTimestamp);
 
         /** Update the scope of the dataset web service (app/profile), if filtering by applications is used */
-        const apps = this.getRequestScope("SBA");
-        const profiles = this.getRequestScope("Profile");
+        const apps = this.getRequestScope("app");
+        const profiles = this.getRequestScope("profile");
 
         /**
          *  Update the audit dashboard data (previous and current period)
@@ -249,33 +261,25 @@ export class AuditService {
     }
 
     public getAuditTimestampFromUrl(): string | string[] | undefined {
-        const expression = this.searchService.query.findSelect("audit_timestamp")?.expression;
-        if (expression) {
-            const expr = this.appService.parseExpr(expression);
-            if (expr instanceof Expr) {
-                return this.getTimestampValueFromExpr(expr);
-            }
+        const filter = this.searchService.query.findFieldFilters("timestamp")[0];
+        switch(filter?.operator) {
+            case 'between':
+                return [filter.start.toString(), filter.end.toString()];
+            case 'eq':
+                return filter.value.toString();
+            default:
+                return undefined;
         }
-        return undefined;
     }
 
     /**
      *
-     * @param facetName
+     * @param field
      * @returns filtered values of a given facet
      */
-    protected getRequestScope(facetName: string): string[] {
-        const expression = this.searchService.query.findSelect(facetName)?.expression;
-        if (expression) {
-            const expr = this.appService.parseExpr(expression);
-            if (expr instanceof Expr) {
-                if (expr.operands?.length > 0) {
-                    return expr.operands.map((op) => op.value!);
-                }
-                return expr.values!;
-            }
-        }
-        return [];
+    protected getRequestScope(field: string): string[] {
+        const filter = this.searchService.query.findFilter(f => isFieldFilter(f) && f.field === field && f.operator === "in") as InFilter;
+        return filter?.values || [];
     }
 
     /**
@@ -289,6 +293,9 @@ export class AuditService {
                 datasets.push(item.query);
                 if (item.relatedQuery) {
                     datasets.push(item.relatedQuery);
+                }
+                if (item.extraTimelineQueries) {
+                    datasets.push(...item.extraTimelineQueries);
                 }
             }
         );
@@ -325,11 +332,12 @@ export class AuditService {
                         .pipe(
                             mergeMap(
                                 (datasetName: string) => this.datasetWebService.get(this.webServiceName!, datasetName, params).pipe(
-                                    catchError(err => { // Catch 500 errors thrown when a query does not exist...
-                                        const error = {};
-                                        error[datasetName] = {errorCode: 500, errorMessage: "Could not find query "+datasetName};
-                                        return of(error);
-                                    })
+                                    map((res: Results) => {
+                                        this.searchService.initializeResults(this.searchService.query, res)
+                                        return {[datasetName]: res} as Dataset
+                                    }),
+                                    // Catch 500 errors thrown when a query does not exist or error parsing sql query ...
+                                    catchError((err) => of({[datasetName]: {errorCode: 500, errorMessage: "Could not find the query "+datasetName + " Or error occurs on executing it"}} as Dataset))
                                 )
                             )
                         );
@@ -340,29 +348,23 @@ export class AuditService {
     }
 
     public updateRangeFilter(timestamp: Date[] | string) {
-        let expr: string;
+        let filter: BooleanFilter | BetweenFilter;
         if (Utils.isString(timestamp)) {
-            expr = this.exprBuilder.makeExpr("timestamp", timestamp);
+            // BooleanFilter is used here in case of string pre-defined dateRange. It will be parsed to a BetweenFilter, by parseAuditTimestamp(), right before being sent to the server
+            filter = {field: "timestamp", value: timestamp, operator: "eq"} as BooleanFilter;
         } else {
-            expr = this.exprBuilder.makeListExpr(
-                "timestamp",
-                timestamp.map((e) => Utils.toSysDateStr(e))
-            );
+            filter = {field: "timestamp", start: Utils.toSysDateStr(timestamp[0]), end: Utils.toSysDateStr(timestamp[1]), operator: "between"} as BetweenFilter;
         }
-        this.searchService.query.removeSelect("audit_timestamp");
-        this.searchService.query.addSelect(expr, "audit_timestamp");
+        this.searchService.query.removeFieldFilters("timestamp");
+        this.searchService.query.addFilter(filter);
         this.searchService.search();
     }
 
-    public updateRequestScope(field: string, value: string[] | string, facetName: string) {
-        let expr: string;
-        if (Utils.isString(value)) {
-            expr = this.exprBuilder.makeExpr(field, value);
-        } else {
-            expr = this.exprBuilder.makeListExpr(field, value);
-        }
-        this.searchService.query.removeSelect(facetName);
-        this.searchService.query.addSelect(expr, facetName);
+    public updateRequestScope(field: string, value: string[] | string) {
+        value = Utils.asArray(value);
+        const filter: InFilter = {field: field, values: value, operator: "in"}
+        this.searchService.query.removeFieldFilters(field);
+        this.searchService.query.addFilter(filter);
         this.searchService.search();
     }
 
@@ -394,14 +396,6 @@ export class AuditService {
         this.infoPreviousFilter =  this.previousRange
                                     ? `${this.intl.formatMessage('msg#dateRange.from')}  ${this.intl.formatDate(this.previousRange[0], {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(this.previousRange[1], {day: "numeric", month: "short", year: "numeric"})}`
                                     : `${this.intl.formatMessage('msg#dateRange.from')} ${this.intl.formatDate(parsedTimestamp.localPrevious, {day: "numeric", month: "short", year: "numeric"})} ${this.intl.formatMessage('msg#dateRange.to')} ${this.intl.formatDate(parsedTimestamp.localStart, {day: "numeric", month: "short", year: "numeric"})}`;
-    }
-
-    private getTimestampValueFromExpr(expr: Expr): string | string[] {
-        if (Utils.isString(expr.value) && expr.value.indexOf("[") > -1) {
-            return JSON.parse(expr.value.replace(/`/g, '"'));
-        } else {
-            return expr.value!;
-        }
     }
 
     protected parseAuditTimestamp(timestamp: string | string[]): AuditDatasetFilters {
@@ -437,13 +431,15 @@ export class AuditService {
             // Calculating the number of years between the two dates
             const diffInYears = Math.round(diffInTime / oneYear);
 
-            if (diffInMonths <= 3) {
+            if (diffInDays <= 7) {
+                this.mask = "YYYY-MM-DD-hh";
+            } else if (diffInMonths <= 6) {
                 this.mask = "YYYY-MM-DD";
             } else {
-                if (diffInYears > 3) {
-                    this.mask = "YYYY";
-                } else {
+                if (diffInYears > 2) {
                     this.mask = "YYYY-MM";
+                } else {
+                    this.mask = "YYYY-WW";
                 }
             }
 
@@ -458,31 +454,31 @@ export class AuditService {
                 case RelativeTimeRanges.Last3H:
                     start = new Date(now.setHours(now.getHours() - 3));
                     previous = new Date(now.setHours(now.getHours() - 3));
-                    this.mask = "YYYY-MM-DD";
+                    this.mask = "YYYY-MM-DD-hh-mm";
                     this.sessionCountParam = 1;
                     break;
                 case RelativeTimeRanges.Last6H:
                     start = new Date(now.setHours(now.getHours() - 6));
                     previous = new Date(now.setHours(now.getHours() - 6));
-                    this.mask = "YYYY-MM-DD";
+                    this.mask = "YYYY-MM-DD-hh-mm";
                     this.sessionCountParam = 1;
                     break;
                 case RelativeTimeRanges.Last12H:
                     start = new Date(now.setHours(now.getHours() - 12));
                     previous = new Date(now.setHours(now.getHours() - 12));
-                    this.mask = "YYYY-MM-DD";
+                    this.mask = "YYYY-MM-DD-hh";
                     this.sessionCountParam = 1;
                     break;
                 case RelativeTimeRanges.Last24H:
                     start = new Date(now.setHours(now.getHours() - 24));
                     previous = new Date(now.setHours(now.getHours() - 24));
-                    this.mask = "YYYY-MM-DD";
+                    this.mask = "YYYY-MM-DD-hh";
                     this.sessionCountParam = (Math.round(this.sessionCountThreshold / 30) > 1) ? Math.round(this.sessionCountThreshold / 30) : 1;
                     break;
                 case RelativeTimeRanges.Last7Days:
                     start = new Date(now.setDate(now.getDate() - 7));
                     previous = new Date(now.setDate(now.getDate() - 7));
-                    this.mask = "YYYY-MM-DD";
+                    this.mask = "YYYY-MM-DD-hh";
                     this.sessionCountParam = (Math.round(this.sessionCountThreshold / 4) > 1) ? Math.round(this.sessionCountThreshold / 4) : 1;
                     break;
                 case RelativeTimeRanges.Last30Days:
@@ -500,25 +496,25 @@ export class AuditService {
                 case RelativeTimeRanges.Last6M:
                     start = new Date(now.setMonth(now.getMonth() - 6));
                     previous = new Date(now.setMonth(now.getMonth() - 6));
-                    this.mask = "YYYY-MM";
+                    this.mask = "YYYY-MM-DD";
                     this.sessionCountParam = this.sessionCountThreshold * 6;
                     break;
                 case RelativeTimeRanges.Last1Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 1));
                     previous = new Date(now.setFullYear(now.getFullYear() - 1));
-                    this.mask = "YYYY-MM";
+                    this.mask = "YYYY-WW";
                     this.sessionCountParam = this.sessionCountThreshold * 12;
                     break;
                 case RelativeTimeRanges.Last2Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 2));
                     previous = new Date(now.setFullYear(now.getFullYear() - 2));
-                    this.mask = "YYYY-MM";
+                    this.mask = "YYYY-WW";
                     this.sessionCountParam = this.sessionCountThreshold * 24;
                     break;
                 case RelativeTimeRanges.Last5Y:
                     start = new Date(now.setFullYear(now.getFullYear() - 5));
                     previous = new Date(now.setFullYear(now.getFullYear() - 5));
-                    this.mask = "YYYY";
+                    this.mask = "YYYY-MM";
                     this.sessionCountParam = this.sessionCountThreshold * 60;
                     break;
                 default:
@@ -529,6 +525,7 @@ export class AuditService {
                     break;
             }
         }
+
         // Override the previous date if the previous range is set
         previous = this.previousRange?.[0] || previous;
         const previousEnd = this.previousRange?.[1] || start;
@@ -539,9 +536,12 @@ export class AuditService {
         const previousToServerTimeZone = this.convertTimeZone(previous);
         const previousEndToServerTimeZone = this.convertTimeZone(previousEnd);
 
+        // Calculate the diff between previous & start dates (in millisecond)
+        this.diffPreviousAndStart = start.getTime() - previous.getTime();
+
         return {
-            currentRange: this.exprBuilder.makeRangeExpr("timestamp", startToServerTimeZone, endToServerTimeZone),
-            previousRange: this.exprBuilder.makeRangeExpr("timestamp", previousToServerTimeZone, previousEndToServerTimeZone),
+            currentRangeFilter: {field: "timestamp", start: Utils.toSqlValue(startToServerTimeZone), end: Utils.toSqlValue(endToServerTimeZone), operator: "between"} as BetweenFilter,
+            previousRangeFilter: {field: "timestamp", start: Utils.toSqlValue(previousToServerTimeZone), end: Utils.toSqlValue(previousEndToServerTimeZone), operator: "between"} as BetweenFilter,
             previous: Utils.toSqlValue(previousToServerTimeZone),
             start: Utils.toSqlValue(startToServerTimeZone),
             end: Utils.toSqlValue(endToServerTimeZone),

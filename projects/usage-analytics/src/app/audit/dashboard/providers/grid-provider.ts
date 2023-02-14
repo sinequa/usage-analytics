@@ -12,7 +12,7 @@ export interface GridColDef extends ColDef {
 }
 
 export const customComparator = (valueA, valueB) => {
-  return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+    return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
 };
 
 @Injectable()
@@ -86,7 +86,7 @@ export class GridProvider {
                 }
 
                 if (config.formatterType === 'text' || config.filterType === 'text') {
-                  colDef.comparator = customComparator;
+                    colDef.comparator = customComparator;
                 }
 
                 columnDefs.push(colDef);

@@ -20,13 +20,15 @@
 </div>
 
 <div class="d-flex flex-row align-items-center flex-wrap">
-    <sq-facet-mysearch
-        [results]="(auditService.data$ | async)"
-        [displayFieldNames]="false"
-        [useBadges]="true"
-        [excludedFacets]="['audit_timestamp']"
-    ></sq-facet-mysearch>
+    <sq-filters
+        [query]="searchService.query"
+        [filter]="searchService.query.filters"
+        [showField]="false"
+        [allowRemove]="true"
+        (filterEdit)="searchService.search()">
+    </sq-filters>
 </div>
+
 
 <!-- Dashboard tabs -->
 <ul class="nav nav-tabs" *ngIf="ready">
@@ -45,6 +47,9 @@
 
             <!-- Button to save tab modifications-->
             <button [sqIcon]="'fas fa-save'" [sqTooltip]="'msg#dashboard.saveTitle' | sqMessage" *ngIf="!dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ml-1" (click)="saveDashboard(dashboard, $event)"></button>
+
+             <!-- Button to rename tab modifications-->
+             <button [sqIcon]="'far fa-edit'" [sqTooltip]="'msg#dashboard.renameTitle' | sqMessage" *ngIf="dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ml-1" (click)="renameDashboard(dashboard, $event)"></button>
 
             <!-- Button to bookmark a tab -->
             <button [sqIcon]="'far fa-bookmark'" [sqTooltip]="'msg#dashboard.setDefaultTitle' | sqMessage" *ngIf="!dashboardService.isDefaultDashboard(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1" (click)="markAsDefaultDashboard(dashboard, $event)"></button>

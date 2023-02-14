@@ -19,6 +19,8 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "ag-grid-community/dist/styles/ag-grid.css";
 @import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 
+$secondary: #0d6efd;
+
 html {
     height: 100%;
 }
@@ -36,14 +38,6 @@ a {
 .monospace {
     font-family: monospace;
 }
-
-// Validation
-// sq-validation-message {
-//     @extend .invalid-feedback;
-//     .form-group > .is-invalid ~ & {
-//         display: block;
-//     }
-// }
 
 sq-feedback-menu {
   button.btn{
@@ -119,6 +113,16 @@ sq-facet-card:has(sq-audit-stat) {
 .dashboard-actions {
     button.btn.btn-link.dropdown-toggle::after {
         display: none !important;
+    }
+}
+
+sq-filters {
+    .sq-filter-operator {
+        color: $secondary;
+    }
+    .sq-filter-value {
+        font-weight: bold;
+        color: $secondary;
     }
 }
 

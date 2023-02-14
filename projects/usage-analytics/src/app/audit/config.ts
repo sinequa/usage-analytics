@@ -34,10 +34,10 @@ export const FACETS: FacetConfig<FacetListParams>[] = [
     {
         name: "SBA",
         title: "SBA",
+        aggregation: "sba",
         type: "list",
         icon: "fas fa-globe-americas",
         parameters: {
-            aggregation: "sba",
             showCount: true,
             searchable: false,
             allowExclude: true,
@@ -49,10 +49,10 @@ export const FACETS: FacetConfig<FacetListParams>[] = [
     {
         name: "Profile",
         title: "Profile",
+        aggregation: "profile",
         type: "list",
         icon: "fas fa-building",
         parameters: {
-            aggregation: "profile",
             showCount: true,
             searchable: false,
             allowExclude: true,
