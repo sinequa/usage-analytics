@@ -190,25 +190,25 @@ export class AuditComponent implements OnDestroy {
     }
 
     exportPNG() {
-        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard!.name);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToPNG(name, this.content);
     }
 
     exportCSV() {
         const items = this.dashboardItems.map(item => item);
-        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard!.name);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToCsv(name, items);
     }
 
     exportXLSX() {
         const items = this.dashboardItems.map(item => item);
-        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard!.name);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportXLSX(name, items);
     }
 
     exportXML() {
         const items = this.dashboardItems.map(item => item);
-        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard!.name);
+        const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToXML(name, items);
     }
 

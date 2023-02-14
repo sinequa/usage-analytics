@@ -67,12 +67,20 @@ export class TimelineProvider {
                     const aggregation = (data as Results).aggregations.find((aggr: Aggregation) => Utils.eqNC(aggr.name, aggregationsTimeSeries[0].name));
                     return aggregation?.items || [];
                 default:
+                    // init items list
                     const items: AggregationItem[] = [];
+                    // retrieve all aggregations defined in the config
                     const aggregations = aggregationsTimeSeries.map((config) => (data as Results).aggregations.find((aggr: Aggregation) => Utils.eqNC(aggr.name, config.name)));
+                    // get the whole list of dates existing in the retrieved aggregations' items
                     const dates = aggregations
                                         .flatMap((agg, index) => (agg?.items || []).map((el) => el[aggregationsTimeSeries[index].dateField || 'value']))
                                         .filter((val) => this._parseDate(val));
 
+                    /**
+                     * Re-set the list of aggregations taking into account that keys of each AggregationItem should be prefixed by the name the corresponding aggregation.
+                     * That is needed to match columns and rows using multiple MERGED aggregation
+                     * when typically, all aggregations have the same keys (value, count ...), so impossible to distinguish them without this approach
+                     */
                     Array.from(new Set(dates)).forEach(
                         (date) => {
                             let item = {value: date};
@@ -87,6 +95,7 @@ export class TimelineProvider {
                         }
                     );
 
+                    // return the new list of aggregations
                     return items.sort((a,b) => this._parseDate(a.value)!.getTime()- this._parseDate(b.value)!.getTime());
             }
         }

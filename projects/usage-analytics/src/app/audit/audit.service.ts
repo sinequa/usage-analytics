@@ -161,7 +161,7 @@ export class AuditService {
          *
          * This will ensure a timestamp filter always in the query (default config value OR customized value in the application customization json)
          */
-        if (!this.searchService.query.findFilter(f => isFieldFilter(f) && f.field === "timestamp")) {
+        if (!(this.searchService.query.findFieldFilters("timestamp").length > 0)) {
             this.updateRangeFilter(this.defaultTimestampFilter?.length > 0 ? this.defaultTimestampFilter : RelativeTimeRanges.Last30Days);
         }
 
@@ -169,10 +169,10 @@ export class AuditService {
          * If the scope(s) of the analytics data needs to be pre-filtered by a default value(s),
          * then update the query accordingly
          */
-        if (!this.searchService.query.findFilter(f => isFieldFilter(f) && f.field === "app") && this.defaultAppFilter?.length > 0) {
+        if (!(this.searchService.query.findFieldFilters("app").length > 0) && this.defaultAppFilter?.length > 0) {
             this.updateRequestScope("app", this.defaultAppFilter);
         }
-        if (!this.searchService.query.findFilter(f => isFieldFilter(f) && f.field === "profile") && this.defaultProfileFilter?.length > 0) {
+        if (!(this.searchService.query.findFieldFilters("profile").length > 0) && this.defaultProfileFilter?.length > 0) {
             this.updateRequestScope("profile", this.defaultProfileFilter);
         }
 
@@ -261,7 +261,7 @@ export class AuditService {
     }
 
     public getAuditTimestampFromUrl(): string | string[] | undefined {
-        const filter = this.searchService.query.findFilter(f => isFieldFilter(f) && f.field === "timestamp");
+        const filter = this.searchService.query.findFieldFilters("timestamp")[0];
         switch(filter?.operator) {
             case 'between':
                 return [filter.start.toString(), filter.end.toString()];
@@ -288,7 +288,7 @@ export class AuditService {
      */
     private updateDatasetsList(): string[] {
         const datasets: string[] = [];
-        this.dashboardService.dashboard!.items.forEach(
+        this.dashboardService.dashboard.items.forEach(
             (item) => {
                 datasets.push(item.query);
                 if (item.relatedQuery) {
@@ -350,6 +350,7 @@ export class AuditService {
     public updateRangeFilter(timestamp: Date[] | string) {
         let filter: BooleanFilter | BetweenFilter;
         if (Utils.isString(timestamp)) {
+            // BooleanFilter is used here in case of string pre-defined dateRange. It will be parsed to a BetweenFilter, by parseAuditTimestamp(), right before being sent to the server
             filter = {field: "timestamp", value: timestamp, operator: "eq"} as BooleanFilter;
         } else {
             filter = {field: "timestamp", start: Utils.toSysDateStr(timestamp[0]), end: Utils.toSysDateStr(timestamp[1]), operator: "between"} as BetweenFilter;
@@ -360,9 +361,7 @@ export class AuditService {
     }
 
     public updateRequestScope(field: string, value: string[] | string) {
-        if (Utils.isString(value)) {
-            value = [value];
-        }
+        value = Utils.asArray(value);
         const filter: InFilter = {field: field, values: value, operator: "in"}
         this.searchService.query.removeFieldFilters(field);
         this.searchService.query.addFilter(filter);

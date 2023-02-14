@@ -156,7 +156,7 @@ export class DashboardService {
     dashboards: Dashboard[] = [];
 
     /** Current active dashboard */
-    dashboard: Dashboard | undefined;
+    dashboard: Dashboard;
 
     /** Default dashboard (active by default or if the user re-initializes the dashboard) */
     defaultDashboard: Dashboard;
@@ -181,6 +181,8 @@ export class DashboardService {
 
     /** A subject informing when dashboards list are initialized properly and ready to use */
     dashboardsInit = new Subject<boolean>();
+
+    private forceReloadDefaultDashboard = false;
 
     constructor(
         public modalService: ModalService,
@@ -468,11 +470,12 @@ export class DashboardService {
             this.prefs.set("dashboard-default", this.defaultDashboard.name);
         }
         // If there is no dashboard explicitly opened currently, we open the default one if defined. If not open a new blank dashboard
-        if(!this.dashboard) {
+        if(!this.dashboard || this.forceReloadDefaultDashboard) {
             const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
             const _blank = this.createDashboard(name);
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
             this.dashboardChanged.next({type: 'LOAD_DEFAULT_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
+            this.forceReloadDefaultDashboard = false;
         }
     }
 
@@ -503,7 +506,7 @@ export class DashboardService {
      * @param item
      */
     public notifyItemChange(item: DashboardItem, event: changeType, notify = false) {
-        this.dashboardChanged.next({type: event, dashboard: this.dashboard!, updateDatasets: notify, item});
+        this.dashboardChanged.next({type: event, dashboard: this.dashboard, updateDatasets: notify, item});
     }
 
     /**
@@ -526,7 +529,7 @@ export class DashboardService {
      */
     public addWidget(
             option: DashboardItemOption,
-            dashboard: Dashboard = this.dashboard!,
+            dashboard: Dashboard = this.dashboard,
             notify = true,
             rows = (option.type === "stat" ? 2 : 4),
             cols = (option.type === "stat" ? 1 : 3),
@@ -562,7 +565,7 @@ export class DashboardService {
      * @param item
      */
     public removeItem(item: DashboardItem) {
-        this.dashboard!.items.splice(this.dashboard!.items.indexOf(item), 1);
+        this.dashboard!.items.splice(this.dashboard.items.indexOf(item), 1);
         this.notifyItemChange(item, 'REMOVE_WIDGET');
     }
 
@@ -708,7 +711,7 @@ export class DashboardService {
                     this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
                     this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
                     this.searchService.navigate({skipSearch: true}).then(() => { // Trigger the local refreshing of the UI
-                        this.dashboard = undefined; // Needed to force redraw the displayed dashboard based on new overriding dashboards
+                        this.forceReloadDefaultDashboard = true; // Needed to force redraw the displayed dashboard based on new overriding dashboards
                         this.dashboardsInit.next(true);
                     });
                 }
