@@ -59,7 +59,7 @@ export interface AuditDatasetFilters {
 })
 export class AuditService {
 
-    private readonly defaultDatasets:  string[] = ["applications"];
+    protected readonly defaultDatasets:  string[] = ["applications"];
 
     public data$ = new ReplaySubject<Dataset>(1);
     public previousPeriodData$ = new ReplaySubject<Dataset>(1);
@@ -286,7 +286,7 @@ export class AuditService {
      *
      * @returns list of queries used by the current displayed dashboard
      */
-    private updateDatasetsList(): string[] {
+    protected updateDatasetsList(): string[] {
         const datasets: string[] = [];
         this.dashboardService.dashboard.items.forEach(
             (item) => {
