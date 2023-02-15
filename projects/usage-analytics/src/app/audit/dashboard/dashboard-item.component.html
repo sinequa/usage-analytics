@@ -7,9 +7,9 @@
     [buttonsStyle]="buttonsStyle"
     [ngSwitch]="config.type">
 
-    <section *ngIf="!loading && !errorMessage" class="h-100">
+    <ng-container *ngIf="!loading && !errorMessage">
         <!-- Timeline view-->
-        <section *ngSwitchCase="'timeline'">
+        <ng-container *ngSwitchCase="'timeline'">
             <sq-timeline
                 *ngIf="config.chartType !== 'Grid'"
                 [data]="timeSeries"
@@ -32,7 +32,7 @@
                 [defaultColDef]="defaultColDef"
                 (gridReady)="onGridReady($event)">
             </ag-grid-angular>
-        </section>
+        </ng-container>
 
         <!-- Statistic view -->
         <sq-audit-stat *ngSwitchCase="'stat'"
@@ -42,7 +42,7 @@
         </sq-audit-stat>
 
         <!-- Chart view -->
-        <div *ngSwitchCase="'chart'">
+        <ng-container *ngSwitchCase="'chart'">
             <sq-fusion-chart
                 #facet
                 *ngIf="config.chartType !== 'grid'"
@@ -66,7 +66,7 @@
                 [defaultColDef]="defaultColDef"
                 (gridReady)="onGridReady($event)">
             </ag-grid-angular>
-        </div>
+        </ng-container>
 
         <!-- Grid view -->
         <ag-grid-angular
@@ -81,7 +81,7 @@
         >
         </ag-grid-angular>
 
-    </section>
+    </ng-container>
 
     <div class="sq-loading" *ngIf="loading">
       <div class="spinner-grow text-primary" role="status">
