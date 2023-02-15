@@ -45,7 +45,7 @@
         <div *ngSwitchCase="'chart'">
             <sq-fusion-chart
                 #facet
-                [hidden]="config.chartType === 'grid'"
+                *ngIf="config.chartType !== 'grid'"
                 [results]="chartResults"
                 [chart]="chart"
                 [width]="innerwidth"
@@ -64,8 +64,7 @@
                 [rowData]="rowData"
                 [columnDefs]="columnDefs"
                 [defaultColDef]="defaultColDef"
-                (gridReady)="onGridReady($event)"
-            >
+                (gridReady)="onGridReady($event)">
             </ag-grid-angular>
         </div>
 
