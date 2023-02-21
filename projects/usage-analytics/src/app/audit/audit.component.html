@@ -2,8 +2,6 @@
     <sq-audit-range-picker></sq-audit-range-picker>
     <sq-facet-card
         *ngIf="(auditService.data$ | async)?.applications"
-        [title]="'Applications'"
-        [icon]="'fas fa-desktop'"
         [collapsible]="true"
         [startCollapsed]="true"
         [buttonsStyle]="isDark()? 'dark' : 'light'"
@@ -14,7 +12,9 @@
             #facet
             class="card position-absolute overflow-hidden"
             [results]="(auditService.data$ | async)?.applications"
-            [facets]="facets">
+            [facets]="facets"
+            [title]="'Applications'"
+            [icon]="'fas fa-desktop'">
         </sq-facet-multi>
     </sq-facet-card>
 </div>
