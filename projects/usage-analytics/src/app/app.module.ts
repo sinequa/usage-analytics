@@ -32,7 +32,6 @@ import { FiltersModule } from "@sinequa/components/filters";
 
 // @sinequa/analytics library
 import { BsTimelineModule } from "@sinequa/analytics/timeline";
-import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
 import { FusionChartsModule } from '@sinequa/analytics/fusioncharts'
 
 import * as FusionCharts from "fusioncharts";
@@ -134,7 +133,6 @@ const selectionOptions: SelectionOptions = {
         BsActionModule,
         GridsterModule,
         BsTimelineModule,
-        BsHeatmapModule,
         AgGridModule,
         FiltersModule
     ],
