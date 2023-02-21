@@ -45,14 +45,24 @@
         <ng-container *ngSwitchCase="'chart'">
             <sq-fusion-chart
                 #facet
-                *ngIf="config.chartType !== 'grid'"
+                [hidden]="config.chartType === 'grid'"
                 [results]="chartResults"
                 [chart]="chart"
                 [width]="innerwidth"
                 [height]="innerheight"
                 [aggregation]="config?.chartData?.aggregation"
                 [type]="config.chartType || 'Column2D'"
-                [types]="[{type: 'Column2D', display: 'Columns 2D'}, {type: 'Bar2D', display: 'Bars 2D'}, {type: 'Pie2D', display: 'Pie 2D'}, {type: 'doughnut2d', display: 'Doughnut 2D'}, {type: 'Column3D', display: 'Columns 3D'}, {type: 'Bar3D', display: 'Bars 3D'}, {type: 'Pie3D', display: 'Pie 3D'}, {type: 'doughnut3d', display: 'Doughnut 3D'}, {type: 'grid', display: 'Grid'}]"
+                [types]="[
+                    {type: 'Column2D', display: 'Columns 2D'},
+                    {type: 'Bar2D', display: 'Bars 2D'},
+                    {type: 'Pie2D', display: 'Pie 2D'},
+                    {type: 'doughnut2d', display: 'Doughnut 2D'},
+                    {type: 'Column3D', display: 'Columns 3D'},
+                    {type: 'Bar3D', display: 'Bars 3D'},
+                    {type: 'Pie3D', display: 'Pie 3D'},
+                    {type: 'doughnut3d', display: 'Doughnut 3D'},
+                    {type: 'grid', display: 'Grid'}
+                ]"
                 [autohide]="false"
                 (initialized)="onChartInitialized($event)"
                 (typeChange)="onChartTypeChange($event)">

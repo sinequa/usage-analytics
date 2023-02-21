@@ -111,7 +111,8 @@ export class DashboardItemComponent implements OnChanges {
         public auditService: AuditService,
         public timelineProvider: TimelineProvider,
         public chartProvider: ChartProvider,
-        public gridProvider: GridProvider) {
+        public gridProvider: GridProvider
+        ) {
 
         this.closeAction = new Action({
             icon: "fas fa-times",
@@ -458,12 +459,7 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     onChartTypeChange(type: string) {
-        if(type === 'grid') {
-            this.config.icon = "fas fa-th-list";
-        }
-        else {
-            this.config.icon = "fas fa-chart-pie";
-        }
+        this.config.icon = type === 'grid' ? "fas fa-th-list" : "fas fa-chart-pie";
         this.config.chartType = type;
         this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
     }
