@@ -15,6 +15,8 @@ import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
 import { ImportService } from "./import.service";
 import { ConfirmType, ModalButton, ModalResult, ModalService } from "@sinequa/core/modal";
+import { CCColumn, CCQuery, EngineType } from "@sinequa/core/web-services";
+import { MapOf } from "@sinequa/core/base";
 
 @Component({
     selector: "sq-audit",
@@ -80,8 +82,13 @@ export class AuditComponent implements OnDestroy {
             if (event.type === "login-complete" || event.type === "session-start") {
 
                 // Hack to fake a CCQuery so the search service works even if no query is attached to the app. (SBA-320)
+                // Hack the column config, so that date column will be well-formatted
+                // The _defaultCCQuery.name must be the same as the key used in MapOf<MapOf<CCColumn>> of columnsByQuery
                 if(!this.appService.defaultCCQuery) {
-                    this.appService['_defaultCCQuery'] = {name : ""};
+                    this.appService['_defaultCCQuery'] = {name : ""} as CCQuery;
+                    this.appService['columnsByQuery'] = {"" : {
+                        "timestamp": {eType: EngineType.dateTime} as CCColumn
+                    } as MapOf<CCColumn>} as MapOf<MapOf<CCColumn>>;
                 }
 
                 // searchService.query is not yet defined from url, need to force its value
