@@ -6,6 +6,7 @@ import {IntlService} from "@sinequa/core/intl";
 import {
     BetweenFilter,
     BooleanFilter,
+    CCWebService,
     Dataset,
     DatasetWebService,
     InFilter,
@@ -59,7 +60,7 @@ export interface AuditDatasetFilters {
 })
 export class AuditService {
 
-    protected readonly defaultDatasets: {webService: string | undefined, query: string}[] = [{webService: this.webServiceName, query: "applications"}];
+    protected readonly defaultDatasets: string[] = ["applications"];
 
     public data$ = new ReplaySubject<Dataset>(1);
     public previousPeriodData$ = new ReplaySubject<Dataset>(1);
@@ -101,19 +102,12 @@ export class AuditService {
     }
 
     /**
-     * This methods retrieves the first webService of type "DataSet", defined at the application configuration level.
-     * It will be used, by default, to resolve the queries of the widgets
-     * It can be overrided by the attribute "webService" of the widget configuration.
+     * This methods retrieves all the web services of type "DataSet" configured within the application.
      */
-    get webServiceName(): string | undefined {
-        if(this.appService.app && this.appService.app.webServices){
-            for (const webService of Object.keys(this.appService.app.webServices)) {
-                if (this.appService.getWebService(webService)?.webServiceType === 'DataSet') {
-                    return webService;
-                }
-            }
-        }
-        return undefined;
+    get ccDataSetWebServices(): CCWebService[] {
+        return Object.keys(this.appService?.app?.webServices || {})
+                    .map((webService: string) => this.appService.getWebService(webService))
+                    .filter((ccWebService: CCWebService | undefined) => ccWebService && (ccWebService.webServiceType === 'DataSet')) as CCWebService[];
     }
 
     get params(): JsonObject {
@@ -292,16 +286,16 @@ export class AuditService {
      *
      * @returns list of {webService, query} used by widgets in the current displayed dashboard
      */
-    protected updateDatasetsList(): {webService: string | undefined, query: string}[] {
-        const datasets: {webService: string | undefined, query: string}[] = [];
+    protected updateDatasetsList(): string[] {
+        const datasets: string[] = [];
         this.dashboardService.dashboard.items.forEach(
             (item) => {
-                datasets.push({webService: item.webService || this.webServiceName, query: item.query});
+                datasets.push(item.query);
                 if (item.relatedQuery) {
-                    datasets.push({webService: item.webService || this.webServiceName, query: item.relatedQuery});
+                    datasets.push(item.relatedQuery);
                 }
                 if (item.extraTimelineQueries) {
-                    datasets.push(...item.extraTimelineQueries.map((el) => ({webService: item.webService || this.webServiceName, query: el})));
+                    datasets.push(...item.extraTimelineQueries);
                 }
             }
         );
@@ -330,34 +324,40 @@ export class AuditService {
                 params = {...params, ...this.customParams}
             }
 
-            if (this.webServiceName) { // Make sure there is,at least, a default webService to use
+            if (this.ccDataSetWebServices.length > 0) { // Make sure there is,at least, a default webService to use
                 this.currentAuditDataLoading = true;
                 this.previousAuditDataLoading = true;
-                const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => (datasetName.query !== "totalUsers" && !excludedDataset.includes(datasetName.query))); // Exclude manual added datasets Or datasets pre-requiring extra input (a config param, an app filter ...)
+                // Exclude manual added datasets Or datasets pre-requiring extra input (a config param, an app filter ...)
+                const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => (datasetName !== "totalUsers" && !excludedDataset.includes(datasetName)));
 
-                // Get unique objects from datasets array, based on the couple webService/query
-                const uniqueDatasets = Array.from(
-                                                new Set(
-                                                    datasets.map((obj: {webService: string | undefined, query: string}) => JSON.stringify(obj))
-                                                )
-                                            ).map((val: string) => JSON.parse(val)) as {webService: string | undefined, query: string}[];
-
-                // Execute datasets pointing to different web services potentially
-                return from(uniqueDatasets)
+                /**
+                 * Execute unique datasets pointing to different web services potentially
+                 * Each query will be resolved using the last dataset in the ccDataSetWebServices list containing it
+                 * Thus, we assume that always a dataset is overriding the previous dataset
+                 */
+                return from(Array.from(new Set(datasets)))
                         .pipe(
                             mergeMap(
-                                ({webService, query}) => this.datasetWebService.get(webService!, query, params).pipe(
-                                    map((res: Results) => {
-                                        this.searchService.initializeResults(this.searchService.query, res)
-                                        return {[query]: res} as Dataset
-                                    }),
-                                    // Catch 500 errors thrown when a query does not exist or error parsing sql query ...
-                                    catchError((err) => of({[query]: {errorCode: 500, errorMessage: "Could not find the query '"+query+ "' in the web service '"+webService+ "' Or error occurs on executing it"}} as Dataset))
-                                )
+                                (query: string) => {
+                                    const webService = this.ccDataSetWebServices.reverse().find((config) => (<Array<any>>config["sQL"]).map((el) => el.name.toLowerCase()).includes(query.toLowerCase()));
+                                    if (webService) {
+                                        return this.datasetWebService.get(webService.name, query, params).pipe(
+                                            map((res: Results) => {
+                                                this.searchService.initializeResults(this.searchService.query, res)
+                                                return {[query]: res} as Dataset
+                                            }),
+                                            // Catch 500 errors thrown when a query does not exist or error parsing sql query ...
+                                            catchError((err) => of({[query]: {errorCode: 500, errorMessage: "An error occurs when executing the query '"+query+ "' "}} as Dataset))
+                                        )
+                                    } else {
+                                        return of({[query]: {errorCode: 500, errorMessage: "Could not find the query '"+query+ "' "}} as Dataset)
+                                    }
+
+                                }
                             )
                         );
             } else {
-                console.error("No DataSet found")
+                console.error("No DataSet web service found")
                 return of({} as Dataset)
             }
     }
