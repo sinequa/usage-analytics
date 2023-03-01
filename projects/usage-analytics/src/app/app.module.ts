@@ -21,7 +21,7 @@ import { AuditInterceptor } from "@sinequa/core/app-utils";
 import { BsSearchModule, SearchOptions, SEARCH_OPTIONS } from "@sinequa/components/search";
 import { BsNotificationModule } from '@sinequa/components/notification';
 import { UtilsModule } from '@sinequa/components/utils';
-import { BsUserSettingsModule } from "@sinequa/components/user-settings";
+import { APP_HELP_FOLDER_OPTIONS, BsUserSettingsModule } from "@sinequa/components/user-settings";
 import { BsFeedbackModule } from "@sinequa/components/feedback";
 import { BsFacetModule } from "@sinequa/components/facet";
 import { BsAdvancedModule } from "@sinequa/components/advanced";
@@ -55,6 +55,7 @@ import { environment } from "../environments/environment";
 // Locales
 import {LocalesConfig, Locale} from "@sinequa/core/intl";
 import enLocale from "../locales/en";
+import { HELP_DEFAULT_FOLDER_OPTIONS } from "./audit/config";
 // import frLocale from "../locales/fr";
 // import deLocale from "../locales/de";
 
@@ -170,7 +171,11 @@ const selectionOptions: SelectionOptions = {
         {provide: HTTP_INTERCEPTORS, useClass: NotificationsInterceptor, multi: true},
 
         {provide: SEARCH_OPTIONS, useValue: searchOptions},
-        {provide: SELECTION_OPTIONS, useValue: selectionOptions}
+        {provide: SELECTION_OPTIONS, useValue: selectionOptions},
+
+        // Provides default help's folder options
+        // This options can be overridden by the custom json configuration from the administration panel, using the property "help-folder-options"
+        { provide: APP_HELP_FOLDER_OPTIONS, useValue: HELP_DEFAULT_FOLDER_OPTIONS }
     ],
     bootstrap: [
         AppComponent
