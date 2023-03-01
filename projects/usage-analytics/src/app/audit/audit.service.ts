@@ -105,9 +105,8 @@ export class AuditService {
      * This methods retrieves all the web services of type "DataSet" configured within the application.
      */
     get ccDataSetWebServices(): CCWebService[] {
-        return Object.keys(this.appService?.app?.webServices || {})
-                    .map((webService: string) => this.appService.getWebService(webService))
-                    .filter((ccWebService: CCWebService | undefined) => ccWebService && (ccWebService.webServiceType === 'DataSet')) as CCWebService[];
+        return Object.values(this.appService?.app?.webServices || {})
+                    .filter(ws => ws.webServiceType === "DataSet") as CCWebService[];
     }
 
     get params(): JsonObject {
@@ -339,7 +338,7 @@ export class AuditService {
                         .pipe(
                             mergeMap(
                                 (query: string) => {
-                                    const webService = this.ccDataSetWebServices.reverse().find((config) => (<Array<any>>config["sQL"]).map((el) => el.name.toLowerCase()).includes(query.toLowerCase()));
+                                    const webService = this.ccDataSetWebServices.reverse().find((config) => (<{name: string}[]>config["sQL"]).find(el => Utils.eqNC(el.name, query)));
                                     if (webService) {
                                         return this.datasetWebService.get(webService.name, query, params).pipe(
                                             map((res: Results) => {
