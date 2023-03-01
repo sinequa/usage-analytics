@@ -230,9 +230,6 @@ export class DashboardItemComponent implements OnChanges {
         if (this.maximizable) {
             this.actions = [this.maximizeAction, ...this.actions]
         }
-        if (this.config.type === "chart" || this.config.type === "timeline") {
-            this.resizeGrid();
-        }
         if (this.tooltipInfo) {
             this.infoAction = new Action({
                 icon: "fas fa-info",
