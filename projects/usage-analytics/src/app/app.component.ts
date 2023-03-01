@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { AppService } from "@sinequa/core/app-utils";
-import { Utils } from "@sinequa/core/base";
 import { ComponentWithLogin } from "@sinequa/core/login";
 import { enableUserFeedbackMenu } from "./audit/config";
 
@@ -15,6 +14,6 @@ export class AppComponent extends ComponentWithLogin {
     }
 
     get enableUserFeedbackMenu(): boolean {
-        return (Utils.isUndefined(this.appService.app?.data?.enableUserFeedbackMenu) ? enableUserFeedbackMenu : this.appService.app?.data?.enableUserFeedbackMenu) as boolean ;
+        return (this.appService.app?.data?.enableUserFeedbackMenu ?? enableUserFeedbackMenu) as boolean;
     }
 }
