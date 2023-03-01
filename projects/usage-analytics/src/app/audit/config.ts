@@ -27,7 +27,10 @@ export const default_app_filter: string | string[] = "";
 export const default_profile_filter: string | string[] = "";
 
 /** Queries requiring filtering by a unique application to display correct data */
-export const mono_scope_queries: string[] = ["newUsersTimeLine", "newUsers"];
+export const mono_scope_queries: string[] = [];
+
+/** Show/Hide the user-feedback menu */
+export const enableUserFeedbackMenu: boolean = true;
 
 /** Filters */
 export const FACETS: FacetConfig<FacetListParams>[] = [
