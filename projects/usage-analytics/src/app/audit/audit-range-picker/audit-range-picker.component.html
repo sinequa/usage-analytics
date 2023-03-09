@@ -1,7 +1,7 @@
 <!-- Header with dropdown button-->
-<div (click)="$event.stopPropagation()" class="d-flex align-items-center justify-content-between dateRange pl-3 pr-2 py-1" [sqTooltip]="'msg#dateRange.dateRangeTooltip' | sqMessage:{currentDate: auditService.infoCurrentFilter, trendRange: auditService.infoPreviousFilter}">
+<div (click)="$event.stopPropagation()" class="d-flex align-items-center justify-content-between dateRange ps-3 pe-2 py-1" [sqTooltip]="'msg#dateRange.dateRangeTooltip' | sqMessage:{currentDate: auditService.infoCurrentFilter, trendRange: auditService.infoPreviousFilter}">
     <span>
-        <i class="far fa-clock mr-2"></i>
+        <i class="far fa-clock me-2"></i>
         Period
     </span>
     <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage" placement="top">
@@ -18,7 +18,7 @@
                 <button
                     *ngFor="let item of relativeTimeRanges"
                     type="button"
-                    class="btn btn-outline-secondary btn-sm mr-1 mb-1"
+                    class="btn btn-outline-secondary btn-sm me-1 mb-1"
                     [ngClass]="{active: item === auditService.currentFilter}"
                     (click)="setAuditRange(item)">
                     {{item | sqMessage}}

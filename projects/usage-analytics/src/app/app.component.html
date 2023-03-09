@@ -4,13 +4,13 @@
         <div class="d-flex">
             <span class="d-flex text-muted brand">
                 <img width="45px" height="45px" src="assets/sinequa-logo-light-sm.png">
-                <h1 class="ml-2">Usage Analytics</h1>
+                <h1 class="ms-2">Usage Analytics</h1>
             </span>
         </div>
 
         <ul class="navbar-nav navbar-right align-items-baseline">
             <sq-user-menu [enableDarkMode]="false"></sq-user-menu>
-            <sq-feedback-menu [style]="'primary'" [rightAligned]="true" class="ml-1" *ngIf="loginService.complete && enableUserFeedbackMenu"></sq-feedback-menu>
+            <sq-feedback-menu [style]="'primary'" [rightAligned]="true" class="ms-1" *ngIf="loginService.complete && enableUserFeedbackMenu"></sq-feedback-menu>
         </ul>
 
     </div>

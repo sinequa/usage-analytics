@@ -46,10 +46,10 @@
             <span *ngIf="!dashboardService.isDashboardSaved(dashboard)">*</span>
 
             <!-- Button to save tab modifications-->
-            <button [sqIcon]="'fas fa-save'" [sqTooltip]="'msg#dashboard.saveTitle' | sqMessage" *ngIf="!dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ml-1" (click)="saveDashboard(dashboard, $event)"></button>
+            <button [sqIcon]="'fas fa-save'" [sqTooltip]="'msg#dashboard.saveTitle' | sqMessage" *ngIf="!dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ms-1" (click)="saveDashboard(dashboard, $event)"></button>
 
              <!-- Button to rename tab modifications-->
-             <button [sqIcon]="'far fa-edit'" [sqTooltip]="'msg#dashboard.renameTitle' | sqMessage" *ngIf="dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ml-1" (click)="renameDashboard(dashboard, $event)"></button>
+             <button [sqIcon]="'far fa-edit'" [sqTooltip]="'msg#dashboard.renameTitle' | sqMessage" *ngIf="dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ms-1" (click)="renameDashboard(dashboard, $event)"></button>
 
             <!-- Button to bookmark a tab -->
             <button [sqIcon]="'far fa-bookmark'" [sqTooltip]="'msg#dashboard.setDefaultTitle' | sqMessage" *ngIf="!dashboardService.isDefaultDashboard(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1" (click)="markAsDefaultDashboard(dashboard, $event)"></button>
@@ -63,15 +63,15 @@
     </li>
     <!-- Button to create a tab -->
     <li class="nav-item align-self-center">
-        <button [sqIcon]="'fas fa-plus-circle'" [sqTooltip]="'msg#dashboard.newTitle' | sqMessage" class="btn btn-link btn-xs py-0 ml-1" (click)="newDashboard()"></button>
+        <button [sqIcon]="'fas fa-plus-circle'" [sqTooltip]="'msg#dashboard.newTitle' | sqMessage" class="btn btn-link btn-xs py-0 ms-1" (click)="newDashboard()"></button>
     </li>
     <div class="btn-group dashboard-actions" [sq-action-buttons]="{items: dashboardActions, style: 'link', rightAligned: true}"></div>
 
     <!-- export actions -->
-    <div class="ml-auto">
+    <div class="ms-auto">
         <sq-action-buttons [sq-action-buttons]="{items: [exportAction], style:'outline-primary', rightAligned: true}"></sq-action-buttons>
-        <sq-widget-palette class="ml-2" *ngIf="loginService.complete"></sq-widget-palette>
-        <button type="button" class="btn btn-outline-primary reset-btn ml-2" (click)="resetDashboards()" [sqTooltip]="'Reset dashboards to default'">
+        <sq-widget-palette class="ms-2" *ngIf="loginService.complete"></sq-widget-palette>
+        <button type="button" class="btn btn-outline-primary reset-btn ms-2" (click)="resetDashboards()" [sqTooltip]="'Reset dashboards to default'">
             <i class="fas fa-undo-alt"></i>
         </button>
     </div>
