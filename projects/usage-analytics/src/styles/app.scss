@@ -1,38 +1,14 @@
-@import "@angular/cdk/overlay-prebuilt";
+$secondary: #0d6efd;
 
-// Bootstrap styles
-@import "bootstrap/scss/bootstrap";
-@import "_spacing.scss"; // import spacing Bootstrap v4 compatibility utilities
-
-/*** Fontawesome ***/
-$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
-@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
-@import "node_modules/@fortawesome/fontawesome-free/scss/brands";
-@import "node_modules/@fortawesome/fontawesome-free/scss/regular";
-@import "node_modules/@fortawesome/fontawesome-free/scss/solid";
-
-@import "@sinequa/components/action/bootstrap/action";
-@import "@sinequa/components/notification/bootstrap/notification";
-
+// @import "@sinequa/components/theme/minimal";
+@import "@sinequa/components/theme/sinequa";
 
 @import "ngx-bootstrap/datepicker/bs-datepicker.css";
 @import "ag-grid-community/dist/styles/ag-grid.css";
 @import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 
-$secondary: #0d6efd;
-
-html {
-    height: 100%;
-}
-
 body {
-    height: 100%;
     font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-}
-
-a {
-    text-decoration: none;
-    color: #3434d6;
 }
 
 .monospace {
@@ -62,15 +38,6 @@ ag-grid-angular {
 
 sq-facet-card:has(sq-audit-stat) {
   display: unset !important;
-}
-
-// Flex basis classes
-.flex-basis-0 {
-  flex-basis: 0;
-}
-
-.flex-basis-auto {
-  flex-basis: auto;
 }
 
 // Scroll bars

@@ -9,7 +9,7 @@
                 <span *ngSwitchCase="'decrease'" [ngClass]="{'green': trendEvaluation === 'ok', 'red': trendEvaluation === 'ko'}">&darr;</span>
                 <span *ngSwitchCase="'stable'" class="stable">&harr;</span>
             </span>
-            <span *ngIf="percentageChange" class="ml-1 stat-percentage"
+            <span *ngIf="percentageChange" class="ms-1 stat-percentage"
                 [ngClass]="{'green': trendEvaluation === 'ok', 'red': trendEvaluation === 'ko', 'stable': trendEvaluation === 'stable'}">
                 {{percentageChange | sqNumber: ({style: 'percent', maximumFractionDigits: 1})}}
             </span>
