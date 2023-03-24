@@ -16,8 +16,9 @@ import {deUserSettings} from "@sinequa/components/user-settings";
 import { deModal } from "@sinequa/core/modal";
 import { deTimeline } from "@sinequa/analytics/timeline";
 import { deFilters } from "@sinequa/components/filters";
+import { deHeatmap } from "@sinequa/analytics/heatmap";
 
-const messages = Utils.merge({}, deCore, deUtils, deNotification, deUserSettings, deFeedback, deFacet, deModal, deAdvanced, deTimeline, deFilters, appMessages);
+const messages = Utils.merge({}, deCore, deUtils, deNotification, deUserSettings, deFeedback, deFacet, deModal, deAdvanced, deTimeline, deFilters, deHeatmap, appMessages);
 
 export default <LocaleData>{
     intl: {
