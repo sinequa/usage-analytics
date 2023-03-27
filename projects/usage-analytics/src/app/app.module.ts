@@ -29,6 +29,7 @@ import { BsModalModule } from "@sinequa/components/modal";
 import { BsActionModule } from "@sinequa/components/action";
 import {SelectionOptions, SELECTION_OPTIONS} from "@sinequa/components/selection";
 import { FiltersModule } from "@sinequa/components/filters";
+import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
 
 // @sinequa/analytics library
 import { BsTimelineModule } from "@sinequa/analytics/timeline";
@@ -135,7 +136,8 @@ const selectionOptions: SelectionOptions = {
         GridsterModule,
         BsTimelineModule,
         AgGridModule,
-        FiltersModule
+        FiltersModule,
+        BsHeatmapModule
     ],
     declarations: [
         AppComponent,
