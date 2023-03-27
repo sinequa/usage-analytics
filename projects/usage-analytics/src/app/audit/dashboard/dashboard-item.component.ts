@@ -2,7 +2,7 @@ import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from
 import { GridsterItemComponent } from 'angular-gridster2';
 import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent } from "ag-grid-community";
 
-import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError } from '@sinequa/core/web-services';
+import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError, ExprFilter } from '@sinequa/core/web-services';
 import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
 import { TimelineSeries } from '@sinequa/analytics/timeline';
@@ -13,6 +13,8 @@ import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
 import { GridProvider } from './providers/grid-provider';
+import { HeatmapItem } from '@sinequa/analytics/heatmap';
+import { HeatmapProvider } from './providers/heatmap-provider';
 
 
 /**
@@ -26,7 +28,7 @@ import { GridProvider } from './providers/grid-provider';
     selector: 'sq-dashboard-item',
     templateUrl: './dashboard-item.component.html',
     styleUrls: ['./dashboard-item.component.scss'],
-    providers: [TimelineProvider, ChartProvider, GridProvider]
+    providers: [TimelineProvider, ChartProvider, GridProvider, HeatmapProvider]
 })
 export class DashboardItemComponent implements OnChanges {
     @Input() config: DashboardItem;
@@ -67,6 +69,7 @@ export class DashboardItemComponent implements OnChanges {
     fullScreenAction: Action;
     maximizeAction: Action;
     timelineOrGridAction: Action;
+    heatmapOrGridAction: Action;
     toggleShowPreviousTimelineAction: Action;
     infoAction: Action;
 
@@ -79,16 +82,14 @@ export class DashboardItemComponent implements OnChanges {
     chartObj?: any;
     chartResults: Results = {
             records: [] as Record[],
-            aggregations: [
-                {
-                    name: "regular-new-user",
-                    column: ""
-                }
-            ] as Aggregation[]
+            aggregations: [] as Aggregation[]
         } as  Results;
 
     // Timeline
     timeSeries: TimelineSeries[] = [];
+
+    // Heatmap
+    heatmapData: HeatmapItem[] = [];
 
     // Grid
     columnDefs: ColDef[] = []
@@ -111,7 +112,8 @@ export class DashboardItemComponent implements OnChanges {
         public auditService: AuditService,
         public timelineProvider: TimelineProvider,
         public chartProvider: ChartProvider,
-        public gridProvider: GridProvider
+        public gridProvider: GridProvider,
+        public heatmapProvider: HeatmapProvider
         ) {
 
         this.closeAction = new Action({
@@ -198,6 +200,15 @@ export class DashboardItemComponent implements OnChanges {
                                     this.rowData = (data as Results)?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
                                 }
                                 break;
+                            case "heatmap":
+                                if (this.config.chartData) {
+                                    this.heatmapData = this.heatmapProvider.getHeatMapData(data, this.config.chartData);
+                                    const fieldX = this.heatmapData[0]?.['fieldX'];
+                                    const fieldY = this.heatmapData[0]?.['fieldY'];
+                                    this.columnDefs = this.heatmapProvider.getGridColumnDefs(this.config.chartData, fieldX, fieldY);
+                                    this.rowData = this.heatmapData;
+                                }
+                                break;
                             case "grid":
                                 this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
                                 if (this.config.aggregationName) {
@@ -252,13 +263,12 @@ export class DashboardItemComponent implements OnChanges {
         }
 
         if (this.config.type === "timeline") {
-
             // Action to Show/Hide previous period timeline
             this.toggleShowPreviousTimelineAction = new Action({
                 icon: this.config.showPreviousPeriod ? "fas fa-compress-alt" : "fas fa-expand-alt",
                 title: this.config.showPreviousPeriod ? "Hide Trend" : "Show Trend",
                 action: () => {
-                    this.toggleShowPreviousTimeline();
+                    this._toggleShowPreviousTimeline();
                 },
                 updater: (action) => {
                     action.icon = this.config.showPreviousPeriod
@@ -272,7 +282,7 @@ export class DashboardItemComponent implements OnChanges {
 
             // Action to switch between Grid/Timeline view
             this.timelineOrGridAction = new Action({
-                title: "Select field",
+                title: "Select a view",
                 text: this.config.chartType,
                 updater: (action) => {
                     action.children = ["Grid", "Timeline"]
@@ -303,13 +313,38 @@ export class DashboardItemComponent implements OnChanges {
             this.actions = [this.timelineOrGridAction, ...this.actions];
             this.timelineOrGridAction.update();
         }
+
+        if (this.config.type === "heatmap") {
+            // Action to switch between Grid/Heatmap view
+            this.heatmapOrGridAction = new Action({
+                title: "Select a view",
+                text: this.config.chartType,
+                updater: (action) => {
+                    action.children = ["Grid", "Heatmap"]
+                        .filter((item) => item !== action.text)
+                        .map(
+                            (item) => new Action({
+                                text: item,
+                                action: (elem, event) => {
+                                    this.config.chartType = item;
+                                    action.text = item;
+                                    this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
+                                    this.heatmapOrGridAction.update();
+                                }
+                            })
+                        );
+                }
+            });
+            // Add actions
+            this.actions = [this.heatmapOrGridAction, ...this.actions];
+            this.heatmapOrGridAction.update();
+        }
     }
 
-    toggleShowPreviousTimeline() {
+    private _toggleShowPreviousTimeline() {
         this.config.showPreviousPeriod = !this.config.showPreviousPeriod;
         this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
         this.toggleShowPreviousTimelineAction.update();
-
         this._updateTimelineData();
     }
 
@@ -462,16 +497,6 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     /**
-     * Notifies parent that a record was clicked
-     * @param record
-     */
-    onRecordClicked(record?: Record){
-        if(record){
-            this.recordClicked.next(record);
-        }
-    }
-
-    /**
      * Open a modal to rename this widget
      */
     rename() {
@@ -489,6 +514,18 @@ export class DashboardItemComponent implements OnChanges {
         if (!!range) {
             this.auditService.updateRangeFilter(range);
         }
+    }
+
+    onHeatmapItemClick(item: HeatmapItem) {
+        const filter = {
+            operator: 'and',
+            filters: [
+                {field: item['fieldX'], value: item.x, operator: "eq"},
+                {field: item['fieldY'], value: item.y, operator: "eq"}
+            ]
+        } as ExprFilter;
+        this.searchService.query.addFilter(filter);
+        this.searchService.search();
     }
 
     isMaximized(): boolean {

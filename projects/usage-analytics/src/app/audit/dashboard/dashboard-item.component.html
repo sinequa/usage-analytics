@@ -87,9 +87,31 @@
             [columnDefs]="columnDefs"
             [defaultColDef]="defaultColDef"
             (gridReady)="onGridReady($event)"
-            (columnResized)="onColumnResized($event)"
-        >
+            (columnResized)="onColumnResized($event)">
         </ag-grid-angular>
+
+        <!-- Heatmap view -->
+        <ng-container *ngSwitchCase="'heatmap'">
+            <sq-heatmap
+                [hidden]="config.chartType === 'Grid'"
+                [data]="heatmapData"
+                [width]="innerwidth"
+                [height]="innerheight"
+                [maxX]="40"
+                [maxY]="40"
+                (itemClicked)="onHeatmapItemClick($event)"
+                [axisClickable]="false">
+            </sq-heatmap>
+            <ag-grid-angular
+                *ngIf="config.chartType === 'Grid'"
+                [ngClass]="'ag-theme-alpine'"
+                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+                [rowData]="rowData"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                (gridReady)="onGridReady($event)">
+            </ag-grid-angular>
+        </ng-container>
 
     </ng-container>
 

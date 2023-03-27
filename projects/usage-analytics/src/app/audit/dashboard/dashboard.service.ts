@@ -3,7 +3,7 @@ import { ValidatorFn, Validators } from '@angular/forms';
 import { Router, UrlSerializer } from '@angular/router';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { Location } from '@angular/common';
-import { Utils } from '@sinequa/core/base';
+import { StrictUnion, Utils } from '@sinequa/core/base';
 import { LoginService } from '@sinequa/core/login';
 import { UserSettingsWebService } from '@sinequa/core/web-services';
 import { ModalResult, ModalService, PromptOptions, ModalButton, ConfirmType } from '@sinequa/core/modal';
@@ -20,6 +20,7 @@ import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
 import { GridColDef } from './providers/grid-provider';
 import { StatLayout, StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
+import { HeatmapData } from './providers/heatmap-provider';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -43,7 +44,7 @@ export interface DashboardItem extends GridsterItem {
     recordId?: string; // For type === 'preview'
     queryStr?: string; // For type === 'preview'
     aggregation?: string; // For type === 'chart'
-    chartData?: ChartData; // For type === 'chart'
+    chartData?: StrictUnion<ChartData | HeatmapData>; // For type === 'chart'
     chartType?: string; // For type === 'chart' && type === 'timeline'
     extraTimelineQueries?: string[]; // For type === 'timeline'
     showPreviousPeriod?: boolean; // For type === 'timeline'

@@ -101,6 +101,10 @@ export class ExportService {
       // export each grid in a separate file
       const grids = this.extractGrids(filename, items);
       grids.forEach(grid => this.saveToCsv(grid.filename, this.objectToCsv(grid.tables).join('\n')));
+
+      // export each heatmap in a separate file
+      const heatmaps = this.extractHeatmaps(filename, items);
+      heatmaps.forEach(heatmap => this.saveToCsv(heatmap.filename, this.objectToCsv(heatmap.tables).join('\n')));
     }
 
   /**
@@ -123,6 +127,9 @@ export class ExportService {
 
     // export each grid
     tables.push(...this.extractGrids(filename, items));
+
+    // export each heatmap
+    tables.push(...this.extractHeatmaps(filename, items));
 
     // as csv files joined in a single array, split them in their own sheet
     const file = `${filename}_${this.date}.xml`;
@@ -149,6 +156,9 @@ export class ExportService {
 
     // export each grid
     tables.push(...this.extractGrids(filename, items).map(grid => grid.tables.length > 0 ? grid : {...grid, tables: ['']}));
+
+    // export each heatmap
+    tables.push(...this.extractHeatmaps(filename, items).map(heatmap => heatmap.tables.length > 0 ? heatmap : {...heatmap, tables: ['']}));
 
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
@@ -383,33 +393,56 @@ export class ExportService {
    * @param items array of dashboard items
   **/
    protected extractGrids(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
-    const grids = items.filter(item => item.config.type === "grid").map(item => {
+    return this.extractGridsOrHeatmaps(filename, items, "grid");
+  }
+
+  /**
+   * Extract each heatmap data.
+   *
+   * @param filename name of the file
+   * @param items array of dashboard items
+   * @returns Array of heatmaps data
+   */
+  protected extractHeatmaps(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+    return this.extractGridsOrHeatmaps(filename, items, "heatmap");
+  }
+
+  /**
+   * Extract data for grids Or heatmaps.
+   *
+   * @param filename name of the file
+   * @param items array of dashboard items
+   * @param type it can be "grid" or "heatmap"
+   * @returns Array of widget's data
+  **/
+  protected extractGridsOrHeatmaps(filename: string, items: DashboardItemComponent[], type: "grid" | "heatmap"): ExtractModel[] {
+    const widgets = items.filter(item => item.config.type === type).map(item => {
       const title = this.translate.formatMessage(item.config.title);
       return {title, rowData: item.rowData, columns: item.columnDefs}
     });
 
-    return grids.length === 0
+    return widgets.length === 0
       ? []
-      : grids.map(grid => {
-          const fields = grid.columns.map(x => x.field);
+      : widgets.map(widget => {
+          const fields = widget.columns.map(x => x.field);
 
           // initialize rows with header
           let rows = [
-            grid.columns.map(
+            widget.columns.map(
               x => x.headerName
             )
           ];
 
           // append each row, if there is no rowData it will just concat an empty array
           rows = rows.concat(
-            grid.rowData.map(row => {
+            widget.rowData.map(row => {
               return fields.map(x => !!x && !!row[x] ? row[x] : "");
             })
           );
 
-          const file = `${filename}_${grid.title}_${this.date}.csv`;
+          const file = `${filename}_${widget.title}_${this.date}.csv`;
           return {
-            title: grid.title,
+            title: widget.title,
             filename: file,
             tables: rows
           } as ExtractModel;
