@@ -109,3 +109,17 @@ sq-filters {
 .sq-flag-de:before {
   content: url('../resources/flags/flag-de.jpg');
 }
+
+
+.sq-timeline-trend {
+  --sq-size: 30px;
+  &:before {
+    content: "";
+    display:block;
+    height: var(--sq-size);
+    width: var(--sq-size);
+    background-size: var(--sq-size) var(--sq-size);
+    background-image: url('../../../assets/timeline-trend.svg');
+    background-repeat: no-repeat;
+  }
+}

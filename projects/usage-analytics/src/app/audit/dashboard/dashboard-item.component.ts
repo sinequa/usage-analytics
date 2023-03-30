@@ -265,15 +265,15 @@ export class DashboardItemComponent implements OnChanges {
         if (this.config.type === "timeline") {
             // Action to Show/Hide previous period timeline
             this.toggleShowPreviousTimelineAction = new Action({
-                icon: this.config.showPreviousPeriod ? "fas fa-compress-alt" : "fas fa-expand-alt",
+                icon: this.config.showPreviousPeriod ? "fas fa-chart-line" : "sq-timeline-trend",
                 title: this.config.showPreviousPeriod ? "Hide Trend" : "Show Trend",
                 action: () => {
                     this._toggleShowPreviousTimeline();
                 },
                 updater: (action) => {
                     action.icon = this.config.showPreviousPeriod
-                        ? "fas fa-compress-alt"
-                        : "fas fa-expand-alt";
+                        ? "fas fa-chart-line"
+                        : "sq-timeline-trend";
                     action.title = this.config.showPreviousPeriod
                         ? "Hide Trend"
                         : "Show Trend";
