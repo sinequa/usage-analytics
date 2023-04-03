@@ -93,7 +93,7 @@ export class DashboardItemComponent implements OnChanges {
 
     // Grid
     columnDefs: ColDef[] = []
-    rowData: (Record | AggregationItem)[] = [];
+    rowData: (Record | AggregationItem | HeatmapItem)[] = [];
     defaultColDef: ColDef = {
         resizable: true,
         sortable: true,
@@ -520,8 +520,8 @@ export class DashboardItemComponent implements OnChanges {
         const filter = {
             operator: 'and',
             filters: [
-                {field: item['fieldX'], value: item.x, operator: "eq"},
-                {field: item['fieldY'], value: item.y, operator: "eq"}
+                {field: item['fieldX'], value: item.x.value, operator: "eq"},
+                {field: item['fieldY'], value: item.y.value, operator: "eq"}
             ]
         } as ExprFilter;
         this.searchService.query.addFilter(filter);
