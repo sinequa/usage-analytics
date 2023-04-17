@@ -44,7 +44,7 @@
                 (click)="addWidget(item)"
                 [sqTooltip]="item?.info | sqMessage"
                 [fallbackPlacements]="['bottom','top']">
-                <div class="button-text" [innerHtml]="item.text | sqMessage"></div>
+                <div class="button-text" [innerHtml]="(item.textHighlight || item.text) | sqMessage"></div>
             </button>
         </div>
     </ng-template>

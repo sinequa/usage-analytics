@@ -32,33 +32,19 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
         /** Update palette after each dashboard change OR after query change ( open new dashboard, shared dashboard ...) */
         this._subscription = merge(
                                     this.dashboardService.dashboardChanged,
-                                    this.searchService.queryStream,
+                                    this.searchService.queryStream
                                 )
-                            .subscribe(() => this.palette = this.getPalette());
+                            .subscribe(() => {
+                                  this.palette = this.getPalette();
+                                  this.filterWidgets(this.searchText.value)
+                                }
+                            );
 
         /** If the search box is not empty, widgets are filtered and sorted according to a score of pertinence of the match */
         this._filterSubscription = this.searchText.valueChanges
                                         .pipe(debounceTime(500), distinctUntilChanged())
                                         .subscribe(
-                                            (text: string) => {
-                                                this.isFiltering = !!text;
-                                                this.suggestService.searchData(
-                                                    '',
-                                                    text,
-                                                    this.dashboardService.getPalette().flatMap((cat) => cat.items),
-                                                    (widget) => widget.text,
-                                                    (widget) => widget.info ? [widget.info] : [],
-                                                ).then(
-                                                    (items) => this.filteredWidgets = items.map(
-                                                                                                (el: ScoredAutocompleteItem<DashboardItemOption, "">) => (
-                                                                                                    {
-                                                                                                        ...el.data,
-                                                                                                        text: (el["displayHtml"].indexOf("<small>") > -1) ? el["displayHtml"].substring(0, el["displayHtml"].indexOf("<small>")) : el["displayHtml"]
-                                                                                                    }
-                                                                                                )
-                                                                                            )
-                                                )
-                                            }
+                                            (text: string) => this.filterWidgets(text)
                                         )
     }
 
@@ -82,6 +68,26 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
                     })
                 )
                 .filter((p: {name: string, items: DashboardItemOption[]}) => p.items.length > 0);
+    }
+
+    filterWidgets(text: string) {
+        this.isFiltering = !!text;
+        this.suggestService.searchData(
+            '',
+            text,
+            this.palette.flatMap((cat) => cat.items),
+            (widget) => widget.text,
+            (widget) => widget.info ? [widget.info] : [],
+        ).then(
+            (items) => this.filteredWidgets = items.map(
+                                                        (el: ScoredAutocompleteItem<DashboardItemOption, "">) => (
+                                                            {
+                                                                ...el.data,
+                                                                textHighlight: (el["displayHtml"].indexOf("<small>") > -1) ? el["displayHtml"].substring(0, el["displayHtml"].indexOf("<small>")) : el["displayHtml"]
+                                                            }
+                                                        )
+                                                    )
+        )
     }
 
     togglePalette() {
