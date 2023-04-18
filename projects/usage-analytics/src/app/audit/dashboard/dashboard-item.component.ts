@@ -1,6 +1,6 @@
 import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
-import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent } from "ag-grid-community";
+import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community";
 
 import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError, ExprFilter } from '@sinequa/core/web-services';
 import { Action } from '@sinequa/components/action';
@@ -196,7 +196,7 @@ export class DashboardItemComponent implements OnChanges {
                             case "chart":
                                 if (this.config.chartData) {
                                     this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
-                                    this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData);
+                                    this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData, true, true);
                                     this.rowData = (data as Results)?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
                                 }
                                 break;
@@ -205,12 +205,12 @@ export class DashboardItemComponent implements OnChanges {
                                     this.heatmapData = this.heatmapProvider.getHeatMapData(data, this.config.chartData);
                                     const fieldX = this.heatmapData[0]?.['fieldX'];
                                     const fieldY = this.heatmapData[0]?.['fieldY'];
-                                    this.columnDefs = this.heatmapProvider.getGridColumnDefs(this.config.chartData, fieldX, fieldY);
+                                    this.columnDefs = this.heatmapProvider.getGridColumnDefs(this.config.chartData, fieldX, fieldY, true, true);
                                     this.rowData = this.heatmapData;
                                 }
                                 break;
                             case "grid":
-                                this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip);
+                                this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip, this.config.enableSelection);
                                 if (this.config.aggregationName) {
                                     this.rowData = this.gridProvider.getAggregationRowData(data, this.config.aggregationName)
                                 } else {
@@ -393,12 +393,12 @@ export class DashboardItemComponent implements OnChanges {
 
         if (this.config.aggregationsTimeSeries) {
             timeSeries = this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask, isCurrent, this.auditService.diffPreviousAndStart);
-            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries, isCurrent);
+            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries, true, true, isCurrent);
             rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries, isCurrent);
         }
         if (this.config.recordsTimeSeries) {
             timeSeries = this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries, isCurrent, this.auditService.diffPreviousAndStart);
-            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries, isCurrent);
+            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries, true, true, isCurrent);
             rowData = data.records;
         }
 
@@ -467,7 +467,9 @@ export class DashboardItemComponent implements OnChanges {
         }
     }
 
-    // Specific callback methods for the ag-grid widget
+    /**
+     * Specific callback methods for the ag-grid widget
+     * */
     onGridReady(event: GridReadyEvent) {
         this.gridApi = event.api;
         this.resizeGrid();
@@ -477,14 +479,21 @@ export class DashboardItemComponent implements OnChanges {
         this.gridApi?.resetRowHeights();
     }
 
-    /**
-     * Resize the grid
-     */
+    onGridSelectionChanged(event: SelectionChangedEvent) {
+
+        const newRows = this.gridApi?.getSelectedRows()
+        console.log(newRows)
+        // filtering logic based on each type of widget
+    }
+
+    //Resize the grid
     resizeGrid() {
         this.gridApi?.sizeColumnsToFit();
     }
 
-    // Specific callback methods for the CHART widget
+    /**
+     * Specific callback methods for the CHART widget
+     */
     onChartInitialized(chartObj: any) {
         this.chartObj = chartObj;
         this.chartObj.resizeTo(this.innerwidth, this.innerheight);

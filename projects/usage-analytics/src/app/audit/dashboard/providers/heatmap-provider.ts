@@ -27,7 +27,7 @@ export class HeatmapProvider {
         return [];
     }
 
-    public getGridColumnDefs(config: HeatmapData, fieldX: string | undefined, fieldY: string | undefined): ColDef[] {
+    public getGridColumnDefs(config: HeatmapData, fieldX: string | undefined, fieldY: string | undefined, showTooltip: boolean | undefined, enableSelection: boolean | undefined): ColDef[] {
         const columnDefs = [
             {
                 headerName: config.displayedFirstColumnName || fieldX || 'Column 1',
@@ -48,6 +48,15 @@ export class HeatmapProvider {
                 cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
             }
         ] as ColDef[];
+
+        if (showTooltip) {
+            columnDefs.forEach((col) => col.tooltipField = col.field)
+        }
+
+        if (enableSelection) {
+            columnDefs[0].checkboxSelection = true;
+        }
+
         return columnDefs;
     }
 
