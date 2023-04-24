@@ -1,8 +1,8 @@
 import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
-import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community";
+import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent, RowNode, SelectionChangedEvent } from "ag-grid-community";
 
-import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError, ExprFilter } from '@sinequa/core/web-services';
+import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError, ExprFilter, Filter, BooleanFilter } from '@sinequa/core/web-services';
 import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
 import { TimelineSeries } from '@sinequa/analytics/timeline';
@@ -15,6 +15,7 @@ import { ChartProvider } from './providers/chart-provider';
 import { GridProvider } from './providers/grid-provider';
 import { HeatmapItem } from '@sinequa/analytics/heatmap';
 import { HeatmapProvider } from './providers/heatmap-provider';
+import { Utils } from '@sinequa/core/base';
 
 
 /**
@@ -99,6 +100,9 @@ export class DashboardItemComponent implements OnChanges {
         sortable: true,
         filter: true
     }
+    private _gridFilter: Filter;
+    private _selectedNode: RowNode | undefined;
+
     /** ag-grid API for the grid */
     gridApi: GridApi | null | undefined;
 
@@ -196,7 +200,7 @@ export class DashboardItemComponent implements OnChanges {
                             case "chart":
                                 if (this.config.chartData) {
                                     this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
-                                    this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData, true, true);
+                                    this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData, true, this.config.enableSelection);
                                     this.rowData = (data as Results)?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
                                 }
                                 break;
@@ -205,7 +209,7 @@ export class DashboardItemComponent implements OnChanges {
                                     this.heatmapData = this.heatmapProvider.getHeatMapData(data, this.config.chartData);
                                     const fieldX = this.heatmapData[0]?.['fieldX'];
                                     const fieldY = this.heatmapData[0]?.['fieldY'];
-                                    this.columnDefs = this.heatmapProvider.getGridColumnDefs(this.config.chartData, fieldX, fieldY, true, true);
+                                    this.columnDefs = this.heatmapProvider.getGridColumnDefs(this.config.chartData, fieldX, fieldY, true, this.config.enableSelection);
                                     this.rowData = this.heatmapData;
                                 }
                                 break;
@@ -393,12 +397,12 @@ export class DashboardItemComponent implements OnChanges {
 
         if (this.config.aggregationsTimeSeries) {
             timeSeries = this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask, isCurrent, this.auditService.diffPreviousAndStart);
-            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries, true, true, isCurrent);
+            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries, true, this.config.enableSelection, isCurrent);
             rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries, isCurrent);
         }
         if (this.config.recordsTimeSeries) {
             timeSeries = this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries, isCurrent, this.auditService.diffPreviousAndStart);
-            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries, true, true, isCurrent);
+            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries, true, this.config.enableSelection, isCurrent);
             rowData = data.records;
         }
 
@@ -472,6 +476,12 @@ export class DashboardItemComponent implements OnChanges {
      * */
     onGridReady(event: GridReadyEvent) {
         this.gridApi = event.api;
+        // Programmatically select filtered rows
+        this.gridApi?.forEachNode((node) => {
+            if (Utils.eq((this._selectedNode?.data)?.toString(), (node.data).toString())) {
+                node.setSelected(true, undefined, true);
+            }
+        });
         this.resizeGrid();
     }
 
@@ -480,10 +490,48 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     onGridSelectionChanged(event: SelectionChangedEvent) {
-
-        const newRows = this.gridApi?.getSelectedRows()
-        console.log(newRows)
-        // filtering logic based on each type of widget
+        const newSelectedNode = this.gridApi!.getSelectedNodes();
+        // Reset previous filter
+        if (this._gridFilter) {
+            this.searchService.query.removeSameFilters(this._gridFilter)
+        }
+        // Programmatically toggle the selection
+        // Obviously, multiple selection is not possible since each selection triggers a new search and we don't want to add actions to handle filtering operator (or, and ...)
+        if (Utils.eq((this._selectedNode?.data)?.toString(), (newSelectedNode[0]?.data)?.toString())) {
+            this.gridApi!.forEachNode((node) => node.setSelected(false));
+            this._selectedNode = undefined;
+        } else {
+            this._selectedNode = newSelectedNode[0];
+        }
+        // Make new filter based on current selection
+        if (this._selectedNode) {
+            const row = this._selectedNode.data;
+            switch (this.config.type) {
+                case "chart":
+                    this._gridFilter = {
+                        operator: 'eq',
+                        field: this.chartResults.aggregations[0].column,
+                        value: row.value,
+                        display: row.display || row.value
+                    } as BooleanFilter
+                    break;
+                case "heatmap":
+                    this._gridFilter = {
+                        operator: 'and',
+                        filters: [
+                            {field: row['fieldX'], value: row.x.value, operator: "eq"},
+                            {field: row['fieldY'], value: row.y.value, operator: "eq"}
+                        ]
+                    } as ExprFilter
+                    break;
+                // Specific custom behaviors for timeline/grid components should go here in dedicated cases
+                default:
+                    break;
+            }
+            this.searchService.query.addFilter(this._gridFilter);
+        }
+        // Trigger new search
+        this.searchService.search();
     }
 
     //Resize the grid

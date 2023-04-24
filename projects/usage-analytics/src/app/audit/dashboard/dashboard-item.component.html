@@ -112,7 +112,8 @@
         [rowData]="rowData"
         [columnDefs]="columnDefs"
         [defaultColDef]="defaultColDef"
-        [rowSelection]="'multiple'"
+        rowSelection="single"
+        suppressRowClickSelection="true"
         (gridReady)="onGridReady($event)"
         (selectionChanged)="onGridSelectionChanged($event)">
     </ag-grid-angular>
