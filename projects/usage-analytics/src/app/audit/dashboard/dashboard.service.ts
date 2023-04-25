@@ -53,6 +53,7 @@ export interface DashboardItem extends GridsterItem {
     columns?: GridColDef[]; // For type === 'grid'
     aggregationName?: string; // For type === 'grid'
     showTooltip?: boolean; // For type === 'grid'
+    enableSelection?: boolean; // For type === 'grid'
     valueLocation?: StatValueLocation; // where to find value field
     valueField?: StatValueField; // how to access value field
     operation?: StatOperation; // operation to compute the value
@@ -116,7 +117,8 @@ export interface DashboardItemOption {
         // For type === 'grid'
         columns?: GridColDef[],
         aggregationName?: string,
-        showTooltip?: boolean
+        showTooltip?: boolean,
+        enableSelection?: boolean
 
     };
 }

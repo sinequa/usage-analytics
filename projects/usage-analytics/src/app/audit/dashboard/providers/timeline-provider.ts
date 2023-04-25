@@ -3,7 +3,7 @@ import { TimelineDate, TimelineSeries, BsFacetTimelineComponent } from "@sinequa
 import { Utils } from "@sinequa/core/base";
 import { Aggregation, AggregationItem, DatasetError, Record, Results } from "@sinequa/core/web-services";
 import * as d3 from 'd3';
-import { ColDef, ValueGetterParams } from "ag-grid-community";
+import { ColDef, ITooltipParams, ValueGetterParams } from "ag-grid-community";
 import moment from 'moment';
 import { IntlService } from "@sinequa/core/intl";
 
@@ -102,7 +102,7 @@ export class TimelineProvider {
         return [];
     }
 
-    public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[], isCurrent: boolean = true): ColDef[] {
+    public getGridColumnDefs(configs: RecordsTimeSeries | RecordsTimeSeries[] | AggregationTimeSeries | AggregationTimeSeries[], showTooltip: boolean | undefined, enableSelection: boolean | undefined, isCurrent: boolean = true): ColDef[] {
         if (!Array.isArray(configs)) {
             configs = [configs];
         }
@@ -117,6 +117,12 @@ export class TimelineProvider {
                     filter: 'agDateColumnFilter',
                     cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(params.value)
                 }] as ColDef[];
+                if (showTooltip) {
+                    columnDefs[0].tooltipField = configs[0].dateField || 'value';
+                }
+                if (enableSelection) {
+                    columnDefs[0].checkboxSelection = true;
+                }
                 for (const valueField of configs[0].valueFields) {
                     const colDef: ColDef = {
                         headerName: valueField.displayedName || valueField.name,
@@ -124,9 +130,18 @@ export class TimelineProvider {
                         cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
                     }
                     if (valueField.operatorResults) {
-                        colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[valueField.name]
+                        colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[valueField.name];
                     } else {
-                        colDef.field = valueField.name
+                        colDef.field = valueField.name;
+                    }
+
+                    // if true, set the tooltip of each cell
+                    if (showTooltip) {
+                        if (valueField.operatorResults) {
+                            colDef.tooltipValueGetter = (params: ITooltipParams) => (params.data as AggregationItem).operatorResults?.[valueField.name];
+                        } else {
+                            colDef.tooltipField = valueField.name;
+                        }
                     }
                     columnDefs.push(colDef);
                 }
@@ -138,6 +153,12 @@ export class TimelineProvider {
                     filter: 'agDateColumnFilter',
                     cellRenderer: (params: any): HTMLElement | string => this.intlService.formatDate(params.value)
                 }] as ColDef[];
+                if (showTooltip) {
+                    columnDefs[0].tooltipField = columnDefs[0].field;
+                }
+                if (enableSelection) {
+                    columnDefs[0].checkboxSelection = true;
+                }
                 for (const config of configs) {
                     for (const valueField of config.valueFields) {
                         const colDef: ColDef = {
@@ -149,6 +170,15 @@ export class TimelineProvider {
                             colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[(config['name'] || '') + valueField.name];
                         } else {
                             colDef.field = (config['name'] || '') + valueField.name;
+                        }
+
+                        // if true, set the tooltip of each cell
+                        if (showTooltip) {
+                            if (valueField.operatorResults) {
+                                colDef.tooltipValueGetter = (params: ITooltipParams) => (params.data as AggregationItem).operatorResults?.[(config['name'] || '') + valueField.name];
+                            } else {
+                                colDef.tooltipField = (config['name'] || '') + valueField.name;
+                            }
                         }
                         columnDefs.push(colDef);
                     }

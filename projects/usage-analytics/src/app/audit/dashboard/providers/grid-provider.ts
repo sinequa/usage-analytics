@@ -20,7 +20,7 @@ export class GridProvider {
 
     constructor(public intlService: IntlService) {}
 
-    public getGridColumnDefs(configs: GridColDef[] | undefined, showTooltip: boolean | undefined): ColDef[] {
+    public getGridColumnDefs(configs: GridColDef[] | undefined, showTooltip: boolean | undefined, enableSelection: boolean | undefined): ColDef[] {
         if (!configs) return [];
 
         const columnDefs = [] as ColDef[];
@@ -91,6 +91,9 @@ export class GridProvider {
 
                 columnDefs.push(colDef);
             }
+        }
+        if (columnDefs[0] && !!enableSelection) {
+            columnDefs[0].checkboxSelection = true;
         }
         return columnDefs;
     }
