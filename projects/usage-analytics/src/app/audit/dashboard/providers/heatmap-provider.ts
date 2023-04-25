@@ -65,8 +65,8 @@ export class HeatmapProvider {
         if(!item.display){
             item.display = String(item.value)
         }
-        const values = String(item.value).split("/");
-        const displays = item.display.split("/");
+        const values = String(item.value).split("$@$");
+        const displays = item.display.split("$@$");
         if(values.length < 2){
             throw new Error(`Cannot parse '${item.value}'`);
         }
