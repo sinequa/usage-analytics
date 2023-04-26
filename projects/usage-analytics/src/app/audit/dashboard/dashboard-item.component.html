@@ -8,6 +8,7 @@
     [ngSwitch]="config.type">
 
     <ng-container *ngIf="!loading && !errorMessage">
+
         <!-- Timeline view-->
         <ng-container *ngSwitchCase="'timeline'">
             <sq-timeline
@@ -23,15 +24,7 @@
                 [legendStyles]="{'justify-content': 'center', 'overflow-y': 'auto', 'width': '98%'}"
                 (selectionChange)="updateAuditRange($event)">
             </sq-timeline>
-            <ag-grid-angular
-                *ngIf="config.chartType === 'Grid'"
-                [ngClass]="'ag-theme-alpine'"
-                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
-                [rowData]="rowData"
-                [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef"
-                (gridReady)="onGridReady($event)">
-            </ag-grid-angular>
+            <ng-container *ngIf="config.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
         <!-- Statistic view -->
@@ -67,27 +60,20 @@
                 (initialized)="onChartInitialized($event)"
                 (typeChange)="onChartTypeChange($event)">
             </sq-fusion-chart>
-            <ag-grid-angular
-                *ngIf="config.chartType === 'grid'"
-                [ngClass]="'ag-theme-alpine'"
-                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
-                [rowData]="rowData"
-                [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef"
-                (gridReady)="onGridReady($event)">
-            </ag-grid-angular>
+            <ng-container *ngIf="config.chartType === 'grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
         <!-- Grid view -->
-        <ag-grid-angular
-            *ngSwitchCase="'grid'"
+        <ag-grid-angular *ngSwitchCase="'grid'"
             [ngClass]="'ag-theme-alpine'"
             [ngStyle]="{width: '100%', height: innerheight + 'px'}"
             [rowData]="rowData"
             [columnDefs]="columnDefs"
             [defaultColDef]="defaultColDef"
+            [rowSelection]="'multiple'"
             (gridReady)="onGridReady($event)"
-            (columnResized)="onColumnResized($event)">
+            (columnResized)="onColumnResized($event)"
+            (selectionChanged)="onGridSelectionChanged($event)">
         </ag-grid-angular>
 
         <!-- Heatmap view -->
@@ -102,15 +88,7 @@
                 (itemClicked)="onHeatmapItemClick($event)"
                 [axisClickable]="false">
             </sq-heatmap>
-            <ag-grid-angular
-                *ngIf="config.chartType === 'Grid'"
-                [ngClass]="'ag-theme-alpine'"
-                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
-                [rowData]="rowData"
-                [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef"
-                (gridReady)="onGridReady($event)">
-            </ag-grid-angular>
+            <ng-container *ngIf="config.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
     </ng-container>
@@ -126,3 +104,17 @@
     </div>
 
 </sq-facet-card>
+
+<ng-template #agGridTpl>
+    <ag-grid-angular
+        [ngClass]="'ag-theme-alpine'"
+        [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        rowSelection="single"
+        suppressRowClickSelection="true"
+        (gridReady)="onGridReady($event)"
+        (selectionChanged)="onGridSelectionChanged($event)">
+    </ag-grid-angular>
+</ng-template>

@@ -27,17 +27,17 @@ export class HeatmapProvider {
         return [];
     }
 
-    public getGridColumnDefs(config: HeatmapData, fieldX: string | undefined, fieldY: string | undefined): ColDef[] {
+    public getGridColumnDefs(config: HeatmapData, fieldX: string | undefined, fieldY: string | undefined, showTooltip: boolean | undefined, enableSelection: boolean | undefined): ColDef[] {
         const columnDefs = [
             {
                 headerName: config.displayedFirstColumnName || fieldX || 'Column 1',
-                field: 'x',
+                field: 'x.display',
                 filter: 'agTextColumnFilter',
                 comparator: customComparator
             },
             {
                 headerName: config.displayedSecondColumnName || fieldY || 'Column 2',
-                field: 'y',
+                field: 'y.display',
                 filter: 'agTextColumnFilter',
                 comparator: customComparator
             },
@@ -48,21 +48,32 @@ export class HeatmapProvider {
                 cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
             }
         ] as ColDef[];
+
+        if (showTooltip) {
+            columnDefs.forEach((col) => col.tooltipField = col.field)
+        }
+
+        if (enableSelection) {
+            columnDefs[0].checkboxSelection = true;
+        }
+
         return columnDefs;
     }
 
     private _parseCrossDistributionItem(column: string, item: AggregationItem): HeatmapItem {
         const fields = column.split('/')
-        const parts = item.value!.toString().split("/");
-        if(parts.length < 2){
-            throw new Error(`Can not parse '${item.value}'`);
+        if(!item.display){
+            item.display = String(item.value)
+        }
+        const values = String(item.value).split("$@$");
+        const displays = item.display.split("$@$");
+        if(values.length < 2){
+            throw new Error(`Cannot parse '${item.value}'`);
         }
         return {
-            x: parts[0],
-            y: parts[1],
+            x: {display: displays[0], value: values[0]},
+            y: {display: displays[1], value: values[1]},
             count: item.count,
-            display: item.value!.toString(),
-            value: item.value as string,
             fieldX: fields[0],
             fieldY: fields[1]
         } as HeatmapItem;
