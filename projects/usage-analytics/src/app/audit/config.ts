@@ -588,8 +588,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "type": "stat",
         "query": "docViewsBySession",
         "icon": "fas fa-balance-scale",
-        "text": "Average Viewed Documents Per Session",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of viewed documents (Document Navigator) per session. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Seeing fewer documents during a search suggests that the answer may have been found in the first results. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all clicked documents DIVIDED BY Total number of sessions",
+        "text": "Average Clicked Documents Per Session",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of clicked documents (Document Navigator) per session. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Seeing fewer documents during a search suggests that the answer may have been found in the first results. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all clicked documents DIVIDED BY Total number of sessions",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -945,7 +945,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
         "query": "queryBounce",
         "icon": "fas fa-balance-scale",
         "text": "Bounce By Search Summary",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of bounces compared to the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  This suggests that the result was likely irrelevant or incomplete. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total bounces DIVIDED BY Total number of search summary.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of bounces compared to the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  This suggests that the result was likely irrelevant or incomplete. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span> Percentage of total bounces among the total number of search summary.",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
