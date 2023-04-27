@@ -20,6 +20,7 @@
 </div>
 
 <div class="d-flex flex-row align-items-center flex-wrap">
+    <span class="sq-breadcrumb-item">Filters : &nbsp;</span>
     <sq-filters
         [query]="searchService.query"
         [filter]="searchService.query.filters"
@@ -28,6 +29,7 @@
         (filterEdit)="searchService.search()">
     </sq-filters>
 </div>
+<span class="sq-breadcrumb-item">Trends calculation period : {{ auditService.infoPreviousFilter | sqMessage }}</span>
 
 
 <!-- Dashboard tabs -->

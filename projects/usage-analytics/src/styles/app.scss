@@ -1,3 +1,6 @@
+:root {
+    --secondary: #0d6efd;
+}
 $secondary: #0d6efd;
 
 // @import "@sinequa/components/theme/minimal";
@@ -85,11 +88,11 @@ sq-facet-card:has(sq-audit-stat) {
 
 sq-filters {
     .sq-filter-operator {
-        color: $secondary;
+        color: var(--secondary);
     }
     .sq-filter-value {
         font-weight: bold;
-        color: $secondary;
+        color: var(--secondary);
     }
 }
 
