@@ -1,7 +1,7 @@
 <div class="audit-filters d-flex">
     <sq-audit-range-picker></sq-audit-range-picker>
     <sq-facet-card
-        *ngIf="(auditService.data$ | async)?.applications"
+        *ngIf="(auditService.data$ | async)?.[auditService.facetFiltersQuery]"
         [collapsible]="true"
         [startCollapsed]="true"
         [buttonsStyle]="isDark()? 'dark' : 'light'"
@@ -11,10 +11,10 @@
         <sq-facet-multi
             #facet
             class="card position-absolute overflow-hidden"
-            [results]="(auditService.data$ | async)?.applications"
+            [results]="(auditService.data$ | async)?.[auditService.facetFiltersQuery]"
             [facets]="facets"
-            [title]="'Applications'"
-            [icon]="'fas fa-desktop'">
+            [title]="facetFiltersName"
+            [icon]="facetFiltersIcon">
         </sq-facet-multi>
     </sq-facet-card>
 </div>

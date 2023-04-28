@@ -9,7 +9,7 @@ import { Subscription } from "rxjs";
 import { skip } from 'rxjs/operators';
 
 import { AuditService } from "./audit.service";
-import { FACETS } from "./config";
+import { FACETS, facet_filters_icon, facet_filters_name } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
@@ -134,6 +134,14 @@ export class AuditComponent implements OnDestroy {
      */
     public get facets(): FacetConfig<FacetListParams>[] {
         return this.appService.app?.data?.facets as any || FACETS;
+    }
+
+    get facetFiltersName(): string {
+        return (this.appService.app?.data?.facet_filters_name ?? facet_filters_name) as string;
+    }
+
+    get facetFiltersIcon(): string {
+        return (this.appService.app?.data?.facet_filters_icon ?? facet_filters_icon) as string;
     }
 
     getDataAction(): Action {

@@ -27,7 +27,8 @@ import {
     session_count_threshold_per_month,
     sq_timezone,
     custom_params,
-    mono_scope_queries
+    mono_scope_queries,
+    facet_filters_query
 } from "./config";
 
 export enum RelativeTimeRanges {
@@ -60,7 +61,7 @@ export interface AuditDatasetFilters {
 })
 export class AuditService {
 
-    protected readonly defaultDatasets: string[] = ["applications"];
+    protected readonly defaultDatasets: string[] = [this.facetFiltersQuery];
 
     public data$ = new ReplaySubject<Dataset>(1);
     public previousPeriodData$ = new ReplaySubject<Dataset>(1);
@@ -147,6 +148,10 @@ export class AuditService {
 
     get monoScopeQueries(): string[] {
         return ((this.appService.app?.data?.params as JsonObject)?.mono_scope_queries || mono_scope_queries) as string[];
+    }
+
+    get facetFiltersQuery(): string {
+        return ((this.appService.app?.data as JsonObject)?.facet_filters_query || facet_filters_query) as string;
     }
 
     public updateAuditFilters() {
