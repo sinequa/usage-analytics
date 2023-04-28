@@ -66,6 +66,9 @@ export const FACETS: FacetConfig<FacetListParams>[] = [
         }
     }
 ];
+export const facet_filters_query: string = "applications";
+export const facet_filters_name: string = "Applications";
+export const facet_filters_icon: string = "fas fa-desktop";
 
 /** Widgets */
 export const WIDGETS: {[key: string]: DashboardItemOption} = {
