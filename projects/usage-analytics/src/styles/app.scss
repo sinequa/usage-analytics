@@ -96,6 +96,14 @@ sq-filters {
     }
 }
 
+sq-facet-card {
+
+    .list-group {
+        overflow: auto;
+        max-height: 50vh;
+    }
+}
+
 // Flag images
 .sq-flag-en:before {
   content: url('../resources/flags/flag-en.jpg');
