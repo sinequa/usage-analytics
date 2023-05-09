@@ -176,6 +176,9 @@ export class DashboardItemComponent implements OnChanges {
 
         if(changes.width && this.width) {
             this.innerwidth = this.width - 2;
+            if (this.config.type === "grid") {
+                this.resizeGrid();
+            }
         }
 
         // Handle dataSets updates
