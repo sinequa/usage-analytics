@@ -33,6 +33,21 @@ export const mono_scope_queries: string[] = [];
 /** Show/Hide the user-feedback menu */
 export const enableUserFeedbackMenu: boolean = true;
 
+/** Predefined period filters */
+export enum RelativeTimeRanges {
+    Last3H = "msg#dateRange.last3H",
+    Last6H = "msg#dateRange.last6H",
+    Last12H = "msg#dateRange.last12H",
+    Last24H = "msg#dateRange.last24H",
+    Last7Days = "msg#dateRange.last7D",
+    Last30Days = "msg#dateRange.last30D",
+    Last90Days = "msg#dateRange.last90D",
+    Last6M = "msg#dateRange.last6M",
+    Last1Y = "msg#dateRange.last1Y",
+    Last2Y = "msg#dateRange.last2Y",
+    Last5Y = "msg#dateRange.last5Y",
+}
+
 /** Filters */
 export const FACETS: FacetConfig<FacetListParams>[] = [
     {
@@ -72,58 +87,34 @@ export const facet_filters_icon: string = "fas fa-desktop";
 
 /** Widgets */
 export const WIDGETS: {[key: string]: DashboardItemOption} = {
-    "queryCountTotalTimeline": {
-        "type": "timeline",
-        "query": "queryTotalTimeLine",
-        "text": "Full-text Queries Timeline",
-        "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of full-text queries over time.<br> <span class='text-decoration-underline'><b>Interpretation:</b></span> An increase in the number of full-text queries over time is an indicator of platform adoption.<br> <span class='text-decoration-underline'><b>Calculation:</b></span> Addition of all Full-text Queries",
+    "usersRepartition": {
+        "id": "usersRepartition",
+        "type": "multiLevelPie",
+        "query": "totalUsers",
+        "icon": "fas fa-chart-pie",
+        "text": "Users Repartition",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span> ",
         "unique": true,
         "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "QueryTotal",
-                "dateField": "value",
-                "valueFields": [{"name": "count", "title": "Query Count Total", "primary": true}]
-            },
-            "chartType": "Timeline"
+            "extraQueries": ["userCountTotal", "newUsers", "activeUsers"]
         }
     },
-
-    "userCountTotalTimeline": {
-        "type": "timeline",
-        "query": "userCountTotalTimeLine",
-        "text": "Total Unique Users Timeline",
-        "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of unique user-ids logged per day in over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on session-summary. Addition of all unique user-ids who did sessions during the day.",
+    "searchCountTotal": {
+        "id": "searchCountTotal",
+        "type": "stat",
+        "query": "searchTotal",
+        "icon": "fas fa-balance-scale",
+        "text": "Search summaries",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of all Search Summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Search Summaries",
         "unique": true,
         "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "UserCountTotal",
-                "dateField": "value",
-                "valueFields": [{"name": "count", "title": "User Count Total", "primary": true}]
-            },
-            "chartType": "Timeline"
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "asc": true
         }
     },
-
-    "sessionCountTotalTimeline": {
-        "type": "timeline",
-        "query": "sessionTotalTimeLine",
-        "text": "Sessions Timeline",
-        "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of unique sessions displayed over time. ⚠️ WARNING ⚠️: If a user occurs between 11:49 pm to 0:10, we will consider these 2 different sessions. This simplifies the calculation by day. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  An increase in the number of sessions over time indicates better adoption of the platform. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all unique session-summary realized during a day over time.",
-        "unique": true,
-        "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "SessionTotal",
-                "dateField": "value",
-                "valueFields": [{"name": "count", "title": "Session Count Total", "primary": true}]
-            },
-            "chartType": "Timeline"
-        }
-    },
-
     "searchCountTotalTimeline": {
+        "id": "searchCountTotalTimeline",
         "type": "timeline",
         "query": "searchTotalTimeLine",
         "text": "Search Summaries Timeline",
@@ -139,13 +130,89 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
+    "usersActivitiesTimeline": {
+        "id": "usersActivitiesTimeline",
+        "type": "timeline",
+        "query": "queryTotalTimeLine",
+        "text": "Users Activities Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of full-text queries over time.<br> <span class='text-decoration-underline'><b>Interpretation:</b></span> An increase in the number of full-text queries over time is an indicator of platform adoption.<br> <span class='text-decoration-underline'><b>Calculation:</b></span> Addition of all Full-text Queries",
+        "unique": true,
+        "parameters": {
+            "extraQueries": ["sessionTotalTimeLine"],
+            "aggregationsTimeSeries": [
+                {
+                    "name": "QueryTotal",
+                    "dateField": "value",
+                    "valueFields": [{"displayedName": "Query Count", "name": "count", "title": "Query Count Total", "primary": true}]
+                },
+                {
+                    "name": "SessionTotal",
+                    "dateField": "value",
+                    "valueFields": [{"displayedName": "Session Count", "name": "count", "title": "Session Count Total", "primary": true}]
+                }
+            ],
+            "chartType": "Timeline"
+        }
+    },
+    "queryCountTotalTimeline": {
+        "id": "queryCountTotalTimeline",
+        "type": "timeline",
+        "query": "queryTotalTimeLine",
+        "text": "Full-text Queries Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of full-text queries over time.<br> <span class='text-decoration-underline'><b>Interpretation:</b></span> An increase in the number of full-text queries over time is an indicator of platform adoption.<br> <span class='text-decoration-underline'><b>Calculation:</b></span> Addition of all Full-text Queries",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "QueryTotal",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Query Count Total", "primary": true}]
+            },
+            "chartType": "Timeline"
+        }
+    },
+    "userCountTotalTimeline": {
+        "id": "userCountTotalTimeline",
+        "type": "timeline",
+        "query": "userCountTotalTimeLine",
+        "text": "Total Unique Users Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of unique user-ids logged per day in over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on session-summary. Addition of all unique user-ids who did sessions during the day.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "UserCountTotal",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "User Count Total", "primary": true}]
+            },
+            "chartType": "Timeline"
+        }
+    },
+    "sessionCountTotalTimeline": {
+        "id": "sessionCountTotalTimeline",
+        "type": "timeline",
+        "query": "sessionTotalTimeLine",
+        "text": "Sessions Timeline",
+        "icon": "fas fa-chart-line",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of unique sessions displayed over time. ⚠️ WARNING ⚠️: If a user occurs between 11:49 pm to 0:10, we will consider these 2 different sessions. This simplifies the calculation by day. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  An increase in the number of sessions over time indicates better adoption of the platform. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all unique session-summary realized during a day over time.",
+        "unique": true,
+        "parameters": {
+            "aggregationsTimeSeries": {
+                "name": "SessionTotal",
+                "dateField": "value",
+                "valueFields": [{"name": "count", "title": "Session Count Total", "primary": true}]
+            },
+            "chartType": "Timeline"
+        }
+    },
     "clickBySearchTimeline": {
+        "id": "clickBySearchTimeline",
         "type": "timeline",
         "query": "avgClicksBySearchTimeLine",
-        "text": "Average Document Clicks By Search-Summary",
+        "text": "Clicked Documents Per Search Summary Timeline (Avg)",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of clicked documents by search summary displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average number of clicked documents by search summary",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of clicked documents per search summary displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average number of clicked documents per search summary",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -156,47 +223,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
-    "avgEngineResponseTimeline": {
-        "type": "timeline",
-        "query": "engineResponseTimeTimeLine",
-        "text": "Average Engine Response Timeline",
-        "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average engine response time (in ms) displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all durationExecution filtered on full-text queries.",
-        "unique": true,
-        "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "EngineResponseTime",
-                "dateField": "value",
-                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Engine Response", "primary": true}]
-            },
-            "chartType": "Timeline"
-        }
-    },
-
-    "maxEngineResponseTimeline": {
-        "type": "timeline",
-        "query": "engineResponseTimeTimeLine",
-        "text": "Maximum Engine Response Timeline",
-        "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Maximum engine response time (in ms) displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Maximum value of all durationExecution filtered on refinement events",
-        "unique": true,
-        "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "EngineResponseTime",
-                "dateField": "value",
-                "valueFields": [{"operatorResults": true, "name": "max", "title": "Maximum Engine Response", "primary": true}]
-            },
-            "chartType": "Timeline"
-        }
-    },
-
     "mrrTimeline": {
+        "id": "mrrTimeline",
         "type": "timeline",
         "query": "avgMRRTimeLine",
-        "text": "Average Mean Reciprocal Rank (MRR) of Search Summary Timeline",
+        "text": "Mean Reciprocal Rank (MRR) of Search Summary Timeline (Avg)",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Captures the rank of clicked document by users: <br> <ul> <li>first doc = 1</li> <li>second doc = 1/2</li> <li>third doc = 1/3</li><li>...</li></ul> and zero if there is no click. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on search-summary. Average of all Mean Reciprocal Rank (MRR) events.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Captures the rank of clicked document by users: <br> <ul> <li>first doc = 1</li> <li>second doc = 1/2</li> <li>third doc = 1/3</li><li>...</li></ul> and zero if there is no click. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on search summary. Average of all Mean Reciprocal Rank (MRR) events.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -207,11 +240,11 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "searchBySessionTimeline": {
+        "id": "searchBySessionTimeline",
         "type": "timeline",
         "query": "avgQueriesBySessionTimeLine",
-        "text": "Average Full-Text Queries by Session Summary Timeline",
+        "text": "Full-Text Queries by Session Summary Timeline (Avg)",
         "icon": "fas fa-chart-line",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of Full-Text Queries per session displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Full-Text Queries DIVIDED BY Total number of Session Summary.",
         "unique": true,
@@ -224,49 +257,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
-    "avgResponseTimeTimeline": {
-        "type": "timeline",
-        "query": "responseTimeTimeLine",
-        "text": "Average Web App Response Timeline",
-        "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average WebApp Response time (in ms) incl. platform &amp; engine displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all duration event filtered on Full-Text Queries.",
-        "unique": true,
-        "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "ResponseTime",
-                "dateField": "value",
-                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Response Time", "primary": true}]
-            },
-            "chartType": "Timeline"
-        }
-    },
-
-    "maxResponseTimeTimeline": {
-        "type": "timeline",
-        "query": "responseTimeTimeLine",
-        "text": "Maximum Web App Response Time Timeline",
-        "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Maximum Web App Response time (in ms) incl. platform &amp; engine displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Maximum value of durations events filtered on full-text queries.",
-        "unique": true,
-        "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "ResponseTime",
-                "dateField": "value",
-                "valueFields": [
-                    {"operatorResults": true, "name": "max", "title": "Maximum Response Time", "primary": true}
-                ]
-            },
-            "chartType": "Timeline"
-        }
-    },
-
     "sessionDurationTimeline": {
+        "id": "sessionDurationTimeline",
         "type": "timeline",
         "query": "avgSessionDurationTimeLine",
-        "text": "Average Session Duration (in sec) Timeline",
+        "text": "Session Duration (in sec) Timeline (Avg)",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> The average session summary duration calculated in seconds. The duration corresponds to the time between the first and the last action of the same session. If there is one user event then the session duration will be 0. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Analysis of the time spent by a user to find a relevant result. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all durations event of session summary DIVIDED BY Total number of session summary.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> The average session summary duration calculated in seconds. The duration corresponds to the time between the first and the last action of the same session. If there is one user event then the session duration will be 0. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Analysis of the time spent by a user by session. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all durations event of session summary DIVIDED BY Total number of session summary.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -277,11 +274,11 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "clickTotalTimeline": {
+        "id": "clickTotalTimeline",
         "type": "timeline",
         "query": "clickTotalTimeLine",
-        "text": "Total Documents Clicked Timeline",
+        "text": "Total Clicked Documents Timeline",
         "icon": "fas fa-chart-line",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Total number of clicked documents displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Indicator to be compared with other information (number of users, searches, etc.). Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all clicked documents",
         "unique": true,
@@ -294,8 +291,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "newUsersTimeline": {
+        "id": "newUsersTimeline",
         "type": "timeline",
         "query": "newUsersTimeLine",
         "text": "New Users Timeline",
@@ -311,8 +308,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "queryBounceTimeline": {
+        "id": "queryBounceTimeline",
         "type": "timeline",
         "query": "queryBounceTimeLine",
         "text": "Bounce Timeline",
@@ -328,13 +325,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "refinementTimeline": {
+        "id": "refinementTimeline",
         "type": "timeline",
         "query": "queryRefineTimeLine",
         "text": "Refinement Timeline",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user has refined displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  This suggests that relevance can be improved. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summary where there are searchrefinements.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user has refined displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  This suggests that relevance can be improved. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summaries where there are search refinements.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -345,8 +342,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "zeroSearchTimeline": {
+        "id": "zeroSearchTimeline",
         "type": "timeline",
         "query": "queryZeroTimeLine",
         "text": "Zero Result Search Timeline",
@@ -362,13 +359,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "searchExitTimeline": {
+        "id": "searchExitTimeline",
         "type": "timeline",
         "query": "searchExitTimeLine",
-        "text": "Search Summary With Exit Timeline",
+        "text": "Search Summaries With Exit Timeline",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user does nothing after viewing the results page displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Suggests that a user does not consider the results provided to be relevant. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on search summary. Addition of all search.exit.timeout and search.exit.logout result events.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user does nothing after viewing the results page displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Suggests that a user does not consider the results provided to be relevant. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on search summary. Addition of all search.exit.timeout and search.exit.logout result events.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -379,8 +376,26 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
+    "queryCountPerUser": {
+        "id": "queryCountPerUser",
+        "type": "stat",
+        "query": "queryTotal",
+        "icon": "fas fa-balance-scale",
+        "text": "Number of Full-Text queries per user (Avg)",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Allows you to follow the adoption of the platform by monitoring usage over the concerned period. When a user conducts more and more Full-Text Queries, this suggests successful adoption. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Full-Text Queries DIVIDED BY Total number of unique user-id.",
+        "unique": true,
+        "parameters": {
+            "statLayout": "standard",
+            "valueLocation": "totalrecordcount",
+            "relatedQuery": "userCountTotal",
+            "relatedValueLocation": "totalrecordcount",
+            "computation": "percentage",
+            "asc": true,
+            "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
+        }
+    },
     "topQueries": {
+        "id": "topQueries",
         "type": "chart",
         "query": "topQueries",
         "icon": "fas fa-th-list",
@@ -394,8 +409,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "grid"
         }
     },
-
     "topNoResultsQueries": {
+        "id": "topNoResultsQueries",
         "type": "chart",
         "query": "topNoResultQueries",
         "icon": "fas fa-th-list",
@@ -409,8 +424,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "grid"
         }
     },
-
     "topSources": {
+        "id": "topSources",
         "type": "chart",
         "query": "topSources",
         "icon": "fas fa-chart-pie",
@@ -424,8 +439,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Pie3D"
         }
     },
-
     "topCollections": {
+        "id": "topCollections",
         "type": "chart",
         "query": "topCollections",
         "icon": "fas fa-chart-pie",
@@ -439,8 +454,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Pie3D"
         }
     },
-
     "topFacets": {
+        "id": "topFacets",
         "type": "chart",
         "query": "topFacets",
         "icon": "fas fa-chart-pie",
@@ -454,12 +469,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Pie3D"
         }
     },
-
     "resultTypes": {
+        "id": "resultTypes",
         "type": "chart",
         "query": "queryByResult",
         "icon": "fas fa-chart-pie",
-        "text": "Last Event After A Search",
+        "text": "End Of A Search",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Last event after a search: <br> <ul> <li>'search.exit.logout': User runs a full-text query and does not click on any document but instead logs out.</li> <li> 'search.exit.timeout': User runs a full-text query and does nothing before the timeout of the session.</li> <li> 'search.with.click': User runs a full-text query, can do refinement and then clicks on a document. </li><li> 'search.with.no.click': User runs a full-text query, can do refinement but doesn't click on a document.</li></ul> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Distribution of values of “Results” event within search summary.",
         "unique": true,
         "parameters": {
@@ -469,26 +484,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Pie3D"
         }
     },
-
-    "queryCountPerUser": {
-        "type": "stat",
-        "query": "queryTotal",
-        "icon": "fas fa-balance-scale",
-        "text": "Average number of Full-Text queries per user",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Allows you to follow the adoption of the platform by monitoring usage over the concerned period. When a user conducts more and more Full-Text Queries, this suggests successful adoption. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Full-Text Queries DIVIDED BY Total number of unique user-id.",
-        "unique": true,
-        "parameters": {
-            "statLayout": "standard",
-            "valueLocation": "totalrecordcount",
-            "relatedQuery": "userCountTotal",
-            "relatedValueLocation": "totalrecordcount",
-            "computation": "percentage",
-            "asc": true,
-            "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
-        }
-    },
-
     "userCountTotal": {
+        "id": "userCountTotal",
         "type": "stat",
         "query": "userCountTotal",
         "icon": "fas fa-balance-scale",
@@ -501,8 +498,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "sessionCountTotal": {
+        "id": "sessionCountTotal",
         "type": "stat",
         "query": "sessionTotal",
         "icon": "fas fa-balance-scale",
@@ -515,13 +512,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "queryCountTotal": {
+        "id": "queryCountTotal",
         "type": "stat",
         "query": "queryTotal",
         "icon": "fas fa-balance-scale",
         "text": "Full-text Queries",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of all full-text queries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Full-Text Queries.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of all full-text queries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Full-Text Queries",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -529,26 +526,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
-    "searchCountTotal": {
-        "type": "stat",
-        "query": "searchTotal",
-        "icon": "fas fa-balance-scale",
-        "text": "Search summaries",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of all Search Summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Search Summaries",
-        "unique": true,
-        "parameters": {
-            "statLayout": "standard",
-            "valueLocation": "totalrecordcount",
-            "asc": true
-        }
-    },
-
     "sessionsByUser": {
+        "id": "sessionsByUser",
         "type": "stat",
         "query": "sessionsByUser",
         "icon": "fas fa-balance-scale",
-        "text": "Average Sessions By User",
+        "text": "Sessions Per User (Avg)",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of sessions per user. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of session summary DIVIDED BY total number of unique user-ids",
         "unique": true,
         "parameters": {
@@ -558,12 +541,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "searchBySession": {
+        "id": "searchBySession",
         "type": "stat",
         "query": "avgQueriesBySession",
         "icon": "fas fa-balance-scale",
-        "text": "Average Full-Text Queries By Session Summary",
+        "text": "Full-Text Queries Per Session Summary (Avg)",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of Full-Text Queries per session summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  The more searches per session the greater the adoption. Adoption indicator. Be careful, if all the searches are linked, this may on the contrary demonstrate too many reformulations and therefore a problem of relevance of the results. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all Full-Text Queries within a session summary",
         "unique": true,
         "parameters": {
@@ -572,12 +555,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "clickBySearch": {
+        "id": "clickBySearch",
         "type": "stat",
         "query": "avgClicksBySearch",
         "icon": "fas fa-balance-scale",
-        "text": "Average Clicked Documents By Search Summary",
+        "text": "Clicked Documents Per Search Summary (Avg)",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of clicked documents per search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Clicking on several documents following a Full-Text Query may demonstrate a greater effort to access the expected result. Relevance indicator. It can also demonstrate that the user enjoys browsing the results (adoption indicator). <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all clicked documents within a search summary",
         "unique": true,
         "parameters": {
@@ -586,12 +569,12 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "viewedDocPerSearch": {
+        "id": "viewedDocPerSearch",
         "type": "stat",
         "query": "docViewsBySession",
         "icon": "fas fa-balance-scale",
-        "text": "Average Clicked Documents Per Session",
+        "text": "Clicked Documents Per Session (Avg)",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average number of clicked documents (Document Navigator) per session. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Seeing fewer documents during a search suggests that the answer may have been found in the first results. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all clicked documents DIVIDED BY Total number of sessions",
         "unique": true,
         "parameters": {
@@ -601,13 +584,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "sessionDuration": {
+        "id": "sessionDuration",
         "type": "stat",
         "query": "avgSessionDuration",
         "icon": "fas fa-balance-scale",
-        "text": "Average Session Duration (in sec)",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> The average session duration calculated in seconds. A session starts when a user logs into the platform and ends when he logs out or a timeout occurs. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Analysis of the time spent by a user to find his result. Relevance Indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all durations within a session summary",
+        "text": "Session Duration (Avg in sec)",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> The average session duration calculated in seconds. A session starts when a user logs into the platform and ends when he logs out or a timeout occurs. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Analysis of the time spent by a user per session. Relevance Indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all durations within a session summary",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -615,8 +598,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "newUsers": {
+        "id": "newUsers",
         "type": "stat",
         "query": "newUsers",
         "icon": "fas fa-balance-scale",
@@ -629,8 +612,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "newUsersRate": {
+        "id": "newUsersRate",
         "type": "stat",
         "query": "newUsers",
         "icon": "fas fa-balance-scale",
@@ -647,8 +630,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
         }
     },
-
     "activeUsers": {
+        "id": "activeUsers",
         "type": "stat",
         "query": "activeUsers",
         "icon": "fas fa-balance-scale",
@@ -661,8 +644,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "activeUsersRate": {
+        "id": "activeUsersRate",
         "type": "stat",
         "query": "activeUsers",
         "icon": "fas fa-balance-scale",
@@ -679,8 +662,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
         }
     },
-
     "userCoverage": {
+        "id": "userCoverage",
         "type": "stat",
         "query": "activeUsers",
         "icon": "fas fa-balance-scale",
@@ -697,13 +680,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
         }
     },
-
     "clickRank1AfterSearchRate": {
+        "id": "clickRank1AfterSearchRate",
         "type": "stat",
         "query": "clickRank1AfterSearch",
         "icon": "fas fa-balance-scale",
         "text": "First Clicked Document Rate",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user clicks on the first document out of the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search summary where there are clicks of rank = 0 DIVIDED BY Total number of search summary",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user clicks on the first document out of the total number of search summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search summaries where there are clicks of rank = 0 DIVIDED BY Total number of search summaries",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -715,13 +698,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
         }
     },
-
     "clickRank1AfterSearchTimeline": {
+        "id": "clickRank1AfterSearchTimeline",
         "type": "timeline",
         "query": "clickRank1AfterSearchTimeline",
         "text": "First Clicked Document Timeline",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user clicks on the first document displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search.summary where there are clicks of rank = 1.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user clicks on the first document displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search results may be considered relevant when there are a maximum number of clicks on the first document. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search.summary where there are clicks of rank = 1.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -732,13 +715,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "clickRank3AfterSearchRate": {
+        "id": "clickRank3AfterSearchRate",
         "type": "stat",
         "query": "clickRank3AfterSearch",
         "icon": "fas fa-balance-scale",
         "text": "First Three Clicked Documents Rate",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user clicks on the first three documents out of the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search.summary where there are clicks of rank = (0,1,2) DIVIDED BY Total number of search summary",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user clicks on the first three documents out of the total number of search summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search.summary where there are clicks of rank = (0,1,2) DIVIDED BY Total number of search summaries",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -750,13 +733,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
         }
     },
-
     "clickRank3AfterSearchTimeline": {
+        "id": "clickRank3AfterSearchTimeline",
         "type": "timeline",
         "query": "clickRank3AfterSearchTimeline",
         "text": "First Three Clicked Documents Timeline",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user clicks on the first three document displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search summary results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summary where there are clicks of rank = (0,1,2).",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user clicks on the first three document displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Search summaries results may be considered relevant when there are a maximum number of clicks on the first three documents. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summaries where there are clicks of rank = (0,1,2).",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -767,13 +750,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "clickAfterSearch": {
+        "id": "clickAfterSearch",
         "type": "stat",
         "query": "clickAfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Search Summary With Clicks",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Total number of search summary where the user has clicked on a document at least once. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Measures the likely success of a search. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search summary where there are at least one clicked documents",
+        "text": "Search Summaries With Clicks",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Total number of search summaries where the user has clicked on a document at least once. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Measures the likely success of a search. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search summaries where there are at least one clicked documents",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -781,13 +764,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "clickAfterSearchRate": {
+        "id": "clickAfterSearchRate",
         "type": "stat",
         "query": "clickAfterSearch",
         "icon": "fas fa-balance-scale",
-        "text": "Search Summary With Click(s) Rate",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user clicks at least on one document out of the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Measures the likely success of a search. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search summary where there are at least one clicked document DIVIDED BY Total number of search summary",
+        "text": "Search Summaries With Click(s) Rate",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user clicks at least on one document out of the total number of search summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Measures the likely success of a search. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search summaries where there are at least one clicked document DIVIDED BY Total number of search summaries",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -799,13 +782,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
         }
     },
-
     "clickAfterSearchTimeline": {
+        "id": "clickAfterSearchTimeline",
         "type": "timeline",
         "query": "clickAfterSearchTimeline",
-        "text": "Search Summary With Click(s) Timeline",
+        "text": "Search Summaries With Click(s) Timeline",
         "icon": "fas fa-chart-line",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user clicks at least on one document displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Measures the likely success of a search. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summary where there are at least one click.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user clicks at least on one document displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Measures the likely success of a search. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summaries where there are at least one click.",
         "unique": true,
         "parameters": {
             "aggregationsTimeSeries": {
@@ -816,13 +799,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "chartType": "Timeline"
         }
     },
-
     "mrr": {
+        "id": "mrr",
         "type": "stat",
         "query": "avgMRR",
         "icon": "fas fa-balance-scale",
         "text": "Mean Reciprocal Rank (MRR)",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Captures the rank of a clicked document by users displayed over time: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of the relevance of the results page. MRR = 1 is the best. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on search-summary. Average of all Mean Reciprocal Rank (MRR) events.",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Captures the rank of a clicked document by users displayed over time: first doc = 1, second doc = 1/2, third doc = 1/3...  and zero if there is no click. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of the relevance of the results page. MRR = 1 is the best. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Based on search summary. Average of all Mean Reciprocal Rank (MRR) events.",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -831,13 +814,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
         }
     },
-
     "refinement": {
+        "id": "refinement",
         "type": "stat",
         "query": "queryRefine",
         "icon": "fas fa-balance-scale",
         "text": "Refinement",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Total number of search summary where the user has refined the search. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summary where there are searchrefinements",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Total number of search summaries where the user has refined the search. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summaries where there are searchrefinements",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -845,13 +828,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": true
         }
     },
-
     "refinementRate": {
+        "id": "refinementRate",
         "type": "stat",
         "query": "queryRefine",
         "icon": "fas fa-balance-scale",
         "text": "Refinement Rate",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user has refined the search compared to the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summary where there are searchrefinements DIVIDED BY Total number of search summary",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user has refined the search compared to the total number of search summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  After a search, the user must refine the results before clicking on a document. This demonstrates that relevance can be improved. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summaries where there are searchrefinements DIVIDED BY Total number of search summaries",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -863,8 +846,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
         }
     },
-
     "zeroSearch": {
+        "id": "zeroSearch",
         "type": "stat",
         "query": "queryZero",
         "icon": "fas fa-balance-scale",
@@ -877,13 +860,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": false
         }
     },
-
     "zeroSearchRate": {
+        "id": "zeroSearchRate",
         "type": "stat",
         "query": "queryZero",
         "icon": "fas fa-balance-scale",
         "text": "Zero Result Search Rate",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of Full-Text Queries without any results compared to the total number of searches queries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of Full-Text Queries where resultcount=0 DIVIDED BY Total number of Full-Text Queries",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of Full-Text Queries without any results compared to the total number of queries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of Full-Text Queries where resultcount=0 DIVIDED BY Total number of Full-Text Queries",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -895,13 +878,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
         }
     },
-
     "searchExit": {
+        "id": "searchExit",
         "type": "stat",
         "query": "searchExit",
         "icon": "fas fa-balance-scale",
-        "text": "Search Summary With Exit",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Total number of search summary where the user does nothing after viewing the results page. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  If the user does a search and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summary where the result event values is search.exit.timeout or search.exit.logout",
+        "text": "Search Summaries With Exit",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Total number of search summaries where the user does nothing after viewing the results page. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  If the user does a search and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all search summaries where the result event values is search.exit.timeout or search.exit.logout",
         "unique": true,
         "parameters": {
             "statLayout": "standard",
@@ -909,13 +892,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "asc": false
         }
     },
-
     "searchExitRate": {
+        "id": "searchExitRate",
         "type": "stat",
         "query": "searchExit",
         "icon": "fas fa-balance-scale",
-        "text": "Search Summary With Exit Rate",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summary where the user does nothing after viewing the results page compared to the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  If the user does a full-text query and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search exits (timeout and logout) DIVIDED BY Total number of search summary.",
+        "text": "Search Summaries With Exit Rate",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of search summaries where the user does nothing after viewing the results page compared to the total number of search summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  If the user does a full-text query and then does not act, this may demonstrate that he does not consider the results provided to be relevant. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Total number of search exits (timeout and logout) DIVIDED BY Total number of search summaries.",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -927,8 +910,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 1}
         }
     },
-
     "queryBounce": {
+        "id": "queryBounce",
         "type": "stat",
         "query": "queryBounce",
         "icon": "fas fa-balance-scale",
@@ -942,13 +925,13 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "decimal", "maximumFractionDigits": 2}
         }
     },
-
     "queryBounceRate": {
+        "id": "queryBounceRate",
         "type": "stat",
         "query": "queryBounce",
         "icon": "fas fa-balance-scale",
-        "text": "Bounce By Search Summary",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of bounces compared to the total number of search summary. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  This suggests that the result was likely irrelevant or incomplete. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span> Percentage of total bounces among the total number of search summary.",
+        "text": "Bounce Per Search Summary",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of bounces compared to the total number of search summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  This suggests that the result was likely irrelevant or incomplete. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span> Percentage of total bounces among the total number of search summaries.",
         "unique": true,
         "parameters": {
             "valueLocation": "totalrecordcount",
@@ -960,45 +943,8 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "numberFormatOptions": {"style": "percent", "maximumFractionDigits": 2}
         }
     },
-
-    "avgResponseTime": {
-        "type": "stat",
-        "query": "avgResponseTime",
-        "icon": "fas fa-balance-scale",
-        "text": "Average Web App Response Time",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average response time (in ms) incl. platform &amp; engine. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of the response speed following a full-text queries. Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all durations filtered on Full Text Queries",
-        "unique": true,
-        "parameters": {
-            "statLayout": "standard",
-            "valueLocation": "aggregations",
-            "valueField": {
-                "name": "avg",
-                "operatorResults": true
-            },
-            "asc": false
-        }
-
-    },
-
-    "avgEngineResponseTime": {
-        "type": "stat",
-        "query": "avgEngineResponseTime",
-        "icon": "fas fa-balance-scale",
-        "text": "Average Engine Response Time",
-        "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average engine response time (in ms). <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of the response speed following a full-text queries. Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all duration executions filtered on full-text queries.",
-        "unique": true,
-        "parameters": {
-            "statLayout": "standard",
-            "valueLocation": "aggregations",
-            "valueField": {
-                "name": "avg",
-                "operatorResults": true
-            },
-            "asc": false
-        }
-    },
-
     "userFeedbackGrid": {
+        "id": "userFeedbackGrid",
         "type": "grid",
         "query": "userFeedback",
         "text": "User Feedback",
@@ -1009,7 +955,7 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "columns": [
                 {
                     "field": "app",
-                    "headerName": "App",
+                    "headerName": "Appl",
                     "filterType": "text",
                     "formatterType": "text"
                 },
@@ -1030,53 +976,79 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             "showTooltip": true
         }
     }
+
 };
 
 /** Dashboards */
 export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position: DashboardItemPosition}[]}[] = [
     {
-        "name": "User Adoption",
+        "name": "Users",
         "items": [
-            {"item": "userCountTotalTimeline", "position": {"x": 0, "y": 0}},
-            {"item": "newUsers", "position": {"x": 3, "y": 0}},
-            {"item": "activeUsers", "position": {"x": 4, "y": 0}},
-            {"item": "userCountTotal", "position": {"x": 3, "y": 6}},
-            {"item": "sessionsByUser", "position": {"x": 4, "y": 8}},
-            {"item": "sessionCountTotal", "position": {"x": 4, "y": 2}},
-            {"item": "searchBySession", "position": {"x": 6, "y": 8}},
-            {"item": "queryCountTotal", "position": {"x": 4, "y": 6}},
-            {"item": "viewedDocPerSearch", "position": {"x": 5, "y": 8}},
-            {"item": "queryCountTotalTimeline", "position": {"x": 0, "y": 4}},
-            {"item": "sessionCountTotalTimeline", "position": {"x": 0, "y": 8}},
-            {"item": "clickBySearch", "position": {"x": 4, "y": 4}},
-            {"item": "userCoverage", "position": {"x" : 3, "y" : 2, "rows" : 4}},
-            {"item": "sessionDuration", "position": {"x" : 3, "y" : 8}},
-            {"item": "topCollections", "position": {"x": 5, "y": 0}},
-            {"item": "topFacets", "position": {"x": 5, "y": 4}},
-            {"item": "userFeedbackGrid", "position": {"x": 3, "y": 10, "rows" : 6,"cols" : 5}}
+            { "item": "userCountTotalTimeline", "position": { "x": 0, "y": 0, "rows": 4, "cols": 4 } },
+            { "item": "newUsersTimeline", "position": { "x": 4, "y": 0, "rows": 4, "cols": 4 } },
+            { "item": "userCoverage", "position": { "x": 0, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "userCountTotal", "position": { "x": 2, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "newUsers", "position": { "x": 4, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "newUsersRate", "position": { "x": 4, "y": 6, "rows": 2, "cols": 2 } },
+            { "item": "activeUsers", "position": { "x": 6, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "activeUsersRate", "position": { "x": 6, "y": 6, "rows": 2, "cols": 2 } }
         ]
     },
     {
-        "name": "Relevancy",
+        "name": "Users Activities",
         "items": [
-            {"item": "topQueries", "position": {"x": 0, "y": 0}},
-            {"item": "topNoResultsQueries", "position": {"x": 0, "y": 4}},
-            {"item": "clickRank3AfterSearchRate", "position": {"x": 4, "y": 0}},
-            {"item": "queryBounceRate", "position": {"x": 4, "y": 4}},
-            {"item": "searchExitRate", "position": {"x": 5, "y": 4, "rows" : 4}},
-            {"item": "zeroSearchRate", "position": {"x": 3, "y": 4}},
-            {"item": "refinementRate", "position": {"x": 3, "y": 6}},
-            {"item": "mrr", "position": {"x": 3, "y": 2}},
-            {"item": "clickRank1AfterSearchRate", "position": {"x": 3, "y": 0}},
-            {"item": "resultTypes", "position": {"x": 5, "y": 0}},
-            {"item": "clickAfterSearchRate", "position": {"x": 4, "y": 2}}
+            { "item": "usersActivitiesTimeline", "position": { "x": 0, "y": 0, "rows": 4, "cols": 3 } },
+            { "item": "sessionCountTotal", "position": { "x": 3, "y": 0, "rows": 2, "cols": 2 } },
+            { "item": "searchBySession", "position": { "x": 5, "y": 6, "rows": 2, "cols": 3 } },
+            { "item": "searchBySessionTimeline", "position": { "x": 5, "y": 2, "rows": 4, "cols": 3 } },
+            { "item": "clickBySearch", "position": { "x": 3, "y": 8, "rows": 2, "cols": 2 } },
+            { "item": "sessionDuration", "position": { "x": 3, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "queryCountTotal", "position": { "x": 5, "y": 0, "rows": 2, "cols": 3 } },
+            { "item": "sessionsByUser", "position": { "x": 3, "y": 2, "rows": 2, "cols": 2 } },
+            { "item": "userCountTotalTimeline", "position": { "x": 0, "y": 4, "rows": 4, "cols": 3 } },
+            { "item": "viewedDocPerSearch", "position": { "x": 3, "y": 6, "rows": 2, "cols": 2 } }
         ]
     },
     {
-        "name": "Performance",
+        "name": "Features Usage",
         "items": [
-            {"item": "avgResponseTimeTimeline", "position": {"x": 0, "y": 0}},
-            {"item": "avgEngineResponseTimeline", "position": {"x": 0, "y": 4}}
+            { "item": "topCollections", "position": { "x": 0, "y": 0, "rows": 8, "cols": 3 } },
+            { "item": "topSources", "position": { "x": 3, "y": 0, "rows": 8, "cols": 3 } },
+            { "item": "topFacets", "position": { "x": 6, "y": 0, "rows": 8, "cols": 2 } }
+        ]
+    },
+    {
+        "name": "Queries",
+        "items": [
+            { "item": "topQueries", "position": { "x": 0, "y": 0, "rows": 5, "cols": 4 } },
+            { "item": "topNoResultsQueries", "position": { "x": 4, "y": 0, "rows": 5, "cols": 4 } },
+            { "item": "queryCountTotalTimeline", "position": { "x": 0, "y": 5, "rows": 3, "cols": 3 } },
+            { "item": "queryCountTotal", "position": { "x": 3, "y": 5, "rows": 3, "cols": 1 } },
+            { "item": "zeroSearchTimeline", "position": { "x": 4, "y": 5, "rows": 3, "cols": 2 } },
+            { "item": "zeroSearch", "position": { "x": 6, "y": 5, "rows": 3, "cols": 1 } },
+            { "item": "zeroSearchRate", "position": { "x": 7, "y": 5, "rows": 3, "cols": 1 } }
+        ]
+    },
+    {
+        "name": "Results",
+        "items": [
+            { "item": "mrrTimeline", "position": { "x": 0, "y": 0, "rows": 6, "cols": 3 } },
+            { "item": "mrr", "position": { "x": 0, "y": 6, "rows": 2, "cols": 2 } },
+            { "item": "resultTypes", "position": { "x": 5, "y": 0, "rows": 4, "cols": 3 } },
+            { "item": "clickRank1AfterSearchRate", "position": { "x": 3, "y": 0, "rows": 2, "cols": 2 } },
+            { "item": "clickRank3AfterSearchRate", "position": { "x": 3, "y": 2, "rows": 2, "cols": 2 } },
+            { "item": "clickAfterSearchRate", "position": { "x": 6, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "searchExitRate", "position": { "x": 6, "y": 6, "rows": 2, "cols": 2 } },
+            { "item": "queryBounceRate", "position": { "x": 6, "y": 8, "rows": 2, "cols": 2 } },
+            { "item": "refinementRate", "position": { "x": 0, "y": 8, "rows": 2, "cols": 2 } },
+            { "item": "clickBySearch", "position": { "x": 3, "y": 4, "rows": 2, "cols": 3 } },
+            { "item": "clickBySearchTimeline", "position": { "x": 2, "y": 6, "rows": 4, "cols": 4 } }
+        ]
+    },
+    {
+        "name": "Feedback",
+        "items": [
+            { "item": "userFeedbackGrid", "position": { "x": 0, "y": 0, "rows": 8, "cols": 8 } }
         ]
     }
 ]
@@ -1143,6 +1115,7 @@ export const PALETTE: {name: string, items: string[]}[] = [
     {
         "name": "User",
         "items": [
+            "usersRepartition",
             "userCountTotalTimeline",
             "newUsersTimeline",
             "userCountTotal",
@@ -1152,22 +1125,13 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "activeUsers",
             "activeUsersRate",
             "userCoverage",
+            "usersActivitiesTimeline",
             "userFeedbackGrid"
-        ]
-    },
-    {
-        "name": "Response time",
-        "items": [
-            "avgEngineResponseTimeline",
-            "maxEngineResponseTimeline",
-            "avgResponseTimeTimeline",
-            "maxResponseTimeTimeline",
-            "avgResponseTime",
-            "avgEngineResponseTime"
         ]
     }
 ]
 
+/** Help page repo */
 export const HELP_DEFAULT_FOLDER_OPTIONS: HelpFolderOptions = {
     folder: 'usage-analytics',
     path: '/r/_sinequa/webpackages/help',

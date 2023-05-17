@@ -37,6 +37,7 @@ import { FusionChartsModule } from '@sinequa/analytics/fusioncharts'
 
 import * as FusionCharts from "fusioncharts";
 import * as charts from "fusioncharts/fusioncharts.charts";
+import * as powerCharts from "fusioncharts/fusioncharts.powercharts";
 import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
 import * as CandyTheme from "fusioncharts/themes/fusioncharts.theme.candy";
 FusionCharts.options.creditLabel = false;
@@ -125,7 +126,7 @@ const selectionOptions: SelectionOptions = {
         BsNotificationModule,
         UtilsModule,
 
-        FusionChartsModule.forRoot(FusionCharts, charts, FusionTheme, CandyTheme),
+        FusionChartsModule.forRoot(FusionCharts, charts, powerCharts, FusionTheme, CandyTheme),
 
         BsUserSettingsModule,
         BsFeedbackModule,

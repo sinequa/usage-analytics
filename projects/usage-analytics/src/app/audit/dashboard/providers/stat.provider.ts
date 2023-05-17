@@ -15,7 +15,7 @@ export type Evaluation = "ok" | "ko" | "stable" | undefined;
 
 // to avoid using this syntaxe: T | undefined.
 // eg: const a:MayBe<number> ==> const a: number | undefined;
-type MayBe<T> = T | undefined;
+export type MayBe<T> = T | undefined;
 
 @Injectable( { providedIn: 'root'})
 export class StatProvider {

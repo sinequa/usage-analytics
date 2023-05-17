@@ -21,6 +21,7 @@ import { AppService } from '@sinequa/core/app-utils';
 import { GridColDef } from './providers/grid-provider';
 import { StatLayout, StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
 import { HeatmapData } from './providers/heatmap-provider';
+import { MultiLevelPieConfig, MultiLevelPieQuery } from './providers/multi-level-pie-provider';
 
 /**
  * Interface storing the configuration of a widget. It must contain the minimal amount of information
@@ -31,6 +32,7 @@ import { HeatmapData } from './providers/heatmap-provider';
  * widget in the dashboard.
  */
 export interface DashboardItem extends GridsterItem {
+    id: string;
     type: string;
     icon: string;
     title: string;
@@ -46,7 +48,7 @@ export interface DashboardItem extends GridsterItem {
     aggregation?: string; // For type === 'chart'
     chartData?: StrictUnion<ChartData | HeatmapData>; // For type === 'chart'
     chartType?: string; // For type === 'chart' && type === 'timeline'
-    extraTimelineQueries?: string[]; // For type === 'timeline'
+    extraQueries?: string[]; // For type === 'timeline' && type === 'multiLevelPie'
     showPreviousPeriod?: boolean; // For type === 'timeline'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
@@ -64,7 +66,9 @@ export interface DashboardItem extends GridsterItem {
     computation?: StatOperation; // operation to get the global value of the stat
     asc?: boolean; // if the positive evaluation is at increase or decrease trend
     statLayout?: StatLayout; // the ui of displaying the stat
-    numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
+    numberFormatOptions?: Intl.NumberFormatOptions; // options of formatting numbers
+    multiLevelPieQueries?: MultiLevelPieQuery[]; // For type === 'multiLevelPie'
+    multiLevelPieData?: MultiLevelPieConfig[]; // For type === 'multiLevelPie'
 }
 
 /**
@@ -80,6 +84,7 @@ export interface Dashboard {
  * is used to create a button to select a type of widget among a list.
  */
 export interface DashboardItemOption {
+    id: string;
     type: string;
     query: string;
     icon: string;
@@ -88,38 +93,41 @@ export interface DashboardItemOption {
     info?: string;
     parameters?: {
         // For type === 'timeline'
-        aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[],
-        recordsTimeSeries?: RecordsTimeSeries,
-
-        // For type === 'chart'
-        chartData?: ChartData,
-
-        // For type === 'chart' && type === 'timeline'
-        chartType?: string,
-
-        // For type === 'timeline'
-        extraTimelineQueries?: string[];
+        aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
+        recordsTimeSeries?: RecordsTimeSeries;
         showPreviousPeriod?: boolean;
 
+        // For type === 'chart'
+        chartData?: ChartData;
+
+        // For type === 'chart' && type === 'timeline'
+        chartType?: string;
+
+        // For type === 'timeline' && type === 'multiLevelPie'
+        extraQueries?: string[];
+
         // For type === 'stat'
-        valueLocation?: StatValueLocation, // where to find value field
-        valueField?: StatValueField, // how to access value field
-        operation?: StatOperation, // operation to compute the value
+        valueLocation?: StatValueLocation; // where to find value field
+        valueField?: StatValueField; // how to access value field
+        operation?: StatOperation; // operation to compute the value
         relatedQuery?: string, // query containing the second leg of the stat operands
-        relatedValueLocation?: StatValueLocation, // where to find the value field of the second stat operands
+        relatedValueLocation?: StatValueLocation; // where to find the value field of the second stat operands
         relatedValueField?: StatValueField, //how to access value field of the second stat operands
-        relatedOperation?: StatOperation, // operation to compute the value of the second stat operands
-        computation?: StatOperation, // operation to get the global value of the stat
-        asc?: boolean, // if the positive evaluation is at increase or decrease trend
-        statLayout?: StatLayout, // the ui of displaying the stat
-        numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
+        relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
+        computation?: StatOperation; // operation to get the global value of the stat
+        asc?: boolean; // if the positive evaluation is at increase or decrease trend
+        statLayout?: StatLayout; // the ui of displaying the stat
+        numberFormatOptions?: Intl.NumberFormatOptions; // options of formatting numbers
 
         // For type === 'grid'
-        columns?: GridColDef[],
-        aggregationName?: string,
-        showTooltip?: boolean,
-        enableSelection?: boolean
+        columns?: GridColDef[];
+        aggregationName?: string;
+        showTooltip?: boolean;
+        enableSelection?: boolean;
 
+        // For type === 'multiLevelPie'
+        multiLevelPieQueries?: MultiLevelPieQuery[];
+        multiLevelPieData?: MultiLevelPieConfig[];
     };
 }
 
@@ -545,6 +553,7 @@ export class DashboardService {
             y: y,
             rows,
             cols,
+            id: option.id,
             type: option.type,
             query: option.query,
             icon: option.icon,

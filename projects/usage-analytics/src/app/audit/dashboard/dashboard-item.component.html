@@ -91,16 +91,30 @@
             <ng-container *ngIf="config.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
+        <!-- Multi level pie view -->
+        <ng-container *ngSwitchCase="'multiLevelPie'">
+            <sq-multi-level-pie-chart
+                #facet
+                [data]="data"
+                [width]="innerwidth"
+                [height]="innerheight"
+                showLabels="true"
+                showValues="true"
+                autohide="false">
+            </sq-multi-level-pie-chart>
+        </ng-container>
+
+
     </ng-container>
 
     <div class="sq-loading" *ngIf="loading">
-      <div class="spinner-grow text-primary" role="status">
-          <span class="sr-only">Loading...</span>
-      </div>
+        <div class="spinner-grow text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
     </div>
 
     <div *ngIf="errorMessage" class="text-center alert-danger p-2 overflow-auto" [ngStyle]="{'height.px': innerheight}">
-      {{errorMessage}}
+        {{errorMessage}}
     </div>
 
 </sq-facet-card>
