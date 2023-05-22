@@ -57,7 +57,7 @@ export class MultiLevelPieProvider {
                 if (queryOperands.every((query) => queries!.find((q) => q.query === query))) {
                     // Replace the query operands with their resolved numerical values
                     const resolvedExpr = expr.replace(/\b\w+\b/g, (match) => this.extractQueryValue(dataset[match], queries!.find((q) => q.query === match)!).toString());
-                    return eval(resolvedExpr);
+                    return eval?.(`"use strict";${resolvedExpr}`) || 0;
                 } else {
                     console.error("Query operand(s) have been used but not defined in 'multiLevelPieQueries' parameter of the widget = " + config.id)
                     return 0;
