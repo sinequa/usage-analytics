@@ -1,6 +1,7 @@
 import { Component, HostListener } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from "@angular/forms";
-import { AuditService, RelativeTimeRanges } from "../audit.service";
+import { AuditService } from "../audit.service";
+import { RelativeTimeRanges } from "../config";
 
 @Component({
     selector: "sq-audit-range-picker",

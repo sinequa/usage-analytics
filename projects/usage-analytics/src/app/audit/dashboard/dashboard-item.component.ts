@@ -6,7 +6,7 @@ import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError, E
 import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
 import { TimelineSeries } from '@sinequa/analytics/timeline';
-import { defaultChart } from '@sinequa/analytics/fusioncharts';
+import { Category, defaultChart } from '@sinequa/analytics/fusioncharts';
 
 import { DashboardItem, DashboardService } from './dashboard.service';
 import { TimelineProvider } from './providers/timeline-provider';
@@ -16,6 +16,7 @@ import { GridProvider } from './providers/grid-provider';
 import { HeatmapItem } from '@sinequa/analytics/heatmap';
 import { HeatmapProvider } from './providers/heatmap-provider';
 import { Utils } from '@sinequa/core/base';
+import { MultiLevelPieProvider } from './providers/multi-level-pie-provider';
 
 
 /**
@@ -29,7 +30,7 @@ import { Utils } from '@sinequa/core/base';
     selector: 'sq-dashboard-item',
     templateUrl: './dashboard-item.component.html',
     styleUrls: ['./dashboard-item.component.scss'],
-    providers: [TimelineProvider, ChartProvider, GridProvider, HeatmapProvider]
+    providers: [TimelineProvider, ChartProvider, GridProvider, HeatmapProvider, MultiLevelPieProvider]
 })
 export class DashboardItemComponent implements OnChanges {
     @Input() config: DashboardItem;
@@ -106,6 +107,9 @@ export class DashboardItemComponent implements OnChanges {
     /** ag-grid API for the grid */
     gridApi: GridApi | null | undefined;
 
+    // Multi level pie
+    data: Category[] = [];
+
     errorMessage?: string;
     loading = true;
 
@@ -117,7 +121,8 @@ export class DashboardItemComponent implements OnChanges {
         public timelineProvider: TimelineProvider,
         public chartProvider: ChartProvider,
         public gridProvider: GridProvider,
-        public heatmapProvider: HeatmapProvider
+        public heatmapProvider: HeatmapProvider,
+        public multiLevelPieProvider: MultiLevelPieProvider
         ) {
 
         this.closeAction = new Action({
@@ -159,10 +164,10 @@ export class DashboardItemComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
 
         if(this.config.type === "chart" && changes.buttonsStyle) {
-          this.chart = {
-            ...defaultChart,
-            theme: this.buttonsStyle === "dark"? "candy" : "fusion"
-          };
+            this.chart = {
+                ...defaultChart,
+                theme: this.buttonsStyle === "dark"? "candy" : "fusion"
+            };
         }
 
         // Manage width and height changes. Some components need additional treatment
@@ -185,6 +190,10 @@ export class DashboardItemComponent implements OnChanges {
         if (this.config.type === "timeline") {
             if (changes.dataset || changes.previousDataSet) {
                 this._updateTimelineData();
+            }
+        } else if (this.config.type === "multiLevelPie") {
+            if (changes.dataset) {
+                this._updateMultiLevelPieData();
             }
         } else {
             if (changes.dataset) {
@@ -234,7 +243,12 @@ export class DashboardItemComponent implements OnChanges {
             }
         }
 
-        // Update the actions
+        // Update actions
+        this._updateActions();
+    }
+
+    // Update the list of actions of the widget
+    private _updateActions() {
         this.actions = [];
         if(this.renamable) {
             this.actions.push(this.renameAction);
@@ -356,7 +370,7 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     private _updateTimelineData() {
-        const queries = [this.config.query, ...(this.config.extraTimelineQueries || [])];
+        const queries = [this.config.query, ...(this.config.extraQueries || [])];
 
         if (queries.every((query) => this.dataset?.[query]) && queries.every((query) => this.previousDataSet?.[query])) {
             this.loading = false;
@@ -410,6 +424,16 @@ export class DashboardItemComponent implements OnChanges {
         }
 
         return {timeSeries, columnDefs, rowData};
+    }
+
+    private _updateMultiLevelPieData() {
+        const queries = this.config.multiLevelPieQueries?.map(item => item.query) || [];
+        if (queries.every((query) => this.dataset?.[query])) {
+            this.loading = false;
+            this.data = this.multiLevelPieProvider.resolveData(this.dataset, this.config, this.config.multiLevelPieData, this.config.multiLevelPieQueries) || [];
+        } else {
+            this.loading = true;
+        }
     }
 
     toggleFullScreen(): void {

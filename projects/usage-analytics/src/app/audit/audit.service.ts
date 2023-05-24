@@ -28,22 +28,9 @@ import {
     sq_timezone,
     custom_params,
     mono_scope_queries,
-    facet_filters_query
+    facet_filters_query,
+    RelativeTimeRanges
 } from "./config";
-
-export enum RelativeTimeRanges {
-    Last3H = "msg#dateRange.last3H",
-    Last6H = "msg#dateRange.last6H",
-    Last12H = "msg#dateRange.last12H",
-    Last24H = "msg#dateRange.last24H",
-    Last7Days = "msg#dateRange.last7D",
-    Last30Days = "msg#dateRange.last30D",
-    Last90Days = "msg#dateRange.last90D",
-    Last6M = "msg#dateRange.last6M",
-    Last1Y = "msg#dateRange.last1Y",
-    Last2Y = "msg#dateRange.last2Y",
-    Last5Y = "msg#dateRange.last5Y",
-}
 
 export interface AuditDatasetFilters {
     currentRangeFilter: BetweenFilter;
@@ -298,8 +285,11 @@ export class AuditService {
                 if (item.relatedQuery) {
                     datasets.push(item.relatedQuery);
                 }
-                if (item.extraTimelineQueries) {
-                    datasets.push(...item.extraTimelineQueries);
+                if (item.extraQueries) {
+                    datasets.push(...item.extraQueries);
+                }
+                if (item.multiLevelPieQueries) {
+                    datasets.push(...item.multiLevelPieQueries.map(item => item.query));
                 }
             }
         );
