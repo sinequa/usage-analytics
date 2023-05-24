@@ -427,7 +427,7 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     private _updateMultiLevelPieData() {
-        const queries = [this.config.query, ...(this.config.extraQueries || [])];
+        const queries = this.config.multiLevelPieQueries?.map(item => item.query) || [];
         if (queries.every((query) => this.dataset?.[query])) {
             this.loading = false;
             this.data = this.multiLevelPieProvider.resolveData(this.dataset, this.config, this.config.multiLevelPieData, this.config.multiLevelPieQueries) || [];

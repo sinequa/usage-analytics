@@ -48,7 +48,7 @@ export interface DashboardItem extends GridsterItem {
     aggregation?: string; // For type === 'chart'
     chartData?: StrictUnion<ChartData | HeatmapData>; // For type === 'chart'
     chartType?: string; // For type === 'chart' && type === 'timeline'
-    extraQueries?: string[]; // For type === 'timeline' && type === 'multiLevelPie'
+    extraQueries?: string[]; // For type === 'timeline'
     showPreviousPeriod?: boolean; // For type === 'timeline'
     aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
     recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'

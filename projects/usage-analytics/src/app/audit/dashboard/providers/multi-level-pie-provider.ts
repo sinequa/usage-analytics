@@ -3,6 +3,7 @@ import { Category } from "@sinequa/analytics/fusioncharts";
 import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
 import { DashboardItem } from "../dashboard.service";
 import { MayBe, StatProvider, StatValueField, StatValueLocation } from "./stat.provider";
+import { Parser } from "expr-eval";
 
 export interface MultiLevelPieQuery {
     query: string;
@@ -49,15 +50,18 @@ export class MultiLevelPieProvider {
      */
     resolveValue(dataset: Dataset, config: DashboardItem, queries: MayBe<MultiLevelPieQuery[]>, expr: string): number {
         if (queries) {
-            // Define the regex pattern to match word operands
-            const pattern = /\b\w+\b/g;
-            // Extract all query operands using the match method
-            const queryOperands = expr.match(pattern);
+            // Extract all query operands
+            const parser = new Parser();
+            const queryOperands = parser.parse(expr).variables();
             if (queryOperands) {
                 if (queryOperands.every((query) => queries!.find((q) => q.query === query))) {
-                    // Replace the query operands with their resolved numerical values
-                    const resolvedExpr = expr.replace(/\b\w+\b/g, (match) => this.extractQueryValue(dataset[match], queries!.find((q) => q.query === match)!).toString());
-                    return eval?.(`"use strict";${resolvedExpr}`) || 0;
+                    // Define an object of all query operands with their resolved numerical values
+                    const resolvedQueryOperands: { [key: string]: number } = {};
+                    queryOperands.forEach((query: string) => {
+                        resolvedQueryOperands[query] = this.extractQueryValue(dataset[query], queries!.find((q) => q.query === query)!);
+                    });
+                    // Evaluate the expression
+                    return parser.evaluate(expr, resolvedQueryOperands);
                 } else {
                     console.error("Query operand(s) have been used but not defined in 'multiLevelPieQueries' parameter of the widget = " + config.id)
                     return 0;

@@ -288,6 +288,9 @@ export class AuditService {
                 if (item.extraQueries) {
                     datasets.push(...item.extraQueries);
                 }
+                if (item.multiLevelPieQueries) {
+                    datasets.push(...item.multiLevelPieQueries.map(item => item.query));
+                }
             }
         );
         return datasets;
