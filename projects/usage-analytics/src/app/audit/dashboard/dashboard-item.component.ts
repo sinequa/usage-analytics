@@ -15,7 +15,6 @@ import { ChartProvider } from './providers/chart-provider';
 import { GridProvider } from './providers/grid-provider';
 import { HeatmapItem } from '@sinequa/analytics/heatmap';
 import { HeatmapProvider } from './providers/heatmap-provider';
-import { Utils } from '@sinequa/core/base';
 import { MultiLevelPieProvider } from './providers/multi-level-pie-provider';
 
 
@@ -505,7 +504,7 @@ export class DashboardItemComponent implements OnChanges {
         this.gridApi = event.api;
         // Programmatically select filtered rows
         this.gridApi?.forEachNode((node) => {
-            if (Utils.eq((this._selectedNode?.data)?.toString(), (node.data).toString())) {
+            if (node.data.$filtered) {
                 node.setSelected(true, undefined, true);
             }
         });
@@ -522,14 +521,7 @@ export class DashboardItemComponent implements OnChanges {
         if (this._gridFilter) {
             this.searchService.query.removeSameFilters(this._gridFilter)
         }
-        // Programmatically toggle the selection
-        // Obviously, multiple selection is not possible since each selection triggers a new search and we don't want to add actions to handle filtering operator (or, and ...)
-        if (Utils.eq((this._selectedNode?.data)?.toString(), (newSelectedNode[0]?.data)?.toString())) {
-            this.gridApi!.forEachNode((node) => node.setSelected(false));
-            this._selectedNode = undefined;
-        } else {
-            this._selectedNode = newSelectedNode[0];
-        }
+        this._selectedNode = newSelectedNode[0];
         // Make new filter based on current selection
         if (this._selectedNode) {
             const row = this._selectedNode.data;
