@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Category } from "@sinequa/analytics/fusioncharts";
 import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
-import { DashboardItem } from "../dashboard.service";
+import { DashboardItem, MultiLevelPieParams } from "../dashboard.service";
 import { MayBe, StatProvider, StatValueField, StatValueLocation } from "./stat.provider";
 import { Parser } from "expr-eval";
 
@@ -26,7 +26,7 @@ export class MultiLevelPieProvider {
         return this.statProvider.extractStatValue(data, queryConfig.valueLocation, queryConfig.valueField) || 0;
     }
 
-    resolveData(dataset: Dataset, config: DashboardItem, categoriesConfig: MayBe<MultiLevelPieConfig[]>, queries: MayBe<MultiLevelPieQuery[]>): Category[] {
+    resolveData(dataset: Dataset, config: DashboardItem<MultiLevelPieParams>, categoriesConfig: MayBe<MultiLevelPieConfig[]>, queries: MayBe<MultiLevelPieQuery[]>): Category[] {
         if (!categoriesConfig) {
             return [];
         }
@@ -48,7 +48,7 @@ export class MultiLevelPieProvider {
      * @param queries
      * @param expr For example "query1 - query2 + queryX * (query5 / query6)"
      */
-    resolveValue(dataset: Dataset, config: DashboardItem, queries: MayBe<MultiLevelPieQuery[]>, expr: string): number {
+    resolveValue(dataset: Dataset, config: DashboardItem<MultiLevelPieParams>, queries: MayBe<MultiLevelPieQuery[]>, expr: string): number {
         if (queries) {
             const parser = new Parser();
             try {

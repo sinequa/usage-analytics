@@ -4,7 +4,7 @@ import domtoimage from "dom-to-image";
 import format from "xml-formatter";
 
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
-import { Dashboard, DashboardItem, DashboardService } from './dashboard/dashboard.service';
+import { Dashboard, DashboardItem, DashboardItemParams, DashboardService, StatParams } from './dashboard/dashboard.service';
 import {StatProvider} from './dashboard/providers/stat.provider';
 
 import {xlsx} from "./xlsx";
@@ -284,7 +284,7 @@ export class ExportService {
 
     if(previousDataSet !== null && dataset !== null){
       // TODO: decimalsPrecision should be a parameter value
-      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config);
+      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config as DashboardItem<StatParams>);
       return ({title, value, percentageChange, trend, trendEvaluation});
     }
 
@@ -299,7 +299,7 @@ export class ExportService {
    * @returns a {@link ExtractModel} object with all stats data or undefined
    */
    protected extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
-    const stats = items.filter(item => item.config.type === "stat");
+    const stats = items.filter(item => item.config.parameters.type === "stat");
     if(stats.length === 0) return;
 
     const results = stats.reduce((acc, item) => {
@@ -319,7 +319,7 @@ export class ExportService {
    * @returns Array of charts data
    */
    protected extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
-    const charts = items.filter(item => item.config.type === "chart").map(item => {
+    const charts = items.filter(item => item.config.parameters.type === "chart").map(item => {
       const title = this.translate.formatMessage(item.config.title);
 
       return {title, data: item.chartResults.aggregations[0].items?.map(elem => ({value: elem.value, count: elem.count}))}
@@ -348,7 +348,7 @@ export class ExportService {
     // timelines components extractions
     // a timeserie could contains one or more series
     // no needs of timeline-provider here as timeseries is the final results after timeline-provider works
-    const timeseries = items.filter(item => item.config.type === "timeline").map(item => {
+    const timeseries = items.filter(item => item.config.parameters.type === "timeline").map(item => {
       const title = this.translate.formatMessage(item.config.title);
       return {title, timeSeries: item.timeSeries}
     });
@@ -416,7 +416,7 @@ export class ExportService {
    * @returns Array of widget's data
   **/
   protected extractGridsOrHeatmaps(filename: string, items: DashboardItemComponent[], type: "grid" | "heatmap"): ExtractModel[] {
-    const widgets = items.filter(item => item.config.type === type).map(item => {
+    const widgets = items.filter(item => item.config.parameters.type === type).map(item => {
       const title = this.translate.formatMessage(item.config.title);
       return {title, rowData: item.rowData, columns: item.columnDefs}
     });
@@ -502,9 +502,9 @@ export class ExportService {
     return workbookXML;
   }
 
-  private getWidgetKey(item: DashboardItem): string{
+  private getWidgetKey(item: DashboardItem<DashboardItemParams>): string{
     const widgets = this.dashboardService.getWidgets();
-    const element = Object.entries(widgets).find(element => item.query === element[1].query && item.title === element[1].text);
+    const element = Object.entries(widgets).find(element => item.id === element[1].id);
     return element ? element[0] : "";
   }
 }
