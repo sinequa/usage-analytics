@@ -50,26 +50,32 @@ export class MultiLevelPieProvider {
      */
     resolveValue(dataset: Dataset, config: DashboardItem, queries: MayBe<MultiLevelPieQuery[]>, expr: string): number {
         if (queries) {
-            // Extract all query operands
             const parser = new Parser();
-            const queryOperands = parser.parse(expr).variables();
-            if (queryOperands) {
-                if (queryOperands.every((query) => queries!.find((q) => q.query === query))) {
-                    // Define an object of all query operands with their resolved numerical values
-                    const resolvedQueryOperands: { [key: string]: number } = {};
-                    queryOperands.forEach((query: string) => {
-                        resolvedQueryOperands[query] = this.extractQueryValue(dataset[query], queries!.find((q) => q.query === query)!);
-                    });
-                    // Evaluate the expression
-                    return parser.evaluate(expr, resolvedQueryOperands);
+            try {
+                // Extract all query operands
+                const queryOperands = parser.parse(expr).variables();
+                if (queryOperands) {
+                    if (queryOperands.every((query) => queries!.find((q) => q.query === query))) {
+                        // Define an object of all query operands with their resolved numerical values
+                        const resolvedQueryOperands: { [key: string]: number } = {};
+                        queryOperands.forEach((query: string) => {
+                            resolvedQueryOperands[query] = this.extractQueryValue(dataset[query], queries!.find((q) => q.query === query)!);
+                        });
+                        // Evaluate the expression
+                        return parser.evaluate(expr, resolvedQueryOperands);
+                    } else {
+                        console.error("Query operand(s) have been used but not defined in 'multiLevelPieQueries' parameter of the widget = " + config.id)
+                        return 0;
+                    }
                 } else {
-                    console.error("Query operand(s) have been used but not defined in 'multiLevelPieQueries' parameter of the widget = " + config.id)
+                    console.error("No query operands found to resolve values in the widget = " + config.id)
                     return 0;
                 }
-            } else {
-                console.error("No query operands found to resolve values in the widget = " + config.id)
+            } catch (error) {
+                console.error("Cannot parse the expression: '" + expr + "'. Please check the 'valueExpr' properties in the widget = " + config.id);
                 return 0;
             }
+
         }
         console.error("Missing attribute 'multiLevelPieQueries' in the widget = " + config.id)
         return 0;

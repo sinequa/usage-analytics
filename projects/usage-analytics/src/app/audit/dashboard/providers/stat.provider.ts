@@ -7,7 +7,6 @@ export interface StatValueField {
     operatorResults?: boolean;
 }
 export type StatValueLocation = "aggregations" | "records" | "totalrecordcount";
-export type StatLayout = "standard" | "chart";
 export type StatOperation = "avg" | "percentage" | "division";
 
 export type Trend = "increase" | "decrease" | "stable" | undefined;

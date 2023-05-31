@@ -54,13 +54,13 @@
                     {type: 'Bar3D', display: 'Bars 3D'},
                     {type: 'Pie3D', display: 'Pie 3D'},
                     {type: 'doughnut3d', display: 'Doughnut 3D'},
-                    {type: 'grid', display: 'Grid'}
+                    {type: 'Grid', display: 'Grid'}
                 ]"
                 [autohide]="false"
                 (initialized)="onChartInitialized($event)"
                 (typeChange)="onChartTypeChange($event)">
             </sq-fusion-chart>
-            <ng-container *ngIf="config.chartType === 'grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
+            <ng-container *ngIf="config.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
         <!-- Grid view -->
