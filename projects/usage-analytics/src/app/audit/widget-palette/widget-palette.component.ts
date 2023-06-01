@@ -83,7 +83,7 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
                                                         (el: ScoredAutocompleteItem<DashboardItemOption, "">) => (
                                                             {
                                                                 ...el.data,
-                                                                textHighlight: (el["displayHtml"].indexOf("<small>") > -1) ? el["displayHtml"].substring(0, el["displayHtml"].indexOf("<small>")) : el["displayHtml"]
+                                                                titleHighlight: (el["displayHtml"].indexOf("<small>") > -1) ? el["displayHtml"].substring(0, el["displayHtml"].indexOf("<small>")) : el["displayHtml"]
                                                             }
                                                         )
                                                     )
