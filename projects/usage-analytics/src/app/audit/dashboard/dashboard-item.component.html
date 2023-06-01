@@ -5,14 +5,14 @@
     [actions]="actions"
     [actionsFirst]="false"
     [buttonsStyle]="buttonsStyle"
-    [ngSwitch]="config.type">
+    [ngSwitch]="config.parameters.type">
 
     <ng-container *ngIf="!loading && !errorMessage">
 
         <!-- Timeline view-->
         <ng-container *ngSwitchCase="'timeline'">
             <sq-timeline
-                *ngIf="config.chartType !== 'Grid'"
+                *ngIf="config.parameters.chartType !== 'Grid'"
                 [data]="timeSeries"
                 [width]="innerwidth"
                 [height]="innerheight"
@@ -38,13 +38,13 @@
         <ng-container *ngSwitchCase="'chart'">
             <sq-fusion-chart
                 #facet
-                [hidden]="config.chartType === 'grid'"
+                [hidden]="config.parameters.chartType === 'Grid'"
                 [results]="chartResults"
                 [chart]="chart"
                 [width]="innerwidth"
                 [height]="innerheight"
-                [aggregation]="config?.chartData?.aggregation"
-                [type]="config.chartType || 'Column2D'"
+                [aggregation]="config.parameters.chartData!.aggregation"
+                [type]="config.parameters.chartType || 'Column2D'"
                 [types]="[
                     {type: 'Column2D', display: 'Columns 2D'},
                     {type: 'Bar2D', display: 'Bars 2D'},
@@ -54,13 +54,13 @@
                     {type: 'Bar3D', display: 'Bars 3D'},
                     {type: 'Pie3D', display: 'Pie 3D'},
                     {type: 'doughnut3d', display: 'Doughnut 3D'},
-                    {type: 'grid', display: 'Grid'}
+                    {type: 'Grid', display: 'Grid'}
                 ]"
                 [autohide]="false"
                 (initialized)="onChartInitialized($event)"
                 (typeChange)="onChartTypeChange($event)">
             </sq-fusion-chart>
-            <ng-container *ngIf="config.chartType === 'grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
+            <ng-container *ngIf="config.parameters.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
         <!-- Grid view -->
@@ -79,7 +79,7 @@
         <!-- Heatmap view -->
         <ng-container *ngSwitchCase="'heatmap'">
             <sq-heatmap
-                [hidden]="config.chartType === 'Grid'"
+                [hidden]="config.parameters.chartType === 'Grid'"
                 [data]="heatmapData"
                 [width]="innerwidth"
                 [height]="innerheight"
@@ -88,7 +88,7 @@
                 (itemClicked)="onHeatmapItemClick($event)"
                 [axisClickable]="false">
             </sq-heatmap>
-            <ng-container *ngIf="config.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
+            <ng-container *ngIf="config.parameters.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
         <!-- Multi level pie view -->

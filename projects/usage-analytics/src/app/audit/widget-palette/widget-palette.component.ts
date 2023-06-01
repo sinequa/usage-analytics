@@ -35,8 +35,8 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
                                     this.searchService.queryStream
                                 )
                             .subscribe(() => {
-                                  this.palette = this.getPalette();
-                                  this.filterWidgets(this.searchText.value)
+                                    this.palette = this.getPalette();
+                                    this.filterWidgets(this.searchText.value)
                                 }
                             );
 
@@ -63,7 +63,7 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
                     (p: {name: string, items: DashboardItemOption[]}) => ({
                         name: p.name,
                         items: p.items.filter(
-                            (widget) => !this.dashboardService.dashboard.items.find((item) => (item.title === widget.text) && !!widget.unique)
+                            (widget) => !this.dashboardService.dashboard.items.find((item) => (item.id === widget.id) && !!widget.unique)
                         )
                     })
                 )
@@ -76,7 +76,7 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
             '',
             text,
             this.palette.flatMap((cat) => cat.items),
-            (widget) => widget.text,
+            (widget) => widget.title,
             (widget) => widget.info ? [widget.info] : [],
         ).then(
             (items) => this.filteredWidgets = items.map(

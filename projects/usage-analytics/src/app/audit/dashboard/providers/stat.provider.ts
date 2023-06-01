@@ -1,13 +1,12 @@
 import { Injectable } from "@angular/core";
 import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
-import {DashboardItem} from "../dashboard.service";
+import {DashboardItem, StatParams} from "../dashboard.service";
 
 export interface StatValueField {
     name: string;
     operatorResults?: boolean;
 }
 export type StatValueLocation = "aggregations" | "records" | "totalrecordcount";
-export type StatLayout = "standard" | "chart";
 export type StatOperation = "avg" | "percentage" | "division";
 
 export type Trend = "increase" | "decrease" | "stable" | undefined;
@@ -101,31 +100,32 @@ export class StatProvider {
     getvalues(
         previousDataSet: Dataset,
         dataset: Dataset,
-        config: DashboardItem,
+        config: DashboardItem<StatParams>,
         ): {value: MayBe<number>, previousValue: MayBe<number>, percentageChange: MayBe<number>, trend: Trend, trendEvaluation: Evaluation} {
 
-        const current: MayBe<number> = this.getBasicValue(dataset[config.query], config.operation, config.valueLocation, config.valueField);
-        const previous: MayBe<number> = this.getBasicValue(previousDataSet[config.query], config.operation, config.valueLocation, config.valueField);
+        const parameters: StatParams = config.parameters;
+        const current: MayBe<number> = this.getBasicValue(dataset[parameters.query], parameters.operation, parameters.valueLocation, parameters.valueField);
+        const previous: MayBe<number> = this.getBasicValue(previousDataSet[parameters.query], parameters.operation, parameters.valueLocation, parameters.valueField);
 
         let relatedCurrent: MayBe<number>;
         let relatedPrevious: MayBe<number>;
 
         let value, previousValue, percentageChange, trend;
 
-        if (!config.computation) {
+        if (!parameters.computation) {
             value = current;
             previousValue = previous;
             percentageChange = this.getPercentageChange(current, previous);
             trend = this.getTrend(current, previous)
         } else {
-            relatedCurrent = this.getBasicValue(dataset[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation, config.relatedValueField);
-            relatedPrevious = this.getBasicValue(previousDataSet[config.relatedQuery!], config.relatedOperation, config.relatedValueLocation, config.relatedValueField);
-            value = this.computeBasicValue(current, relatedCurrent, config.computation);
-            previousValue = this.computeBasicValue(previous, relatedPrevious, config.computation);
+            relatedCurrent = this.getBasicValue(dataset[parameters.relatedQuery!], parameters.relatedOperation, parameters.relatedValueLocation, parameters.relatedValueField);
+            relatedPrevious = this.getBasicValue(previousDataSet[parameters.relatedQuery!], parameters.relatedOperation, parameters.relatedValueLocation, parameters.relatedValueField);
+            value = this.computeBasicValue(current, relatedCurrent, parameters.computation);
+            previousValue = this.computeBasicValue(previous, relatedPrevious, parameters.computation);
             percentageChange = this.getPercentageChange(value, previousValue);
             trend = this.getTrend(value, previousValue);
         }
-        const trendEvaluation = this.getTrendEvaluation(trend, config.asc);
+        const trendEvaluation = this.getTrendEvaluation(trend, parameters.asc);
 
         return {value, previousValue, percentageChange, trend, trendEvaluation};
     }

@@ -8,7 +8,7 @@ import { SearchService } from '@sinequa/components/search';
 import { TimelineSeries } from '@sinequa/analytics/timeline';
 import { Category, defaultChart } from '@sinequa/analytics/fusioncharts';
 
-import { DashboardItem, DashboardService } from './dashboard.service';
+import { ChartParams, DashboardItem, DashboardItemParams, DashboardService, GridParams, HeatmapParams, MultiLevelPieParams, TimelineParams } from './dashboard.service';
 import { TimelineProvider } from './providers/timeline-provider';
 import { AuditService } from '../audit.service';
 import { ChartProvider } from './providers/chart-provider';
@@ -32,7 +32,7 @@ import { MultiLevelPieProvider } from './providers/multi-level-pie-provider';
     providers: [TimelineProvider, ChartProvider, GridProvider, HeatmapProvider, MultiLevelPieProvider]
 })
 export class DashboardItemComponent implements OnChanges {
-    @Input() config: DashboardItem;
+    @Input() config: DashboardItem<DashboardItemParams>;
     @Input() results: Results;
     @Input() dataset: Dataset;
     @Input() previousDataSet: Dataset;
@@ -162,7 +162,7 @@ export class DashboardItemComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
 
-        if(this.config.type === "chart" && changes.buttonsStyle) {
+        if(this.config.parameters.type === "chart" && changes.buttonsStyle) {
             this.chart = {
                 ...defaultChart,
                 theme: this.buttonsStyle === "dark"? "candy" : "fusion"
@@ -180,58 +180,68 @@ export class DashboardItemComponent implements OnChanges {
 
         if(changes.width && this.width) {
             this.innerwidth = this.width - 2;
-            if (this.config.type === "grid") {
+            if (this.config.parameters.type === "grid") {
                 this.resizeGrid();
             }
         }
 
         // Handle dataSets updates
-        if (this.config.type === "timeline") {
+        if (this.config.parameters.type === "timeline") {
             if (changes.dataset || changes.previousDataSet) {
                 this._updateTimelineData();
             }
-        } else if (this.config.type === "multiLevelPie") {
+        } else if (this.config.parameters.type === "multiLevelPie") {
             if (changes.dataset) {
                 this._updateMultiLevelPieData();
             }
         } else {
             if (changes.dataset) {
-                if (this.dataset?.[this.config.query]) {
+                if (this.dataset[this.config.parameters.query]) {
                     this.loading = false;
-                    const data = this.dataset?.[this.config.query];
+                    const data = this.dataset[this.config.parameters.query];
                     let relatedData;
-                    if (this.config?.relatedQuery) {
-                        relatedData = this.dataset?.[this.config?.relatedQuery];
+                    if (this.config.parameters.relatedQuery) {
+                        relatedData = this.dataset[this.config.parameters.relatedQuery];
                     }
                     if ((data as DatasetError).errorMessage || (relatedData as DatasetError)?.errorMessage) {
                         this.errorMessage = (data as DatasetError)?.errorMessage || (relatedData as DatasetError)?.errorMessage
                     } else {
                         this.errorMessage = undefined;
-                        switch (this.config.type) {
+                        switch (this.config.parameters.type) {
                             case "chart":
-                                if (this.config.chartData) {
-                                    this.chartResults = this.chartProvider.getChartData(data, this.config.chartData);
-                                    this.columnDefs = this.chartProvider.getGridColumnDefs(this.config.chartData, true, this.config.enableSelection);
-                                    this.rowData = (data as Results)?.aggregations?.find((agg) => agg.name === this.config.chartData?.aggregation)?.items || []
+                                {
+                                    const parameters: ChartParams = this.config.parameters;
+                                    if (parameters.chartData) {
+                                        this.chartResults = this.chartProvider.getChartData(data, parameters.chartData);
+                                        this.columnDefs = this.chartProvider.getGridColumnDefs(parameters.chartData, true, parameters.enableSelection);
+                                        this.rowData = (data as Results)?.aggregations?.find((agg) => agg.name === parameters.chartData.aggregation)?.items || []
+                                    }
+                                    break;
                                 }
-                                break;
                             case "heatmap":
-                                if (this.config.chartData) {
-                                    this.heatmapData = this.heatmapProvider.getHeatMapData(data, this.config.chartData);
-                                    const fieldX = this.heatmapData[0]?.['fieldX'];
-                                    const fieldY = this.heatmapData[0]?.['fieldY'];
-                                    this.columnDefs = this.heatmapProvider.getGridColumnDefs(this.config.chartData, fieldX, fieldY, true, this.config.enableSelection);
-                                    this.rowData = this.heatmapData;
+                                {
+                                    const parameters: HeatmapParams = this.config.parameters;
+                                    if (parameters.chartData) {
+                                        this.heatmapData = this.heatmapProvider.getHeatMapData(data, parameters.chartData);
+                                        const fieldX = this.heatmapData[0]?.['fieldX'];
+                                        const fieldY = this.heatmapData[0]?.['fieldY'];
+                                        this.columnDefs = this.heatmapProvider.getGridColumnDefs(parameters.chartData, fieldX, fieldY, true, parameters.enableSelection);
+                                        this.rowData = this.heatmapData;
+                                    }
+                                    break;
                                 }
-                                break;
                             case "grid":
-                                this.columnDefs = this.gridProvider.getGridColumnDefs(this.config.columns, this.config.showTooltip, this.config.enableSelection);
-                                if (this.config.aggregationName) {
-                                    this.rowData = this.gridProvider.getAggregationRowData(data, this.config.aggregationName)
-                                } else {
-                                    this.rowData = (data as Results).records
+                                {
+                                    const parameters: GridParams = this.config.parameters;
+                                    this.columnDefs = this.gridProvider.getGridColumnDefs(parameters.columns, parameters.showTooltip, parameters.enableSelection);
+                                    if (parameters.aggregation) {
+                                        this.rowData = this.gridProvider.getAggregationRowData(data, parameters.aggregation)
+                                    } else {
+                                        this.rowData = (data as Results).records
+                                    }
+                                    break;
                                 }
-                                break;
+
                             default:
                                 break;
                         }
@@ -282,19 +292,20 @@ export class DashboardItemComponent implements OnChanges {
             this.actions = [this.infoAction, ...this.actions]
         }
 
-        if (this.config.type === "timeline") {
+        if (this.config.parameters.type === "timeline") {
+            const parameters: TimelineParams = this.config.parameters;
             // Action to Show/Hide previous period timeline
             this.toggleShowPreviousTimelineAction = new Action({
-                icon: this.config.showPreviousPeriod ? "fas fa-chart-line" : "sq-timeline-trend",
-                title: this.config.showPreviousPeriod ? "Hide Trend" : "Show Trend",
+                icon: parameters.showPreviousPeriod ? "fas fa-chart-line" : "sq-timeline-trend",
+                title: parameters.showPreviousPeriod ? "Hide Trend" : "Show Trend",
                 action: () => {
                     this._toggleShowPreviousTimeline();
                 },
                 updater: (action) => {
-                    action.icon = this.config.showPreviousPeriod
+                    action.icon = parameters.showPreviousPeriod
                         ? "fas fa-chart-line"
                         : "sq-timeline-trend";
-                    action.title = this.config.showPreviousPeriod
+                    action.title = parameters.showPreviousPeriod
                         ? "Hide Trend"
                         : "Show Trend";
                 }
@@ -303,7 +314,7 @@ export class DashboardItemComponent implements OnChanges {
             // Action to switch between Grid/Timeline view
             this.timelineOrGridAction = new Action({
                 title: "Select a view",
-                text: this.config.chartType,
+                text: parameters.chartType,
                 updater: (action) => {
                     action.children = ["Grid", "Timeline"]
                         .filter((item) => item !== action.text)
@@ -311,7 +322,7 @@ export class DashboardItemComponent implements OnChanges {
                             (item) => new Action({
                                 text: item,
                                 action: (elem, event) => {
-                                    this.config.chartType = item;
+                                    parameters.chartType = item as "Timeline" | "Grid";
                                     action.text = item;
                                     this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
                                     this.timelineOrGridAction.update();
@@ -334,11 +345,12 @@ export class DashboardItemComponent implements OnChanges {
             this.timelineOrGridAction.update();
         }
 
-        if (this.config.type === "heatmap") {
+        if (this.config.parameters.type === "heatmap") {
+            const parameters: HeatmapParams = this.config.parameters;
             // Action to switch between Grid/Heatmap view
             this.heatmapOrGridAction = new Action({
                 title: "Select a view",
-                text: this.config.chartType,
+                text: parameters.chartType,
                 updater: (action) => {
                     action.children = ["Grid", "Heatmap"]
                         .filter((item) => item !== action.text)
@@ -346,7 +358,7 @@ export class DashboardItemComponent implements OnChanges {
                             (item) => new Action({
                                 text: item,
                                 action: (elem, event) => {
-                                    this.config.chartType = item;
+                                    parameters.chartType = item as "Grid" | "Heatmap";
                                     action.text = item;
                                     this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
                                     this.heatmapOrGridAction.update();
@@ -362,19 +374,19 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     private _toggleShowPreviousTimeline() {
-        this.config.showPreviousPeriod = !this.config.showPreviousPeriod;
+        this.config.parameters.showPreviousPeriod = !this.config.parameters.showPreviousPeriod;
         this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
         this.toggleShowPreviousTimelineAction.update();
         this._updateTimelineData();
     }
 
     private _updateTimelineData() {
-        const queries = [this.config.query, ...(this.config.extraQueries || [])];
+        const parameters = this.config.parameters as TimelineParams;
 
-        if (queries.every((query) => this.dataset?.[query]) && queries.every((query) => this.previousDataSet?.[query])) {
+        if (parameters.queries.every((query) => this.dataset?.[query]) && parameters.queries.every((query) => this.previousDataSet?.[query])) {
             this.loading = false;
-            const currentDatas = queries.map((query) => this.dataset?.[query]);
-            const previousDatas = queries.map((query) => this.previousDataSet?.[query]);
+            const currentDatas = parameters.queries.map((query) => this.dataset?.[query]);
+            const previousDatas = parameters.queries.map((query) => this.previousDataSet?.[query]);
 
             if (currentDatas.some((data) => (data as DatasetError)?.errorMessage) || previousDatas.some((data) => (data as DatasetError)?.errorMessage)) {
                 this.errorMessage = (currentDatas.find((data) => (data as DatasetError)?.errorMessage) as DatasetError)?.errorMessage || (previousDatas.find((data) => (data as DatasetError)?.errorMessage) as DatasetError)?.errorMessage
@@ -382,7 +394,7 @@ export class DashboardItemComponent implements OnChanges {
                 this.errorMessage = undefined;
                 this.timeSeries = [];
 
-                if (!this.config.showPreviousPeriod) {
+                if (!parameters.showPreviousPeriod) {
                     const {timeSeries, columnDefs, rowData} = this._getTimelineData(currentDatas as Results[], true);
                     this.timeSeries = this.timelineProvider.applyStyleRules(timeSeries);
                     this.columnDefs = columnDefs;
@@ -406,19 +418,20 @@ export class DashboardItemComponent implements OnChanges {
             records: [] as Record[],
             aggregations: datas.flatMap((result) => (result as Results).aggregations)
         } as Results;
+        const parameters = this.config.parameters as TimelineParams;
 
         let timeSeries: TimelineSeries[] = [];
         let columnDefs: ColDef[] = [];
         let rowData: (Record | AggregationItem)[] = [];
 
-        if (this.config.aggregationsTimeSeries) {
-            timeSeries = this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask, isCurrent, this.auditService.diffPreviousAndStart);
-            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries, true, this.config.enableSelection, isCurrent);
-            rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries, isCurrent);
+        if (parameters.aggregationsTimeSeries) {
+            timeSeries = this.timelineProvider.getAggregationsTimeSeries(data, parameters.aggregationsTimeSeries, this.auditService.mask, isCurrent, this.auditService.diffPreviousAndStart);
+            columnDefs = this.timelineProvider.getGridColumnDefs(parameters.aggregationsTimeSeries, true, parameters.enableSelection, isCurrent);
+            rowData = this.timelineProvider.getAggregationsRowData(data, parameters.aggregationsTimeSeries, isCurrent);
         }
-        if (this.config.recordsTimeSeries) {
-            timeSeries = this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries, isCurrent, this.auditService.diffPreviousAndStart);
-            columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries, true, this.config.enableSelection, isCurrent);
+        if (parameters.recordsTimeSeries) {
+            timeSeries = this.timelineProvider.getRecordsTimeSeries(data, parameters.recordsTimeSeries, isCurrent, this.auditService.diffPreviousAndStart);
+            columnDefs = this.timelineProvider.getGridColumnDefs(parameters.recordsTimeSeries, true, parameters.enableSelection, isCurrent);
             rowData = data.records;
         }
 
@@ -426,10 +439,11 @@ export class DashboardItemComponent implements OnChanges {
     }
 
     private _updateMultiLevelPieData() {
-        const queries = this.config.multiLevelPieQueries?.map(item => item.query) || [];
+        const parameters = this.config.parameters as MultiLevelPieParams;
+        const queries = parameters.multiLevelPieQueries?.map(item => item.query) || [];
         if (queries.every((query) => this.dataset?.[query])) {
             this.loading = false;
-            this.data = this.multiLevelPieProvider.resolveData(this.dataset, this.config, this.config.multiLevelPieData, this.config.multiLevelPieQueries) || [];
+            this.data = this.multiLevelPieProvider.resolveData(this.dataset, <DashboardItem<MultiLevelPieParams>>this.config, parameters.multiLevelPieData, parameters.multiLevelPieQueries) || [];
         } else {
             this.loading = true;
         }
@@ -525,7 +539,7 @@ export class DashboardItemComponent implements OnChanges {
         // Make new filter based on current selection
         if (this._selectedNode) {
             const row = this._selectedNode.data;
-            switch (this.config.type) {
+            switch (this.config.parameters.type) {
                 case "chart":
                     this._gridFilter = {
                         operator: 'eq',
@@ -566,9 +580,9 @@ export class DashboardItemComponent implements OnChanges {
         this.chartObj.resizeTo(this.innerwidth, this.innerheight);
     }
 
-    onChartTypeChange(type: string) {
-        this.config.icon = type === 'grid' ? "fas fa-th-list" : "fas fa-chart-pie";
-        this.config.chartType = type;
+    onChartTypeChange(type: "Grid" | "Column2D" | "Bar2D" | "Pie2D" | "doughnut2d" | "Column3D" | "Bar3D" | "Pie3D" | "doughnut3d") {
+        this.config.icon = type === 'Grid' ? "fas fa-th-list" : "fas fa-chart-pie";
+        (this.config.parameters as ChartParams).chartType = type;
         this.dashboardService.notifyItemChange(this.config, 'CHANGE_WIDGET_CONFIG');
     }
 

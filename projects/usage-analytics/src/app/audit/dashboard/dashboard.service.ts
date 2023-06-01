@@ -19,116 +19,79 @@ import { PALETTE, STANDARD_DASHBOARDS, WIDGETS } from '../config';
 import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
 import { GridColDef } from './providers/grid-provider';
-import { StatLayout, StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
+import { StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
 import { HeatmapData } from './providers/heatmap-provider';
 import { MultiLevelPieConfig, MultiLevelPieQuery } from './providers/multi-level-pie-provider';
 
-/**
- * Interface storing the configuration of a widget. It must contain the minimal amount of information
- * to rebuild the widget's content (eg. for the preview we need an id and a query).
- * This configuration is stored in user settings and/or shared with other users, so it must not include
- * large objects or raw data (only the means to rebuild these objects or data).
- * This interface is an extension of GridsterItem, so that we store things like the position of each
- * widget in the dashboard.
- */
-export interface DashboardItem extends GridsterItem {
-    id: string;
-    type: string;
-    icon: string;
-    title: string;
-    query: string;
-    unique?: boolean;
-    info?: string;
-    width?: number;
-    height?: number;
+export interface TimelineParams {
+    type: "timeline";
+    queries: string[];
+    chartType: "Timeline" | "Grid";
+    aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
+    recordsTimeSeries?: RecordsTimeSeries;
+    showPreviousPeriod?: boolean;
+    enableSelection?: boolean;
+}
 
-    // Properties specific to some types
-    recordId?: string; // For type === 'preview'
-    queryStr?: string; // For type === 'preview'
-    aggregation?: string; // For type === 'chart'
-    chartData?: StrictUnion<ChartData | HeatmapData>; // For type === 'chart'
-    chartType?: string; // For type === 'chart' && type === 'timeline'
-    extraQueries?: string[]; // For type === 'timeline'
-    showPreviousPeriod?: boolean; // For type === 'timeline'
-    aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
-    recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
-    columns?: GridColDef[]; // For type === 'grid'
-    aggregationName?: string; // For type === 'grid'
-    showTooltip?: boolean; // For type === 'grid'
-    enableSelection?: boolean; // For type === 'grid'
+export interface ChartParams {
+    type: "chart";
+    query: string;
+    chartType: "Column2D" | "Bar2D" | "Pie2D" | "doughnut2d" | "Column3D" | "Bar3D" | "Pie3D" | "doughnut3d" | "Grid";
+    chartData: ChartData;
+    enableSelection?: boolean;
+}
+
+export interface HeatmapParams {
+    type: "heatmap";
+    query: string;
+    chartType: "Heatmap" | "Grid";
+    chartData: HeatmapData;
+    enableSelection?: boolean;
+}
+
+export interface MultiLevelPieParams {
+    type: "multiLevelPie";
+    multiLevelPieQueries: MultiLevelPieQuery[];
+    multiLevelPieData: MultiLevelPieConfig[];
+}
+
+export interface StatParams {
+    type: "stat"
+    query: string;
+    asc: boolean; // if the positive evaluation is at increase or decrease trend
     valueLocation?: StatValueLocation; // where to find value field
     valueField?: StatValueField; // how to access value field
     operation?: StatOperation; // operation to compute the value
-    relatedQuery?: string; // query containing the second leg of the stat operands
+    relatedQuery?: string, // query containing the second leg of the stat operands
     relatedValueLocation?: StatValueLocation; // where to find the value field of the second stat operands
-    relatedValueField?: StatValueField; // how to access value field of the second stat operands
+    relatedValueField?: StatValueField, //how to access value field of the second stat operands
     relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
     computation?: StatOperation; // operation to get the global value of the stat
-    asc?: boolean; // if the positive evaluation is at increase or decrease trend
-    statLayout?: StatLayout; // the ui of displaying the stat
     numberFormatOptions?: Intl.NumberFormatOptions; // options of formatting numbers
-    multiLevelPieQueries?: MultiLevelPieQuery[]; // For type === 'multiLevelPie'
-    multiLevelPieData?: MultiLevelPieConfig[]; // For type === 'multiLevelPie'
 }
 
-/**
- * A dashboard configuration interface incl. a name and the configuration of each widget
- */
-export interface Dashboard {
-    name: string;
-    items: DashboardItem[];
+export interface GridParams {
+    type: "grid"
+    query: string;
+    columns: GridColDef[];
+    aggregation?: string;
+    showTooltip?: boolean;
+    enableSelection?: boolean;
 }
+
+export type DashboardItemParams = TimelineParams | ChartParams | HeatmapParams | MultiLevelPieParams | StatParams | GridParams;
 
 /**
  * An interface to define a type of widget that can be added to the dashboard. This basic information
- * is used to create a button to select a type of widget among a list.
+ * is used to create the widget from the palette.
  */
 export interface DashboardItemOption {
     id: string;
-    type: string;
-    query: string;
     icon: string;
-    text: string;
+    title: string;
+    parameters: StrictUnion<DashboardItemParams>;
     unique?: boolean;
     info?: string;
-    parameters?: {
-        // For type === 'timeline'
-        aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
-        recordsTimeSeries?: RecordsTimeSeries;
-        showPreviousPeriod?: boolean;
-
-        // For type === 'chart'
-        chartData?: ChartData;
-
-        // For type === 'chart' && type === 'timeline'
-        chartType?: string;
-
-        // For type === 'timeline' && type === 'multiLevelPie'
-        extraQueries?: string[];
-
-        // For type === 'stat'
-        valueLocation?: StatValueLocation; // where to find value field
-        valueField?: StatValueField; // how to access value field
-        operation?: StatOperation; // operation to compute the value
-        relatedQuery?: string, // query containing the second leg of the stat operands
-        relatedValueLocation?: StatValueLocation; // where to find the value field of the second stat operands
-        relatedValueField?: StatValueField, //how to access value field of the second stat operands
-        relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
-        computation?: StatOperation; // operation to get the global value of the stat
-        asc?: boolean; // if the positive evaluation is at increase or decrease trend
-        statLayout?: StatLayout; // the ui of displaying the stat
-        numberFormatOptions?: Intl.NumberFormatOptions; // options of formatting numbers
-
-        // For type === 'grid'
-        columns?: GridColDef[];
-        aggregationName?: string;
-        showTooltip?: boolean;
-        enableSelection?: boolean;
-
-        // For type === 'multiLevelPie'
-        multiLevelPieQueries?: MultiLevelPieQuery[];
-        multiLevelPieData?: MultiLevelPieConfig[];
-    };
 }
 
 export interface DashboardItemPosition {
@@ -138,11 +101,38 @@ export interface DashboardItemPosition {
     cols?: number;
 }
 
+/**
+ * Interface storing the configuration of a widget. It must contain the minimal amount of information
+ * to rebuild the widget's content (eg. for the preview we need an id and a query).
+ * This configuration is stored in user settings and/or shared with other users, so it must not include
+ * large objects or raw data (only the means to rebuild these objects or data).
+ * This interface is an extension of GridsterItem, so that we store things like the position of each
+ * widget in the dashboard.
+ */
+export interface DashboardItem<DashboardItemParams> extends GridsterItem {
+    id: string;
+    icon: string;
+    title: string;
+    parameters: StrictUnion<DashboardItemParams>;
+    unique?: boolean;
+    info?: string;
+    width?: number;
+    height?: number;
+}
+
+/**
+ * A dashboard configuration interface incl. a name and the configuration of each widget
+ */
+export interface Dashboard {
+    name: string;
+    items: DashboardItem<DashboardItemParams>[];
+}
+
 export interface DashboardChange {
     type: changeType,
     dashboard: Dashboard;
     updateDatasets: boolean;
-    item?: DashboardItem;
+    item?: DashboardItem<DashboardItemParams>;
 }
 
 export type changeType =
@@ -220,7 +210,7 @@ export class DashboardService {
             },
             resizable: {enabled: true},
             itemChangeCallback: (item, itemComponent) => {
-                this.notifyItemChange(item as DashboardItem, 'PLAIN_UI_CHANGE');
+                this.notifyItemChange(item as DashboardItem<DashboardItemParams>, 'PLAIN_UI_CHANGE');
             },
             itemResizeCallback: (item, itemComponent) => {
                 if (!document.fullscreenElement) { // Exclude the change detection on switch from/to full-screen mode
@@ -303,7 +293,7 @@ export class DashboardService {
         }
         else if(dashboardShared) {
             const db = Utils.fromJson(dashboardShared);
-            if(db as DashboardItem[]) {
+            if(db as DashboardItem<DashboardItemParams>[]) {
                 this.setSharedDashboard(db);
             }
             else {
@@ -494,7 +484,7 @@ export class DashboardService {
      * Load shared dashboard, as a new draft dashboard, based on its given items
      * @param items
      */
-    public setSharedDashboard(items: DashboardItem[]) {
+    public setSharedDashboard(items: DashboardItem<DashboardItemParams>[]) {
         const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
         const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
@@ -516,7 +506,7 @@ export class DashboardService {
      * Fire an event when a dashboard item changes
      * @param item
      */
-    public notifyItemChange(item: DashboardItem, event: changeType, notify = false) {
+    public notifyItemChange(item: DashboardItem<DashboardItemParams>, event: changeType, notify = false) {
         this.dashboardChanged.next({type: event, dashboard: this.dashboard, updateDatasets: notify, item});
     }
 
@@ -542,29 +532,21 @@ export class DashboardService {
             option: DashboardItemOption,
             dashboard: Dashboard = this.dashboard,
             notify = true,
-            rows = (option.type === "stat" ? 2 : 4),
-            cols = (option.type === "stat" ? 1 : 3),
+            rows = (option.parameters.type === "stat" ? 2 : 4),
+            cols = (option.parameters.type === "stat" ? 1 : 3),
             x = 0,
             y = 0,
-            closable = true): DashboardItem {
+            closable = true): DashboardItem<DashboardItemParams> {
 
         let item = {
             x: x,
             y: y,
             rows,
             cols,
-            id: option.id,
-            type: option.type,
-            query: option.query,
-            icon: option.icon,
-            unique: option.unique,
-            title: option.text,
             closable: closable,
-            info: option.info
+            ...option
         };
-        if (option.parameters) {
-            item = {...item, ...option.parameters}
-        }
+
         dashboard.items.push(item);
         if (notify) {
             this.dashboardChanged.next({type: 'ADD_WIDGET', dashboard: dashboard, updateDatasets: true});
@@ -576,7 +558,7 @@ export class DashboardService {
      * Remove a widget from the dashboard
      * @param item
      */
-    public removeItem(item: DashboardItem) {
+    public removeItem(item: DashboardItem<DashboardItemParams>) {
         this.dashboard!.items.splice(this.dashboard.items.indexOf(item), 1);
         this.notifyItemChange(item, 'REMOVE_WIDGET');
     }
@@ -586,7 +568,7 @@ export class DashboardService {
      * @param item
      * @param newTitle
      */
-    public renameWidget(item: DashboardItem, newTitle: string) {
+    public renameWidget(item: DashboardItem<DashboardItemParams>, newTitle: string) {
         item.title = newTitle;
         this.notifyItemChange(item, 'CHANGE_WIDGET_CONFIG');
     }
@@ -595,7 +577,7 @@ export class DashboardService {
      * Open a dialog to submit a new name for a given widget
      * @param item
      */
-    public renameWidgetModal(item: DashboardItem) {
+    public renameWidgetModal(item: DashboardItem<DashboardItemParams>) {
 
         const model: PromptOptions = {
             title: 'msg#dashboard.renameWidget',

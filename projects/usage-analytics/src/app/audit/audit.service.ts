@@ -281,15 +281,17 @@ export class AuditService {
         const datasets: string[] = [];
         this.dashboardService.dashboard.items.forEach(
             (item) => {
-                datasets.push(item.query);
-                if (item.relatedQuery) {
-                    datasets.push(item.relatedQuery);
+                if (item.parameters.query) {
+                    datasets.push(item.parameters.query);
                 }
-                if (item.extraQueries) {
-                    datasets.push(...item.extraQueries);
+                if (item.parameters.relatedQuery) {
+                    datasets.push(item.parameters.relatedQuery);
                 }
-                if (item.multiLevelPieQueries) {
-                    datasets.push(...item.multiLevelPieQueries.map(item => item.query));
+                if (item.parameters.queries) {
+                    datasets.push(...item.parameters.queries);
+                }
+                if (item.parameters.multiLevelPieQueries) {
+                    datasets.push(...item.parameters.multiLevelPieQueries.map(item => item.query));
                 }
             }
         );
