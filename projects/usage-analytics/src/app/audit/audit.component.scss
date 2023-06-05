@@ -76,22 +76,6 @@ a.nav-link.active, a.nav-link:hover {
     }
 }
 
-$facet-width: 275px;
-
-.audit-filters {
-    gap: 1rem;
-
-    sq-facet-card {
-        min-width: $facet-width;
-    }
-
-    sq-facet-multi {
-        z-index: 100;
-        width: $facet-width;
-        overflow: auto;
-    }
-}
-
 
 // Dashboard (Gridster)
 
@@ -99,17 +83,6 @@ gridster {
     background: transparent !important;
     z-index: 1;
     padding: 0px !important;
-}
-
-// Active when resizing or dragging items: prevents a glitch when the mouse pointer hovers the preview's iframe
-gridster.display-grid {
-    ::ng-deep iframe {
-        pointer-events: none !important;
-    }
-
-    ::ng-deep iframe {
-        pointer-events: none !important;
-    }
 }
 
 gridster-item.gridster-item-moving {

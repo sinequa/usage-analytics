@@ -1,7 +1,7 @@
 :root {
-    --secondary: #0d6efd;
+    --secondary: rgb(12, 117, 255);
 }
-$secondary: #0d6efd;
+$secondary: rgb(12, 117, 255);
 
 // @import "@sinequa/components/theme/minimal";
 @import "@sinequa/components/theme/sinequa";
@@ -20,7 +20,6 @@ body {
 
 sq-feedback-menu {
   button.btn{
-      border-radius: 19px;
       width: 38px;
       height: 38px;
       padding-left: 10px;

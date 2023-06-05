@@ -1,24 +1,3 @@
-<div class="audit-filters d-flex">
-    <sq-audit-range-picker></sq-audit-range-picker>
-    <sq-facet-card
-        *ngIf="(auditService.data$ | async)?.[auditService.facetFiltersQuery]"
-        [collapsible]="true"
-        [startCollapsed]="true"
-        [buttonsStyle]="isDark()? 'dark' : 'light'"
-        [collapseOnClickOutside]="true"
-        (click)="$event.stopPropagation()"
-        >
-        <sq-facet-multi
-            #facet
-            class="card position-absolute overflow-hidden"
-            [results]="(auditService.data$ | async)?.[auditService.facetFiltersQuery]"
-            [facets]="facets"
-            [title]="facetFiltersName"
-            [icon]="facetFiltersIcon">
-        </sq-facet-multi>
-    </sq-facet-card>
-</div>
-
 <div class="d-flex flex-row align-items-center flex-wrap">
     <span class="sq-breadcrumb-item">Filters : &nbsp;</span>
     <sq-filters
