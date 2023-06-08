@@ -1,43 +1,7 @@
-::ng-deep sq-dashboard-item {
-    sq-facet-card > .card {
-        height: 100%;
-    }
-
-    sq-facet-card > .card .card-body {
-        overflow-y: auto;
-    }
-
-    .btn-group button.disabled {
-        pointer-events: auto;
-    }
-
-    sq-collapse {
-        height: 100%;
-
-        >div {
-            height: 100%;
-        }
-    }
-
-    .gridster-item-resizable-handler.handle-e {
-        width: 8px;
-        right: -5px;
-    }
-
-    ag-grid-angular ::ng-deep {
-        padding: 0;
-
-        .ag-root-wrapper {
-            border: none !important;
-        }
-    }
-
-    .sq-loading {
-        display: flex;
-        text-align: center;
-        height: 100%;
-        justify-content: center;
-        align-items: center;
-    }
-
+.sq-loading {
+    display: flex;
+    text-align: center;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
 }

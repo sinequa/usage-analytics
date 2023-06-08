@@ -90,6 +90,21 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
         )
     }
 
+    getIcon(item: DashboardItemOption): string {
+        switch (item.parameters.type) {
+            case "timeline":
+                return "fas fa-chart-line";
+            case "chart":
+                return "fas fa-chart-pie";
+            case "stat":
+                return "fas fa-balance-scale";
+            case "grid":
+                return "fas fa-th-list";
+        }
+        return "";
+    }
+
+
     togglePalette() {
         this.showPalette = !this.showPalette;
     }

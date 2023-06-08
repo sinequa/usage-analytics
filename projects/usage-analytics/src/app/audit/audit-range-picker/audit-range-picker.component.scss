@@ -12,6 +12,7 @@
     & button {
         outline: none;
     }
+
     &-options {
         width: 220px;
         z-index: 100;
@@ -36,4 +37,18 @@
         background-color: $facet-btn-light-active-bg;
         opacity: .6;
     }
+}
+
+.title {
+    color: #4a4a4a;
+}
+
+.custom-date-label {
+    font-size: 14px;
+}
+
+.line-separation {
+    margin-bottom: 0px;
+    width: 90%;
+    margin-left: 5%;
 }

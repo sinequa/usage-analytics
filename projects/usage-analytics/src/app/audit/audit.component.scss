@@ -5,15 +5,6 @@
     gap: 1rem;
 }
 
-::ng-deep sq-loading-bar {
-    margin-top: -15px;
-
-    .slider {
-        width: 98% !important;
-        height: 5px !important;
-    }
-}
-
 ::ng-deep gridster {
     // allow dropdown to be visible when it's height
     // is taller than the widget's height
@@ -65,15 +56,19 @@
 a.nav-link {
     cursor: pointer;
     user-select: none;
-    .btn-focus {
+    .btn-focus, .dashboard-actions {
         visibility: hidden
     }
 }
 
 a.nav-link.active, a.nav-link:hover {
-    .btn-focus {
+    .btn-focus, .dashboard-actions {
         visibility: visible
     }
+}
+
+.sq-nav-tabs {
+    margin-top: -10px;
 }
 
 
@@ -98,12 +93,6 @@ gridster-item.gridster-item-resizing {
     opacity: 0.7;
 }
 
-.reset-btn {
-    height: 38px;
-    width: 42px;
-}
-
 .sq-breadcrumb-item {
-    font-weight: bold;
     color: var(--secondary);
 }

@@ -602,9 +602,9 @@ export class DashboardService {
      * - Changing the layout mode of Gridster
      * - auto Saving the dashboard
      */
-    public createDashboardActions(): Action[] {
+    public createSettingsActions(): Action[] {
 
-        const dashboardActions = [] as Action[];
+        const settingsActions = [] as Action[];
 
         // Action to select the "manual" layout mode
         this.manualLayoutAction = new Action({
@@ -645,7 +645,7 @@ export class DashboardService {
 
         // Assemble the actions into one menu
         const settings = new Action({
-            icon: 'fas fa-ellipsis-v',
+            icon: 'fas fa-gear',
             title: 'msg#dashboard.settingsTitle',
             children: [
                 this.manualLayoutAction,
@@ -654,9 +654,9 @@ export class DashboardService {
             ],
         });
 
-        dashboardActions.push(settings);
+        settingsActions.push(settings);
 
-        return dashboardActions;
+        return settingsActions;
     }
 
     public openDashboard(dashboard: Dashboard) {
