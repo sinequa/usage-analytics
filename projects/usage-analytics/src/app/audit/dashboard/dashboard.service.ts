@@ -243,7 +243,10 @@ export class DashboardService {
         this.userSettingsService.events.subscribe(event => {
             // E.g. new login occurs
             // ==> settings need to be rebuilt
-            this.setLayout(this.layout);
+            if (this.loginService.complete) {
+                this.setLayout(this.layout);
+            }
+
         });
 
         // Manage Auto-save dashboards.
@@ -602,9 +605,7 @@ export class DashboardService {
      * - Changing the layout mode of Gridster
      * - auto Saving the dashboard
      */
-    public createSettingsActions(): Action[] {
-
-        const settingsActions = [] as Action[];
+    public createSettingsActions(): Action {
 
         // Action to select the "manual" layout mode
         this.manualLayoutAction = new Action({
@@ -644,7 +645,7 @@ export class DashboardService {
         }
 
         // Assemble the actions into one menu
-        const settings = new Action({
+        const settingsAction = new Action({
             icon: 'fas fa-gear',
             title: 'msg#dashboard.settingsTitle',
             children: [
@@ -654,9 +655,7 @@ export class DashboardService {
             ],
         });
 
-        settingsActions.push(settings);
-
-        return settingsActions;
+        return settingsAction;
     }
 
     public openDashboard(dashboard: Dashboard) {

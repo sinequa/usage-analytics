@@ -26,9 +26,9 @@ export class AuditComponent implements OnDestroy {
     @ViewChild("content", {static: false}) content: ElementRef;
 
     public exportAction: Action;
+    public settingsAction: Action;
 
     public dashboards: Dashboard[] = [];
-    public settingsActions: Action[];
 
     // keep track of focused element
     public focusElementIndex: number;
@@ -63,7 +63,7 @@ export class AuditComponent implements OnDestroy {
                 // Properly display dashboards (default, opened ...)
                 this.dashboardService.handleNavigation();
                 this.dashboardService.setDefaultDashboard();
-                this.settingsActions = this.dashboardService.createSettingsActions();
+                this.settingsAction = this.dashboardService.createSettingsActions();
 
                 // Request data upon login
                 this.auditService.updateAuditFilters();

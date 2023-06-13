@@ -13,7 +13,7 @@
         <span class="sq-breadcrumb-item">Trends calculation period : {{ auditService.infoPreviousFilter | sqMessage }}</span>
     </section>
 
-    <div class="d-flex align-items-center ms-auto">
+    <div class="d-flex align-items-center me-1 ms-auto">
         <sq-action-buttons class="action-btn ms-1" [sq-action-buttons]="{items: [exportAction], style:'primary', rightAligned: true}"></sq-action-buttons>
         <button type="button" class="btn btn-primary action-btn ms-1" (click)="resetDashboards()" [sqTooltip]="'Reset dashboards to default configuration'">
             <i class="fas fa-undo-alt"></i>
@@ -59,13 +59,11 @@
             <i class="fas fa-plus"></i>
         </button>
         <sq-widget-palette class="ms-1" *ngIf="loginService.complete"></sq-widget-palette>
-        <sq-action-buttons class="action-btn ms-1" [sq-action-buttons]="{items: settingsActions, style:'primary', rightAligned: true}"></sq-action-buttons>
-        <!-- <sq-action-buttons class="action-btn ms-1" [sq-action-buttons]="{items: [exportAction], style:'primary', rightAligned: true}"></sq-action-buttons>
-        <button type="button" class="btn btn-primary action-btn ms-1" (click)="resetDashboards()" [sqTooltip]="'Reset dashboards to default configuration'">
-            <i class="fas fa-undo-alt"></i>
-        </button> -->
+        <sq-action-buttons class="action-btn ms-1" [sq-action-buttons]="{items: [settingsAction], style:'primary', rightAligned: true}"></sq-action-buttons>
     </div>
 </ul>
+
+<!-- Current Dashboard -->
 <gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete && ready">
     <div #content>
         <gridster-item [item]="item" *ngFor="let item of dashboardService.dashboard.items; index as i" [attr.focus]="i === focusElementIndex">

@@ -4,7 +4,7 @@
         <i class="fas fa-clock me-2"></i>
         Period
     </span>
-    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage" placement="top">
+    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage" placement="bottom">
         <i class="fas fa-chevron-{{showDateRangeOptions ? 'up' : 'down'}}"></i>
     </button>
 </div>

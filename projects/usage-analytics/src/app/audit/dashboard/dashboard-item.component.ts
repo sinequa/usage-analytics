@@ -67,25 +67,19 @@ export class DashboardItemComponent implements OnChanges {
     toggleShowPreviousTimelineAction: Action;
 
     private readonly closeAction = new Action({
-        //icon: "fas fa-times",
         text: "Remove",
         action: () => this.close()
     });
     private readonly renameAction = new Action({
-        //icon: "far fa-edit",
         text: "Rename",
         action: () => this.rename()
     });
     private readonly maximizeAction = new Action({
-        //icon: "fas fa-expand-alt",
         text: "Maximize",
         action: () => {
             this.toggleMaximizedView()
         },
         updater: (action) => {
-            // action.icon = this.isMaximized()
-            //     ? "fas fa-compress-alt"
-            //     : "fas fa-expand-alt";
             action.text = this.isMaximized()
                 ? "Minimize"
                 : "Maximize";
@@ -270,7 +264,6 @@ export class DashboardItemComponent implements OnChanges {
                         ...this.auditService.customParams
                     }
                 },
-                fallbackPlacements: ["top", "bottom"],
                 disabled: true,
                 action: () => {}
             });

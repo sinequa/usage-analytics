@@ -1,7 +1,3 @@
-.min-h-100 {
-    min-height: 100%;
-}
-
 .sq-nav {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
@@ -10,19 +6,19 @@
     height: calc(100vh - 75px);
 }
 
-$facet-width: 220px;
 
 .audit-filters {
+    --facet-width: 220px;
     margin-left: 125px;
     gap: 2rem;
 
     sq-facet-card {
-        min-width: $facet-width;
+        min-width: var(--facet-width);
     }
 
     sq-facet-multi {
         z-index: 100;
-        width: $facet-width;
+        width: var(--facet-width);
         overflow: auto;
     }
 }

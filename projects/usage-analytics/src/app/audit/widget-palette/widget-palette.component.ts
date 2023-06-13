@@ -97,7 +97,7 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
             case "chart":
                 return "fas fa-chart-pie";
             case "stat":
-                return "fas fa-balance-scale";
+                return "fas fa-chart-simple";
             case "grid":
                 return "fas fa-th-list";
         }

@@ -5,7 +5,47 @@
     gap: 1rem;
 }
 
+.main-content {
+    overflow-y: hidden;
+}
+
+.unsaved {
+    color: indianred !important;
+}
+
+a.nav-link {
+    cursor: pointer;
+    user-select: none;
+    .btn-focus, .dashboard-actions {
+        visibility: hidden
+    }
+}
+
+a.nav-link.active, a.nav-link:hover {
+    .btn-focus, .dashboard-actions {
+        visibility: visible
+    }
+}
+
+.sq-nav-tabs {
+    margin-top: -10px;
+}
+
+.new-dashboard:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.sq-breadcrumb-item {
+    color: var(--secondary);
+}
+
+// Override gridster styles
 ::ng-deep gridster {
+    background: transparent !important;
+    z-index: 1;
+    padding: 0px !important;
+
     // allow dropdown to be visible when it's height
     // is taller than the widget's height
     gridster-item {
@@ -45,54 +85,10 @@
     }
 }
 
-.main-content {
-    overflow-y: hidden;
-}
-
-.unsaved {
-    color: indianred !important;
-}
-
-a.nav-link {
-    cursor: pointer;
-    user-select: none;
-    .btn-focus, .dashboard-actions {
-        visibility: hidden
-    }
-}
-
-a.nav-link.active, a.nav-link:hover {
-    .btn-focus, .dashboard-actions {
-        visibility: visible
-    }
-}
-
-.sq-nav-tabs {
-    margin-top: -10px;
-}
-
-
-// Dashboard (Gridster)
-
-gridster {
-    background: transparent !important;
-    z-index: 1;
-    padding: 0px !important;
-}
-
 gridster-item.gridster-item-moving {
     z-index: 100 !important;
 }
 
 gridster-item.gridster-item-resizing {
     overflow: hidden;
-}
-
-.new-dashboard:hover {
-    cursor: pointer;
-    opacity: 0.7;
-}
-
-.sq-breadcrumb-item {
-    color: var(--secondary);
 }

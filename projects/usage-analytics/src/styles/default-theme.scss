@@ -2,29 +2,6 @@
     --secondary: rgb(12, 117, 255);
 }
 
-sq-feedback-menu {
-    button.btn {
-        width: 38px;
-        height: 38px;
-        padding-left: 10px;
-    }
-
-    .dropdown-toggle::after {
-        display: none;
-    }
-}
-
-.sq-action-buttons {
-    .dropdown-toggle::after {
-        display: none !important;
-    }
-}
-
-.action-btn {
-    width: 38px;
-    height: 38px;
-}
-
 bs-daterangepicker-container {
     left: 440px !important;
     top: -160px !important
@@ -80,6 +57,34 @@ sq-dashboard-item {
     .gridster-item-resizable-handler.handle-e {
         width: 8px;
         right: -5px;
+    }
+}
+
+sq-feedback-menu {
+    button.btn {
+        width: 38px;
+        height: 38px;
+        padding-left: 10px;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+    }
+}
+
+.sq-action-buttons {
+    .dropdown-toggle::after {
+        display: none !important;
+    }
+}
+
+.action-btn {
+    width: 38px;
+    height: 38px;
+
+    & button.sq-action-item-content {
+        width: 38px;
+        height: 38px;
     }
 }
 
