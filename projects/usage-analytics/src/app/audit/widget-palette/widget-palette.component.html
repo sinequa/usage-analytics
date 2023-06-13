@@ -37,13 +37,13 @@
     <ng-template #filtered>
         <div class="d-flex flex-wrap mb-3">
             <button
-                [sqIcon]="item.icon"
                 type="button"
                 class="btn btn-outline-primary mx-1 my-1"
                 *ngFor="let item of filteredWidgets"
                 (click)="addWidget(item)"
                 [sqTooltip]="item?.info | sqMessage"
                 [fallbackPlacements]="['bottom','top']">
+                <i class="{{getIcon(item)}}"></i>
                 <div class="button-text" [innerHtml]="(item.titleHighlight || item.title) | sqMessage"></div>
             </button>
         </div>
