@@ -21,7 +21,7 @@ import { AuditInterceptor } from "@sinequa/core/app-utils";
 import { BsSearchModule, SearchOptions, SEARCH_OPTIONS } from "@sinequa/components/search";
 import { BsNotificationModule } from '@sinequa/components/notification';
 import { UtilsModule } from '@sinequa/components/utils';
-import { APP_HELP_FOLDER_OPTIONS, BsUserSettingsModule } from "@sinequa/components/user-settings";
+import { BsUserSettingsModule } from "@sinequa/components/user-settings";
 import { BsFeedbackModule } from "@sinequa/components/feedback";
 import { BsFacetModule } from "@sinequa/components/facet";
 import { BsAdvancedModule } from "@sinequa/components/advanced";
@@ -43,7 +43,7 @@ import * as CandyTheme from "fusioncharts/themes/fusioncharts.theme.candy";
 FusionCharts.options.creditLabel = false;
 
 // Components
-import { AppComponent } from "./app.component";
+import { APP_HELP_FOLDER_OPTIONS, AppComponent } from "./app.component";
 import { AuditComponent } from "./audit/audit.component";
 import { AuditRangePickerComponent } from "./audit/audit-range-picker/audit-range-picker.component";
 import { DashboardItemComponent } from "./audit/dashboard/dashboard-item.component";

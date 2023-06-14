@@ -5,16 +5,47 @@
     gap: 1rem;
 }
 
-::ng-deep sq-loading-bar {
-    margin-top: -15px;
+.main-content {
+    overflow-y: hidden;
+}
 
-    .slider {
-        width: 98% !important;
-        height: 5px !important;
+.unsaved {
+    color: indianred !important;
+}
+
+a.nav-link {
+    cursor: pointer;
+    user-select: none;
+    .btn-focus, .dashboard-actions {
+        visibility: hidden
     }
 }
 
+a.nav-link.active, a.nav-link:hover {
+    .btn-focus, .dashboard-actions {
+        visibility: visible
+    }
+}
+
+.sq-nav-tabs {
+    margin-top: -10px;
+}
+
+.new-dashboard:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.sq-breadcrumb-item {
+    color: var(--secondary);
+}
+
+// Override gridster styles
 ::ng-deep gridster {
+    background: transparent !important;
+    z-index: 1;
+    padding: 0px !important;
+
     // allow dropdown to be visible when it's height
     // is taller than the widget's height
     gridster-item {
@@ -54,83 +85,10 @@
     }
 }
 
-.main-content {
-    overflow-y: hidden;
-}
-
-.unsaved {
-    color: indianred !important;
-}
-
-a.nav-link {
-    cursor: pointer;
-    user-select: none;
-    .btn-focus {
-        visibility: hidden
-    }
-}
-
-a.nav-link.active, a.nav-link:hover {
-    .btn-focus {
-        visibility: visible
-    }
-}
-
-$facet-width: 275px;
-
-.audit-filters {
-    gap: 1rem;
-
-    sq-facet-card {
-        min-width: $facet-width;
-    }
-
-    sq-facet-multi {
-        z-index: 100;
-        width: $facet-width;
-        overflow: auto;
-    }
-}
-
-
-// Dashboard (Gridster)
-
-gridster {
-    background: transparent !important;
-    z-index: 1;
-    padding: 0px !important;
-}
-
-// Active when resizing or dragging items: prevents a glitch when the mouse pointer hovers the preview's iframe
-gridster.display-grid {
-    ::ng-deep iframe {
-        pointer-events: none !important;
-    }
-
-    ::ng-deep iframe {
-        pointer-events: none !important;
-    }
-}
-
 gridster-item.gridster-item-moving {
     z-index: 100 !important;
 }
 
 gridster-item.gridster-item-resizing {
     overflow: hidden;
-}
-
-.new-dashboard:hover {
-    cursor: pointer;
-    opacity: 0.7;
-}
-
-.reset-btn {
-    height: 38px;
-    width: 42px;
-}
-
-.sq-breadcrumb-item {
-    font-weight: bold;
-    color: var(--secondary);
 }

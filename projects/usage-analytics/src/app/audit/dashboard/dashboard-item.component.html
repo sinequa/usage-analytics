@@ -5,6 +5,7 @@
     [actions]="actions"
     [actionsFirst]="false"
     [buttonsStyle]="buttonsStyle"
+    [defaultTooltipPlacement]="'bottom'"
     [ngSwitch]="config.parameters.type">
 
     <ng-container *ngIf="!loading && !errorMessage">
@@ -24,7 +25,7 @@
                 [legendStyles]="{'justify-content': 'center', 'overflow-y': 'auto', 'width': '98%'}"
                 (selectionChange)="updateAuditRange($event)">
             </sq-timeline>
-            <ng-container *ngIf="config.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
+            <ng-container *ngIf="config.parameters.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
         </ng-container>
 
         <!-- Statistic view -->

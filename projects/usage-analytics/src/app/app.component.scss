@@ -1,12 +1,24 @@
-.min-h-100 {
-  min-height: 100%;
-}
-
-.brand {
-  outline: none !important;
-  cursor: pointer;
+.sq-nav {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
 .full-height {
-  height: calc(100vh - 75px);
+    height: calc(100vh - 75px);
+}
+
+
+.audit-filters {
+    --facet-width: 220px;
+    margin-left: 125px;
+    gap: 2rem;
+
+    sq-facet-card {
+        min-width: var(--facet-width);
+    }
+
+    sq-facet-multi {
+        z-index: 100;
+        width: var(--facet-width);
+        overflow: auto;
+    }
 }
