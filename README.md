@@ -206,7 +206,7 @@ On the first hand and considering the type of the widget (timeline, chart, grid 
 On the other hand, it is also possible to apply some actions to dashboards such as create new dashboard, delete, rename,  mark as default ...
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
 
-Notice that any saved modification leads to an update of the whole configuration in the **user settings** and, so on, it will be the version displayed to that specific user.
+Notice that any saved modification leads to an update of the whole configuration in the **user settings** and, so on, it will be saved as the default version displayed to that specific user.
 Users can always reset their modifications and go back to the default configuration as defined in the customization of the application or in the config.ts file .
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/reset-dashboards.PNG)</span>
 
@@ -236,24 +236,13 @@ In addition to options already provided to an ordinary user, an admin can modify
 
 Adding a widget will impact several parts of the code, and several aspects must be taken into account:
 
-- The widget must be displayed (within its parent component `sq-dashboard-item`).
+- The widget must be displayed (within its parent component `sq-dashboard-item`, as an additional switch case).
 - The widget creation must be triggered somewhere in the application (upon initialization or user action).
-- The widget must be synchronized with other widgets and the dataset web service.
+- The widget must properly interact with other widgets and the dataset web service (query changes, ...).
 - The widget might have properties needing to be persisted.
-- The widget size must adapt to the dashboard grid.
+- The widget size must be adapted to the dashboard grid.
 
-**1 - Widget display** <a name="widget_display"></a>
-
-The widget's display must be implemented in the `sq-dashboard-item` component (`app/audit/dashboard/dashboard-item.component`). The template of this component is composed of a `sq-facet-card` (see [facets](https://sinequa.github.io/sba-angular/tutorial/facet-module.html)) wrapping a Switch-Case directive to display the desired component (either a chart, stat, timeline, etc.). Therefore, adding a new component means simply adding a new "case" such as:
-
-```html
-<my-custom-widget *ngSwitchCase="'my-custom-type'" [results]="results">
-</my-custom-widget>
-```
-
-Your widget might require other input parameters, that you can create and manage inside `dashboard-item.component.ts` (generally, binding the global `results`, `dataset` or `data` as an input of your component is needed to refresh the widget upon new dataset web service changes). The component might also generate events, which you will want to handle in the controller as well.
-
-**2 - Widget creation / initialization** <a name="widget_creation"></a>
+**1 - Widget creation / initialization** <a name="widget_creation"></a>
 
 The creation of the widget can occur in different ways:
 
@@ -322,6 +311,17 @@ this.dashboardService.addWidget(WIDGET);
 ```
 
 This method returns the `item` object (of type `DashboardItem`) that will be passed to the `sq-dashboard-item` component. You can add or modify properties of this `item`: This is useful if your widget expects specific types of inputs.
+
+**2 - Widget display** <a name="widget_display"></a>
+
+The widget's display must be implemented in the `sq-dashboard-item` component (`src/app/audit/dashboard/dashboard-item.component`). The template of this component is composed of a `sq-facet-card` (see [facets](https://sinequa.github.io/sba-angular/tutorial/facet-module.html)) wrapping a Switch-Case directive to display the desired component (either a chart, stat, timeline, etc.). Therefore, adding a new component means simply adding a new "case" such as:
+
+```html
+<my-custom-widget *ngSwitchCase="'my-custom-type'" [results]="results">
+</my-custom-widget>
+```
+
+Your widget might require other input parameters, that you can create and manage inside `dashboard-item.component.ts` (generally, binding the global `results`, `dataset` or `data` as an input of your component is needed to refresh the widget upon new dataset web service changes). The component might also generate events, which you will want to handle in the controller as well.
 
 **3 - Widget synchronization** <a name="widget_synchronization"></a>
 
