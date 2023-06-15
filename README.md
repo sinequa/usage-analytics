@@ -76,7 +76,7 @@ This logic is implemented in the `audit.service.ts` :
 
 - `getParallelStreamAuditData(filters: string, start: string, end: string, apps: string[], profiles: string[], excludedDataset: string[] = []): Observable<Dataset>`
 
-    This method triggers HTTP requests of the dataset web service.
+    This method triggers parallel HTTP requests among the queries defined in the dataset web service.
 
 - `updateRangeFilter(timestamp: Date[] | string)`
 
@@ -100,7 +100,7 @@ This logic is implemented in the `audit.service.ts` :
 
 Dashboards of *Usage Analytics* are based on the [**angular-gridster2**](https://tiberiuzuld.github.io/angular-gridster2/) library.
 
-The application is organized in multiple tabs. Each tab is a dashboard.
+The application is organized in multiple tabs. Each tab is considered as a separate dashboard.
 
  <!-- that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a palette of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
 
@@ -172,7 +172,7 @@ This can be done whether in local config file at app level `config.ts` or define
 
 ### <a name="initialization_of_dashboards"></a> Initialization of dashboards
 
-Starting from the 11.9.0, the application includes a smart behavior when loading dashboards. It consists of notifying users, having customized their dashboards, of potential changes made by admins to the default configuration.
+Starting from the 11.9.0, the application includes a smart behavior when loading dashboards. It consists of notifying users, having customized their own dashboards, of potential changes made by admins to the default configuration.
 
 <span style="display:block;text-align:center">![Notification](/docs/assets/updates-notification.PNG)</span>
 
@@ -184,25 +184,26 @@ Behind the scenes, a sequence of comparisons is performed between several *Hash 
 
 ### <a name="customization"></a> Customization
 
-Basically, tow different way of customization can be applied to the *Usage Analytics* application. All depends on the user rights.
+Basically, two different ways of customization can be applied to the *Usage Analytics* application, depending on the user rights.
 
 **1 - Ordinary user** <a name="ordinary_user"></a>
 
 Ordinary users have the ability to perform several modifications on both widgets and dashboards.
 
-On the first hand, they can:
+On the first hand and considering the type of the widget (timeline, chart, grid ...), they can:
 
 - Resize existing widgets
 - Rename widgets
 - Remove widgets from the dashboard
 - Change the display of widgets
+- Show/Hide timelines illustrating the previous period
 
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/widget-actions.PNG)</span>
 
 - Add widgets from a palette of predefined ones
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/add-widget.PNG)</span>
 
-On the other hand, it is also possible to apply some actions to dashboards such as creating new dashboard, deleting dashboard, marking as default ...
+On the other hand, it is also possible to apply some actions to dashboards such as create new dashboard, delete, rename,  mark as default ...
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
 
 Notice that any saved modification leads to an update of the whole configuration in the **user settings** and, so on, it will be the version displayed to that specific user.
