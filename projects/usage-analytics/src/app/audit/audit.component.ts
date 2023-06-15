@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { Action } from "@sinequa/components/action";
-import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
 import { UIService } from "@sinequa/components/utils";
 import { AppService } from "@sinequa/core/app-utils";
@@ -9,7 +8,6 @@ import { Subscription } from "rxjs";
 import { skip } from 'rxjs/operators';
 
 import { AuditService } from "./audit.service";
-import { FACETS, facet_filters_icon, facet_filters_name } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
@@ -28,9 +26,9 @@ export class AuditComponent implements OnDestroy {
     @ViewChild("content", {static: false}) content: ElementRef;
 
     public exportAction: Action;
+    public settingsAction: Action;
 
     public dashboards: Dashboard[] = [];
-    public dashboardActions: Action[];
 
     // keep track of focused element
     public focusElementIndex: number;
@@ -65,7 +63,7 @@ export class AuditComponent implements OnDestroy {
                 // Properly display dashboards (default, opened ...)
                 this.dashboardService.handleNavigation();
                 this.dashboardService.setDefaultDashboard();
-                this.dashboardActions = this.dashboardService.createDashboardActions();
+                this.settingsAction = this.dashboardService.createSettingsActions();
 
                 // Request data upon login
                 this.auditService.updateAuditFilters();
@@ -108,13 +106,13 @@ export class AuditComponent implements OnDestroy {
 
         this.exportAction = new Action({
             icon: "fas fa-file-alt",
-            name: "export/import",
+            title: "Export/Import dashboards",
             children: [
                 this.getDataAction(),
                 new Action({separator: true}),
                 this.getLayoutAction(),
                 new Action({separator: true}),
-                ...this.getDashboardsDefAction()
+                ...this.getDashboardsDefinitionAction()
             ]
         })
 
@@ -127,49 +125,27 @@ export class AuditComponent implements OnDestroy {
         this._dashboardInitSubscription?.unsubscribe();
     }
 
-    /**
-     * Returns the configuration of the facets displayed.
-     * The configuration from the config.ts file can be overriden by configuration from
-     * the app configuration on the server
-     */
-    public get facets(): FacetConfig<FacetListParams>[] {
-        return this.appService.app?.data?.facets as any || FACETS;
-    }
-
-    get facetFiltersName(): string {
-        return (this.appService.app?.data?.facet_filters_name ?? facet_filters_name) as string;
-    }
-
-    get facetFiltersIcon(): string {
-        return (this.appService.app?.data?.facet_filters_icon ?? facet_filters_icon) as string;
-    }
-
-    getDataAction(): Action {
+    private getDataAction(): Action {
         return new Action({
             name: "Export dashboard data",
-            title: "Export dashboard data",
             text: "Export dashboard data",
             children: [
                 new Action({
-                    title: "As Excel",
                     text: "As Excel",
                     name: "exportAsXLS",
                     action: () => this.exportXLSX()
                 }),
                 new Action({
-                    title: "As CSV",
                     text: "As CSV",
                     name: "exportAsCSV",
                     action: () => this.exportCSV()
                 }),
                 new Action({
-                    title: "As XML",
                     text: "As XML",
                     name: "exportAsXML",
                     action: () => this.exportXML()
                 }),
                 new Action({
-                    title: "As PNG image",
                     text: "As PNG image",
                     name: "exportAsPNG",
                     action: () => this.exportPNG()
@@ -178,25 +154,22 @@ export class AuditComponent implements OnDestroy {
         })
     }
 
-    getLayoutAction(): Action {
+    private getLayoutAction(): Action {
         return new Action({
             name: "Export dashboards layout as JSON",
-            title: "Export dashboards layout as JSON",
             text: "Export dashboards layout as JSON",
             action: () => this.exportLayoutJson()
         })
     }
 
-    getDashboardsDefAction(): Action[] {
+    private getDashboardsDefinitionAction(): Action[] {
         return [
             new Action({
-                title: "Export dashboards definition as JSON",
                 text: "Export dashboards definition as JSON",
                 name: "Export dashboards definition as JSON",
                 action: () => this.exportDefJson()
             }),
             new Action({
-                title: "Import dashboards definition from JSON",
                 text: "Import dashboards definition from JSON",
                 name: "Import dashboards definition from JSON",
                 action: () => this.importDefJson()
@@ -204,38 +177,38 @@ export class AuditComponent implements OnDestroy {
         ]
     }
 
-    exportPNG() {
+    private exportPNG() {
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToPNG(name, this.content);
     }
 
-    exportCSV() {
+    private exportCSV() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToCsv(name, items);
     }
 
-    exportXLSX() {
+    private exportXLSX() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportXLSX(name, items);
     }
 
-    exportXML() {
+    private exportXML() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToXML(name, items);
     }
 
-    exportLayoutJson() {
+    private exportLayoutJson() {
         this.exportService.exportLayoutToJson("dashboards-layout", this.dashboardService.dashboards);
     }
 
-    exportDefJson() {
+    private exportDefJson() {
         this.exportService.exportDefToJson("dashboards-definition", this.dashboardService.dashboards);
     }
 
-    importDefJson() {
+    private importDefJson() {
         this.importService.dashboardsDefFromJson();
     }
 

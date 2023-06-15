@@ -1,15 +1,35 @@
-<nav class="navbar navbar-expand navbar-light bg-light pb-0">
+<nav class="navbar navbar-expand sq-nav pb-0">
     <div class="container-fluid pb-2">
 
         <div class="d-flex">
-            <span class="d-flex text-muted brand">
-                <img width="45px" height="45px" src="assets/sinequa-logo-light-sm.png">
-                <h1 class="ms-2">Usage Analytics</h1>
-            </span>
+            <img src="assets/logo.png" alt="sinequa logo">
+            <div class="audit-filters d-flex">
+                <sq-audit-range-picker></sq-audit-range-picker>
+                <sq-facet-card
+                    *ngIf="filterData"
+                    [collapsible]="true"
+                    [startCollapsed]="true"
+                    buttonsStyle="light"
+                    [collapseOnClickOutside]="true"
+                    [defaultTooltipPlacement]="'bottom'"
+                    (click)="$event.stopPropagation()">
+                    <sq-facet-multi
+                        #facet
+                        class="card position-absolute overflow-hidden"
+                        [results]="filterData"
+                        [facets]="facets"
+                        [title]="facetFiltersName"
+                        [icon]="facetFiltersIcon">
+                    </sq-facet-multi>
+                </sq-facet-card>
+            </div>
         </div>
 
-        <ul class="navbar-nav navbar-right align-items-baseline">
-            <sq-user-menu [enableDarkMode]="false"></sq-user-menu>
+        <ul class="navbar-nav navbar-right align-items-center me-2">
+            <sq-user-menu enableDarkMode="false" enableHelp="false" showText="true" icon="fa-regular fa-user"></sq-user-menu>
+            <button type="button" class="btn btn-primary action-btn ms-1" *ngIf="loginService.complete" (click)="openHelpPage()" [sqTooltip]="'Help'" placement="bottom">
+                <i class="fas fa-question"></i>
+            </button>
             <sq-feedback-menu [style]="'primary'" [rightAligned]="true" class="ms-1" *ngIf="loginService.complete && enableUserFeedbackMenu"></sq-feedback-menu>
         </ul>
 

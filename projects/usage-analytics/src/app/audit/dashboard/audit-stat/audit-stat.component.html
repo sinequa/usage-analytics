@@ -1,4 +1,4 @@
-<div class="stat p-1" *ngIf="value;else noData">
+<div class="stat p-0" *ngIf="value;else noData">
     <div class="stat-wrapper">
         <span class="stat-value">{{value | sqNumber: (config?.numberFormatOptions || numberFormatOptions)}}</span>
     </div>
