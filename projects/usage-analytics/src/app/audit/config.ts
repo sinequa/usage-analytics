@@ -1058,7 +1058,9 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
             { "item": "queryCountTotal", "position": { "x": 5, "y": 0, "rows": 2, "cols": 3 } },
             { "item": "sessionsByUser", "position": { "x": 3, "y": 2, "rows": 2, "cols": 2 } },
             { "item": "userCountTotalTimeline", "position": { "x": 0, "y": 4, "rows": 4, "cols": 3 } },
-            { "item": "viewedDocPerSearch", "position": { "x": 3, "y": 6, "rows": 2, "cols": 2 } }
+            { "item": "viewedDocPerSearch", "position": { "x": 3, "y": 6, "rows": 2, "cols": 2 } },
+            { "item": "searchCountTotal", "position": { "x": 5, "y": 8, "rows": 2, "cols": 3 } },
+            { "item": "searchCountTotalTimeline", "position": { "x": 0, "y": 8, "rows": 4, "cols": 3 } }
         ]
     },
     {
@@ -1078,7 +1080,9 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
             { "item": "queryCountTotal", "position": { "x": 3, "y": 5, "rows": 3, "cols": 1 } },
             { "item": "zeroSearchTimeline", "position": { "x": 4, "y": 5, "rows": 3, "cols": 2 } },
             { "item": "zeroSearch", "position": { "x": 6, "y": 5, "rows": 3, "cols": 1 } },
-            { "item": "zeroSearchRate", "position": { "x": 7, "y": 5, "rows": 3, "cols": 1 } }
+            { "item": "zeroSearchRate", "position": { "x": 7, "y": 5, "rows": 3, "cols": 1 } },
+            { "item": "searchCountTotalTimeline", "position": { "x": 0, "y": 8, "rows": 3, "cols": 3 } },
+            { "item": "searchCountTotal", "position": { "x": 3, "y": 8, "rows": 3, "cols": 1 } }
         ]
     },
     {

@@ -1,0 +1,50 @@
+// Flag images
+.sq-flag-en:before {
+    content: url('../resources/flags/flag-en.jpg');
+}
+
+.sq-flag-en-gb:before {
+    content: url('../resources/flags/flag-en-gb.jpg');
+}
+
+.sq-flag-fr:before {
+    content: url('../resources/flags/flag-fr.jpg');
+}
+
+.sq-flag-de:before {
+    content: url('../resources/flags/flag-de.jpg');
+}
+
+button i.sq-timeline-trend {
+    --sq-size: 20px;
+
+    &:before {
+        content: "";
+        display: block;
+        height: var(--sq-size);
+        width: var(--sq-size);
+        background-size: var(--sq-size) var(--sq-size);
+        background-image: url('/assets/timeline-trend.svg');
+        background-repeat: no-repeat;
+    }
+}
+
+button:hover i.sq-timeline-trend {
+    &:before {
+        background-image: url('/assets/timeline-trend-hover.svg');
+    }
+}
+
+button i.sq-add-widget {
+    --sq-size: 26px;
+
+    &:before {
+        content: "";
+        display: block;
+        height: var(--sq-size);
+        width: var(--sq-size);
+        background-size: var(--sq-size) var(--sq-size);
+        background-image: url('/assets/add-widget.svg');
+        background-repeat: no-repeat;
+    }
+}

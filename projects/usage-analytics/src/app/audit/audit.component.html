@@ -1,39 +1,28 @@
-<div class="audit-filters d-flex">
-    <sq-audit-range-picker></sq-audit-range-picker>
-    <sq-facet-card
-        *ngIf="(auditService.data$ | async)?.[auditService.facetFiltersQuery]"
-        [collapsible]="true"
-        [startCollapsed]="true"
-        [buttonsStyle]="isDark()? 'dark' : 'light'"
-        [collapseOnClickOutside]="true"
-        (click)="$event.stopPropagation()"
-        >
-        <sq-facet-multi
-            #facet
-            class="card position-absolute overflow-hidden"
-            [results]="(auditService.data$ | async)?.[auditService.facetFiltersQuery]"
-            [facets]="facets"
-            [title]="facetFiltersName"
-            [icon]="facetFiltersIcon">
-        </sq-facet-multi>
-    </sq-facet-card>
-</div>
+<div class="d-flex">
+    <section>
+        <div class="d-flex flex-row align-items-center flex-wrap">
+            <span class="sq-breadcrumb-item">Filters : &nbsp;</span>
+            <sq-filters
+                [query]="searchService.query"
+                [filter]="searchService.query.filters"
+                [showField]="false"
+                [allowRemove]="true"
+                (filterEdit)="searchService.search()">
+            </sq-filters>
+        </div>
+        <span class="sq-breadcrumb-item">Trends calculation period : {{ auditService.infoPreviousFilter | sqMessage }}</span>
+    </section>
 
-<div class="d-flex flex-row align-items-center flex-wrap">
-    <span class="sq-breadcrumb-item">Filters : &nbsp;</span>
-    <sq-filters
-        [query]="searchService.query"
-        [filter]="searchService.query.filters"
-        [showField]="false"
-        [allowRemove]="true"
-        (filterEdit)="searchService.search()">
-    </sq-filters>
+    <div class="d-flex align-items-center me-1 ms-auto">
+        <sq-action-buttons class="action-btn ms-1" [sq-action-buttons]="{items: [exportAction], style:'primary', rightAligned: true}"></sq-action-buttons>
+        <button type="button" class="btn btn-primary action-btn ms-1" (click)="resetDashboards()" [sqTooltip]="'Reset dashboards to default configuration'">
+            <i class="fas fa-undo-alt"></i>
+        </button>
+    </div>
 </div>
-<span class="sq-breadcrumb-item">Trends calculation period : {{ auditService.infoPreviousFilter | sqMessage }}</span>
-
 
 <!-- Dashboard tabs -->
-<ul class="nav nav-tabs" *ngIf="ready">
+<ul class="nav nav-tabs sq-nav-tabs" *ngIf="ready">
     <li class="nav-item" *ngFor="let dashboard of dashboardService.allDashboards; let i=index">
         <a
             class="nav-link"
@@ -50,34 +39,31 @@
             <!-- Button to save tab modifications-->
             <button [sqIcon]="'fas fa-save'" [sqTooltip]="'msg#dashboard.saveTitle' | sqMessage" *ngIf="!dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ms-1" (click)="saveDashboard(dashboard, $event)"></button>
 
-             <!-- Button to rename tab modifications-->
-             <button [sqIcon]="'far fa-edit'" [sqTooltip]="'msg#dashboard.renameTitle' | sqMessage" *ngIf="dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ms-1" (click)="renameDashboard(dashboard, $event)"></button>
-
             <!-- Button to bookmark a tab -->
             <button [sqIcon]="'far fa-bookmark'" [sqTooltip]="'msg#dashboard.setDefaultTitle' | sqMessage" *ngIf="!dashboardService.isDefaultDashboard(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1" (click)="markAsDefaultDashboard(dashboard, $event)"></button>
 
             <!-- Button to share a tab -->
             <button [sqIcon]="'fas fa-share-alt'" [sqTooltip]="'msg#dashboard.shareTitle' | sqMessage" class="btn-focus btn btn-link btn-xs py-0 px-1" (click)="shareDashboard(dashboard, $event)"></button>
 
+            <!-- Button to rename tab modifications-->
+            <button [sqIcon]="'far fa-edit'" [sqTooltip]="'msg#dashboard.renameTitle' | sqMessage" *ngIf="dashboardService.isDashboardSaved(dashboard)" class="btn-focus btn btn-link btn-xs py-0 px-1 ms-1" (click)="renameDashboard(dashboard, $event)"></button>
+
             <!-- Button to delete a tab -->
             <button [sqIcon]="'fas fa-times-circle'" [sqTooltip]="'msg#dashboard.deleteTitle' | sqMessage" class="btn-focus btn btn-link btn-xs py-0 px-1" (click)="deleteDashboard(dashboard, $event)"></button>
         </a>
     </li>
-    <!-- Button to create a tab -->
-    <li class="nav-item align-self-center">
-        <button [sqIcon]="'fas fa-plus-circle'" [sqTooltip]="'msg#dashboard.newTitle' | sqMessage" class="btn btn-link btn-xs py-0 ms-1" (click)="newDashboard()"></button>
-    </li>
-    <div class="btn-group dashboard-actions" [sq-action-buttons]="{items: dashboardActions, style: 'link', rightAligned: true}"></div>
 
-    <!-- export actions -->
-    <div class="ms-auto">
-        <sq-action-buttons [sq-action-buttons]="{items: [exportAction], style:'outline-primary', rightAligned: true}"></sq-action-buttons>
-        <sq-widget-palette class="ms-2" *ngIf="loginService.complete"></sq-widget-palette>
-        <button type="button" class="btn btn-outline-primary reset-btn ms-2" (click)="resetDashboards()" [sqTooltip]="'Reset dashboards to default'">
-            <i class="fas fa-undo-alt"></i>
+    <!-- actions -->
+    <div class="d-flex align-items-center ms-auto">
+        <button type="button" class="btn btn-primary action-btn ms-1" (click)="newDashboard()" [sqTooltip]="'msg#dashboard.newTitle' | sqMessage">
+            <i class="fas fa-plus"></i>
         </button>
+        <sq-widget-palette class="ms-1" *ngIf="loginService.complete"></sq-widget-palette>
+        <sq-action-buttons class="action-btn ms-1" [sq-action-buttons]="{items: [settingsAction], style:'primary', rightAligned: true}"></sq-action-buttons>
     </div>
 </ul>
+
+<!-- Current Dashboard -->
 <gridster #gridster [options]="dashboardService.options" *ngIf="loginService.complete && ready">
     <div #content>
         <gridster-item [item]="item" *ngFor="let item of dashboardService.dashboard.items; index as i" [attr.focus]="i === focusElementIndex">
