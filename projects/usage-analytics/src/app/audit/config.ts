@@ -1036,14 +1036,15 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
     {
         "name": "Users",
         "items": [
-            { "item": "userCountTotalTimeline", "position": { "x": 0, "y": 0, "rows": 4, "cols": 4 } },
-            { "item": "newUsersTimeline", "position": { "x": 4, "y": 0, "rows": 4, "cols": 4 } },
-            { "item": "userCoverage", "position": { "x": 0, "y": 4, "rows": 2, "cols": 2 } },
-            { "item": "userCountTotal", "position": { "x": 2, "y": 4, "rows": 2, "cols": 2 } },
-            { "item": "newUsers", "position": { "x": 4, "y": 4, "rows": 2, "cols": 2 } },
-            { "item": "newUsersRate", "position": { "x": 4, "y": 6, "rows": 2, "cols": 2 } },
-            { "item": "activeUsers", "position": { "x": 6, "y": 4, "rows": 2, "cols": 2 } },
-            { "item": "activeUsersRate", "position": { "x": 6, "y": 6, "rows": 2, "cols": 2 } }
+            { "item": "userCountTotalTimeline", "position": { "x": 6, "y": 4, "rows": 4, "cols": 2 } },
+            { "item": "newUsersTimeline", "position": { "x": 3, "y": 4, "rows": 4, "cols": 3 } },
+            { "item": "userCoverage", "position": { "x": 3, "y": 2, "rows": 2, "cols": 2 } },
+            { "item": "userCountTotal", "position": { "x": 3, "y": 0, "rows": 2, "cols": 2 } },
+            { "item": "newUsers", "position": { "x": 5, "y": 0, "rows": 2, "cols": 1 } },
+            { "item": "newUsersRate", "position": { "x": 6, "y": 0, "rows": 2, "cols": 2 } },
+            { "item": "activeUsers", "position": { "x": 5, "y": 2, "rows": 2, "cols": 1 } },
+            { "item": "activeUsersRate", "position": { "x": 6, "y": 2, "rows": 2, "cols": 2 } },
+            { "item": "usersRepartition", "position": { "x": 0, "y": 0, "rows": 8, "cols": 3 } }
         ]
     },
     {
@@ -1088,17 +1089,16 @@ export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position
     {
         "name": "Results",
         "items": [
-            { "item": "mrrTimeline", "position": { "x": 0, "y": 0, "rows": 6, "cols": 3 } },
-            { "item": "mrr", "position": { "x": 0, "y": 6, "rows": 2, "cols": 2 } },
-            { "item": "resultTypes", "position": { "x": 5, "y": 0, "rows": 4, "cols": 3 } },
-            { "item": "clickRank1AfterSearchRate", "position": { "x": 3, "y": 0, "rows": 2, "cols": 2 } },
-            { "item": "clickRank3AfterSearchRate", "position": { "x": 3, "y": 2, "rows": 2, "cols": 2 } },
-            { "item": "clickAfterSearchRate", "position": { "x": 6, "y": 4, "rows": 2, "cols": 2 } },
-            { "item": "searchExitRate", "position": { "x": 6, "y": 6, "rows": 2, "cols": 2 } },
-            { "item": "queryBounceRate", "position": { "x": 6, "y": 8, "rows": 2, "cols": 2 } },
-            { "item": "refinementRate", "position": { "x": 0, "y": 8, "rows": 2, "cols": 2 } },
-            { "item": "clickBySearch", "position": { "x": 3, "y": 4, "rows": 2, "cols": 3 } },
-            { "item": "clickBySearchTimeline", "position": { "x": 2, "y": 6, "rows": 4, "cols": 4 } }
+            { "item": "mrrTimeline", "position": { "x": 0, "y": 0, "rows": 4, "cols": 4 } },
+            { "item": "mrr", "position": { "x": 4, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "clickRank1AfterSearchRate", "position": { "x": 4, "y": 0, "rows": 2, "cols": 2 } },
+            { "item": "clickRank3AfterSearchRate", "position": { "x": 4, "y": 2, "rows": 2, "cols": 2 } },
+            { "item": "clickAfterSearchRate", "position": { "x": 6, "y": 0, "rows": 2, "cols": 2 } },
+            { "item": "searchExitRate", "position": { "x": 6, "y": 2, "rows": 2, "cols": 2 } },
+            { "item": "queryBounceRate", "position": { "x": 6, "y": 6, "rows": 2, "cols": 2 } },
+            { "item": "refinementRate", "position": { "x": 4, "y": 6, "rows": 2, "cols": 2 } },
+            { "item": "clickBySearch", "position": { "x": 6, "y": 4, "rows": 2, "cols": 2 } },
+            { "item": "clickBySearchTimeline", "position": { "x": 0, "y": 4, "rows": 4, "cols": 4 } }
         ]
     },
     {
