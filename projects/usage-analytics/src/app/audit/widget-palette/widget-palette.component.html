@@ -28,7 +28,9 @@
                         [sqTooltip]="item?.info | sqMessage"
                         [fallbackPlacements]="['bottom','top']">
                         <i class="{{getIcon(item)}}"></i>
-                        <div class="button-text">{{item.title | sqMessage}}</div>
+                        <div class="button-text-container">
+                            <div class="button-text">{{item.title | sqMessage}}</div>
+                        </div>
                     </button>
                 </div>
             </details>
@@ -44,7 +46,9 @@
                 [sqTooltip]="item?.info | sqMessage"
                 [fallbackPlacements]="['bottom','top']">
                 <i class="{{getIcon(item)}}"></i>
-                <div class="button-text" [innerHtml]="(item.titleHighlight || item.title) | sqMessage"></div>
+                <div class="button-text-container">
+                    <div class="button-text" [innerHtml]="(item.titleHighlight || item.title) | sqMessage"></div>
+                </div>
             </button>
         </div>
     </ng-template>
