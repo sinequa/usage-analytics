@@ -24,14 +24,14 @@ button i.sq-timeline-trend {
         height: var(--sq-size);
         width: var(--sq-size);
         background-size: var(--sq-size) var(--sq-size);
-        background-image: url('/assets/timeline-trend.svg');
+        background-image: url('^assets/timeline-trend.svg');
         background-repeat: no-repeat;
     }
 }
 
 button:hover i.sq-timeline-trend {
     &:before {
-        background-image: url('/assets/timeline-trend-hover.svg');
+        background-image: url('^assets/timeline-trend-hover.svg');
     }
 }
 
@@ -44,7 +44,7 @@ button i.sq-add-widget {
         height: var(--sq-size);
         width: var(--sq-size);
         background-size: var(--sq-size) var(--sq-size);
-        background-image: url('/assets/add-widget.svg');
+        background-image: url('^assets/add-widget.svg');
         background-repeat: no-repeat;
     }
 }
