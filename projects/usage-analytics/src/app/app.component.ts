@@ -7,6 +7,7 @@ import { AuditService } from "./audit/audit.service";
 import { BsUserMenuComponent, HelpFolderOptions } from "@sinequa/components/user-settings";
 import { IntlService } from "@sinequa/core/intl";
 import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
+import { Title } from "@angular/platform-browser";
 
 /** A token that is used to inject the help folder options.
  * Expects a {@link HelpFolderOptions} object.
@@ -26,17 +27,23 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
         public appService: AppService,
         public auditService: AuditService,
         public intlService: IntlService,
+        public titleService: Title,
         @Optional() @Inject(APP_HELP_FOLDER_OPTIONS) private helpDefaultFolderOptions: HelpFolderOptions | null | undefined)
     {
         super();
     }
 
     ngOnInit() {
+        super.ngOnInit();
         // This is needed to fix the issue of ExpressionChangedAfterItHasBeenCheckedError on app startup
         // caused by the use of (auditService.data$ | async)?.[auditService.facetFiltersQuery] directly in the template
         this.auditService.data$.subscribe((dataset: Dataset) => {
             this.filterData = dataset[this.auditService.facetFiltersQuery];
         })
+    }
+
+    onLoginComplete() {
+        this.titleService.setTitle(this.appService.app?.data?.title as string || "Usage Analytics");
     }
 
     /**
@@ -58,6 +65,10 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
 
     get enableUserFeedbackMenu(): boolean {
         return (this.appService.app?.data?.enableUserFeedbackMenu ?? enableUserFeedbackMenu) as boolean;
+    }
+
+    get appLogo(): string {
+        return this.appService.app?.data?.logo as string ?? "assets/logo.png";
     }
 
     openHelpPage() {
