@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Category } from "@sinequa/analytics/fusioncharts";
-import { Dataset, DatasetError, Results } from "@sinequa/core/web-services";
-import { DashboardItem, MultiLevelPieParams } from "../dashboard.service";
+import { Dataset, DatasetError, isDatasetError, Results } from "@sinequa/core/web-services";
 import { MayBe, StatProvider, StatValueField, StatValueLocation } from "./stat.provider";
 import { Parser } from "expr-eval";
 
@@ -23,21 +22,28 @@ export class MultiLevelPieProvider {
     constructor(private statProvider: StatProvider) {}
 
     extractQueryValue(data: MayBe<Results | DatasetError>, queryConfig: MultiLevelPieQuery): number {
+        if(!data) {
+            throw new Error(`Missing data for resolving '${queryConfig.query}'`);
+        }
+        if(isDatasetError(data)) {
+            throw new Error(data.errorMessage);
+        }
         return this.statProvider.extractStatValue(data, queryConfig.valueLocation, queryConfig.valueField) || 0;
     }
 
-    resolveData(dataset: Dataset, config: DashboardItem<MultiLevelPieParams>, categoriesConfig: MayBe<MultiLevelPieConfig[]>, queries: MayBe<MultiLevelPieQuery[]>): Category[] {
+    resolveData(dataset: Dataset, categoriesConfig: MayBe<MultiLevelPieConfig[]>, queries: MayBe<MultiLevelPieQuery[]>): Category[] {
         if (!categoriesConfig) {
             return [];
         }
         return categoriesConfig.map((item) => {
-            const value = this.resolveValue(dataset, config, queries, item.valueExpr);
+            const {value, error} = this.resolveValue(dataset, queries, item.valueExpr);
             return {
                 ...item,
                 originalLabel: item.label,
+                label: item.label + (error? ` (${error})` : ''),
                 value: value,
                 count: value,
-                category: this.resolveData(dataset, config,  item.category, queries)
+                category: value > 0? this.resolveData(dataset, item.category, queries) : []
             };
         }) as Category[];
     }
@@ -48,37 +54,24 @@ export class MultiLevelPieProvider {
      * @param queries
      * @param expr For example "query1 - query2 + queryX * (query5 / query6)"
      */
-    resolveValue(dataset: Dataset, config: DashboardItem<MultiLevelPieParams>, queries: MayBe<MultiLevelPieQuery[]>, expr: string): number {
-        if (queries) {
+    resolveValue(dataset: Dataset, queries: MayBe<MultiLevelPieQuery[]>, expr: string): {value: number, error?: string} {
+        try {
             const parser = new Parser();
-            try {
-                // Extract all query operands
-                const queryOperands = parser.parse(expr).variables();
-                if (queryOperands) {
-                    if (queryOperands.every((query) => queries!.find((q) => q.query === query))) {
-                        // Define an object of all query operands with their resolved numerical values
-                        const resolvedQueryOperands: { [key: string]: number } = {};
-                        queryOperands.forEach((query: string) => {
-                            resolvedQueryOperands[query] = this.extractQueryValue(dataset[query], queries!.find((q) => q.query === query)!);
-                        });
-                        // Evaluate the expression
-                        return parser.evaluate(expr, resolvedQueryOperands);
-                    } else {
-                        console.error("Query operand(s) have been used but not defined in 'multiLevelPieQueries' parameter of the widget = " + config.id)
-                        return 0;
-                    }
-                } else {
-                    console.error("No query operands found to resolve values in the widget = " + config.id)
-                    return 0;
+            // Extract all query operands
+            const queryOperands = parser.parse(expr).variables();
+            const operands: { [key: string]: number } = {};// Define an object of all query operands with their resolved numerical values
+            for(let query of queryOperands) {
+                const config = queries?.find((q) => q.query === query);
+                if(!config) {
+                    throw new Error(`Missing query for operand '${query}'`);
                 }
-            } catch (error) {
-                console.error("Cannot parse the expression: '" + expr + "'. Please check the 'valueExpr' properties in the widget = " + config.id);
-                return 0;
+                operands[query] = this.extractQueryValue(dataset[query], config);
             }
-
+            return {value: parser.evaluate(expr, operands)};
         }
-        console.error("Missing attribute 'multiLevelPieQueries' in the widget = " + config.id)
-        return 0;
+        catch(e) {
+            return {value: 0, error: e.message};
+        }
     }
 
 }
