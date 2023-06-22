@@ -24,15 +24,27 @@
             font-size: 30px;
         }
 
+        .button-text-container {
+            flex-grow:1;
+            display: grid;
+            align-items: center;
+        }
+
         .button-text {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: inline;
             font-size: 12px;
 
-            & ::ng-deep b {
+            ::ng-deep b {
                 background-color: yellow;
+            }
+        }
+    }
+
+    /* override button's hover behavior when button text is highlighted  */
+    button:hover {
+        .button-text {
+            ::ng-deep b {
+                color: var(--bs-btn-hover-bg);
             }
         }
     }

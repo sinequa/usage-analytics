@@ -26,7 +26,7 @@
         </div>
 
         <ul class="navbar-nav navbar-right align-items-center me-2">
-            <sq-user-menu enableDarkMode="false" enableHelp="false" showText="true" icon="fa-regular fa-user"></sq-user-menu>
+            <sq-user-menu [enableDarkMode]="false" [enableHelp]="false" [showText]="true" icon="fa-regular fa-user"></sq-user-menu>
             <button type="button" class="btn btn-primary action-btn ms-1" *ngIf="loginService.complete" (click)="openHelpPage()" [sqTooltip]="'Help'" placement="bottom">
                 <i class="fas fa-question"></i>
             </button>
