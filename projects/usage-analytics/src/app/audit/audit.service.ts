@@ -48,8 +48,6 @@ export interface AuditDatasetFilters {
 })
 export class AuditService {
 
-    protected readonly defaultDatasets: string[] = [this.facetFiltersQuery];
-
     public data$ = new ReplaySubject<Dataset>(1);
     public previousPeriodData$ = new ReplaySubject<Dataset>(1);
 
@@ -278,7 +276,7 @@ export class AuditService {
      * @returns list of {webService, query} used by widgets in the current displayed dashboard
      */
     protected updateDatasetsList(): string[] {
-        const datasets: string[] = [];
+        const datasets: string[] = [this.facetFiltersQuery];
         this.dashboardService.dashboard.items.forEach(
             (item) => {
                 if (item.parameters.query) {
@@ -324,7 +322,8 @@ export class AuditService {
                 this.currentAuditDataLoading = true;
                 this.previousAuditDataLoading = true;
                 // Exclude manual added datasets Or datasets pre-requiring extra input (a config param, an app filter ...)
-                const datasets = this.defaultDatasets.concat(this.updateDatasetsList()).filter((datasetName) => (datasetName !== "totalUsers" && !excludedDataset.includes(datasetName)));
+                const datasets = this.updateDatasetsList()
+                  .filter((datasetName) => (datasetName !== "totalUsers" && !excludedDataset.includes(datasetName)));
 
                 /**
                  * Execute unique datasets pointing to different web services potentially
