@@ -1,4 +1,4 @@
-// ### Environment ###
+zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz// ### Environment ###
 properties([
 	parameters([
 		string(name:"SBA_VERSION",  defaultValue: "", description: "version of sba", trim: true),
@@ -62,19 +62,26 @@ node (params.SBA_NODE) {
 		}
 
 		// Validate app fired
-		if (modeCallFromSbaInternal) {
-			// Validate app fired on merge event
-			stage('Update package') {
-				// update package.json with version
-				jf.updatePackage(sba_version)
-			}
-		}
+//		if (modeCallFromSbaInternal) {
+//			// Validate app fired on merge event
+//			stage('Update package') {
+//				// update package.json with version
+//				jf.updatePackage(sba_version)
+//			}
+//		}
 
 		
 		// install dependencies, fallback to official registry
 		// and retry if get on internal repo fails
 		stage('NPM Install') {
 			bat "npm ci"
+		}
+		
+		stage('Install @sinequa pkg') {
+			when (modeCallFromSbaInternal) {
+				echo "npm install @sinequa/core@${sba_version} @sinequa/components@${sba_version} @sinequa/analytics@${sba_version} --legacy-peer-deps"
+				bat "npm install @sinequa/core@${sba_version} @sinequa/components@${sba_version} @sinequa/analytics@${sba_version} --legacy-peer-deps3
+			}
 		}
 		
 		// Build the app started on commit event
