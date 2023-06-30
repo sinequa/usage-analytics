@@ -77,7 +77,7 @@ node (params.SBA_NODE) {
 		}
 		
 		stage('Install @sinequa pkg') {
-			if (modellFromSbaInternal) {
+			if (modeCallFromSbaInternal) {
 				echo "npm install @sinequa/core@${sba_version} @sinequa/components@${sba_version} @sinequa/analytics@${sba_version} --legacy-peer-deps"
 				bat  "npm install @sinequa/core@${sba_version} @sinequa/components@${sba_version} @sinequa/analytics@${sba_version} --legacy-peer-deps"
 			}
