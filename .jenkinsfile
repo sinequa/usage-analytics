@@ -1,4 +1,3 @@
-// ### Environment ###
 properties([
 	parameters([
 		string(name:"SBA_VERSION",  defaultValue: "", description: "version of sba", trim: true),
@@ -50,10 +49,6 @@ node (params.SBA_NODE) {
 			def nmfolder = "node_modules"
 			echo ".Rmdir /s /q ${nmfolder}"
 			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
-			
-			// clean the npm cache
-			echo ".Cache clean force"
-			bat "npm cache clean --force"
 		}
 		
 		stage('Create user') {
@@ -65,43 +60,24 @@ node (params.SBA_NODE) {
 			bat "npm whoami"
 		}
 
-		// Validate app fired
-		if (modeCallFromSbaInternal) {
-			// Validate app fired on merge event
-			stage('Update package') {
-				// update package.json with version
-				jf.updatePackage(sba_version)
-			}
-		}
-
-		
 		// install dependencies, fallback to official registry
 		// and retry if get on internal repo fails
 		stage('NPM Install') {
-			echo "npm install"
-			def ret = bat (script: "npm install", returnStatus: true)
-			if (ret) {
-				// set .npmrc file as original
-				// check registry
-				// install again
-				bat """
-				  echo "----------"
-				  echo "restore .npmrc file"
-				  call git restore .npmrc
-				  echo "verify the registry"
-				  call npm config get registry
-				  echo "npm install again"
-				  call npm install
-				"""
+			echo ".npm ci"
+			bat "npm ci"
+		}
+		
+		stage('Install @sinequa pkg') {
+			if (modeCallFromSbaInternal) {
+				echo ".npm install @sinequa/core@${sba_version} @sinequa/components@${sba_version} @sinequa/analytics@${sba_version} --legacy-peer-deps"
+				bat  "npm install @sinequa/core@${sba_version} @sinequa/components@${sba_version} @sinequa/analytics@${sba_version} --legacy-peer-deps"
 			}
 		}
 		
 		// Build the app started on commit event
 		stage('Build') {
-			bat """
-				echo "npm run build --if-present"
-				npm run build --if-present
-			"""
+			echo ".npm run build --if-present"
+			bat "npm run build --if-present"
 		}
 	
 	} catch (err) {
