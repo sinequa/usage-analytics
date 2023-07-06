@@ -105,8 +105,9 @@ export class WidgetPaletteComponent implements OnInit, OnDestroy {
                 return "fas fa-th";
             case "multiLevelPie":
                 return "fas fa-chart-pie";
+            default:
+                return "";
         }
-        return "";
     }
 
 
