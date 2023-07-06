@@ -39,6 +39,9 @@ export const mono_scope_queries: string[] = [];
 /** Show/Hide the user-feedback menu */
 export const enableUserFeedbackMenu: boolean = true;
 
+/** Show/Hide the help page link */
+export const enableHelpPageLink: boolean = true;
+
 /** Predefined period filters */
 export enum RelativeTimeRanges {
     Last3H = "msg#dateRange.last3H",
@@ -537,7 +540,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     },
     "resultTypes": {
         "id": "resultTypes",
-        "icon": "fas fa-chart-pie",
         "title": "Last event after a search",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Last event after a search: <br> <ul> <li>'search.exit.logout': User runs a query and does not click on any document but instead logs out.</li> <li> 'search.exit.timeout': User runs a query and does nothing before the timeout of the session.</li> <li> 'search.with.click': User runs a query, can do refinement and then clicks on a document. </li><li> 'search.with.no.click': User runs a query, can do refinement but doesn't click on a document.</li></ul> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Distribution of values of “Results” event within search summary.",
         "unique": true,
@@ -992,7 +994,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "avgEngineResponseTimeline": {
         "id": "avgEngineResponseTimeline",
         "title": "Average Engine Response Timeline",
-        "icon": "fas fa-chart-line",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average engine response time (in ms) displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all durationExecution filtered on query.summary.",
         "unique": true,
         "parameters": {
@@ -1010,7 +1011,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "maxEngineResponseTimeline": {
         "id": "maxEngineResponseTimeline",
         "title": "Maximum Engine Response Timeline",
-        "icon": "fas fa-chart-line",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Maximum engine response time (in ms) displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Maximum value of all durationExecution filtered on refinement events",
         "unique": true,
         "parameters": {
@@ -1028,7 +1028,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "avgResponseTimeTimeline": {
         "id": "avgResponseTimeTimeline",
         "title": "Average Web App Response Timeline",
-        "icon": "fas fa-chart-line",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average WebApp Response time (in ms) incl. platform & engine displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all duration event filtered on query.summary.",
         "unique": true,
         "parameters": {
@@ -1046,7 +1045,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     "maxResponseTimeTimeline": {
         "id": "maxResponseTimeTimeline",
         "title": "Maximum Web App Response Time Timeline",
-        "icon": "fas fa-chart-line",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Maximum Web App Response time (in ms) incl. platform & engine displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Maximum value of durations events filtered on query.summary.",
         "unique": true,
         "parameters": {
@@ -1065,7 +1063,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     },
     "avgResponseTime": {
         "id": "avgResponseTime",
-        "icon": "fas fa-balance-scale",
         "title": "Average Web App Response Time",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average response time (in ms) incl. platform & engine. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of the response speed following a query.summary. Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all durations filtered on query.summary",
         "unique": true,
@@ -1083,7 +1080,6 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
     },
     "avgEngineResponseTime": {
         "id": "avgEngineResponseTime",
-        "icon": "fas fa-balance-scale",
         "title": "Average Engine Response Time",
         "info": "<span class='text-decoration-underline'><b>Description:</b></span> Average engine response time (in ms). <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Evaluation of the response speed following a query.summary. Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Average of all duration executions filtered on query.summary.",
         "unique": true,

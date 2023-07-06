@@ -207,6 +207,10 @@ Users can always reset their modifications and go back to the default configurat
 
 In addition to options already provided to an ordinary user, an admin can modify several aspects from **Customization (JSON)** tab of the application. There, it is possible to override: 
 
+- `logo: string`: (**"assets/logo.png"** by default) Path of the application logo.
+- `title: string`: (**"Usage Analytics"** by default) Application name displayed in the browser tab.
+- `enableUserFeedbackMenu: boolean`: (**true** by default) Show/Hide the button used to send a user's feedback.
+- `enableHelpPageLink: boolean`: (**true** by default) Show/Hide the button used to navigate to the help page.
 - `sq_timezone: string`: (**"UTC"** by default) Time zone name of Sinequa server to which time filters should be converted before being sent. Please refer to the [time zones database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 - `session_count_threshold_per_month: number`: (**2** by default) Used by “Active Users” related widgets. It allows to modify the calculation: a user is considered active when he did at least such sessions.
 - `potential_total_user_count: number`: (**0** by default) Used by “User Coverage” widget. It represents the total number of users who can use the platform within the company. Notice that this parameter **must be updated** by the admin. If not, the widget will display an error message.
@@ -239,7 +243,6 @@ In addition to options already provided to an ordinary user, an admin can modify
 - `default_app_filter: string | string[]`: (**""** by default) Pre-filtering the scope of the queries in the dataset by the provided list of SBA applications.
 - `default_profile_filter: string | string[]`: (**""** by default) Pre-filtering the scope of the queries in the dataset by the provided list of PROFILE applications.
 - `mono_scope_queries: string[]`: (**[]** by default) List of widgets requiring a filter by a unique scope ( if not the case, an error message is displayed within the widget).
-- `enableUserFeedbackMenu: boolean`: (**true** by default) Show/Hide the button used to send user's feedback.
 - `facet_filters_query: string`: (**applications** by default) Query name used by the filtering facet.
 - `facet_filters_name: string`: (**Applications** by default) Name of the filtering facet.
 - `facet_filters_icon: string`: (**fas fa-desktop** by default) Icon of the filtering facet.
