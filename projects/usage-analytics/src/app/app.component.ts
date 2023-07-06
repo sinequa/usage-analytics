@@ -1,7 +1,7 @@
 import { Component, Inject, InjectionToken, OnInit, Optional } from "@angular/core";
 import { AppService } from "@sinequa/core/app-utils";
 import { ComponentWithLogin } from "@sinequa/core/login";
-import { FACETS, enableUserFeedbackMenu, facet_filters_icon, facet_filters_name, logo, title } from "./audit/config";
+import { FACETS, enableHelpPageLink, enableUserFeedbackMenu, facet_filters_icon, facet_filters_name, logo, title } from "./audit/config";
 import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { AuditService } from "./audit/audit.service";
 import { BsUserMenuComponent, HelpFolderOptions } from "@sinequa/components/user-settings";
@@ -46,6 +46,10 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
         this.titleService.setTitle((this.appService.app?.data?.title ?? title) as string);
     }
 
+    get appLogo(): string {
+        return (this.appService.app?.data?.logo ?? logo) as string;
+    }
+
     /**
      * Returns the configuration of the facets displayed.
      * The configuration from the config.ts file can be overriden by configuration from
@@ -67,8 +71,8 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
         return (this.appService.app?.data?.enableUserFeedbackMenu ?? enableUserFeedbackMenu) as boolean;
     }
 
-    get appLogo(): string {
-        return (this.appService.app?.data?.logo ?? logo) as string;
+    get enableHelpPageLink(): boolean {
+        return (this.appService.app?.data?.enableHelpPageLink ?? enableHelpPageLink) as boolean;
     }
 
     openHelpPage() {
