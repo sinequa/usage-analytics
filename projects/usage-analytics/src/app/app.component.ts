@@ -1,7 +1,7 @@
 import { Component, Inject, InjectionToken, OnInit, Optional } from "@angular/core";
 import { AppService } from "@sinequa/core/app-utils";
 import { ComponentWithLogin } from "@sinequa/core/login";
-import { FACETS, enableUserFeedbackMenu, facet_filters_icon, facet_filters_name } from "./audit/config";
+import { FACETS, enableUserFeedbackMenu, facet_filters_icon, facet_filters_name, logo, title } from "./audit/config";
 import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { AuditService } from "./audit/audit.service";
 import { BsUserMenuComponent, HelpFolderOptions } from "@sinequa/components/user-settings";
@@ -43,7 +43,7 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
     }
 
     onLoginComplete() {
-        this.titleService.setTitle(this.appService.app?.data?.title as string || "Usage Analytics");
+        this.titleService.setTitle((this.appService.app?.data?.title ?? title) as string);
     }
 
     /**
@@ -68,7 +68,7 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
     }
 
     get appLogo(): string {
-        return this.appService.app?.data?.logo as string ?? "assets/logo.png";
+        return (this.appService.app?.data?.logo ?? logo) as string;
     }
 
     openHelpPage() {
