@@ -76,7 +76,7 @@ This logic is implemented in the `audit.service.ts` :
 
 - `getParallelStreamAuditData(filters: string, start: string, end: string, apps: string[], profiles: string[], excludedDataset: string[] = []): Observable<Dataset>`
 
-    This method triggers HTTP requests of the dataset web service.
+    This method triggers parallel HTTP requests among the queries defined in the dataset web service.
 
 - `updateRangeFilter(timestamp: Date[] | string)`
 
@@ -100,14 +100,7 @@ This logic is implemented in the `audit.service.ts` :
 
 Dashboards of *Usage Analytics* are based on the [**angular-gridster2**](https://tiberiuzuld.github.io/angular-gridster2/) library.
 
-The application is organized in multiple tabs. Each tab is a dashboard.
-
- <!-- that can be customized, by the users, by dragging and resizing widgets, and adding new ones from a palette of predefined widget types. A developer can easily add new widget types, or configure the existing ones.
-
-Dashboards can be saved with a name, marked as default and shared with colleagues. Users can also manage their dashboards' settings. -->
-
-<!-- <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span> -->
-
+The application is organized in multiple tabs. Each tab is considered as a separate dashboard.
 
 A dashboard is basically defined by the following simplified piece of code :
 ```html
@@ -172,7 +165,7 @@ This can be done whether in local config file at app level `config.ts` or define
 
 ### <a name="initialization_of_dashboards"></a> Initialization of dashboards
 
-Starting from the 11.9.0, the application includes a smart behavior when loading dashboards. It consists of notifying users, having customized their dashboards, of potential changes made by admins to the default configuration.
+Starting from the 11.9.0, the application includes a smart behavior when loading dashboards. It consists of notifying users, having customized their own dashboards, of potential changes made by admins to the default configuration.
 
 <span style="display:block;text-align:center">![Notification](/docs/assets/updates-notification.PNG)</span>
 
@@ -184,28 +177,29 @@ Behind the scenes, a sequence of comparisons is performed between several *Hash 
 
 ### <a name="customization"></a> Customization
 
-Basically, tow different way of customization can be applied to the *Usage Analytics* application. All depends on the user rights.
+Basically, two different ways of customization can be applied to the *Usage Analytics* application, depending on the user rights.
 
 **1 - Ordinary user** <a name="ordinary_user"></a>
 
 Ordinary users have the ability to perform several modifications on both widgets and dashboards.
 
-On the first hand, they can:
+On the first hand and considering the type of the widget (timeline, chart, grid ...), they can:
 
 - Resize existing widgets
 - Rename widgets
 - Remove widgets from the dashboard
 - Change the display of widgets
+- Show/Hide timelines illustrating the previous period
 
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/widget-actions.PNG)</span>
 
 - Add widgets from a palette of predefined ones
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/add-widget.PNG)</span>
 
-On the other hand, it is also possible to apply some actions to dashboards such as creating new dashboard, deleting dashboard, marking as default ...
+On the other hand, it is also possible to apply some actions to dashboards such as create new dashboard, delete, rename,  mark as default ...
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/dashboard_actions.PNG)</span>
 
-Notice that any saved modification leads to an update of the whole configuration in the **user settings** and, so on, it will be the version displayed to that specific user.
+Notice that any saved modification leads to an update of the whole configuration in the **user settings** and, so on, it will be saved as the default version displayed to that specific user.
 Users can always reset their modifications and go back to the default configuration as defined in the customization of the application or in the config.ts file .
 <span style="display:block;text-align:center">![Dashboard actions](/docs/assets/reset-dashboards.PNG)</span>
 
@@ -217,15 +211,40 @@ In addition to options already provided to an ordinary user, an admin can modify
 - `session_count_threshold_per_month: number`: (**2** by default) Used by “Active Users” related widgets. It allows to modify the calculation: a user is considered active when he did at least such sessions.
 - `potential_total_user_count: number`: (**0** by default) Used by “User Coverage” widget. It represents the total number of users who can use the platform within the company. Notice that this parameter **must be updated** by the admin. If not, the widget will display an error message.
 - `static_filters_expr: string`: (**""** by default) A filter expression appended to the **where clause** of **all queries in the dataset**. **A fielded search syntax is required**. Please refer to the [documentation](https://doc.sinequa.com/en.sinequa-es.v11/Content/en.sinequa-es.ui.searchOperators.html) for further information.
+
+    For example, if you want to exclude a fake user, of **userid = "my-fake-user-id"**, (used in the testing phase) from all queries, you should have the following :
+    ```json
+    "static_filters_expr": "userid <> 'my-fake-user-id'"
+    ```
+    This will result in adding the following expression to the where clause of all queries:
+    ```sql
+    where userid <> 'my-fake-user-id'
+    ```
 - `custom_params: : MapOf<string>`: (**{}** by default) Set of params that could be declared and used in **a specific query statement (From clause, where clause …)**. A custom param is accessible at the query level using its key and the following syntax **{$.key}**.
+
+    For example, if you have to manage multiple analytics applications, each corresponding to a specific Sinequa application, and assuming that you want to use different audit index for each one, you can use the following configuration to simply target a specific index from you customization tab:
+    ```json
+    "custom_params": {
+        "audit_index": "my-audit-index"
+    }
+    ```
+    Then, you can use the **{$.audit_index}** in the query statement as follows:
+    ```sql
+    select ... from {IfEmpty($.audit_index,GetIndexNames('audit,auditreplicated,auditreplicatedqueue'))} where ...
+    ```
+    ⚠️ Notice that the **GetIndexNames** function, used by default in all queries to resolve the index(es) in the **FROM clause**, is differently applied **only in this example** to handle the case where the **audit_index** is defined in the customization tab. Thus, if you want to have this behavior, please don't forget to update your `dataset web service`
 - `default_timestamp_filter: string | Date[]`: (**""** by default) Override the default time filter (initially set to 1 month at the application level). Possible values are :
     - Members of `RelativeTimeRanges` enumeration (`["msg#dateRange.last3H", "msg#dateRange.last6H", "msg#dateRange.last12H", "msg#dateRange.last24H", "msg#dateRange.last7D", "msg#dateRange.last30D", "msg#dateRange.last90D", "msg#dateRange.last6M", "msg#dateRange.last1Y", "msg#dateRange.last2Y", "msg#dateRange.last5Y"]`).
     - Array of start and end date (`[new Date("1/1/2021"), new Date("1/1/2022")]`).
 - `default_app_filter: string | string[]`: (**""** by default) Pre-filtering the scope of the queries in the dataset by the provided list of SBA applications.
 - `default_profile_filter: string | string[]`: (**""** by default) Pre-filtering the scope of the queries in the dataset by the provided list of PROFILE applications.
-- `mono_scope_queries: string[]`: (**["newUsersTimeLine", "newUsers"]** by default) List of widgets requiring a filter by a unique scope ( if not the case, an error message is displayed within the widget).
+- `mono_scope_queries: string[]`: (**[]** by default) List of widgets requiring a filter by a unique scope ( if not the case, an error message is displayed within the widget).
+- `enableUserFeedbackMenu: boolean`: (**true** by default) Show/Hide the button used to send user's feedback.
+- `facet_filters_query: string`: (**applications** by default) Query name used by the filtering facet.
+- `facet_filters_name: string`: (**Applications** by default) Name of the filtering facet.
+- `facet_filters_icon: string`: (**fas fa-desktop** by default) Icon of the filtering facet.
 - `facets: FacetConfig<FacetListParams>[]`: List of facet filter's configuration available on the top of dashboards. Please refer to this [documentation](https://sinequa.github.io/sba-angular/tutorial/facet-module.html) for more informations about facets.
-- `widgets: {[key: string]: DashboardItemOption}`: Configurations of available widgets in the application.
+- `widgets: MapOf<DashboardItemOption>`: Configurations of available widgets in the application.
 - `standardDashboards: {name: string, items: {item: string, position: DashboardItemPosition}[]}[]`: Definition of default dashboards to be displayed for users if no customization is stored in their user settings (after saving modification(s)).
 - `palette: {name: string, items: string[]}[]`: List of available widgets that could be added to a dashboard.
 
@@ -235,15 +254,449 @@ In addition to options already provided to an ordinary user, an admin can modify
 
 Adding a widget will impact several parts of the code, and several aspects must be taken into account:
 
-- The widget must be displayed (within its parent component `sq-dashboard-item`).
+- The widget must be displayed (within its parent component `sq-dashboard-item`, as an additional switch case).
 - The widget creation must be triggered somewhere in the application (upon initialization or user action).
-- The widget must be synchronized with other widgets and the dataset web service.
+- The widget must properly interact with other widgets and the dataset web service (query changes, ...).
 - The widget might have properties needing to be persisted.
-- The widget size must adapt to the dashboard grid.
+- The widget size must be adapted to the dashboard grid.
 
-**1 - Widget display** <a name="widget_display"></a>
+**1 - Widget creation / initialization** <a name="widget_creation"></a>
 
-The widget's display must be implemented in the `sq-dashboard-item` component (`app/audit/dashboard/dashboard-item.component`). The template of this component is composed of a `sq-facet-card` (see [facets](https://sinequa.github.io/sba-angular/tutorial/facet-module.html)) wrapping a Switch-Case directive to display the desired component (either a chart, stat, timeline, etc.). Therefore, adding a new component means simply adding a new "case" such as:
+The creation of the widget can occur in different ways:
+
+  1. By selecting a built-in widget from the palette.
+  2. On initialization, when a dashboards are created / loaded.
+  3. Adding custom widget in `config.ts` or at administration level.
+
+In any case, it is necessary to create a `DashboardItemOption` object. By design, this interface is very generic and can be used to create any type of widget. It contains the following properties: 
+```ts
+export interface DashboardItemOption {
+    id: string;
+    icon: string;
+    title: string;
+    parameters: StrictUnion<DashboardItemParams>;
+    unique?: boolean;
+    info?: string;
+}
+```
+where :
+- `id` is the unique identifier of the widget.
+- `icon` is the icon displayed in the palette.
+- `title` is the title displayed in the palette.
+- `unique` is an optional boolean indicating if the widget can be used multiple times in the same dashboard.
+- `info` is an optional string displayed in the widget's tooltip.
+- `parameters` is a strict union of `DashboardItemParams`, all possible parameters for all widgets. By default, it is defined as follow:
+
+```ts
+export type DashboardItemParams = TimelineParams | ChartParams | HeatmapParams | MultiLevelPieParams | StatParams | GridParams;
+```
+
+⚠️ Assuming this design, adding a new custom widget must override `DashboardItemParams` type. For example, if we want to create a new widget type called `MyWidgetType`, we must create a new interface `MyWidgetTypeParams` and add it to the `DashboardItemParams` union. The `DashboardItemParams` type will then be defined as follow:
+
+```ts
+export type DashboardItemParams = TimelineParams | ChartParams | HeatmapParams | MultiLevelPieParams | StatParams | GridParams | MyWidgetTypeParams;
+```
+
+- **i) Timeline widget**
+
+This widget type is used to display a timeline chart. Its parameters must implement the `TimelineParams` interface:
+
+```ts
+export interface TimelineParams {
+    type: "timeline";
+    queries: string[];
+    chartType: "Timeline" | "Grid";
+    aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
+    recordsTimeSeries?: RecordsTimeSeries;
+    showPreviousPeriod?: boolean;
+    enableSelection?: boolean;
+}
+```
+where :
+- `type` is the widget type fixed as "timeline".
+- `queries` is the list of queries to be executed to retrieve the data.
+- `chartType` is the view of chart to be displayed. It can be either "Timeline" or "Grid".
+- `aggregationsTimeSeries` is an optional aggregation(s) information needed to display aggregation data on the chart. It can be either an `AggregationTimeSeries` object or a list of `AggregationTimeSeries` objects.
+- `recordsTimeSeries` is an optional records information needed to display records data on the chart. It must be a `RecordsTimeSeries` object.
+- `showPreviousPeriod` is an optional boolean indicating wether the previous period should be displayed/hidden on the chart.
+- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid view.
+
+As an example, the configuration object to create a "Search count timeline" widget is as follow:
+
+```ts
+"searchCountTotalTimeline": {
+    "id": "searchCountTotalTimeline",
+    "title": "Search Summaries Timeline",
+    "icon": "fas fa-chart-line",
+    "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of Search Summaries over time. <br>      <span class='text-decoration-underline'><b>Interpretation:</b></span>  An increase in the number of Search Summaries over time is an indicator of platform adoption. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Search Summaries.",
+    "unique": true,
+    "parameters": {
+        "type": "timeline",
+        "queries": ["searchTotalTimeLine"],
+        "aggregationsTimeSeries": {
+            "name": "SearchSummaryTotal",
+            "dateField": "value",
+            "valueFields": [{"name": "count", "title": "Search Summaries Count", "primary": true}]
+        },
+        "chartType": "Timeline",
+        "showPreviousPeriod": false
+    }
+}
+```
+
+- **ii) Chart widget**
+
+This widget type is used to display a non-temporal chart. Its parameters must implement the `ChartParams` interface:
+
+```ts
+export interface ChartParams {
+    type: "chart";
+    query: string;
+    chartType: "Column2D" | "Bar2D" | "Pie2D" | "doughnut2d" | "Column3D" | "Bar3D" | "Pie3D" | "doughnut3d" | "Grid";
+    chartData: ChartData;
+    enableSelection?: boolean;
+}
+```
+where :
+- `type` is the widget type fixed as "chart".
+- `query` is the query to be executed to retrieve the data.
+- `chartType` is the view of chart to be displayed. It can be either "Column2D", "Bar2D", "Pie2D", "doughnut2d", "Column3D", "Bar3D", "Pie3D", "doughnut3d" or "Grid".
+- `chartData` is the information needed to load the displayed data on the chart. It must be a `ChartData` object.
+- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid view.
+
+As an example, the configuration object to create a "Top queries" widget is as follow:
+
+```ts
+"topQueries": {
+    "id": "topQueries",
+    "icon": "fas fa-th-list",
+    "title": "Top Full-text Queries",
+    "info": "<span class='text-decoration-underline'><b>Description:</b></span> Most frequent full-text queries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Understanding user searches enables levers to be activated to provide them with more relevant results. Relevance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Distribution of the top 100 full-text queries",
+    "unique": true,
+    "parameters": {
+        "type": "chart",
+        "query": "topQueries",
+        "chartData": {
+            "aggregation": "query"
+        },
+        "chartType": "Grid"
+    }
+}
+```
+
+- **iii) Heatmap widget**
+
+This widget type is used to display a heatmap chart. Its parameters must implement the `HeatmapParams` interface:
+
+```ts
+export interface HeatmapParams {
+    type: "heatmap";
+    query: string;
+    chartType: "Heatmap" | "Grid";
+    chartData: HeatmapData;
+    enableSelection?: boolean;
+}
+```
+where :
+- `type` is the widget type fixed as "heatmap".
+- `query` is the query to be executed to retrieve the data.
+- `chartType` is the view of chart to be displayed. It can be either "Heatmap" or "Grid".
+- `chartData` is the information needed to load the displayed data on the chart. It must be a `HeatmapData` object.
+- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid view.
+
+As an example, the configuration object to create a "Indexing sources / file extensions Success" widget is as follow:
+
+```ts
+"sourceFileExtensionsSuccess": {
+    "id": "sourceFileExtensionsSuccess",
+    "icon": "fas fa-th fa-fw",
+    "title": "Indexing sources / file extensions Success",
+    "info": "<span class='text-decoration-underline'><b>Description:</b></span>Allows to locate the most successfully indexed documents mixing a source with a type of file extension.. ",
+    "unique": true,
+    "parameters": {
+        "type": "heatmap",
+        "query": "indexingSourceFileExtensionsSuccess",
+        "chartData": {
+            "aggregation": "SourceFileExtensionsSuccess"
+        },
+        "chartType": "Heatmap"
+    }
+}
+```
+
+- **iv) Stat widget**
+
+This widget type is used to display a statistic. Its parameters must implement the `StatParams` interface:
+
+```ts
+export interface StatParams {
+    type: "stat";
+    query: string;
+    asc: boolean;
+    valueLocation?: StatValueLocation;
+    valueField?: StatValueField;
+    operation?: StatOperation;
+    relatedQuery?: string;
+    relatedValueLocation?: StatValueLocation;
+    relatedValueField?: StatValueField;
+    relatedOperation?: StatOperation;
+    computation?: StatOperation;
+    numberFormatOptions?: Intl.NumberFormatOptions;
+}
+```
+where :
+- `type` is the widget type fixed as "stat".
+- `query` is the query to be executed to retrieve the data.
+- `asc` is a boolean indicating wether the positive evaluation is at increase or decrease trend.
+- `valueLocation` is an optional `StatValueLocation` object indicating where to find the value field.
+- `valueField` is an optional `StatValueField` object indicating how to access value field.
+- `operation` is an optional `StatOperation` object indicating the operation to compute the value.
+- `relatedQuery` is an optional string containing the query containing the second leg of the stat operands.
+- `relatedValueLocation` is an optional `StatValueLocation` object indicating where to find the value field of the second stat operands.
+- `relatedValueField` is an optional `StatValueField` object indicating how to access value field of the second stat operands.
+- `relatedOperation` is an optional `StatOperation` object indicating the operation to compute the value of the second stat operands.
+- `computation` is an optional `StatOperation` object indicating the operation to get the global value of the stat.
+- `numberFormatOptions` is an optional `Intl.NumberFormatOptions` object indicating the options of formatting numbers.
+
+As an example, the configuration object to create a "Search count" widget is as follow:
+
+```ts
+"searchCountTotal": {
+    "id": "searchCountTotal",
+    "icon": "fas fa-balance-scale",
+    "title": "Search summaries",
+    "info": "<span class='text-decoration-underline'><b>Description:</b></span> Number of all Search Summaries. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Adoption indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Addition of all Search Summaries",
+    "unique": true,
+    "parameters": {
+        "type": "stat",
+        "query": "searchTotal",
+        "valueLocation": "totalrecordcount",
+        "asc": true
+    }
+}
+```
+
+- **v) Grid widget**
+
+This widget type is used to display a grid. Its parameters must implement the `GridParams` interface:
+
+```ts
+export interface GridParams {
+    type: "grid"
+    query: string;
+    columns: GridColDef[];
+    aggregation?: string;
+    showTooltip?: boolean;
+    enableSelection?: boolean;
+}
+```
+where :
+- `type` is the widget type fixed as "grid".
+- `query` is the query to be executed to retrieve the data.
+- `columns` is an array of `GridColDef` objects indicating the columns to be displayed on the grid.
+- `aggregation` is an optional string indicating that this aggregation data will be applied on the grid, if not `Results.records` will be used.
+- `showTooltip` is an optional boolean indicating wether the tooltip should be displayed on the grid.
+- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid.
+
+As an example, the configuration object to create a "User feedback grid" widget is as follow:
+
+```ts
+"userFeedbackGrid": {
+        "id": "userFeedbackGrid",
+        "title": "User Feedback",
+        "icon": "fas fa-th-list",
+        "info": "<span class='text-decoration-underline'><b>Description:</b></span> User messages sent via the Feedback widget",
+        "unique": true,
+        "parameters": {
+            "type": "grid",
+            "query": "userFeedback",
+            "columns": [
+                {
+                    "field": "app",
+                    "headerName": "Appl",
+                    "filterType": "text",
+                    "formatterType": "text"
+                },
+                {
+                    "field": "message",
+                    "headerName": "Message",
+                    "filterType": "text",
+                    "formatterType": "text"
+                },
+                {
+                    "field": "detail",
+                    "headerName": "Detail",
+                    "filterType": "text",
+                    "formatterType": "text",
+                    "multiLineCell": true
+                }
+            ],
+            "showTooltip": true
+        }
+    }
+```
+
+- **vi) Multi Level Pie widget**
+
+This widget type is used to display a multi level pie. Its parameters must implement the `MultiLevelPieParams` interface:
+
+```ts
+export interface MultiLevelPieParams {
+    type: "multiLevelPie";
+    multiLevelPieQueries: MultiLevelPieQuery[];
+    multiLevelPieData: MultiLevelPieConfig[];
+}
+```
+where :
+- `type` is the widget type fixed as "multiLevelPie".
+- `multiLevelPieQueries` is an array of `MultiLevelPieQuery` objects indicating all the queries needing to be executed to retrieve the data and the location of the concerning data.
+- `multiLevelPieData` is an array of `MultiLevelPieConfig` objects indicating the representational tree configuration of the multi level pie.
+
+As an example, the configuration object to create a "Users Repartition" widget is as follow:
+
+```ts
+"usersRepartition": {
+    "id": "usersRepartition",
+    "title": "Taxonomy of users",
+    "info": "",
+    "unique": true,
+    "parameters": {
+        "type": "multiLevelPie",
+        "multiLevelPieQueries": [
+            {
+                "query": "totalUsers",
+                "valueLocation": "totalrecordcount"
+            },
+            {
+                "query": "userCountTotal",
+                "valueLocation": "totalrecordcount"
+            },
+            {
+                "query": "newUsers",
+                "valueLocation": "totalrecordcount"
+            },
+            {
+                "query": "activeNewUsers",
+                "valueLocation": "totalrecordcount"
+            },
+            {
+                "query": "inactiveNewUsers",
+                "valueLocation": "totalrecordcount"
+            },
+            {
+                "query": "existingUsers",
+                "valueLocation": "totalrecordcount"
+            },
+            {
+                "query": "activeExistingUsers",
+                "valueLocation": "totalrecordcount"
+            },
+            {
+                "query": "inactiveExistingUsers",
+                "valueLocation": "totalrecordcount"
+            }
+        ],
+        "multiLevelPieData": [
+            {
+                "label": "Potential users",
+                "valueExpr": "totalUsers",
+                "category": [
+                    {
+                        "label": "Unique users",
+                        "valueExpr": "userCountTotal",
+                        "category": [
+                            {
+                                "label": "New users",
+                                "valueExpr": "newUsers",
+                                "category": [
+                                    {
+                                        "label": "Active new users",
+                                        "valueExpr": "activeNewUsers"
+                                    },
+                                    {
+                                        "label": "Inactive new users",
+                                        "valueExpr": "inactiveNewUsers"
+                                    },
+                                    {
+                                        "label": "Zero search",
+                                        "valueExpr": "newUsers - activeNewUsers - inactiveNewUsers"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "Existing users",
+                                "valueExpr": "existingUsers",
+                                "category": [
+                                    {
+                                        "label": "Active existing users",
+                                        "valueExpr": "activeExistingUsers"
+                                    },
+                                    {
+                                        "label": "Inactive existing users",
+                                        "valueExpr": "inactiveExistingUsers"
+                                    },
+                                    {
+                                        "label": "Zero search",
+                                        "valueExpr": "existingUsers - activeExistingUsers - inactiveExistingUsers"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Never connected users",
+                        "valueExpr": "totalUsers - userCountTotal"
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+⚠️ Notice that the queries name are used in the `valueExpr` as operands in order to calculate the value of each node of the tree. The corresponding value is resolved by the method `resolveValue` in the `multi-level-pie-provider.ts` component (`src/app/audit/dashboard/providers/multi-level-pie-provider`)
+
+Once the configuration object of the widget is ready, it can be included to the **Palette**, simply add it to the list :
+
+```ts
+export const PALETTE: {name: string, items: string[]}[] = [
+  {
+      name: "...",
+      items: [
+          ...
+          "my-new-widget",
+          ...
+      ]
+  }
+]
+```
+
+To include this new widget on initialization of a standard dashboard, simply add it to the list of its items:
+
+```ts
+// The position of the widget inside the dashboard can be set by default, using "position".
+// Otherwise, Gridster library will automatically put it in first empty position  
+export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position: DashboardItemPosition}[]}[] = [
+    {
+        name: "...",
+        items: [
+            {item: "my-new-widget", position: {x: 0, y: 0}}
+        ]
+    }
+]
+```
+
+Finally, if you want to add a widget programmatically, just pass your dashboard option to the `addWidget()` method:
+
+```ts
+// This adds a new widget with default size to the current dashboard (optional arguments can be passed to set the size and other settings)
+this.dashboardService.addWidget(MY_NEW_WIDGET);
+```
+
+This method returns the `item` object (of type `DashboardItem`) that will be passed to the `sq-dashboard-item` component. You can add or modify properties of this `item`: This is useful if your widget expects specific types of inputs.
+
+**2 - Widget display** <a name="widget_display"></a>
+
+The widget's display must be implemented in the `sq-dashboard-item` component (`src/app/audit/dashboard/dashboard-item.component`). The template of this component is composed of a `sq-facet-card` (see [facets](https://sinequa.github.io/sba-angular/tutorial/facet-module.html)) wrapping a Switch-Case directive to display the desired component (either a chart, stat, timeline, etc.). Therefore, adding a new component means simply adding a new "case" such as:
 
 ```html
 <my-custom-widget *ngSwitchCase="'my-custom-type'" [results]="results">
@@ -252,83 +705,13 @@ The widget's display must be implemented in the `sq-dashboard-item` component (`
 
 Your widget might require other input parameters, that you can create and manage inside `dashboard-item.component.ts` (generally, binding the global `results`, `dataset` or `data` as an input of your component is needed to refresh the widget upon new dataset web service changes). The component might also generate events, which you will want to handle in the controller as well.
 
-**2 - Widget creation / initialization** <a name="widget_creation"></a>
-
-The creation of the widget can occur in different ways:
-
-  1. By selecting a built-in widget from the palette.
-  2. On initialization, when a dashboards are created / loaded.
-  3. Adding custom widget in `config.ts` or at administration level.
-
-In any case, it is necessary to create a `DashboardItemOption`, an object consisting of a widget's `type`, `query`, `text`, `icon` and a `unique` property (that can prevent users from using same widget multiple times in the same dashboard). 
-
-For example, the configuration object to create a "Search by session timeline" widget is as follow:
-
-```ts
-"searchBySessionTimeline": {
-        "type": "timeline",
-        "query": "avgQueriesBySessionTimeLine",
-        "text": "Average Queries By Session",
-        "icon": "fas fa-chart-line",
-        "info": "Average number of search queries per session displayed over time. Interpretation: Adoption indicator. Calculation: Addition of all searchcount / Total number of unique session-ids.",
-        "unique": true,
-        "parameters": {
-            "aggregationsTimeSeries": {
-                "name": "AvgQueriesBySession",
-                "dateField": "value",
-                "valueFields": [{"operatorResults": true, "name": "avg", "title": "Average Search By Session", "primary": true}]
-            },
-            "chartType": "Timeline"
-        }
-    }
-```
-
-To include this new widget to the "Palette", simply add it to the list :
-
-```ts
-
-export const PALETTE: {name: string, items: string[]}[] = [
-  {
-      name: "Timelines",
-      items: [
-          ...
-          "searchBySessionTimeline",
-          ...
-      ]
-  }
-]
-```
-
-To include a new widget on initialization of a standard dashboard, add it to the list of its items:
-
-```ts
-// The position of the widget inside the dashboard can be set by default, using "position".
-// Otherwise, Gridster library will automatically put it in first empty position  
-export const  STANDARD_DASHBOARDS: {name: string, items: {item: string, position: DashboardItemPosition}[]}[] = [
-    {
-        name: "msg#dashboards.userAdoption",
-        items: [
-            {item: "searchBySessionTimeline", position: {x: 0, y: 0}}
-        ]
-    }
-```
-
-Finally, if you want to add a widget programmatically, just pass your dashboard option to the `addWidget()` method:
-
-```ts
-// This adds a new widget with default size to the current dashboard (optional arguments can be passed to set the size and other settings)
-this.dashboardService.addWidget(WIDGET);
-```
-
-This method returns the `item` object (of type `DashboardItem`) that will be passed to the `sq-dashboard-item` component. You can add or modify properties of this `item`: This is useful if your widget expects specific types of inputs.
-
 **3 - Widget synchronization** <a name="widget_synchronization"></a>
 
 The way the built-in widgets are designed is actually to **avoid explicit synchronization**, that is: to do nothing and keep the components independent from each other.
 
 However, it is clear when using *Usage Analytics* that *some form of synchronization happens* when the user interacts with a component. For example, if I use the timeline to update the time range filter.
 
-The way it works is that the widgets **respond only to an update of the global dataset web service response**. Widgets cannot talk to each other, but some user interactions (like selecting a portion on the chart) can trigger a refresh of the global dataset web service response (which itself triggers a refresh of the widgets).
+The way it works is that the widgets **respond only to an update of the global dataset web service response**. **Widgets cannot talk to each other directly**, but some user interactions (like selecting a portion on the chart) can trigger a refresh of the global dataset web service response (which itself triggers a refresh of the widgets).
 
 **4 - Widget persistence** <a name="widget_persistence"></a>
 
@@ -344,6 +727,8 @@ In the standard components, the items that are persisted are for example:
 - For the **timeline** widget: aggregationsTimeSeries...
 - For the **chart** widget: chart data and chart type...
 - For the **stat** widget: valueLocation, operation, relatedQuery...
+- For the **grid** widget: row data, columns, grid options...
+- For the **multi level pie** widget: tree data, queries ...
 
 If your custom widget needs to have a part of the state persisted, a few things need to be considered:
 
@@ -482,77 +867,67 @@ Often in any analytics dashboards, you may need to display numbers in different 
 
 **8 - Display multiple time series in a single timeline** <a name="plot_multiple_timeseries"></a>
 
-Displaying multiple time series is a common use case in analytics dashboards and it is handled by the application. The question is whether it is doable via customization tab only Or need extra code at application level.
+Displaying multiple time series is a common use case in analytics dashboards and it is handled by the application.
 
-This depends on the data itself. For example, assuming you want to plot 2 time series related to 2 different aggregations: "Toto" and "Foo".
+This depends on the data itself. For example, assuming you want to plot 2 time series related to 2 different aggregations: "Toto" and "Foo". Those aggregations could be returned from the same query or from 2 different queries.
 
-- **a) Both aggregations are returned within the same query**
-
-In this case you just need to provide the correct configuration of the widget. It would be something like 
+- If they are returned from the same query "dummyQuery", you need to define the 2 aggregations in the `aggregationsTimeSeries` parameter of the widget configuration. For example :
 
 ```ts
 {
-  "type": "timeline",
-  "query": "....",
-  "text": "my-custom-timeline",
-  "icon": "fas fa-chart-line",
-  "info": "....",
-  "unique": true,
-  "parameters": {
-      "aggregationsTimeSeries": [
-          {
-              "name": "Toto",
-              "dateField": "....",
-              "valueFields": [{"name": "...", "title": "....", "primary": true}]
-          },
-          {
-              "name": "Foo",
-              "dateField": "....",
-              "valueFields": [{"name": "...", "title": "....", "primary": true}]
-          }
-      ],
-      "chartType": "Timeline"
-  }
+    "id": "my-custom-timeline",
+    "title": "my-custom-timeline title",
+    "icon": "fas fa-chart-line",
+    "info": "....",
+    "unique": true,
+    "parameters": {
+        "type": "timeline",
+        "queries": ["dummyQuery"],
+        "aggregationsTimeSeries": [
+            {
+                "name": "Toto",
+                "dateField": "....",
+                "valueFields": [{"name": "...", "title": "....", "primary": true}]
+            },
+            {
+                "name": "Foo",
+                "dateField": "....",
+                "valueFields": [{"name": "...", "title": "....", "primary": true}]
+            }
+        ],
+        "chartType": "Timeline"
+    }
 }
 ```
 
-- **b) A merge of 2 queries is needed to retrieve both aggregations**
-
-In this case, you need to programmatically merge both aggregations in a single Results object. So, in `dashboard-item.component.ts`, once their respective queries are available (in the onChange()). Your custom code should looks like the following
+- In the other case where the 2 aggregations are returned from 2 different queries "dummyQuery1" and "dummyQuery2", you need simply to define the both queries in the `queries` parameter of the widget configuration. For example :
 
 ```ts
-switch (this.config.type) {
-    case "timeline":
-        this.timeSeries = [];
-        if (this.config.title === 'my-custom-timeline') {
-            data = {
-            records: [] as Record[],
-                aggregations: [
-                    (this.dataset?.["query 1"] as Results).aggregations[0], // assuming this is the aggregation "Toto"
-                    (this.dataset?.["query 2"] as Results).aggregations[0], // assuming this is the aggregation "Foo"
-                ] as Aggregation[]
-            } as Results
-        }
-        if (this.config.aggregationsTimeSeries) {
-            this.timeSeries.push(
-                ...this.timelineProvider.getAggregationsTimeSeries(data, this.config.aggregationsTimeSeries, this.auditService.mask)
-            );
-            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.aggregationsTimeSeries);
-            this.rowData = this.timelineProvider.getAggregationsRowData(data, this.config.aggregationsTimeSeries);
-        }
-        if (this.config.recordsTimeSeries) {
-            this.timeSeries.push(
-                ...this.timelineProvider.getRecordsTimeSeries(data, this.config.recordsTimeSeries)
-            );
-            this.columnDefs = this.timelineProvider.getGridColumnDefs(this.config.recordsTimeSeries);
-            this.rowData = data.records
-        }
-        break;
-
-    ....
+{
+    "id": "my-custom-timeline",
+    "title": "my-custom-timeline title",
+    "icon": "fas fa-chart-line",
+    "info": "....",
+    "unique": true,
+    "parameters": {
+        "type": "timeline",
+        "queries": ["dummyQuery1", "dummyQuery2"],
+        "aggregationsTimeSeries": [
+            {
+                "name": "Toto",
+                "dateField": "....",
+                "valueFields": [{"name": "...", "title": "....", "primary": true}]
+            },
+            {
+                "name": "Foo",
+                "dateField": "....",
+                "valueFields": [{"name": "...", "title": "....", "primary": true}]
+            }
+        ],
+        "chartType": "Timeline"
+    }
 }
 ```
-Then, use the customization as shown in a).
 
 ### <a name="export_import"></a> Export / Import
 
