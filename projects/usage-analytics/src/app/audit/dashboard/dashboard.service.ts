@@ -87,9 +87,9 @@ export type DashboardItemParams = TimelineParams | ChartParams | HeatmapParams |
  */
 export interface DashboardItemOption {
     id: string;
-    icon: string;
     title: string;
     parameters: StrictUnion<DashboardItemParams>;
+    icon?: string;
     unique?: boolean;
     info?: string;
 }
@@ -111,9 +111,9 @@ export interface DashboardItemPosition {
  */
 export interface DashboardItem<DashboardItemParams> extends GridsterItem {
     id: string;
-    icon: string;
     title: string;
     parameters: StrictUnion<DashboardItemParams>;
+    icon?: string;
     unique?: boolean;
     info?: string;
     width?: number;
