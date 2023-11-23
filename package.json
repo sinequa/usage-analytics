@@ -112,6 +112,7 @@
     "postcss": "^8.2.15",
     "sass-color-helpers": "^2.1.1",
     "ts-node": "~8.3.0",
-    "typescript": "~4.6.4"
+    "typescript": "~4.6.4",
+    "zod": "^3.22.4"
   }
 }
