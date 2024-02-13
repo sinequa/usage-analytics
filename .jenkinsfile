@@ -1,17 +1,101 @@
-pipeline {
-    agent { label 'Sun' }
-	options { disableConcurrentBuilds() }
-	stages {
+// ### Environment ###
+properties([
+	parameters([
+		string(name:"SBA_VERSION",  defaultValue: "", description: "Version of sba", trim: true),
+		string(name:"SBA_NODE",    defaultValue: "${env.SBA_NODE}", description: "Execution node name", trim: true)
+	]),
+	disableConcurrentBuilds()
+])
+
+// Get mail parameters from jenkins env vars
+url           = "${env.NPM_SERVER_URL}"
+npm_user      = "${env.NPM_USER}"
+npm_pass      = "${env.NPM_PASS}"
+npm_mail      = "${env.NPM_MAIL}"
+mailto        = "${env.NPM_MAILING_LIST}"
+
+// get job variables from job parameters
+sba_version   = "${params.SBA_VERSION}"
+sba_app_list  = "${params.SBA_APP_LIST}"
+pkg_suffix    = "-DEV"
+sba_tag       = ""
+tag_prefix    = "rel_"
+
+// .npmrc variables for verdaccio connection
+scope  = "@sinequa"
+fnpmrc = '.npmrc'
+anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}", "scripts-prepend-node-path=true"]
+
+
+// run job on a specific node if needed
+node (params.SBA_NODE) {
+	currentBuild.result = "SUCCESS"
+	try {
+
+		// get the source code
+		checkout scm
+
+		// load jenkins functions
+		def rootDir = pwd()
+		def jf = load "${rootDir}/.jenkins_function.groovy"
+		// get the branch name
+		def myBranch = jf.getBranch()
+
+		// get the npm path (if empty, the file path does not exist)
+		def myNPM = jf.getNPMpath("npm.cmd")
+		if (myNPM == "" ) {
+			// get node executable for the branch
+			jf.getIceNode(myBranch)
+			// get the npm path
+			myNPM = jf.getNPMpath("npm.cmd")
+		}
+		if (myNPM == "" ) {
+			// get node executable from develop
+			jf.getIceNode("develop")
+			// get the npm path
+			myNPM = jf.getNPMpath("npm.cmd")
+		}
+		// A path must be found to do something
+		if (myNPM == "" ) {
+			currentBuild.result = "FAILURE"
+			throw err
+		}
+		println "npm.cmd used (${myBranch}): ${myNPM}"
+		println "Version: "
+		bat "@call ${myNPM} -v"
+		
+		stage('Clean') {
+			// delete dependency modules
+			def nmfolder = "node_modules"
+			echo ".Rmdir /s /q ${nmfolder}"
+			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
+			
+			// clean the npm cache
+			echo ".Cache clean force"
+			bat "@call ${myNPM} cache clean --force"
+		}
+
+		stage('Create user') {
+			// create user for verdaccio
+			bat "npm-cli-login -u ${npm_user} -p ${npm_pass} -e ${npm_mail} -r ${url} -s ${scope} --config-path ${fnpmrc}"
+			// add connection infos in .npmrc file
+			jf.appendFile(fnpmrc, anpmrc)
+			// check the connection
+			bat "@call ${myNPM} whoami"
+		}
 		stage('NPM Install') {
-			steps {
-				bat "npm ci"	
-			}
+			// get the dependency modules
+			bat "@call ${myNPM} ci"
 		}
 		stage('Build') {
 			steps {
-				bat "npm run build --if-present"
+				echo "${myNPM} run build --if-present"
+				bat  "@call ${myNPM} run build --if-present"
 			}
 		}
+	} catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
 	}
 }
 
