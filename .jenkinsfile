@@ -83,16 +83,17 @@ node (params.SBA_NODE) {
 			// check the connection
 			bat "@call ${myNPM} whoami"
 		}
+		
 		stage('NPM Install') {
 			// get the dependency modules
 			bat "@call ${myNPM} ci"
 		}
+		
 		stage('Build') {
-			steps {
-				echo "${myNPM} run build --if-present"
-				bat  "@call ${myNPM} run build --if-present"
-			}
+			echo "${myNPM} run build --if-present"
+			bat  "@call ${myNPM} run build --if-present"
 		}
+		
 	} catch (err) {
 		currentBuild.result = "FAILURE"
 		throw err
