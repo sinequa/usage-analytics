@@ -1,6 +1,6 @@
 <div class="stat p-0" *ngIf="value;else noData">
     <div class="stat-wrapper">
-        <span class="stat-value">{{value | sqNumber: (config?.numberFormatOptions || numberFormatOptions)}}</span>
+        <span class="stat-value">{{value | sqNumber: (config?.parameters.numberFormatOptions || numberFormatOptions)}}</span>
     </div>
     <div class="d-flex h-30 align-items-end">
         <div [sqTooltip]="trendTooltip | sqMessage:{currentDate: currentRange, trendRange: previousRange, currentValue: value, previousValue: previousValue}" placement="bottom" [fallbackPlacements]="['bottom', 'top']" class="cursor-help">
