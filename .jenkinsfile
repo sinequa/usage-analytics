@@ -30,6 +30,13 @@ anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}", "scripts-pre
 // run job on a specific node if needed
 node (params.SBA_NODE) {
 	currentBuild.result = "SUCCESS"
+	// if param sba_version is not null, the call comes from sba-internal
+	def modeCallFromSbaInternal = false
+	if (sba_version.length() > 0) {
+		echo "SBA_VERSION should comming from build of sba-internal"
+		modeCallFromSbaInternal = true
+	}
+	
 	try {
 
 		// get the source code
@@ -84,9 +91,34 @@ node (params.SBA_NODE) {
 			bat "@call ${myNPM} whoami"
 		}
 		
+		// Validate app fired
+		if (modeCallFromSbaInternal) {
+			// Validate app fired on merge event
+			stage('Update package') {
+				// update package.json with version
+				jf.updatePackage(sba_version)
+			}
+		}
+		
+		// install dependencies, fallback to official registry
+		// and retry if get on internal repo fails
 		stage('NPM Install') {
-			// get the dependency modules
-			bat "@call ${myNPM} ci"
+			echo "npm install"
+			def ret = bat (script: "${myNPM} install", returnStatus: true)
+			if (ret) {
+				// set .npmrc file as original
+				// check registry
+				// install again
+				bat """
+				  echo "----------"
+				  echo "restore .npmrc file"
+				  call git restore .npmrc
+				  echo "verify the registry"
+				  call ${myNPM} config get registry
+				  echo "${myNPM} install again"
+				  call ${myNPM} install
+				"""
+			}
 		}
 		
 		// Build the app started on commit event
@@ -98,5 +130,10 @@ node (params.SBA_NODE) {
 	} catch (err) {
 		currentBuild.result = "FAILURE"
 		throw err
+	} finally {
+		// should no be blocker
+		if ( modeCallFromSbaInternal && (currentBuild.result == "FAILURE")) {
+			currentBuild.result = "UNSTABLE"
+		}
 	}
 }
