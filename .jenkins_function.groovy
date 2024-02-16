@@ -1,7 +1,5 @@
 // Useful Jenkins functions
 
-<<<<<<< HEAD
-=======
 // call a job to build an app
 def build_app(sba_version, jobToBuild, branch) {
 	stage("Build app ${jobToBuild}") {
@@ -79,7 +77,6 @@ def getBranch() {
 	return tmpBranch
 }
 
->>>>>>> release/11.7.0
 // get the branch name and the version number from the right jenkins variable 
 def findBranchNumber() {
 	def tmpBranch=""
@@ -93,36 +90,13 @@ def findBranchNumber() {
 	// return: release%2F11.7.0
 
 	echo "Triggering job for branch ${env.BRANCH_NAME}"
-<<<<<<< HEAD
-	if (env.BRANCH_NAME.contains("PR-")) {
-		tmpBranch = env.CHANGE_TARGET
-	} else {
-		tmpBranch = env.BRANCH_NAME
-	}
-	echo "tmpBranch: ${tmpBranch}"
-=======
 	tmpBranch = getBranch()
->>>>>>> release/11.7.0
 
 	theBranch = tmpBranch.replace("/", "%2F")
 	echo "Branch returned: ${theBranch}"
 	return theBranch
 }
 
-<<<<<<< HEAD
-// function to check if we are in PR or another branch
-def buildOrMerge() {
-	def typeAction = ""
-	if (env.BRANCH_NAME.contains("PR-")) {
-		typeAction = "build"
-	} else {
-		typeAction = "merge"
-	}
-	return typeAction
-}
-
-=======
->>>>>>> release/11.7.0
 // function to append lines to the end of a file
 def appendFile(afile, what) {
 	def content = ""
@@ -143,26 +117,6 @@ def appendFile(afile, what) {
 	}
 }
 
-<<<<<<< HEAD
-// function to update sinequa package version in package.json file
-def updatePackage(version) {
-	withEnv(["pkgVersion=${version}"]) {
-		echo "pkgVersion = ${env.pkgVersion}"
-		powershell ('''
-			$file = 'package.json'
-			write-host "Update: $file packages: @sinequa with pkgVersion: $env:pkgVersion"
-			$regex1 = '\\"\\@sinequa/core\\".*'
-			$regex2 = '\\"\\@sinequa/components\\".*'
-			$regex3 = '\\"\\@sinequa/analytics\\".*'
-			$s1 = '"@sinequa/core": "' + $env:pkgVersion + '",'
-			$s2 = '"@sinequa/components": "' + $env:pkgVersion + '",'
-			$s3 = '"@sinequa/analytics": "' + $env:pkgVersion + '",'
-			(Get-Content $file) -replace $regex1, $s1 -replace $regex2, $s2 -replace $regex3, $s3 | Set-Content $file
-			''')
-	}
-}
-
-=======
 // function to send an email to the authors of the commit
 def sendMessage(color, specificMessage, logfile="") {
 	echo "Message is: ${specificMessage}"
@@ -246,5 +200,4 @@ def getNPMpath(pgm) {
 	return pgmPath
 }
 
->>>>>>> release/11.7.0
 return this
