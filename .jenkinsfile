@@ -12,19 +12,23 @@ url           = "${env.NPM_SERVER_URL}"
 npm_user      = "${env.NPM_USER}"
 npm_pass      = "${env.NPM_PASS}"
 npm_mail      = "${env.NPM_MAIL}"
+mailto        = "${env.NPM_MAILING_LIST}"
 
 // get job variables from job parameters
 sba_version   = "${params.SBA_VERSION}"
+sba_app_list  = "${params.SBA_APP_LIST}"
+pkg_suffix    = "-DEV"
+sba_tag       = ""
+tag_prefix    = "rel_"
 
 // .npmrc variables for verdaccio connection
 scope  = "@sinequa"
 fnpmrc = '.npmrc'
-anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}"]
-inpmrc = ['node-options="--max-old-space-size=8192"']
+anpmrc = ["always-auth=true", "registry=${url}/", "scope=${scope}", "scripts-prepend-node-path=true"]
 
-// Pipeline workflow (main)
+
+// run job on a specific node if needed
 node (params.SBA_NODE) {
-
 	currentBuild.result = "SUCCESS"
 	// if param sba_version is not null, the call comes from sba-internal
 	def modeCallFromSbaInternal = false
@@ -32,39 +36,61 @@ node (params.SBA_NODE) {
 		echo "SBA_VERSION should comming from build of sba-internal"
 		modeCallFromSbaInternal = true
 	}
-
-	try {
 	
+	try {
+
 		// get the source code
 		checkout scm
-		
+
 		// load jenkins functions
 		def rootDir = pwd()
 		def jf = load "${rootDir}/.jenkins_function.groovy"
-		def currentBranch = jf.findBranchNumber()
-		// sba_version : commes from sba-internal just build before 
-		echo "sba_version: ${sba_version}"
+		// get the branch name
+		def myBranch = jf.getBranch()
+
+		// get the npm path (if empty, the file path does not exist)
+		def myNPM = jf.getNPMpath("npm.cmd")
+		if (myNPM == "" ) {
+			// get node executable for the branch
+			jf.getIceNode(myBranch)
+			// get the npm path
+			myNPM = jf.getNPMpath("npm.cmd")
+		}
+		if (myNPM == "" ) {
+			// get node executable from develop
+			jf.getIceNode("develop")
+			// get the npm path
+			myNPM = jf.getNPMpath("npm.cmd")
+		}
+		// A path must be found to do something
+		if (myNPM == "" ) {
+			currentBuild.result = "FAILURE"
+			throw err
+		}
+		println "npm.cmd used (${myBranch}): ${myNPM}"
+		println "Version: "
+		bat "@call ${myNPM} -v"
 		
 		stage('Clean') {
-			// delete dependency modules 
+			// delete dependency modules
 			def nmfolder = "node_modules"
 			echo ".Rmdir /s /q ${nmfolder}"
 			bat "if exist ${nmfolder} ( rmdir /s /q ${nmfolder} )"
 			
 			// clean the npm cache
 			echo ".Cache clean force"
-			bat "npm cache clean --force"
+			bat "@call ${myNPM} cache clean --force"
 		}
-		
+
 		stage('Create user') {
 			// create user for verdaccio
 			bat "npm-cli-login -u ${npm_user} -p ${npm_pass} -e ${npm_mail} -r ${url} -s ${scope} --config-path ${fnpmrc}"
 			// add connection infos in .npmrc file
 			jf.appendFile(fnpmrc, anpmrc)
 			// check the connection
-			bat "npm whoami"
+			bat "@call ${myNPM} whoami"
 		}
-
+		
 		// Validate app fired
 		if (modeCallFromSbaInternal) {
 			// Validate app fired on merge event
@@ -73,13 +99,12 @@ node (params.SBA_NODE) {
 				jf.updatePackage(sba_version)
 			}
 		}
-
 		
 		// install dependencies, fallback to official registry
 		// and retry if get on internal repo fails
 		stage('NPM Install') {
 			echo "npm install"
-			def ret = bat (script: "npm install", returnStatus: true)
+			def ret = bat (script: "${myNPM} install", returnStatus: true)
 			if (ret) {
 				// set .npmrc file as original
 				// check registry
@@ -89,21 +114,19 @@ node (params.SBA_NODE) {
 				  echo "restore .npmrc file"
 				  call git restore .npmrc
 				  echo "verify the registry"
-				  call npm config get registry
-				  echo "npm install again"
-				  call npm install
+				  call ${myNPM} config get registry
+				  echo "${myNPM} install again"
+				  call ${myNPM} install
 				"""
 			}
 		}
 		
 		// Build the app started on commit event
 		stage('Build') {
-			bat """
-				echo "npm run build --if-present"
-				npm run build --if-present
-			"""
+			echo "${myNPM} run build --if-present"
+			bat  "@call ${myNPM} run build --if-present"
 		}
-	
+		
 	} catch (err) {
 		currentBuild.result = "FAILURE"
 		throw err
