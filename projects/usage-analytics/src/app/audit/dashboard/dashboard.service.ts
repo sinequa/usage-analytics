@@ -3,7 +3,7 @@ import { ValidatorFn, Validators } from '@angular/forms';
 import { Router, UrlSerializer } from '@angular/router';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { Location } from '@angular/common';
-import { Utils } from '@sinequa/core/base';
+import { StrictUnion, Utils } from '@sinequa/core/base';
 import { LoginService } from '@sinequa/core/login';
 import { UserSettingsWebService } from '@sinequa/core/web-services';
 import { ModalResult, ModalService, PromptOptions, ModalButton, ConfirmType } from '@sinequa/core/modal';
@@ -19,99 +19,79 @@ import { PALETTE, STANDARD_DASHBOARDS, WIDGETS } from '../config';
 import { ChartData } from './providers/chart-provider';
 import { AppService } from '@sinequa/core/app-utils';
 import { GridColDef } from './providers/grid-provider';
-import { StatLayout, StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
+import { StatOperation, StatValueField, StatValueLocation } from './providers/stat.provider';
+import { HeatmapData } from './providers/heatmap-provider';
+import { MultiLevelPieConfig, MultiLevelPieQuery } from './providers/multi-level-pie-provider';
 
-/**
- * Interface storing the configuration of a widget. It must contain the minimal amount of information
- * to rebuild the widget's content (eg. for the preview we need an id and a query).
- * This configuration is stored in user settings and/or shared with other users, so it must not include
- * large objects or raw data (only the means to rebuild these objects or data).
- * This interface is an extension of GridsterItem, so that we store things like the position of each
- * widget in the dashboard.
- */
-export interface DashboardItem extends GridsterItem {
-    type: string;
-    icon: string;
-    title: string;
+export interface TimelineParams {
+    type: "timeline";
+    queries: string[];
+    chartType: "Timeline" | "Grid";
+    aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[];
+    recordsTimeSeries?: RecordsTimeSeries;
+    showPreviousPeriod?: boolean;
+    enableSelection?: boolean;
+}
+
+export interface ChartParams {
+    type: "chart";
     query: string;
-    unique?: boolean;
-    info?: string;
-    width?: number;
-    height?: number;
+    chartType: "Column2D" | "Bar2D" | "Pie2D" | "doughnut2d" | "Column3D" | "Bar3D" | "Pie3D" | "doughnut3d" | "Grid";
+    chartData: ChartData;
+    enableSelection?: boolean;
+}
 
-    // Properties specific to some types
-    recordId?: string; // For type === 'preview'
-    queryStr?: string; // For type === 'preview'
-    aggregation?: string; // For type === 'chart'
-    chartData?: ChartData; // For type === 'chart'
-    chartType?: string; // For type === 'chart' && type === 'timeline'
-    aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[]; // For type === 'timeline'
-    recordsTimeSeries?: RecordsTimeSeries; // For type === 'timeline'
-    columns?: GridColDef[]; // For type === 'grid'
-    aggregationName?: string; // For type === 'grid'
-    showTooltip?: boolean; // For type === 'grid'
+export interface HeatmapParams {
+    type: "heatmap";
+    query: string;
+    chartType: "Heatmap" | "Grid";
+    chartData: HeatmapData;
+    enableSelection?: boolean;
+}
+
+export interface MultiLevelPieParams {
+    type: "multiLevelPie";
+    multiLevelPieQueries: MultiLevelPieQuery[];
+    multiLevelPieData: MultiLevelPieConfig[];
+}
+
+export interface StatParams {
+    type: "stat"
+    query: string;
+    asc: boolean; // if the positive evaluation is at increase or decrease trend
     valueLocation?: StatValueLocation; // where to find value field
     valueField?: StatValueField; // how to access value field
     operation?: StatOperation; // operation to compute the value
-    relatedQuery?: string; // query containing the second leg of the stat operands
+    relatedQuery?: string, // query containing the second leg of the stat operands
     relatedValueLocation?: StatValueLocation; // where to find the value field of the second stat operands
-    relatedValueField?: StatValueField; // how to access value field of the second stat operands
+    relatedValueField?: StatValueField, //how to access value field of the second stat operands
     relatedOperation?: StatOperation; // operation to compute the value of the second stat operands
     computation?: StatOperation; // operation to get the global value of the stat
-    asc?: boolean; // if the positive evaluation is at increase or decrease trend
-    statLayout?: StatLayout; // the ui of displaying the stat
-    numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
+    numberFormatOptions?: Intl.NumberFormatOptions; // options of formatting numbers
 }
 
-/**
- * A dashboard configuration interface incl. a name and the configuration of each widget
- */
-export interface Dashboard {
-    name: string;
-    items: DashboardItem[];
+export interface GridParams {
+    type: "grid"
+    query: string;
+    columns: GridColDef[];
+    aggregation?: string;
+    showTooltip?: boolean;
+    enableSelection?: boolean;
 }
+
+export type DashboardItemParams = TimelineParams | ChartParams | HeatmapParams | MultiLevelPieParams | StatParams | GridParams;
 
 /**
  * An interface to define a type of widget that can be added to the dashboard. This basic information
- * is used to create a button to select a type of widget among a list.
+ * is used to create the widget from the palette.
  */
 export interface DashboardItemOption {
-    type: string;
-    query: string;
-    icon: string;
-    text: string;
+    id: string;
+    title: string;
+    parameters: StrictUnion<DashboardItemParams>;
+    icon?: string;
     unique?: boolean;
     info?: string;
-    parameters?: {
-        // For type === 'timeline'
-        aggregationsTimeSeries?: AggregationTimeSeries | AggregationTimeSeries[],
-        recordsTimeSeries?: RecordsTimeSeries,
-
-        // For type === 'chart'
-        chartData?: ChartData,
-
-        // For type === 'chart' && type === 'timeline'
-        chartType?: string,
-
-        // For type === 'stat'
-        valueLocation?: StatValueLocation, // where to find value field
-        valueField?: StatValueField, // how to access value field
-        operation?: StatOperation, // operation to compute the value
-        relatedQuery?: string, // query containing the second leg of the stat operands
-        relatedValueLocation?: StatValueLocation, // where to find the value field of the second stat operands
-        relatedValueField?: StatValueField, //how to access value field of the second stat operands
-        relatedOperation?: StatOperation, // operation to compute the value of the second stat operands
-        computation?: StatOperation, // operation to get the global value of the stat
-        asc?: boolean, // if the positive evaluation is at increase or decrease trend
-        statLayout?: StatLayout, // the ui of displaying the stat
-        numberFormatOptions?: Intl.NumberFormatOptions // options of formatting numbers
-
-        // For type === 'grid'
-        columns?: GridColDef[],
-        aggregationName?: string,
-        showTooltip?: boolean
-
-    };
 }
 
 export interface DashboardItemPosition {
@@ -121,11 +101,38 @@ export interface DashboardItemPosition {
     cols?: number;
 }
 
+/**
+ * Interface storing the configuration of a widget. It must contain the minimal amount of information
+ * to rebuild the widget's content (eg. for the preview we need an id and a query).
+ * This configuration is stored in user settings and/or shared with other users, so it must not include
+ * large objects or raw data (only the means to rebuild these objects or data).
+ * This interface is an extension of GridsterItem, so that we store things like the position of each
+ * widget in the dashboard.
+ */
+export interface DashboardItem<DashboardItemParams> extends GridsterItem {
+    id: string;
+    title: string;
+    parameters: StrictUnion<DashboardItemParams>;
+    icon?: string;
+    unique?: boolean;
+    info?: string;
+    width?: number;
+    height?: number;
+}
+
+/**
+ * A dashboard configuration interface incl. a name and the configuration of each widget
+ */
+export interface Dashboard {
+    name: string;
+    items: DashboardItem<DashboardItemParams>[];
+}
+
 export interface DashboardChange {
     type: changeType,
     dashboard: Dashboard;
     updateDatasets: boolean;
-    item?: DashboardItem;
+    item?: DashboardItem<DashboardItemParams>;
 }
 
 export type changeType =
@@ -176,6 +183,8 @@ export class DashboardService {
     /** A subject informing when dashboards list are initialized properly and ready to use */
     dashboardsInit = new Subject<boolean>();
 
+    private forceReloadDefaultDashboard = false;
+
     constructor(
         public modalService: ModalService,
         public userSettingsService: UserSettingsWebService,
@@ -201,7 +210,7 @@ export class DashboardService {
             },
             resizable: {enabled: true},
             itemChangeCallback: (item, itemComponent) => {
-                this.notifyItemChange(item as DashboardItem, 'PLAIN_UI_CHANGE');
+                this.notifyItemChange(item as DashboardItem<DashboardItemParams>, 'PLAIN_UI_CHANGE');
             },
             itemResizeCallback: (item, itemComponent) => {
                 if (!document.fullscreenElement) { // Exclude the change detection on switch from/to full-screen mode
@@ -234,7 +243,10 @@ export class DashboardService {
         this.userSettingsService.events.subscribe(event => {
             // E.g. new login occurs
             // ==> settings need to be rebuilt
-            this.setLayout(this.layout);
+            if (this.loginService.complete) {
+                this.setLayout(this.layout);
+            }
+
         });
 
         // Manage Auto-save dashboards.
@@ -284,7 +296,7 @@ export class DashboardService {
         }
         else if(dashboardShared) {
             const db = Utils.fromJson(dashboardShared);
-            if(db as DashboardItem[]) {
+            if(db as DashboardItem<DashboardItemParams>[]) {
                 this.setSharedDashboard(db);
             }
             else {
@@ -382,11 +394,21 @@ export class DashboardService {
                                 () => {},
                                 () => {},
                                 () => {
+                                    /**
+                                     * Update Hashes
+                                     */
                                     this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
                                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
-                                    this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
-                                    this.dashboards = standardDashboards;
-                                    this.dashboardsInit.next(true);
+                                    this.prefs.delete("skipped-hash") // Once hashes are updated, "skipped hash" must be cleared
+                                    this.prefs.delete("dashboard-default") // Previous default dashboard may not be present in the new version. Thus, need to clear this information
+
+                                    /**
+                                     * Redraw the UI
+                                     */
+                                    this.dashboards = standardDashboards; // Assign the new value to dashboards
+                                    this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
+                                    this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
+                                    this.searchService.navigate({skipSearch: true}).then(() => this.dashboardsInit.next(true)); // Trigger the local refreshing of the UI
                                 }
                             )
                         } else if(res === ModalResult.No) {
@@ -452,11 +474,12 @@ export class DashboardService {
             this.prefs.set("dashboard-default", this.defaultDashboard.name);
         }
         // If there is no dashboard explicitly opened currently, we open the default one if defined. If not open a new blank dashboard
-        if(!this.dashboard) {
+        if(!this.dashboard || this.forceReloadDefaultDashboard) {
             const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
             const _blank = this.createDashboard(name);
             this.dashboard = Utils.copy(this.defaultDashboard ? this.defaultDashboard : _blank); // Default dashboard is kept as a deep copy, so we don't change it by editing the dashboard
             this.dashboardChanged.next({type: 'LOAD_DEFAULT_DASHBOARD', dashboard: this.dashboard, updateDatasets: false});
+            this.forceReloadDefaultDashboard = false;
         }
     }
 
@@ -464,7 +487,7 @@ export class DashboardService {
      * Load shared dashboard, as a new draft dashboard, based on its given items
      * @param items
      */
-    public setSharedDashboard(items: DashboardItem[]) {
+    public setSharedDashboard(items: DashboardItem<DashboardItemParams>[]) {
         const name = this.formatMessage(defaultDashboardName) + ' ' + (this.draftDashboards.length+1);
         const _shared = {name: name, items};
         this.draftDashboards.push(_shared)
@@ -477,7 +500,7 @@ export class DashboardService {
      */
     public isDashboardSaved(dashboard = this.dashboard): boolean {
         return this.defaultDashboard
-                && dashboard
+                && !!dashboard
                 && !dashboard.name.startsWith(this.formatMessage(defaultDashboardName))
                 && !this.changedDashboards.find(d => d.name === dashboard.name);
     }
@@ -486,7 +509,7 @@ export class DashboardService {
      * Fire an event when a dashboard item changes
      * @param item
      */
-    public notifyItemChange(item: DashboardItem, event: changeType, notify = false) {
+    public notifyItemChange(item: DashboardItem<DashboardItemParams>, event: changeType, notify = false) {
         this.dashboardChanged.next({type: event, dashboard: this.dashboard, updateDatasets: notify, item});
     }
 
@@ -512,28 +535,21 @@ export class DashboardService {
             option: DashboardItemOption,
             dashboard: Dashboard = this.dashboard,
             notify = true,
-            rows = (option.type === "stat" ? 2 : 4),
-            cols = (option.type === "stat" ? 1 : 3),
+            rows = (option.parameters.type === "stat" ? 2 : 4),
+            cols = (option.parameters.type === "stat" ? 1 : 3),
             x = 0,
             y = 0,
-            closable = true): DashboardItem {
+            closable = true): DashboardItem<DashboardItemParams> {
 
         let item = {
             x: x,
             y: y,
             rows,
             cols,
-            type: option.type,
-            query: option.query,
-            icon: option.icon,
-            unique: option.unique,
-            title: option.text,
             closable: closable,
-            info: option.info
+            ...option
         };
-        if (option.parameters) {
-            item = {...item, ...option.parameters}
-        }
+
         dashboard.items.push(item);
         if (notify) {
             this.dashboardChanged.next({type: 'ADD_WIDGET', dashboard: dashboard, updateDatasets: true});
@@ -545,8 +561,8 @@ export class DashboardService {
      * Remove a widget from the dashboard
      * @param item
      */
-    public removeItem(item: DashboardItem) {
-        this.dashboard.items.splice(this.dashboard.items.indexOf(item), 1);
+    public removeItem(item: DashboardItem<DashboardItemParams>) {
+        this.dashboard!.items.splice(this.dashboard.items.indexOf(item), 1);
         this.notifyItemChange(item, 'REMOVE_WIDGET');
     }
 
@@ -555,7 +571,7 @@ export class DashboardService {
      * @param item
      * @param newTitle
      */
-    public renameWidget(item: DashboardItem, newTitle: string) {
+    public renameWidget(item: DashboardItem<DashboardItemParams>, newTitle: string) {
         item.title = newTitle;
         this.notifyItemChange(item, 'CHANGE_WIDGET_CONFIG');
     }
@@ -564,7 +580,7 @@ export class DashboardService {
      * Open a dialog to submit a new name for a given widget
      * @param item
      */
-    public renameWidgetModal(item: DashboardItem) {
+    public renameWidgetModal(item: DashboardItem<DashboardItemParams>) {
 
         const model: PromptOptions = {
             title: 'msg#dashboard.renameWidget',
@@ -589,9 +605,7 @@ export class DashboardService {
      * - Changing the layout mode of Gridster
      * - auto Saving the dashboard
      */
-    public createDashboardActions(): Action[] {
-
-        const dashboardActions = [] as Action[];
+    public createSettingsActions(): Action {
 
         // Action to select the "manual" layout mode
         this.manualLayoutAction = new Action({
@@ -631,8 +645,8 @@ export class DashboardService {
         }
 
         // Assemble the actions into one menu
-        const settings = new Action({
-            icon: 'fas fa-ellipsis-v',
+        const settingsAction = new Action({
+            icon: 'fas fa-gear',
             title: 'msg#dashboard.settingsTitle',
             children: [
                 this.manualLayoutAction,
@@ -641,9 +655,7 @@ export class DashboardService {
             ],
         });
 
-        dashboardActions.push(settings);
-
-        return dashboardActions;
+        return settingsAction;
     }
 
     public openDashboard(dashboard: Dashboard) {
@@ -657,9 +669,11 @@ export class DashboardService {
             this.saveAs(dashboard);
         }
         else {
-            const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
-            this.changedDashboards.splice(index, 1);
-            this.patchDashboards();
+            const callback = () => {
+                const index = this.changedDashboards.findIndex(d => d.name === dashboard.name);
+                this.changedDashboards.splice(index, 1);
+            }
+            this.patchDashboards(true, undefined, callback);
         }
     }
 
@@ -667,6 +681,11 @@ export class DashboardService {
         this.userSettingsService
             .patch({dashboards: dashboards})
             .subscribe(
+                () => {},
+                (error) => {
+                    this.notificationService.error("Could not " + event + " dashboards definition !");
+                    console.error("Could not  " + event + "  dashboards definition !", error);
+                },
                 () => {
                     /**
                      * Update Hashes
@@ -676,18 +695,18 @@ export class DashboardService {
                     this.prefs.set("standard-dashboards-hash", standardDashboardsHash); // Update the hash of the last used standard dashboards' version
                     this.prefs.set("standard-widgets-hash", standardWidgetsHash); // Update the hash of the last used standard widgets' version
                     this.prefs.delete("skipped-hash")// Once hashes are updated, "skipped hash" must be cleared
+                    this.prefs.delete("dashboard-default") // Previous default dashboard may not be present in the new version. Thus, need to clear this information
 
                     /**
-                     * Force app reload with none queryParams
-                     * It ensures then the reload of dashboards from updated user-settings
+                     * Redraw the UI
                      */
-                    const url = (window.location.href.split('?'))[0];
-                    window.location.assign(url);
-                    window.location.reload();
-                },
-                (error) => {
-                    this.notificationService.error("Could not " + event + " dashboards definition !");
-                    console.error("Could not  " + event + "  dashboards definition !", error);
+                    this.dashboards = dashboards; // Assign the new value to dashboards
+                    this.searchService.queryStringParams = {}; // Remove all queryStringParams (dashboard, dashboardShared ...) from the url
+                    this.searchService.clearQuery(); // Clear the query (remove all eventually applied filters)
+                    this.searchService.navigate({skipSearch: true}).then(() => { // Trigger the local refreshing of the UI
+                        this.forceReloadDefaultDashboard = true; // Needed to force redraw the displayed dashboard based on new overriding dashboards
+                        this.dashboardsInit.next(true);
+                    });
                 }
             );
     }
@@ -702,6 +721,37 @@ export class DashboardService {
         this.dashboard = Utils.copy(_blank);
         delete this.searchService.queryStringParams.dashboard;
         this.dashboardChanged.next({type: 'NEW_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+    }
+
+    public renameDashboard(dashboard: Dashboard) {
+        const originalName = dashboard.name;
+        const unique : ValidatorFn = (control) => {
+            const checkUnique = !control.value?.startsWith(this.formatMessage(defaultDashboardName)) && (!this.getDashboard(control.value) || control.value === originalName);
+            if(!checkUnique) return {unique: true};
+            return null;
+        };
+
+        const model: PromptOptions = {
+            title: 'msg#dashboard.renameModalTitle',
+            message: 'msg#dashboard.saveAsModalMessage',
+            buttons: [],
+            output: '',
+            validators: [Validators.required, unique]
+        };
+
+        this.modalService.prompt(model).then(res => {
+            if(res === ModalResult.OK) {
+                dashboard.name = model.output;
+                // Update User settings
+                const callback = () => {
+                    // Update URL (store dashboard name in the queryParams) and navigate to the newly renamed dashboard
+                    this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
+                    this.searchService.navigate({skipSearch: true});
+                }
+                this.patchDashboards(true, undefined, callback);
+
+            }
+        });
     }
 
     public deleteDashboard(dashboard: Dashboard) {
@@ -722,12 +772,26 @@ export class DashboardService {
         }).then(value => {
             if(value === ModalResult.OK) {
                 const index = this.allDashboards.findIndex(d => d.name === dashboard.name);
+                const callback = () => {
+                    // Open next/previous dashboard. If not existing, create new empty dashboard
+                    if (this.allDashboards[index]) {
+                        this.dashboard = Utils.copy(this.allDashboards[index]);
+                        delete this.searchService.queryStringParams.dashboard;
+                        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+                    } else if (this.allDashboards[index - 1]) {
+                        this.dashboard = Utils.copy(this.allDashboards[index - 1]);
+                        delete this.searchService.queryStringParams.dashboard;
+                        this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
+                    } else {
+                        this.newDashboard();
+                    }
+                }
 
                 // Delete the dashboard
                 if (this.isDashboardSaved(dashboard)) {
                     const i = this.dashboards.findIndex(d => d.name === dashboard.name);
                     this.dashboards.splice(i, 1);
-                    this.patchDashboards(false);
+                    this.patchDashboards(false, undefined, callback);
                     if(this.prefs.get("dashboard-default") === dashboard.name) {
                         this.prefs.delete("dashboard-default");
                     }
@@ -735,19 +799,7 @@ export class DashboardService {
                 else {
                     const i = this.draftDashboards.findIndex(d => d.name === dashboard.name);
                     this.draftDashboards.splice(i, 1);
-                }
-
-                // Open next/previous dashboard. If not existing, create new empty dashboard
-                if (this.allDashboards[index]) {
-                    this.dashboard = Utils.copy(this.allDashboards[index]);
-                    delete this.searchService.queryStringParams.dashboard;
-                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
-                } else if (this.allDashboards[index - 1]) {
-                    this.dashboard = Utils.copy(this.allDashboards[index - 1]);
-                    delete this.searchService.queryStringParams.dashboard;
-                    this.dashboardChanged.next({type: 'OPEN_DASHBOARD', dashboard: this.dashboard, updateDatasets: true});
-                } else {
-                    this.newDashboard();
+                    callback();
                 }
             }
         });
@@ -856,15 +908,31 @@ export class DashboardService {
             if(res === ModalResult.OK) {
                 const db = Utils.copy(dashboard);
                 db.name = model.output;
-                // Update User settings
+
+                // Update the list of dashboards
                 this.dashboards.push(db);
-                this.patchDashboards();
-                // Delete the saved dashboard from the draftDashboards
+
+                // Store a copy of draft dashboards
+                const copyDraft = [...this.draftDashboards];
+
+                // Delete the saved dashboard from the draftDashboards at this point of time in order to avoid flickering on successful patch
                 const index = this.draftDashboards.findIndex(d => d.name === originalName);
                 this.draftDashboards.splice(index, 1);
-                // Update URL (store dashboard name in the queryParams)
-                this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
-                this.searchService.navigate({skipSearch: true});
+
+                const successCallback = () => {
+                    // Update URL (store dashboard name in the queryParams)
+                    this.searchService.queryStringParams.dashboard = model.output; // Needed when refreshing the page
+                    this.searchService.navigate({skipSearch: true});
+                }
+
+                const errorCallback = () => {
+                    // If the patch fails, restore the list of draft dashboards
+                    this.draftDashboards = copyDraft;
+                }
+
+                // Update User settings
+                this.patchDashboards(true, undefined, successCallback, errorCallback);
+
             }
         });
 
@@ -874,15 +942,17 @@ export class DashboardService {
      * Updates the list of dashboards in the user settings
      * @param notify
      */
-    protected patchDashboards(notify = true, dashboards?: Dashboard[]) {
+    protected patchDashboards(notify = true, dashboards?: Dashboard[], successCallback = (): any => {}, errorCallback = (): any => {}) {
         this.userSettingsService.patch({dashboards: dashboards || this.dashboards})
             .subscribe(
                 next => {
+                    successCallback();
                     if(notify) {
                         this.notificationService.success("msg#dashboard.saveSuccess");
                     }
                 },
                 error => {
+                    errorCallback();
                     if(notify) {
                         this.notificationService.error("msg#dashboard.saveFailure");
                     }

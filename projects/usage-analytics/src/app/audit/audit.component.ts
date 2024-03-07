@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { Action } from "@sinequa/components/action";
-import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { SearchService } from "@sinequa/components/search";
 import { UIService } from "@sinequa/components/utils";
 import { AppService } from "@sinequa/core/app-utils";
@@ -9,12 +8,13 @@ import { Subscription } from "rxjs";
 import { skip } from 'rxjs/operators';
 
 import { AuditService } from "./audit.service";
-import { FACETS } from "./config";
 import { Dashboard, DashboardService } from "./dashboard/dashboard.service";
 import {DashboardItemComponent} from "./dashboard/dashboard-item.component";
 import {ExportService} from "./export.service";
 import { ImportService } from "./import.service";
 import { ConfirmType, ModalButton, ModalResult, ModalService } from "@sinequa/core/modal";
+import { CCColumn, CCQuery, EngineType } from "@sinequa/core/web-services";
+import { MapOf } from "@sinequa/core/base";
 
 @Component({
     selector: "sq-audit",
@@ -26,9 +26,9 @@ export class AuditComponent implements OnDestroy {
     @ViewChild("content", {static: false}) content: ElementRef;
 
     public exportAction: Action;
+    public settingsAction: Action;
 
     public dashboards: Dashboard[] = [];
-    public dashboardActions: Action[];
 
     // keep track of focused element
     public focusElementIndex: number;
@@ -44,7 +44,7 @@ export class AuditComponent implements OnDestroy {
         public auditService: AuditService,
         public dashboardService: DashboardService,
         private ui: UIService,
-        private searchService: SearchService,
+        public searchService: SearchService,
         public loginService: LoginService,
         private appService: AppService,
         private exportService: ExportService,
@@ -63,7 +63,7 @@ export class AuditComponent implements OnDestroy {
                 // Properly display dashboards (default, opened ...)
                 this.dashboardService.handleNavigation();
                 this.dashboardService.setDefaultDashboard();
-                this.dashboardActions = this.dashboardService.createDashboardActions();
+                this.settingsAction = this.dashboardService.createSettingsActions();
 
                 // Request data upon login
                 this.auditService.updateAuditFilters();
@@ -71,7 +71,7 @@ export class AuditComponent implements OnDestroy {
                                             .pipe(skip(1))
                                             .subscribe(() => this.auditService.updateAuditFilters());
 
-                this.ready = true
+                this.ready = true;
             }
         )
 
@@ -80,8 +80,13 @@ export class AuditComponent implements OnDestroy {
             if (event.type === "login-complete" || event.type === "session-start") {
 
                 // Hack to fake a CCQuery so the search service works even if no query is attached to the app. (SBA-320)
+                // Hack the column config, so that date column will be well-formatted
+                // The _defaultCCQuery.name must be the same as the key used in MapOf<MapOf<CCColumn>> of columnsByQuery
                 if(!this.appService.defaultCCQuery) {
-                    this.appService['_defaultCCQuery'] = {};
+                    this.appService['_defaultCCQuery'] = {name : ""} as CCQuery;
+                    this.appService['columnsByQuery'] = {"" : {
+                        "timestamp": {eType: EngineType.dateTime} as CCColumn
+                    } as MapOf<CCColumn>} as MapOf<MapOf<CCColumn>>;
                 }
 
                 // searchService.query is not yet defined from url, need to force its value
@@ -101,13 +106,13 @@ export class AuditComponent implements OnDestroy {
 
         this.exportAction = new Action({
             icon: "fas fa-file-alt",
-            name: "export/import",
+            title: "Export/Import dashboards",
             children: [
                 this.getDataAction(),
                 new Action({separator: true}),
                 this.getLayoutAction(),
                 new Action({separator: true}),
-                ...this.getDashboardsDefAction()
+                ...this.getDashboardsDefinitionAction()
             ]
         })
 
@@ -120,41 +125,27 @@ export class AuditComponent implements OnDestroy {
         this._dashboardInitSubscription?.unsubscribe();
     }
 
-    /**
-     * Returns the configuration of the facets displayed.
-     * The configuration from the config.ts file can be overriden by configuration from
-     * the app configuration on the server
-     */
-    public get facets(): FacetConfig<FacetListParams>[] {
-        return this.appService.app?.data?.facets as any || FACETS;
-    }
-
-    getDataAction(): Action {
+    private getDataAction(): Action {
         return new Action({
             name: "Export dashboard data",
-            title: "Export dashboard data",
             text: "Export dashboard data",
             children: [
                 new Action({
-                    title: "As Excel",
                     text: "As Excel",
                     name: "exportAsXLS",
                     action: () => this.exportXLSX()
                 }),
                 new Action({
-                    title: "As CSV",
                     text: "As CSV",
                     name: "exportAsCSV",
                     action: () => this.exportCSV()
                 }),
                 new Action({
-                    title: "As XML",
                     text: "As XML",
                     name: "exportAsXML",
                     action: () => this.exportXML()
                 }),
                 new Action({
-                    title: "As PNG image",
                     text: "As PNG image",
                     name: "exportAsPNG",
                     action: () => this.exportPNG()
@@ -163,25 +154,22 @@ export class AuditComponent implements OnDestroy {
         })
     }
 
-    getLayoutAction(): Action {
+    private getLayoutAction(): Action {
         return new Action({
             name: "Export dashboards layout as JSON",
-            title: "Export dashboards layout as JSON",
             text: "Export dashboards layout as JSON",
             action: () => this.exportLayoutJson()
         })
     }
 
-    getDashboardsDefAction(): Action[] {
+    private getDashboardsDefinitionAction(): Action[] {
         return [
             new Action({
-                title: "Export dashboards definition as JSON",
                 text: "Export dashboards definition as JSON",
                 name: "Export dashboards definition as JSON",
                 action: () => this.exportDefJson()
             }),
             new Action({
-                title: "Import dashboards definition from JSON",
                 text: "Import dashboards definition from JSON",
                 name: "Import dashboards definition from JSON",
                 action: () => this.importDefJson()
@@ -189,38 +177,38 @@ export class AuditComponent implements OnDestroy {
         ]
     }
 
-    exportPNG() {
+    private exportPNG() {
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToPNG(name, this.content);
     }
 
-    exportCSV() {
+    private exportCSV() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToCsv(name, items);
     }
 
-    exportXLSX() {
+    private exportXLSX() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportXLSX(name, items);
     }
 
-    exportXML() {
+    private exportXML() {
         const items = this.dashboardItems.map(item => item);
         const name = this.dashboardService.formatMessage(this.dashboardService.dashboard.name);
         this.exportService.exportToXML(name, items);
     }
 
-    exportLayoutJson() {
+    private exportLayoutJson() {
         this.exportService.exportLayoutToJson("dashboards-layout", this.dashboardService.dashboards);
     }
 
-    exportDefJson() {
+    private exportDefJson() {
         this.exportService.exportDefToJson("dashboards-definition", this.dashboardService.dashboards);
     }
 
-    importDefJson() {
+    private importDefJson() {
         this.importService.dashboardsDefFromJson();
     }
 
@@ -232,7 +220,7 @@ export class AuditComponent implements OnDestroy {
         this.modalService
             .confirm({
                 title: "Reset dashboards definition",
-                message: "You are about to loose ALL your current dashboards definition. Do you want to continue?",
+                message: "You are about to lose ALL your current dashboards definition. Do you want to continue?",
                 buttons: [
                     new ModalButton({result: ModalResult.Cancel}),
                     new ModalButton({result: ModalResult.OK, text: "Confirm", primary: true})
@@ -256,6 +244,11 @@ export class AuditComponent implements OnDestroy {
     saveDashboard(dashboard, $event): void {
         $event.stopPropagation();
         this.dashboardService.saveDashboard(dashboard);
+    }
+
+    renameDashboard(dashboard, $event): void {
+        $event.stopPropagation();
+        this.dashboardService.renameDashboard(dashboard);
     }
 
     shareDashboard(dashboard: Dashboard, $event): void {

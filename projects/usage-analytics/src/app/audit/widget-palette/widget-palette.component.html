@@ -1,23 +1,55 @@
-<button type="button" class="btn btn-outline-primary palette-btn" (click)="togglePalette(); $event.stopPropagation()" [sqTooltip]="'msg#dashboard.addWidget' | sqMessage">
-    <i class="fas fa-plus"></i>
+<button type="button" class="btn btn-primary action-btn btn-add-widget" (click)="togglePalette(); $event.stopPropagation()" [sqTooltip]="'msg#dashboard.addWidget' | sqMessage">
+    <i class="sq-add-widget"></i>
 </button>
 
 <div class="card flex-column palette text-muted position-absolute" *ngIf="showPalette" (click)="$event.stopPropagation()">
-    <div *ngFor="let element of palette" class="mb-3">
-        <details>
-            <summary>{{element.name | sqMessage}}</summary>
-            <div class="d-flex flex-wrap">
-                <button
-                    [sqIcon]="item.icon"
-                    type="button"
-                    class="btn btn-outline-secondary mx-1 my-1"
-                    *ngFor="let item of element.items"
-                    (click)="addWidget(item)"
-                    [sqTooltip]="item?.info | sqMessage"
-                    [fallbackPlacements]="['bottom','top']">
-                    <div class="button-text">{{item.text | sqMessage}}</div>
-                </button>
-            </div>
-        </details>
+    <div class="form-control d-flex align-items-center mb-3">
+        <div class="me-2 text-muted">
+            <i class="fas fa-fw fa-search primary-icon"></i>
+        </div>
+        <input
+            class="search-input"
+            type="text"
+            name="searchText"
+            [formControl]="searchText"
+            autocomplete="off"
+            placeholder="Search for a widget">
     </div>
+    <ng-container *ngIf="!isFiltering;else filtered">
+        <div *ngFor="let element of palette" class="mb-3">
+            <details>
+                <summary>{{element.name | sqMessage}}</summary>
+                <div class="d-flex flex-wrap">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary mx-1 my-1"
+                        *ngFor="let item of element.items"
+                        (click)="addWidget(item)"
+                        [sqTooltip]="item?.info | sqMessage"
+                        [fallbackPlacements]="['bottom','top']">
+                        <i class="{{getIcon(item)}}"></i>
+                        <div class="button-text-container">
+                            <div class="button-text">{{item.title | sqMessage}}</div>
+                        </div>
+                    </button>
+                </div>
+            </details>
+        </div>
+    </ng-container>
+    <ng-template #filtered>
+        <div class="d-flex flex-wrap mb-3">
+            <button
+                type="button"
+                class="btn btn-outline-primary mx-1 my-1"
+                *ngFor="let item of filteredWidgets"
+                (click)="addWidget(item)"
+                [sqTooltip]="item?.info | sqMessage"
+                [fallbackPlacements]="['bottom','top']">
+                <i class="{{getIcon(item)}}"></i>
+                <div class="button-text-container">
+                    <div class="button-text" [innerHtml]="(item.titleHighlight || item.title) | sqMessage"></div>
+                </div>
+            </button>
+        </div>
+    </ng-template>
 </div>

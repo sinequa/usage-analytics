@@ -28,20 +28,22 @@ import { BsAdvancedModule } from "@sinequa/components/advanced";
 import { BsModalModule } from "@sinequa/components/modal";
 import { BsActionModule } from "@sinequa/components/action";
 import {SelectionOptions, SELECTION_OPTIONS} from "@sinequa/components/selection";
+import { FiltersModule } from "@sinequa/components/filters";
+import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
 
 // @sinequa/analytics library
 import { BsTimelineModule } from "@sinequa/analytics/timeline";
-import { BsHeatmapModule } from "@sinequa/analytics/heatmap";
 import { FusionChartsModule } from '@sinequa/analytics/fusioncharts'
 
 import * as FusionCharts from "fusioncharts";
 import * as charts from "fusioncharts/fusioncharts.charts";
+import * as powerCharts from "fusioncharts/fusioncharts.powercharts";
 import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
 import * as CandyTheme from "fusioncharts/themes/fusioncharts.theme.candy";
 FusionCharts.options.creditLabel = false;
 
 // Components
-import { AppComponent } from "./app.component";
+import { APP_HELP_FOLDER_OPTIONS, AppComponent } from "./app.component";
 import { AuditComponent } from "./audit/audit.component";
 import { AuditRangePickerComponent } from "./audit/audit-range-picker/audit-range-picker.component";
 import { DashboardItemComponent } from "./audit/dashboard/dashboard-item.component";
@@ -55,6 +57,7 @@ import { environment } from "../environments/environment";
 // Locales
 import {LocalesConfig, Locale} from "@sinequa/core/intl";
 import enLocale from "../locales/en";
+import { HELP_DEFAULT_FOLDER_OPTIONS } from "./audit/config";
 // import frLocale from "../locales/fr";
 // import deLocale from "../locales/de";
 
@@ -123,7 +126,7 @@ const selectionOptions: SelectionOptions = {
         BsNotificationModule,
         UtilsModule,
 
-        FusionChartsModule.forRoot(FusionCharts, charts, FusionTheme, CandyTheme),
+        FusionChartsModule.forRoot(FusionCharts, charts, powerCharts, FusionTheme, CandyTheme),
 
         BsUserSettingsModule,
         BsFeedbackModule,
@@ -133,8 +136,9 @@ const selectionOptions: SelectionOptions = {
         BsActionModule,
         GridsterModule,
         BsTimelineModule,
-        BsHeatmapModule,
-        AgGridModule
+        AgGridModule,
+        FiltersModule,
+        BsHeatmapModule
     ],
     declarations: [
         AppComponent,
@@ -170,7 +174,11 @@ const selectionOptions: SelectionOptions = {
         {provide: HTTP_INTERCEPTORS, useClass: NotificationsInterceptor, multi: true},
 
         {provide: SEARCH_OPTIONS, useValue: searchOptions},
-        {provide: SELECTION_OPTIONS, useValue: selectionOptions}
+        {provide: SELECTION_OPTIONS, useValue: selectionOptions},
+
+        // Provides default help's folder options
+        // This options can be overridden by the custom json configuration from the administration panel, using the property "help-folder-options"
+        { provide: APP_HELP_FOLDER_OPTIONS, useValue: HELP_DEFAULT_FOLDER_OPTIONS }
     ],
     bootstrap: [
         AppComponent

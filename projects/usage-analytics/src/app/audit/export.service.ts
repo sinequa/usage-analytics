@@ -1,11 +1,10 @@
 import {ElementRef, Injectable} from '@angular/core';
-import { Utils } from '@sinequa/core/base';
 import {IntlService} from '@sinequa/core/intl';
 import domtoimage from "dom-to-image";
-import { saveAs } from "file-saver";
+import format from "xml-formatter";
 
 import {DashboardItemComponent} from './dashboard/dashboard-item.component';
-import { Dashboard, DashboardItem, DashboardService } from './dashboard/dashboard.service';
+import { Dashboard, DashboardItem, DashboardItemParams, DashboardService, StatParams } from './dashboard/dashboard.service';
 import {StatProvider} from './dashboard/providers/stat.provider';
 
 import {xlsx} from "./xlsx";
@@ -72,7 +71,7 @@ export class ExportService {
 
         // lib used to create image from specific HTML element
         domtoimage.toBlob(element.nativeElement).then(blob => {
-            saveAs(blob,  `${filename}_${this.date}.png`);
+            this.saveAs(`${filename}_${this.date}.png`, "image/png", blob)
             // do not forget to remove our previous height to allow gridster to adjust automatically his height
             element.nativeElement.style = undefined;
           } );
@@ -102,6 +101,10 @@ export class ExportService {
       // export each grid in a separate file
       const grids = this.extractGrids(filename, items);
       grids.forEach(grid => this.saveToCsv(grid.filename, this.objectToCsv(grid.tables).join('\n')));
+
+      // export each heatmap in a separate file
+      const heatmaps = this.extractHeatmaps(filename, items);
+      heatmaps.forEach(heatmap => this.saveToCsv(heatmap.filename, this.objectToCsv(heatmap.tables).join('\n')));
     }
 
   /**
@@ -125,8 +128,12 @@ export class ExportService {
     // export each grid
     tables.push(...this.extractGrids(filename, items));
 
+    // export each heatmap
+    tables.push(...this.extractHeatmaps(filename, items));
+
     // as csv files joined in a single array, split them in their own sheet
-    this.csvToXML(tables, filename);
+    const file = `${filename}_${this.date}.xml`;
+    this.saveAs(file, "text/xml;charset=utf-8", format(this.csvToXML(tables))) // Here format() is used to beautify the xml file
   }
 
   /**
@@ -150,9 +157,12 @@ export class ExportService {
     // export each grid
     tables.push(...this.extractGrids(filename, items).map(grid => grid.tables.length > 0 ? grid : {...grid, tables: ['']}));
 
+    // export each heatmap
+    tables.push(...this.extractHeatmaps(filename, items).map(heatmap => heatmap.tables.length > 0 ? heatmap : {...heatmap, tables: ['']}));
+
     // Excel sheet's name limited to 31 characters
     const worksheets = tables.map(worksheet => ({
-      data: [...(Utils.isArray(worksheet.tables[0]) ? worksheet.tables : this.objectToCsv(worksheet.tables).map(it => it.split(',')))],
+      data: [...(Array.isArray(worksheet.tables[0]) ? worksheet.tables : this.objectToCsv(worksheet.tables).map(it => it.split(',')))],
       name: worksheet.title.slice(0,30)
     }));
 
@@ -165,7 +175,7 @@ export class ExportService {
       lastModifiedBy: '',
       worksheets: worksheets
     }).then((content) => {
-      saveAs(content, file);
+      this.saveAs(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", content);
     });
 
   }
@@ -185,7 +195,7 @@ export class ExportService {
     const universalBOM = "\uFEFF"; // Byte Order Mark forcing Excel to use UTF-8 for CSV files
     const keys = Object.keys(rows[0]);
     const csvData = universalBOM +
-      (Utils.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
+      (Array.isArray(rows[0]) ? '' : keys.join(separator) + '\n') +
       rows.map(row => keys.map(k => {
           let cell = (row[k] === null || row[k] === undefined) ? '' : row[k];
           cell = cell instanceof Date
@@ -248,7 +258,7 @@ export class ExportService {
     this.saveAs(filename, 'text/json', jsonData);
   }
 
-  private saveAs(filename: string, fileType: string, data: string) {
+  private saveAs(filename: string, fileType: string, data: string | Blob) {
     const blob = new Blob([data], { type: fileType });
     if (navigator.msSaveBlob) { // IE 10+
       navigator.msSaveBlob(blob, filename);
@@ -274,7 +284,7 @@ export class ExportService {
 
     if(previousDataSet !== null && dataset !== null){
       // TODO: decimalsPrecision should be a parameter value
-      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config);
+      const {value, percentageChange, trend, trendEvaluation } = this.statProvider.getvalues(previousDataSet, dataset, config as DashboardItem<StatParams>);
       return ({title, value, percentageChange, trend, trendEvaluation});
     }
 
@@ -289,7 +299,7 @@ export class ExportService {
    * @returns a {@link ExtractModel} object with all stats data or undefined
    */
    protected extractStats(filename: string, items: DashboardItemComponent[]): ExtractModel | undefined {
-    const stats = items.filter(item => item.config.type === "stat");
+    const stats = items.filter(item => item.config.parameters.type === "stat");
     if(stats.length === 0) return;
 
     const results = stats.reduce((acc, item) => {
@@ -309,7 +319,7 @@ export class ExportService {
    * @returns Array of charts data
    */
    protected extractCharts(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
-    const charts = items.filter(item => item.config.type === "chart").map(item => {
+    const charts = items.filter(item => item.config.parameters.type === "chart").map(item => {
       const title = this.translate.formatMessage(item.config.title);
 
       return {title, data: item.chartResults.aggregations[0].items?.map(elem => ({value: elem.value, count: elem.count}))}
@@ -338,7 +348,7 @@ export class ExportService {
     // timelines components extractions
     // a timeserie could contains one or more series
     // no needs of timeline-provider here as timeseries is the final results after timeline-provider works
-    const timeseries = items.filter(item => item.config.type === "timeline").map(item => {
+    const timeseries = items.filter(item => item.config.parameters.type === "timeline").map(item => {
       const title = this.translate.formatMessage(item.config.title);
       return {title, timeSeries: item.timeSeries}
     });
@@ -383,33 +393,56 @@ export class ExportService {
    * @param items array of dashboard items
   **/
    protected extractGrids(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
-    const grids = items.filter(item => item.config.type === "grid").map(item => {
+    return this.extractGridsOrHeatmaps(filename, items, "grid");
+  }
+
+  /**
+   * Extract each heatmap data.
+   *
+   * @param filename name of the file
+   * @param items array of dashboard items
+   * @returns Array of heatmaps data
+   */
+  protected extractHeatmaps(filename: string, items: DashboardItemComponent[]): ExtractModel[] {
+    return this.extractGridsOrHeatmaps(filename, items, "heatmap");
+  }
+
+  /**
+   * Extract data for grids Or heatmaps.
+   *
+   * @param filename name of the file
+   * @param items array of dashboard items
+   * @param type it can be "grid" or "heatmap"
+   * @returns Array of widget's data
+  **/
+  protected extractGridsOrHeatmaps(filename: string, items: DashboardItemComponent[], type: "grid" | "heatmap"): ExtractModel[] {
+    const widgets = items.filter(item => item.config.parameters.type === type).map(item => {
       const title = this.translate.formatMessage(item.config.title);
       return {title, rowData: item.rowData, columns: item.columnDefs}
     });
 
-    return grids.length === 0
+    return widgets.length === 0
       ? []
-      : grids.map(grid => {
-          const fields = grid.columns.map(x => x.field);
+      : widgets.map(widget => {
+          const fields = widget.columns.map(x => x.field);
 
           // initialize rows with header
           let rows = [
-            grid.columns.map(
+            widget.columns.map(
               x => x.headerName
             )
           ];
 
           // append each row, if there is no rowData it will just concat an empty array
           rows = rows.concat(
-            grid.rowData.map(row => {
+            widget.rowData.map(row => {
               return fields.map(x => !!x && !!row[x] ? row[x] : "");
             })
           );
 
-          const file = `${filename}_${grid.title}_${this.date}.csv`;
+          const file = `${filename}_${widget.title}_${this.date}.csv`;
           return {
-            title: grid.title,
+            title: widget.title,
             filename: file,
             tables: rows
           } as ExtractModel;
@@ -422,8 +455,7 @@ export class ExportService {
    * @param tables contains data per worksheet
    * @param filename
    */
-  private csvToXML(tables: {title:string, tables:any[]}[], filename: string) {
-    const uri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
+  private csvToXML(tables: {title:string, tables:any[]}[]): string {
     const tmplWorkbookXML = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:excel"  xmlns:html="https://www.w3.org/TR/html401/">'
       + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>Sinequa R&amp;D</Author><Created>{created}</Created></DocumentProperties>'
       + '<Styles>'
@@ -433,7 +465,6 @@ export class ExportService {
       + '{worksheets}</Workbook>'
     const tmplWorksheetXML = '<Worksheet ss:Name="{nameWS}"><Table>{rows}</Table></Worksheet>'
     const tmplCellXML = '<Cell{attributeStyleID}{attributeFormula}><Data ss:Type="{nameType}">{data}</Data></Cell>'
-    const base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
     const format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
 
     let workbookXML = "";
@@ -442,7 +473,7 @@ export class ExportService {
 
     for(const [index, values] of tables.entries()) {
       if(values.tables){
-        const data = Utils.isArray(values.tables[0]) ? values.tables : this.objectToCsv(values.tables).map(it => it.split(','))
+        const data = Array.isArray(values.tables[0]) ? values.tables : this.objectToCsv(values.tables).map(it => it.split(','))
         for(const row of data) {
           rowsXML += '<Row>';
           for(const cell of row) {
@@ -468,20 +499,12 @@ export class ExportService {
     const ctx: XLWorkbookType = {created: (new Date()).getTime(), worksheets: worksheetsXML};
     workbookXML = format(tmplWorkbookXML, ctx);
 
-    // saveAs()
-    const link = document.createElement("a");
-    link.href = uri + base64(workbookXML);
-    link.download = `${filename}_${this.date}.xls` || 'Workbook.xls';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
+    return workbookXML;
   }
 
-  private getWidgetKey(item: DashboardItem): string{
+  private getWidgetKey(item: DashboardItem<DashboardItemParams>): string{
     const widgets = this.dashboardService.getWidgets();
-    const element = Object.entries(widgets).find(element => item.query === element[1].query && item.title === element[1].text);
+    const element = Object.entries(widgets).find(element => item.id === element[1].id);
     return element ? element[0] : "";
   }
 }

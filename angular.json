@@ -50,9 +50,11 @@
               "vis-timeline",
               "fusioncharts",
               "fusioncharts/fusioncharts.charts",
+              "fusioncharts/themes/fusioncharts.theme.candy",
+              "fusioncharts/themes/fusioncharts.theme.fusion",
               "moment-timezone",
               "dom-to-image",
-              "file-saver",
+              "xml-formatter",
               "diacritics",
               "fast-text-encoding",
               "ag-grid-community"

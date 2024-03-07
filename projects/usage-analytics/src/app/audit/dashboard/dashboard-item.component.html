@@ -5,38 +5,28 @@
     [actions]="actions"
     [actionsFirst]="false"
     [buttonsStyle]="buttonsStyle"
-    [ngSwitch]="config.type">
+    [defaultTooltipPlacement]="'bottom'"
+    [ngSwitch]="config.parameters.type">
 
-    <section *ngIf="!loading && !errorMessage" class="h-100">
+    <ng-container *ngIf="!loading && !errorMessage">
+
         <!-- Timeline view-->
-        <section *ngSwitchCase="'timeline'">
+        <ng-container *ngSwitchCase="'timeline'">
             <sq-timeline
-                *ngIf="config.chartType !== 'Grid'"
+                *ngIf="config.parameters.chartType !== 'Grid'"
                 [data]="timeSeries"
                 [width]="innerwidth"
-                [height]="(timeSeries?.length > 1) ? (innerheight - 30) : innerheight"
+                [height]="innerheight"
                 [showTooltip]="true"
-                [curveType]="'curveLinear'"
-                (rangeChange)="updateAuditRange($event)"
+                [curveType]="'curveStep'"
+                [showLegend]="timeSeries?.length > 1"
+                [legendHeight]="50"
+                [legendYOffset]="8"
+                [legendStyles]="{'justify-content': 'center', 'overflow-y': 'auto', 'width': '98%'}"
                 (selectionChange)="updateAuditRange($event)">
             </sq-timeline>
-            <sq-timeline-legend
-                *ngIf="timeSeries?.length > 1 && config.chartType !== 'Grid'"
-                [data]="timeSeries"
-                [yOffset]="8"
-                [legendStyles]="{'justify-content': 'center'}">
-            </sq-timeline-legend>
-            <ag-grid-angular
-                *ngIf="config.chartType === 'Grid'"
-                [ngClass]="'ag-theme-alpine'"
-                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
-                [rowData]="rowData"
-                [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef"
-                (gridReady)="onGridReady($event)"
-            >
-            </ag-grid-angular>
-        </section>
+            <ng-container *ngIf="config.parameters.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
+        </ng-container>
 
         <!-- Statistic view -->
         <sq-audit-stat *ngSwitchCase="'stat'"
@@ -46,56 +36,101 @@
         </sq-audit-stat>
 
         <!-- Chart view -->
-        <div *ngSwitchCase="'chart'">
+        <ng-container *ngSwitchCase="'chart'">
             <sq-fusion-chart
                 #facet
-                [hidden]="config.chartType === 'grid'"
+                [hidden]="config.parameters.chartType === 'Grid'"
                 [results]="chartResults"
                 [chart]="chart"
                 [width]="innerwidth"
                 [height]="innerheight"
-                [aggregation]="config?.chartData?.aggregation"
-                [type]="config.chartType || 'Column2D'"
-                [types]="[{type: 'Column2D', display: 'Columns 2D'}, {type: 'Bar2D', display: 'Bars 2D'}, {type: 'Pie2D', display: 'Pie 2D'}, {type: 'doughnut2d', display: 'Doughnut 2D'}, {type: 'Column3D', display: 'Columns 3D'}, {type: 'Bar3D', display: 'Bars 3D'}, {type: 'Pie3D', display: 'Pie 3D'}, {type: 'doughnut3d', display: 'Doughnut 3D'}, {type: 'grid', display: 'Grid'}]"
+                [aggregation]="config.parameters.chartData!.aggregation"
+                [type]="config.parameters.chartType || 'Column2D'"
+                [types]="[
+                    {type: 'Column2D', display: 'Columns 2D'},
+                    {type: 'Bar2D', display: 'Bars 2D'},
+                    {type: 'Pie2D', display: 'Pie 2D'},
+                    {type: 'doughnut2d', display: 'Doughnut 2D'},
+                    {type: 'Column3D', display: 'Columns 3D'},
+                    {type: 'Bar3D', display: 'Bars 3D'},
+                    {type: 'Pie3D', display: 'Pie 3D'},
+                    {type: 'doughnut3d', display: 'Doughnut 3D'},
+                    {type: 'Grid', display: 'Grid'}
+                ]"
                 [autohide]="false"
                 (initialized)="onChartInitialized($event)"
                 (typeChange)="onChartTypeChange($event)">
             </sq-fusion-chart>
-            <ag-grid-angular
-                *ngIf="config.chartType === 'grid'"
-                [ngClass]="'ag-theme-alpine'"
-                [ngStyle]="{width: '100%', height: innerheight + 'px'}"
-                [rowData]="rowData"
-                [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef"
-                (gridReady)="onGridReady($event)"
-            >
-            </ag-grid-angular>
-        </div>
+            <ng-container *ngIf="config.parameters.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
+        </ng-container>
 
         <!-- Grid view -->
-        <ag-grid-angular
-            *ngSwitchCase="'grid'"
+        <ag-grid-angular *ngSwitchCase="'grid'"
             [ngClass]="'ag-theme-alpine'"
             [ngStyle]="{width: '100%', height: innerheight + 'px'}"
             [rowData]="rowData"
             [columnDefs]="columnDefs"
             [defaultColDef]="defaultColDef"
+            [rowSelection]="'multiple'"
             (gridReady)="onGridReady($event)"
             (columnResized)="onColumnResized($event)"
-        >
+            (selectionChanged)="onGridSelectionChanged($event)">
         </ag-grid-angular>
 
-    </section>
+        <!-- Heatmap view -->
+        <ng-container *ngSwitchCase="'heatmap'">
+            <sq-heatmap
+                [hidden]="config.parameters.chartType === 'Grid'"
+                [data]="heatmapData"
+                [width]="innerwidth"
+                [height]="innerheight"
+                [maxX]="40"
+                [maxY]="40"
+                (itemClicked)="onHeatmapItemClick($event)"
+                [axisClickable]="false">
+            </sq-heatmap>
+            <ng-container *ngIf="config.parameters.chartType === 'Grid'" [ngTemplateOutlet]="agGridTpl"></ng-container>
+        </ng-container>
+
+        <!-- Multi level pie view -->
+        <ng-container *ngSwitchCase="'multiLevelPie'">
+            <sq-multi-level-pie-chart
+                #facet
+                [data]="data"
+                [width]="innerwidth"
+                [height]="innerheight"
+                [clickable]="false"
+                showLabels="true"
+                showValues="true"
+                autohide="false">
+            </sq-multi-level-pie-chart>
+        </ng-container>
+
+
+    </ng-container>
 
     <div class="sq-loading" *ngIf="loading">
-      <div class="spinner-grow text-primary" role="status">
-          <span class="sr-only">Loading...</span>
-      </div>
+        <div class="spinner-grow text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
     </div>
 
     <div *ngIf="errorMessage" class="text-center alert-danger p-2 overflow-auto" [ngStyle]="{'height.px': innerheight}">
-      {{errorMessage}}
+        {{errorMessage}}
     </div>
 
 </sq-facet-card>
+
+<ng-template #agGridTpl>
+    <ag-grid-angular
+        [ngClass]="'ag-theme-alpine'"
+        [ngStyle]="{width: '100%', height: innerheight + 'px'}"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        rowSelection="single"
+        suppressRowClickSelection="true"
+        (gridReady)="onGridReady($event)"
+        (selectionChanged)="onGridSelectionChanged($event)">
+    </ag-grid-angular>
+</ng-template>

@@ -5,7 +5,7 @@
 //----------------------------------------------------------
 import JSZip from "jszip";
 
-export const xlsx = function(file: any): Promise<any> {
+export const xlsx = function(file: any): Promise<Blob> {
 
 	let s, i, j, k, l, t, w, index, data, val, style, border, borderIndex, font, fontIndex,
 		worksheet, id, columns, cols, colWidth, cell, merges, merged;

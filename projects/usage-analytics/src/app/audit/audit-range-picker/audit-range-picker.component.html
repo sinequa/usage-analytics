@@ -1,10 +1,10 @@
 <!-- Header with dropdown button-->
-<div (click)="$event.stopPropagation()" class="d-flex align-items-center justify-content-between dateRange pl-3 pr-2 py-1" [sqTooltip]="'msg#dateRange.dateRangeTooltip' | sqMessage:{currentDate: auditService.infoCurrentFilter, trendRange: auditService.infoPreviousFilter}">
-    <span>
-        <i class="far fa-clock mr-2"></i>
-        {{auditService.currentFilter | sqMessage}}
+<div (click)="$event.stopPropagation()" class="d-flex align-items-center justify-content-between dateRange ps-3 pe-2 py-1">
+    <span class="fw-bold title">
+        <i class="fas fa-clock me-2"></i>
+        Period
     </span>
-    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions()" [sqTooltip]="showDateRangeOptions ? 'msg#facetCard.collapse' : 'msg#facetCard.expand' | sqMessage" placement="top">
+    <button class="btn btn-light btn-sm" (click)="toggleDateRangeOptions()" [sqTooltip]="showDateRangeOptions ? ('msg#facetCard.collapse' | sqMessage) : ('msg#facetCard.expand' | sqMessage)" placement="bottom">
         <i class="fas fa-chevron-{{showDateRangeOptions ? 'up' : 'down'}}"></i>
     </button>
 </div>
@@ -12,13 +12,13 @@
 <div class="card flex-column dateRange-options text-muted position-absolute" *ngIf="showDateRangeOptions" (click)="$event.stopPropagation()">
     <form [formGroup]="form">
         <!-- List of predefined filters -->
-        <div class="d-flex flex-column py-2 px-2">
-            <span class="pb-1">{{'msg#dateRange.predefinedDateRange' | sqMessage}}</span>
+        <div class="d-flex flex-column px-2">
+            <span class="d-flex align-items-center py-2 fw-bold">{{'msg#dateRange.predefinedDateRange' | sqMessage}}</span>
             <div class="d-flex flex-wrap">
                 <button
                     *ngFor="let item of relativeTimeRanges"
                     type="button"
-                    class="btn btn-outline-secondary btn-sm mr-1 mb-1"
+                    class="btn btn-outline-primary btn-sm me-1 mb-1"
                     [ngClass]="{active: item === auditService.currentFilter}"
                     (click)="setAuditRange(item)">
                     {{item | sqMessage}}
@@ -26,8 +26,8 @@
             </div>
         </div>
         <!-- Custom date range selector -->
-        <div class="d-flex flex-column py-2 px-2">
-            <span class="pb-1">{{'msg#dateRange.absoluteDateRange' | sqMessage}}</span>
+        <div class="d-flex flex-column px-2">
+            <span class="d-flex align-items-center py-2 fw-bold">{{'msg#dateRange.absoluteDateRange' | sqMessage}}</span>
             <div class="d-flex flex-wrap">
                 <sq-date-range-picker
                     [options]="{closedRange: true}"
@@ -38,19 +38,20 @@
                 </sq-date-range-picker>
             </div>
         </div>
-        <!-- Custom date range selector -->
-        <div class="d-flex flex-column py-2 px-2">
-            <span class="pb-1">{{'msg#dateRange.trendsCalculations.title' | sqMessage}}</span>
+        <!-- Trends calculation -->
+        <hr class="line-separation">
+        <div class="d-flex flex-column px-2">
+            <span class="d-flex align-items-center py-2 fw-bold">{{'msg#dateRange.trendsCalculations.title' | sqMessage}}</span>
             <!-- Default mode checkbox -->
-            <div class="custom-control custom-checkbox my-1">
-                <input class="custom-control-input" type="checkbox" id="applySameRange" [formControl]="applySamePeriodForTrendsControl">
-                <label class="custom-control-label" for="applySameRange" [sqTooltip]="'msg#dateRange.trendsCalculations.tooltip' | sqMessage">
+            <div class="d-flex align-items-baseline">
+                <input class="me-1" type="checkbox" id="applySameRange" [formControl]="applySamePeriodForTrendsControl">
+                <label class="custom-date-label" for="applySameRange" [sqTooltip]="'msg#dateRange.trendsCalculations.tooltip' | sqMessage">
                     {{'msg#dateRange.trendsCalculations.label' | sqMessage}}
                 </label>
             </div>
             <!-- Select comparison period -->
-            <div *ngIf="!applySamePeriodForTrendsControl.value" [sqTooltip]="'msg#dateRange.trendsCalculations.customPeriodTooltip' | sqMessage">
-                <span class="pb-1">{{'msg#dateRange.trendsCalculations.customPeriod' | sqMessage}}</span>
+            <div *ngIf="!applySamePeriodForTrendsControl.value" [sqTooltip]="'msg#dateRange.trendsCalculations.customPeriodTooltip' | sqMessage" class="mb-2">
+                <span class="custom-date-label fw-bold">{{'msg#dateRange.trendsCalculations.customPeriod' | sqMessage}}</span>
                 <div class="d-flex flex-wrap">
                     <sq-date-range-picker
                         [options]="{closedRange: true}"

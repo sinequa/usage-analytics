@@ -1,16 +1,20 @@
+@import "@sinequa/components/theme/colors";
+@import "@sinequa/components/theme/variables";
+
 .dateRange {
-    height: 42px;
-    width: 260px;
+    height: 40px;
+    width: 220px;
     z-index: 100;
-    background-color: rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #ddecff;
     border-radius: 0.25rem;
+    box-shadow: 0 5px 7px rgba(0, 0, 0, 0.08);
 
     & button {
         outline: none;
     }
+
     &-options {
-        width: 260px;
+        width: 220px;
         z-index: 100;
         margin-top: -2px;
         border-top-left-radius: 0px;
@@ -18,3 +22,33 @@
     }
 }
 
+.btn-light {
+    background-color: $facet-btn-light-bg;
+    border-color: $facet-btn-light-border-color;
+
+    &:hover,
+    &.active {
+        color: $facet-btn-light-active-color;
+        background-color: $facet-btn-light-active-bg;
+        border-color: $facet-btn-light-active-border-color;
+    }
+
+    &.active:hover {
+        background-color: $facet-btn-light-active-bg;
+        opacity: .6;
+    }
+}
+
+.title {
+    color: #4a4a4a;
+}
+
+.custom-date-label {
+    font-size: 14px;
+}
+
+.line-separation {
+    margin-bottom: 0px;
+    width: 90%;
+    margin-left: 5%;
+}

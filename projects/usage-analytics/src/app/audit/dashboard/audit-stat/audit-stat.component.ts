@@ -2,7 +2,7 @@ import { Component, Input, SimpleChanges,  OnChanges} from '@angular/core';
 
 import { Results, DatasetError} from '@sinequa/core/web-services';
 import {AuditService} from '../../audit.service';
-import { DashboardItem } from '../dashboard.service';
+import { DashboardItem, StatParams } from '../dashboard.service';
 import { Evaluation, StatProvider, Trend } from '../providers/stat.provider';
 
 
@@ -13,7 +13,7 @@ import { Evaluation, StatProvider, Trend } from '../providers/stat.provider';
     providers: [StatProvider]
 })
 export class AuditStatComponent implements OnChanges {
-    @Input() config: DashboardItem;
+    @Input() config: DashboardItem<StatParams>;
     @Input() dataset: {[key: string]: Results | DatasetError};
     @Input() previousDataSet: {[key: string]: Results | DatasetError};
     @Input() numberFormatOptions: Intl.NumberFormatOptions = {style: 'decimal', maximumFractionDigits: 1};

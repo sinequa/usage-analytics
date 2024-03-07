@@ -22,7 +22,7 @@ export class ImportService {
         this.modalService
             .confirm({
                 title: "Import dashboards definition",
-                message: "You are about to loose ALL your current dashboards definition. Do you want to continue?",
+                message: "You are about to lose ALL your current dashboards definition. Do you want to continue?",
                 buttons: [
                     new ModalButton({result: ModalResult.Cancel}),
                     new ModalButton({result: ModalResult.OK, text: "Confirm", primary: true})
