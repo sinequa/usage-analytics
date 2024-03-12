@@ -1269,6 +1269,6 @@ export const HELP_DEFAULT_FOLDER_OPTIONS: HelpFolderOptions = {
     folder: 'usage-analytics',
     path: '/r/_sinequa/webpackages/help',
     indexFile: 'olh-index.html',
-    useLocale: false,
-    useLocaleAsPrefix: false
+    useLocale: true,
+    useLocaleAsPrefix: true
 }
