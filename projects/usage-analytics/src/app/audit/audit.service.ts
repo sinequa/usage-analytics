@@ -9,6 +9,7 @@ import {
     CCWebService,
     Dataset,
     DatasetWebService,
+    Filter,
     InFilter,
     isFieldFilter,
     PrincipalWebService,
@@ -123,8 +124,8 @@ export class AuditService {
         return ((this.appService.app?.data?.params as JsonObject)?.session_count_threshold_per_month || session_count_threshold_per_month) as number;
     }
 
-    get staticFiltersExpr(): string {
-        return ((this.appService.app?.data?.params as JsonObject)?.static_filters_expr || static_filters_expr) as string;
+    get staticFiltersExpr(): Filter | null {
+        return ((this.appService.app?.data?.params as JsonObject)?.static_filters_expr || static_filters_expr) as Filter | null;
     }
 
     get customParams(): MapOf<string> {
@@ -184,11 +185,11 @@ export class AuditService {
 
         const currentQuery = query.copy();
         currentQuery.addFilter(this._parsedTimestamp.currentRangeFilter);
-        const currentFilters = JSON.stringify(currentQuery.filters);
+        const currentFilters = currentQuery.filters;
 
         const previousQuery = query.copy();
         previousQuery.addFilter(this._parsedTimestamp.previousRangeFilter);
-        const previousFilters = JSON.stringify(previousQuery.filters);
+        const previousFilters = previousQuery.filters;
 
         // convert range filters to something more readable
         // used by stats component tooltip
@@ -215,7 +216,7 @@ export class AuditService {
         this.previousPeriodData$.next(previousPeriodData);
 
         // Specific widgets require a pre-filtering by a unique app in order to have relevant data. If not, an error message is displayed
-        this.getParallelStreamAuditData(currentFilters, this._parsedTimestamp.start, this._parsedTimestamp.end, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
+        this.getParallelStreamAuditData(currentFilters!, this._parsedTimestamp.start, this._parsedTimestamp.end, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
             .subscribe(
                 (data) => {
                     currentPeriodData = {...currentPeriodData, ...data};
@@ -233,7 +234,7 @@ export class AuditService {
                 }
             )
 
-        this.getParallelStreamAuditData(previousFilters, this._parsedTimestamp.previous, this._parsedTimestamp.start, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
+        this.getParallelStreamAuditData(previousFilters!, this._parsedTimestamp.previous, this._parsedTimestamp.start, apps, profiles, (apps.concat(profiles).length === 1) ? [] : this.monoScopeQueries)
             .subscribe(
                 (data) => {
                     previousPeriodData = {...previousPeriodData, ...data};
@@ -297,7 +298,7 @@ export class AuditService {
     }
 
     protected getParallelStreamAuditData(
-        filters: string,
+        filters: Filter,
         start: string,
         end: string,
         apps: string[],
@@ -305,7 +306,7 @@ export class AuditService {
         excludedDataset: string[] = []): Observable<Dataset> {
 
             let params = {
-                select: !!this.staticFiltersExpr ? (`((${this.staticFiltersExpr})` + " AND " + `(${filters}))`) : filters,
+                select: JSON.stringify(this.staticFiltersExpr !== null ? {operator: "and", filters: [filters, this.staticFiltersExpr]} : filters),
                 start,
                 end,
                 mask: this.mask,
