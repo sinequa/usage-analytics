@@ -2,6 +2,7 @@ import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
 import { HelpFolderOptions } from "@sinequa/components/user-settings";
 import { MapOf } from "@sinequa/core/base";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
+import { Filter } from "@sinequa/core/web-services";
 
 /** Application logo */
 export const logo: string = "assets/logo.png";
@@ -19,7 +20,7 @@ export const session_count_threshold_per_month: number = 2;
 export const potential_total_user_count: number = 0;
 
 /** Filters expression to be added in the WHERE clause of ALL DATASETS */
-export const static_filters_expr: string = "";
+export const static_filters_expr: Filter | null = null;
 
 /** Set of params that could be used as input in A SPECIFIC DATASET ( WHERE clause, FROM clause ...)*/
 export const custom_params: MapOf<string> = {};
