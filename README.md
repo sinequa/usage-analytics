@@ -225,8 +225,7 @@ In addition to options already provided to an ordinary user, an admin can modify
                 "field": "userid",
                 "operator": "in",
                 "values": [
-                    "sinequa|admin",
-                    "azuread|f9c06035-4be9-4792-a853-458476de4aae"
+                    "my-fake-user-id"
                 ]
             }
         ]
