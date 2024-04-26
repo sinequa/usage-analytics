@@ -107,20 +107,20 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "usage-analytics:build:development",
             "ssl": true,
-            "proxyConfig": "projects/usage-analytics/src/proxy.conf.json"
+            "proxyConfig": "projects/usage-analytics/src/proxy.conf.json",
+            "buildTarget": "usage-analytics:build:development"
           },
           "configurations": {
             "production": {
-              "browserTarget": "usage-analytics:build:production"
+              "buildTarget": "usage-analytics:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "usage-analytics:build"
+            "buildTarget": "usage-analytics:build"
           }
         },
         "test": {
