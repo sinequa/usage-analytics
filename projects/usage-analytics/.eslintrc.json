@@ -21,7 +21,10 @@
           "error",
           {
             "type": "element",
-            "prefix": ["app", "sq"],
+            "prefix": [
+              "app",
+              "sq"
+            ],
             "style": "kebab-case"
           }
         ],
@@ -29,7 +32,10 @@
           "error",
           {
             "type": "attribute",
-            "prefix": ["app", "sq"],
+            "prefix": [
+              "app",
+              "sq"
+            ],
             "style": "camelCase"
           }
         ],
