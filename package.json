@@ -61,7 +61,7 @@
     "matchmedia-polyfill": "^0.3.2",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.37",
-    "ngx-bootstrap": "^10.3.0",
+    "ngx-bootstrap": "^11.0.2",
     "ngx-vis": "^3.1.0",
     "propagating-hammerjs": "2.0.1",
     "rxjs": "~7.5.0",
