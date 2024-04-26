@@ -82,10 +82,12 @@
                 }
               ],
               "stylePreprocessorOptions": {
-                "includePaths": ["./node_modules"]
+                "includePaths": [
+                  "./node_modules"
+                ]
               }
             },
-            "development" : {
+            "development": {
               "outputPath": "dist-debug/usage-analytics",
               "buildOptimizer": false,
               "optimization": false,
@@ -94,7 +96,9 @@
               "sourceMap": true,
               "namedChunks": true,
               "stylePreprocessorOptions": {
-                "includePaths": ["./node_modules"]
+                "includePaths": [
+                  "./node_modules"
+                ]
               }
             }
           },
@@ -158,6 +162,14 @@
           }
         }
       }
+    }
+  },
+  "schematics": {
+    "@angular-eslint/schematics:application": {
+      "setParserOptionsProject": true
+    },
+    "@angular-eslint/schematics:library": {
+      "setParserOptionsProject": true
     }
   }
 }
