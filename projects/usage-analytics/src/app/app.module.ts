@@ -1,4 +1,4 @@
-import { NgModule/*, APP_INITIALIZER*/ } from "@angular/core";
+import { NgModule, APP_INITIALIZER } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule, Routes } from '@angular/router';
@@ -43,7 +43,7 @@ import * as CandyTheme from "fusioncharts/themes/fusioncharts.theme.candy";
 FusionCharts.options.creditLabel = false;
 
 // Components
-import { APP_HELP_FOLDER_OPTIONS, AppComponent } from "./app.component";
+import { /*APP_HELP_FOLDER_OPTIONS,*/ AppComponent } from "./app.component";
 import { AuditComponent } from "./audit/audit.component";
 import { AuditRangePickerComponent } from "./audit/audit-range-picker/audit-range-picker.component";
 import { DashboardItemComponent } from "./audit/dashboard/dashboard-item.component";
@@ -57,15 +57,12 @@ import { environment } from "../environments/environment";
 // Locales
 import {LocalesConfig, Locale} from "@sinequa/core/intl";
 import enLocale from "../locales/en";
-import { HELP_DEFAULT_FOLDER_OPTIONS } from "./audit/config";
 // import frLocale from "../locales/fr";
 // import deLocale from "../locales/de";
 
 // Initialization of @sinequa/core
 export const startConfig: StartConfig = {
-    // app: "_usage-analytics",
     production: environment.production,
-    // autoSAMLProvider: environment.autoSAMLProvider,
     auditEnabled: true
 };
 
@@ -154,7 +151,7 @@ const selectionOptions: SelectionOptions = {
         // server automatically at startup using the application name specified in the URL (app[-debug]/<app-name>).
         // This allows an application to avoid hard-coding parameters in the StartConfig but requires that the application
         // be served from the an app[-debug]/<app name> URL.
-        // {provide: APP_INITIALIZER, useFactory: StartConfigInitializer, deps: [StartConfigWebService], multi: true},
+        {provide: APP_INITIALIZER, useFactory: StartConfigInitializer, deps: [StartConfigWebService], multi: true},
 
         // Provides the Angular LocationStrategy to be used for reading route state from the browser's URL. Currently
         // only the HashLocationStrategy is supported by Sinequa.
@@ -174,11 +171,7 @@ const selectionOptions: SelectionOptions = {
         {provide: HTTP_INTERCEPTORS, useClass: NotificationsInterceptor, multi: true},
 
         {provide: SEARCH_OPTIONS, useValue: searchOptions},
-        {provide: SELECTION_OPTIONS, useValue: selectionOptions},
-
-        // Provides default help's folder options
-        // This options can be overridden by the custom json configuration from the administration panel, using the property "help-folder-options"
-        { provide: APP_HELP_FOLDER_OPTIONS, useValue: HELP_DEFAULT_FOLDER_OPTIONS }
+        {provide: SELECTION_OPTIONS, useValue: selectionOptions}
     ],
     bootstrap: [
         AppComponent

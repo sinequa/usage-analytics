@@ -3,9 +3,10 @@
         "/api",
         "/xdownload",
         "/saml/redirect",
-        "/log"
+        "/log",
+        "/r"
     ],
-    "target": "https://vm-su-sba.sinequa.com:13343",
-    "secure": true,
+    "target": "http://localhost",
+    "secure": false,
     "changeOrigin": true
 }
