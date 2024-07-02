@@ -1,5 +1,4 @@
 import { FacetConfig, FacetListParams } from "@sinequa/components/facet";
-import { HelpFolderOptions } from "@sinequa/components/user-settings";
 import { MapOf } from "@sinequa/core/base";
 import { DashboardItemOption, DashboardItemPosition } from "./dashboard/dashboard.service";
 import { Filter } from "@sinequa/core/web-services";
@@ -1264,12 +1263,3 @@ export const PALETTE: {name: string, items: string[]}[] = [
         ]
     }
 ]
-
-/** Help page repo */
-export const HELP_DEFAULT_FOLDER_OPTIONS: HelpFolderOptions = {
-    folder: 'usage-analytics',
-    path: '/r/_sinequa/webpackages/help',
-    indexFile: 'olh-index.html',
-    useLocale: true,
-    useLocaleAsPrefix: true
-}
