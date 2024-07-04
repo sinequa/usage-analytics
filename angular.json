@@ -82,10 +82,12 @@
                 }
               ],
               "stylePreprocessorOptions": {
-                "includePaths": ["./node_modules"]
+                "includePaths": [
+                  "./node_modules"
+                ]
               }
             },
-            "development" : {
+            "development": {
               "outputPath": "dist-debug/usage-analytics",
               "buildOptimizer": false,
               "optimization": false,
@@ -94,7 +96,9 @@
               "sourceMap": true,
               "namedChunks": true,
               "stylePreprocessorOptions": {
-                "includePaths": ["./node_modules"]
+                "includePaths": [
+                  "./node_modules"
+                ]
               }
             }
           },
@@ -103,20 +107,20 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "usage-analytics:build:development",
             "ssl": true,
-            "proxyConfig": "projects/usage-analytics/src/proxy.conf.json"
+            "proxyConfig": "projects/usage-analytics/src/proxy.conf.json",
+            "buildTarget": "usage-analytics:build:development"
           },
           "configurations": {
             "production": {
-              "browserTarget": "usage-analytics:build:production"
+              "buildTarget": "usage-analytics:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "usage-analytics:build"
+            "buildTarget": "usage-analytics:build"
           }
         },
         "test": {
@@ -158,6 +162,14 @@
           }
         }
       }
+    }
+  },
+  "schematics": {
+    "@angular-eslint/schematics:application": {
+      "setParserOptionsProject": true
+    },
+    "@angular-eslint/schematics:library": {
+      "setParserOptionsProject": true
     }
   }
 }
