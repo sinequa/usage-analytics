@@ -273,7 +273,6 @@ export class AuditService {
     }
 
     /**
-     *
      * @param isCurrent used to determine if the datasets are used in the current or previous period. This is used to filter out the datasets that are not involved in the trend calculation
      * @returns list of {webService, query} used by widgets in the current displayed dashboard
      */
