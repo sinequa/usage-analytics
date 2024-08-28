@@ -214,11 +214,22 @@ In addition to options already provided to an ordinary user, an admin can modify
 - `sq_timezone: string`: (**"UTC"** by default) Time zone name of Sinequa server to which time filters should be converted before being sent. Please refer to the [time zones database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 - `session_count_threshold_per_month: number`: (**2** by default) Used by “Active Users” related widgets. It allows to modify the calculation: a user is considered active when he did at least such sessions.
 - `potential_total_user_count: number`: (**0** by default) Used by “User Coverage” widget. It represents the total number of users who can use the platform within the company. Notice that this parameter **must be updated** by the admin. If not, the widget will display an error message.
-- `static_filters_expr: string`: (**""** by default) A filter expression appended to the **where clause** of **all queries in the dataset**. **A fielded search syntax is required**. Please refer to the [documentation](https://doc.sinequa.com/en.sinequa-es.v11/Content/en.sinequa-es.ui.searchOperators.html) for further information.
+- `static_filters_expr: string`: (**null** by default) A filter expression appended to the **where clause** of **all queries in the dataset**. **A Filter object syntax is required**. Please refer to the [documentation](https://sinequa.github.io/sba-angular/libraries/core/app-utils#filtering-the-metadata) for further information.
 
     For example, if you want to exclude a fake user, of **userid = "my-fake-user-id"**, (used in the testing phase) from all queries, you should have the following :
     ```json
-    "static_filters_expr": "userid <> 'my-fake-user-id'"
+    "static_filters_expr": {
+        "operator": "not",
+        "filters": [
+            {
+                "field": "userid",
+                "operator": "in",
+                "values": [
+                    "my-fake-user-id"
+                ]
+            }
+        ]
+    }
     ```
     This will result in adding the following expression to the where clause of all queries:
     ```sql
