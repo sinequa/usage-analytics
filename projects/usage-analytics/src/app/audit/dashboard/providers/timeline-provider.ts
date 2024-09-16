@@ -15,6 +15,7 @@ export interface TimeSeries {
 export interface TimelineValueField {
     name: string;
     operatorResults?: boolean;
+    partId?: string | number;
     title?: string;
     primary?: boolean;
     displayedName?: string;
@@ -87,7 +88,8 @@ export class TimelineProvider {
                             (<Array<AggregationTimeSeries>>aggregationsTimeSeries).forEach(
                                 (aggregationTimeSeries, index) => {
                                     for (const valueField of aggregationTimeSeries.valueFields) {
-                                        item[aggregationTimeSeries.name+valueField.name] = aggregations[index]?.items?.find((el) => el[aggregationTimeSeries.dateField || 'value'] === date)?.[valueField.name]
+                                        const element = aggregations[index]?.items?.find((el) => el[aggregationTimeSeries.dateField || 'value'] === date);
+                                        item[aggregationTimeSeries.name+valueField.name] = element ? (valueField.operatorResults ? element?.operatorResults?.[valueField.name] : element?.[valueField.name]) : "No data to display";
                                     }
                                 }
                             );
@@ -163,22 +165,14 @@ export class TimelineProvider {
                     for (const valueField of config.valueFields) {
                         const colDef: ColDef = {
                             headerName: valueField.displayedName || valueField.name,
+                            field: (config['name'] || '') + valueField.name,
                             filter: "agNumberColumnFilter",
-                            cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
-                        }
-                        if (valueField.operatorResults) {
-                            colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[(config['name'] || '') + valueField.name];
-                        } else {
-                            colDef.field = (config['name'] || '') + valueField.name;
+                            cellRenderer: (params: any): HTMLElement | string => Utils.isNumber(params.value) ? this.intlService.formatNumber(params.value) : params.value
                         }
 
                         // if true, set the tooltip of each cell
                         if (showTooltip) {
-                            if (valueField.operatorResults) {
-                                colDef.tooltipValueGetter = (params: ITooltipParams) => (params.data as AggregationItem).operatorResults?.[(config['name'] || '') + valueField.name];
-                            } else {
-                                colDef.tooltipField = (config['name'] || '') + valueField.name;
-                            }
+                            colDef.tooltipField = (config['name'] || '') + valueField.name;
                         }
                         columnDefs.push(colDef);
                     }
