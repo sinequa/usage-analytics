@@ -89,7 +89,15 @@ export class TimelineProvider {
                                 (aggregationTimeSeries, index) => {
                                     for (const valueField of aggregationTimeSeries.valueFields) {
                                         const element = aggregations[index]?.items?.find((el) => el[aggregationTimeSeries.dateField || 'value'] === date);
-                                        item[aggregationTimeSeries.name+valueField.name] = element ? (valueField.operatorResults ? element?.operatorResults?.[valueField.name] : element?.[valueField.name]) : "No data to display";
+                                        if (valueField.operatorResults) {
+                                          if (valueField.partId) { // case of **perc** operator
+                                            item[aggregationTimeSeries.name+valueField.name+valueField.partId] = element ? (element.operatorResults?.[valueField.name] as Array<{p: number; value: number}>).find(el => el.p === valueField.partId)?.value : "No data to display";
+                                          } else { // case of other operators
+                                            item[aggregationTimeSeries.name+valueField.name] = element ? (element.operatorResults?.[valueField.name]) : "No data to display";
+                                          }
+                                        } else { // case of default aggregationItem's count
+                                          item[aggregationTimeSeries.name+valueField.name] = element ? ( element[valueField.name]) : "No data to display";
+                                        }
                                     }
                                 }
                             );
@@ -132,7 +140,11 @@ export class TimelineProvider {
                         cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
                     }
                     if (valueField.operatorResults) {
+                      if (valueField.partId) {
+                        colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[valueField.name].find(el => el.p === valueField.partId)?.value;
+                      } else {
                         colDef.valueGetter = (params: ValueGetterParams) => (params.data as AggregationItem).operatorResults?.[valueField.name];
+                      }
                     } else {
                         colDef.field = valueField.name;
                     }
@@ -140,7 +152,11 @@ export class TimelineProvider {
                     // if true, set the tooltip of each cell
                     if (showTooltip) {
                         if (valueField.operatorResults) {
+                          if (valueField.partId) {
+                            colDef.tooltipValueGetter = (params: ITooltipParams) => (params.data as AggregationItem).operatorResults?.[valueField.name].find(el => el.p === valueField.partId)?.value;
+                          } else {
                             colDef.tooltipValueGetter = (params: ITooltipParams) => (params.data as AggregationItem).operatorResults?.[valueField.name];
+                          }
                         } else {
                             colDef.tooltipField = valueField.name;
                         }
@@ -165,14 +181,14 @@ export class TimelineProvider {
                     for (const valueField of config.valueFields) {
                         const colDef: ColDef = {
                             headerName: valueField.displayedName || valueField.name,
-                            field: (config['name'] || '') + valueField.name,
+                            field: (config['name'] || '') + valueField.name + (valueField.partId ? valueField.partId : ''),
                             filter: "agNumberColumnFilter",
                             cellRenderer: (params: any): HTMLElement | string => Utils.isNumber(params.value) ? this.intlService.formatNumber(params.value) : params.value
                         }
 
                         // if true, set the tooltip of each cell
                         if (showTooltip) {
-                            colDef.tooltipField = (config['name'] || '') + valueField.name;
+                            colDef.tooltipField = (config['name'] || '') + valueField.name + (valueField.partId ? valueField.partId : '');
                         }
                         columnDefs.push(colDef);
                     }
@@ -193,7 +209,17 @@ export class TimelineProvider {
 
                 aggregation.items.forEach((item) => {
                     const date = this._parseDate(item[aggregationTimeSeries.dateField]);
-                    const value = valueField.operatorResults? item.operatorResults?.[valueField.name] : item[valueField.name];
+                    //const value = valueField.operatorResults? item.operatorResults?.[valueField.name] : item[valueField.name];
+                    let value;
+                    if (valueField.operatorResults) {
+                        if (valueField.partId) {
+                            value = (item.operatorResults?.[valueField.name] as Array<{p: number; value: number}>).find(el => el.p === valueField.partId)?.value;
+                        } else {
+                            value = item.operatorResults?.[valueField.name];
+                        }
+                    } else {
+                      value = item[valueField.name];
+                    }
                     if(date && value) {
                         rawDates.push({date, value});
                     }
@@ -229,7 +255,7 @@ export class TimelineProvider {
                 dates.forEach(item => item.date = BsFacetTimelineComponent.shiftDate(item.date, mask));
 
                 timeSeries.push({
-                    name: (valueField.title ? valueField.title : valueField.name) + (isCurrent ? '' : ' (previous)'),
+                    name: (valueField.title ? valueField.title : (valueField.name + (valueField.partId ? valueField.partId : ''))) + (isCurrent ? '' : ' (previous)'),
                     dates,
                     primary: !!valueField.primary ? true : false,
                     showDatapoints: true
