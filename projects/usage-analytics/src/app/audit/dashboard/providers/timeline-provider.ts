@@ -180,7 +180,7 @@ export class TimelineProvider {
                 for (const config of configs) {
                     for (const valueField of config.valueFields) {
                         const colDef: ColDef = {
-                            headerName: valueField.displayedName || valueField.name,
+                            headerName: valueField.displayedName || (valueField.name + ' ' + (valueField.partId ? valueField.partId : '')),
                             field: (config['name'] || '') + valueField.name + (valueField.partId ? valueField.partId : ''),
                             filter: "agNumberColumnFilter",
                             cellRenderer: (params: any): HTMLElement | string => Utils.isNumber(params.value) ? this.intlService.formatNumber(params.value) : params.value
