@@ -135,7 +135,7 @@ export class TimelineProvider {
                 }
                 for (const valueField of configs[0].valueFields) {
                     const colDef: ColDef = {
-                        headerName: valueField.displayedName || valueField.name,
+                        headerName: valueField.displayedName || (valueField.name + ' ' + (valueField.partId ? valueField.partId : '')),
                         filter: "agNumberColumnFilter",
                         cellRenderer: (params: any): HTMLElement | string => this.intlService.formatNumber(params.value)
                     }
