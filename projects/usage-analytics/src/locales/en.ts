@@ -1,6 +1,4 @@
 import {LocaleData} from "@sinequa/core/intl";
-import d3Format from "d3-format/locale/en-US.json";
-import d3Time from "d3-time-format/locale/en-US.json";
 import {enCore} from "@sinequa/core";
 import appMessages from "./messages/en.json";
 import "intl/locale-data/jsonp/en-US"; // Safari
@@ -16,6 +14,10 @@ import { enTimeline } from "@sinequa/analytics/timeline";
 import { enFilters } from "@sinequa/components/filters";
 import { enHeatmap } from "@sinequa/analytics/heatmap";
 
+import * as format from "node_modules/d3-format/locale/en-US.json";
+import * as time from "node_modules/d3-time-format/locale/en-US.json";
+
+
 const messages = Utils.merge({}, enCore, enUtils, enNotification, enUserSettings, enFeedback, enFacet, enModal, enAdvanced, enTimeline, enFilters, enHeatmap, appMessages);
 
 export default <LocaleData>{
@@ -24,8 +26,8 @@ export default <LocaleData>{
     },
     d3: {
         locale: "en-US",
-        format: d3Format,
-        time: d3Time
+        format,
+        time
     },
     messages: messages
 };
