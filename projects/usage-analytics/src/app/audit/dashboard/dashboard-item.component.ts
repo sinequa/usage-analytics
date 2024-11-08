@@ -1,6 +1,6 @@
 import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
-import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent, RowNode, SelectionChangedEvent } from "ag-grid-community";
+import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent, IRowNode, SelectionChangedEvent } from "ag-grid-community";
 
 import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError, ExprFilter, Filter, BooleanFilter } from '@sinequa/core/web-services';
 import { Action } from '@sinequa/components/action';
@@ -113,7 +113,7 @@ export class DashboardItemComponent implements OnChanges {
         filter: true
     }
     private _gridFilter: Filter;
-    private _selectedNode: RowNode | undefined;
+    private _selectedNode: IRowNode | undefined;
 
     /** ag-grid API for the grid */
     gridApi: GridApi | null | undefined;
@@ -456,7 +456,7 @@ export class DashboardItemComponent implements OnChanges {
         // Programmatically select filtered rows
         this.gridApi?.forEachNode((node) => {
             if (node.data.$filtered) {
-                node.setSelected(true, undefined, true);
+                node.setSelected(true, undefined);
             }
         });
         this.resizeGrid();

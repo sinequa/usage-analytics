@@ -1093,8 +1093,30 @@ export const WIDGETS: {[key: string]: DashboardItemOption} = {
             },
             "asc": false
         }
+    },
+    "percResponseTimeTimeline": {
+      "id": "percResponseTimeTimeline",
+      "title": "Percentile Query Response Time Timeline",
+      "info": "<span class='text-decoration-underline'><b>Description:</b></span> Percentile WebApp Response time (in ms) incl. platform & engine displayed over time. <br> <span class='text-decoration-underline'><b>Interpretation:</b></span>  Performance indicator. <br> <span class='text-decoration-underline'><b>Calculation:</b></span>  Percentile of all duration event filtered on query.summary.",
+      "unique": true,
+      "parameters": {
+        "type": "timeline",
+        "queries": ["responseTimeTimeLine"],
+        "aggregationsTimeSeries": {
+          "name": "ResponseTime",
+          "dateField": "value",
+          "valueFields": [
+              {"operatorResults": true, "name": "perc", "title": "0,50", "primary": true, "partId": 50},
+              {"operatorResults": true, "name": "perc", "title": "0,80", "primary": true, "partId": 80},
+              {"operatorResults": true, "name": "perc", "title": "0,85", "primary": true, "partId": 85},
+              {"operatorResults": true, "name": "perc", "title": "0,90", "primary": true, "partId": 90},
+              {"operatorResults": true, "name": "perc", "title": "0,95", "primary": true, "partId": 95}
+          ]
+        },
+        "chartType": "Timeline",
+        "showPreviousPeriod": false
+      }
     }
-
 };
 
 /** Dashboards */
@@ -1259,7 +1281,8 @@ export const PALETTE: {name: string, items: string[]}[] = [
             "avgResponseTimeTimeline",
             "maxResponseTimeTimeline",
             "avgResponseTime",
-            "avgEngineResponseTime"
+            "avgEngineResponseTime",
+            "percResponseTimeTimeline"
         ]
     }
 ]
