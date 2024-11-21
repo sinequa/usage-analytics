@@ -113,7 +113,7 @@ export class DashboardItemComponent implements OnChanges {
         filter: true
     }
     private _gridFilter: Filter;
-    private _selectedNode: IRowNode | undefined;
+    private _selectedNode: IRowNode;
 
     /** ag-grid API for the grid */
     gridApi: GridApi | null | undefined;
