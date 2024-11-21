@@ -1,21 +1,21 @@
-import { Component, Input, SimpleChanges, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent, IRowNode, SelectionChangedEvent } from "ag-grid-community";
 import { GridsterItemComponent } from 'angular-gridster2';
-import { ColDef, ColumnResizedEvent, GridApi, GridReadyEvent, RowNode, SelectionChangedEvent } from "ag-grid-community";
 
-import { Results, Record, Aggregation, AggregationItem, Dataset, DatasetError, ExprFilter, Filter, BooleanFilter } from '@sinequa/core/web-services';
+import { Category, defaultChart } from '@sinequa/analytics/fusioncharts';
+import { TimelineSeries } from '@sinequa/analytics/timeline';
 import { Action } from '@sinequa/components/action';
 import { SearchService } from '@sinequa/components/search';
-import { TimelineSeries } from '@sinequa/analytics/timeline';
-import { Category, defaultChart } from '@sinequa/analytics/fusioncharts';
+import { Aggregation, AggregationItem, BooleanFilter, Dataset, DatasetError, ExprFilter, Filter, Record, Results } from '@sinequa/core/web-services';
 
-import { ChartParams, DashboardItem, DashboardItemParams, DashboardService, GridParams, HeatmapParams, MultiLevelPieParams, TimelineParams } from './dashboard.service';
-import { TimelineProvider } from './providers/timeline-provider';
+import { HeatmapItem } from '@sinequa/analytics/heatmap';
 import { AuditService } from '../audit.service';
+import { ChartParams, DashboardItem, DashboardItemParams, DashboardService, GridParams, HeatmapParams, MultiLevelPieParams, TimelineParams } from './dashboard.service';
 import { ChartProvider } from './providers/chart-provider';
 import { GridProvider } from './providers/grid-provider';
-import { HeatmapItem } from '@sinequa/analytics/heatmap';
 import { HeatmapProvider } from './providers/heatmap-provider';
 import { MultiLevelPieProvider } from './providers/multi-level-pie-provider';
+import { TimelineProvider } from './providers/timeline-provider';
 
 
 /**
@@ -113,7 +113,7 @@ export class DashboardItemComponent implements OnChanges {
         filter: true
     }
     private _gridFilter: Filter;
-    private _selectedNode: RowNode | undefined;
+    private _selectedNode: IRowNode;
 
     /** ag-grid API for the grid */
     gridApi: GridApi | null | undefined;
@@ -456,7 +456,7 @@ export class DashboardItemComponent implements OnChanges {
         // Programmatically select filtered rows
         this.gridApi?.forEachNode((node) => {
             if (node.data.$filtered) {
-                node.setSelected(true, undefined, true);
+                node.setSelected(true, undefined);
             }
         });
         this.resizeGrid();
