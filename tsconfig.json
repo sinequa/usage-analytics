@@ -1,36 +1,38 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
-      "baseUrl": "./",
-      "outDir": "./dist/out-tsc",
-      "sourceMap": true,
-      "declaration": false,
-      "downlevelIteration": true,
-      "experimentalDecorators": true,
-      "module": "es2020",
-      "moduleResolution": "node",
-      "importHelpers": true,
-      "target": "ES2022",
-      "allowSyntheticDefaultImports": true,
-      "preserveSymlinks": true,
-      "noFallthroughCasesInSwitch": true,
-      "noImplicitReturns": true,
-      "noImplicitThis": true,
-      "noUnusedLocals": true,
-      "strictFunctionTypes": true,
-      "strictNullChecks": true,
-      "resolveJsonModule": true,
-      "esModuleInterop": true,
-      "typeRoots": [
-        "node_modules/@types",
-        "node_modules/@sinequa/core/@types"
-      ],
-      "lib": [
-        "es2020",
-        "ES2020.Intl",
-        "dom"
-      ],
-      "useDefineForClassFields": false
+        "baseUrl": "./",
+        "outDir": "./dist/out-tsc",
+        "sourceMap": true,
+        "declaration": false,
+        "downlevelIteration": true,
+        "experimentalDecorators": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "target": "ESNext",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "preserveSymlinks": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "incremental": true,
+        "noImplicitOverride": true,
+        "typeRoots": [
+            "node_modules/@types",
+            "@sinequa/core/@types",
+            "@sinequa/core/base/strict-union"
+        ],
+        "lib": [
+            "es2020",
+            "dom",
+            "ES2021.Intl"
+        ],
     },
     "angularCompilerOptions": {
         "fullTemplateTypeCheck": true,
