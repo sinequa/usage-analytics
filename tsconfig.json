@@ -7,10 +7,12 @@
         "declaration": false,
         "downlevelIteration": true,
         "experimentalDecorators": true,
-        "module": "es2020",
+        "module": "esnext",
         "moduleResolution": "node",
         "importHelpers": true,
         "target": "es2020",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "preserveSymlinks": true,
         "noFallthroughCasesInSwitch": true,
@@ -19,16 +21,17 @@
         "noUnusedLocals": true,
         "strictFunctionTypes": true,
         "strictNullChecks": true,
-        "resolveJsonModule": true,
-        "esModuleInterop": true,
+        "incremental": true,
+        "noImplicitOverride": true,
         "typeRoots": [
             "node_modules/@types",
-            "node_modules/@sinequa/core/@types"
+            "@sinequa/core/@types",
+            "@sinequa/core/base/strict-union"
         ],
         "lib": [
             "es2020",
-            "ES2020.Intl",
-            "dom"
+            "dom",
+            "ES2021.Intl"
         ],
     },
     "angularCompilerOptions": {

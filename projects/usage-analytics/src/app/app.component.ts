@@ -33,7 +33,7 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
         super();
     }
 
-    ngOnInit() {
+    override ngOnInit() {
         super.ngOnInit();
         // This is needed to fix the issue of ExpressionChangedAfterItHasBeenCheckedError on app startup
         // caused by the use of (auditService.data$ | async)?.[auditService.facetFiltersQuery] directly in the template
@@ -42,7 +42,7 @@ export class AppComponent extends ComponentWithLogin implements OnInit {
         })
     }
 
-    onLoginComplete() {
+    override onLoginComplete() {
         this.titleService.setTitle((this.appService.app?.data?.title ?? title) as string);
     }
 
