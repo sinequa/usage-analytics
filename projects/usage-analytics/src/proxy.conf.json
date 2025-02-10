@@ -1,12 +1,14 @@
-{
-    "context": [
-        "/api",
-        "/xdownload",
-        "/saml/redirect",
-        "/log",
-        "/r"
-    ],
-    "target": "http://localhost",
-    "secure": false,
-    "changeOrigin": true
-}
+[
+    {
+        "context": [
+            "/api",
+            "/xdownload",
+            "/saml/redirect",
+            "/log",
+            "/r"
+        ],
+        "target": "http://localhost",
+        "secure": false,
+        "changeOrigin": true
+    }
+]

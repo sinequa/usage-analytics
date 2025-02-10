@@ -13,10 +13,8 @@ import { enUtils } from "@sinequa/components/utils";
 import { enTimeline } from "@sinequa/analytics/timeline";
 import { enFilters } from "@sinequa/components/filters";
 import { enHeatmap } from "@sinequa/analytics/heatmap";
-
 import * as format from "node_modules/d3-format/locale/en-US.json";
 import * as time from "node_modules/d3-time-format/locale/en-US.json";
-
 
 const messages = Utils.merge({}, enCore, enUtils, enNotification, enUserSettings, enFeedback, enFacet, enModal, enAdvanced, enTimeline, enFilters, enHeatmap, appMessages);
 
