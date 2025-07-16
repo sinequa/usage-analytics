@@ -332,8 +332,8 @@ where :
 - `chartType` is the view of chart to be displayed. It can be either "Timeline" or "Grid".
 - `aggregationsTimeSeries` is an optional aggregation(s) information needed to display aggregation data on the chart. It can be either an `AggregationTimeSeries` object or a list of `AggregationTimeSeries` objects.
 - `recordsTimeSeries` is an optional records information needed to display records data on the chart. It must be a `RecordsTimeSeries` object.
-- `showPreviousPeriod` is an optional boolean indicating wether the previous period should be displayed/hidden on the chart.
-- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid view.
+- `showPreviousPeriod` is an optional boolean indicating whether the previous period should be displayed/hidden on the chart.
+- `enableSelection` is an optional boolean indicating whether the selection should be enabled/disabled on the grid view.
 
 As an example, the configuration object to create a "Search count timeline" widget is as follow:
 
@@ -376,7 +376,7 @@ where :
 - `query` is the query to be executed to retrieve the data.
 - `chartType` is the view of chart to be displayed. It can be either "Column2D", "Bar2D", "Pie2D", "doughnut2d", "Column3D", "Bar3D", "Pie3D", "doughnut3d" or "Grid".
 - `chartData` is the information needed to load the displayed data on the chart. It must be a `ChartData` object.
-- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid view.
+- `enableSelection` is an optional boolean indicating whether the selection should be enabled/disabled on the grid view.
 
 As an example, the configuration object to create a "Top queries" widget is as follow:
 
@@ -416,7 +416,7 @@ where :
 - `query` is the query to be executed to retrieve the data.
 - `chartType` is the view of chart to be displayed. It can be either "Heatmap" or "Grid".
 - `chartData` is the information needed to load the displayed data on the chart. It must be a `HeatmapData` object.
-- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid view.
+- `enableSelection` is an optional boolean indicating whether the selection should be enabled/disabled on the grid view.
 
 As an example, the configuration object to create a "Indexing sources / file extensions Success" widget is as follow:
 
@@ -461,7 +461,7 @@ export interface StatParams {
 where :
 - `type` is the widget type fixed as "stat".
 - `query` is the query to be executed to retrieve the data.
-- `asc` is a boolean indicating wether the positive evaluation is at increase or decrease trend.
+- `asc` is a boolean indicating whether the positive evaluation is at increase or decrease trend.
 - `valueLocation` is an optional `StatValueLocation` object indicating where to find the value field.
 - `valueField` is an optional `StatValueField` object indicating how to access value field.
 - `operation` is an optional `StatOperation` object indicating the operation to compute the value.
@@ -509,8 +509,8 @@ where :
 - `query` is the query to be executed to retrieve the data.
 - `columns` is an array of `GridColDef` objects indicating the columns to be displayed on the grid.
 - `aggregation` is an optional string indicating that this aggregation data will be applied on the grid, if not `Results.records` will be used.
-- `showTooltip` is an optional boolean indicating wether the tooltip should be displayed on the grid.
-- `enableSelection` is an optional boolean indicating wether the selection should be enabled/disabled on the grid.
+- `showTooltip` is an optional boolean indicating whether the tooltip should be displayed on the grid.
+- `enableSelection` is an optional boolean indicating whether the selection should be enabled/disabled on the grid.
 
 As an example, the configuration object to create a "User feedback grid" widget is as follow:
 
