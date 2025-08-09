@@ -122,44 +122,6 @@
           "options": {
             "buildTarget": "usage-analytics:build"
           }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/usage-analytics/src/test.ts",
-            "polyfills": "projects/usage-analytics/src/polyfills.ts",
-            "tsConfig": "projects/usage-analytics/tsconfig.spec.json",
-            "karmaConfig": "projects/usage-analytics/karma.conf.js",
-            "assets": [
-              "projects/usage-analytics/src/favicon.ico",
-              "projects/usage-analytics/src/assets"
-            ],
-            "styles": [
-              "projects/usage-analytics/src/styles/app.scss"
-            ],
-            "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "projects/usage-analytics/**/*.ts",
-              "projects/usage-analytics/**/*.html"
-            ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "usage-analytics:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "usage-analytics:serve:production"
-            }
-          }
         }
       }
     }
