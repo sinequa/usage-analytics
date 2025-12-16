@@ -17,7 +17,8 @@ export const APP_HELP_FOLDER_OPTIONS = new InjectionToken<HelpFolderOptions>('AP
 @Component({
     selector: "sq-app",
     templateUrl: "./app.component.html",
-    styleUrls: ["./app.component.scss"]
+    styleUrls: ["./app.component.scss"],
+    standalone: false
 })
 export class AppComponent extends ComponentWithLogin implements OnInit {
 

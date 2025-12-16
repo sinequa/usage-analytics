@@ -20,6 +20,7 @@ import { MapOf } from "@sinequa/core/base";
     selector: "sq-audit",
     templateUrl: "./audit.component.html",
     styleUrls: ["./audit.component.scss"],
+    standalone: false
 })
 export class AuditComponent implements OnDestroy {
     @ViewChildren(DashboardItemComponent) dashboardItems: QueryList<DashboardItemComponent>

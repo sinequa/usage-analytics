@@ -10,6 +10,7 @@ import { DashboardItemOption, DashboardService } from "../dashboard/dashboard.se
     selector: "sq-widget-palette",
     templateUrl: "./widget-palette.component.html",
     styleUrls: ["./widget-palette.component.scss"],
+    standalone: false
 })
 export class WidgetPaletteComponent implements OnInit, OnDestroy {
 
