@@ -10,7 +10,8 @@ import { Evaluation, StatProvider, Trend } from '../providers/stat.provider';
     selector: 'sq-audit-stat',
     templateUrl: './audit-stat.component.html',
     styleUrls: ['./audit-stat.component.scss'],
-    providers: [StatProvider]
+    providers: [StatProvider],
+    standalone: false
 })
 export class AuditStatComponent implements OnChanges {
     @Input() config: DashboardItem<StatParams>;
