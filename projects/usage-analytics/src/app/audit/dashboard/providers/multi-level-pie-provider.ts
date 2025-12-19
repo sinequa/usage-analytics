@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Category } from "@sinequa/analytics/fusioncharts";
 import { Dataset, DatasetError, isDatasetError, Results } from "@sinequa/core/web-services";
 import { MayBe, StatProvider, StatValueField, StatValueLocation } from "./stat.provider";
-import { Parser } from "expr-eval";
+import { Parser } from "expr-eval-fork";
 
 export interface MultiLevelPieQuery {
     query: string;

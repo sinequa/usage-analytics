@@ -29,7 +29,8 @@ import { TimelineProvider } from './providers/timeline-provider';
     selector: 'sq-dashboard-item',
     templateUrl: './dashboard-item.component.html',
     styleUrls: ['./dashboard-item.component.scss'],
-    providers: [TimelineProvider, ChartProvider, GridProvider, HeatmapProvider, MultiLevelPieProvider]
+    providers: [TimelineProvider, ChartProvider, GridProvider, HeatmapProvider, MultiLevelPieProvider],
+    standalone: false
 })
 export class DashboardItemComponent implements OnChanges {
     @Input() config: DashboardItem<DashboardItemParams>;
