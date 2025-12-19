@@ -7,6 +7,7 @@ import { RelativeTimeRanges } from "../config";
     selector: "sq-audit-range-picker",
     templateUrl: "./audit-range-picker.component.html",
     styleUrls: ["./audit-range-picker.component.scss"],
+    standalone: false
 })
 export class AuditRangePickerComponent {
 
