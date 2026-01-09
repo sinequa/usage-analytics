@@ -83,7 +83,8 @@
   "overrides": {
     "autoprefixer": "10.4.5",
     "esbuild": "0.25.0",
-    "tmp": "0.2.4"
+    "tmp": "0.2.4",
+    "jspdf": "4.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.2.19",
