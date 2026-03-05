@@ -81,10 +81,7 @@
     "zone.js": "~0.15.1"
   },
   "overrides": {
-    "autoprefixer": "10.4.5",
-    "esbuild": "0.25.0",
-    "tmp": "0.2.4",
-    "jspdf": "4.0.0"
+    "serialize-javascript": "^7.0.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.3.14",
