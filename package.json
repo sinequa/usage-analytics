@@ -86,7 +86,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.3.14",
     "@angular/cli": "^20.3.14",
-    "@angular/compiler-cli": "^20.3.16",
+    "@angular/compiler-cli": "^21.2.7",
     "@angular/language-service": "^20.3.16",
     "@swimlane/ngx-charts": "^20.1.0",
     "@types/d3": "^7.4.0",
