@@ -78,7 +78,7 @@
     "vis-util": "5.0.3",
     "xml-formatter": "^3.2.0",
     "xss": "^1.0.0",
-    "zone.js": "~0.15.1"
+    "zone.js": "~0.16.1"
   },
   "overrides": {
     "serialize-javascript": "^7.0.3"
