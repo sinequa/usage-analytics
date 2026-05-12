@@ -33,7 +33,7 @@
     "@sinequa/components": "rel_11.13.0",
     "@sinequa/core": "rel_11.13.0",
     "@swimlane/ngx-charts": "^20.1.0",
-    "ag-grid-angular": "^32.2.0",
+    "ag-grid-angular": "^35.2.1",
     "ag-grid-community": "^32.2.0",
     "angular-gridster2": "^18.0.1",
     "atomicjs": "^4.4.1",
