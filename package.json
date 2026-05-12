@@ -95,7 +95,7 @@
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/marked": "^4.0.3",
-    "@types/node": "^18.19.31",
+    "@types/node": "^25.7.0",
     "eslint": "^8.57.0",
     "ng-packagr": "^20.3.2",
     "postcss": "^8.2.15",
