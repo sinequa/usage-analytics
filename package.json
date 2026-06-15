@@ -104,7 +104,7 @@
     "eslint": "^8.57.0",
     "ng-packagr": "^20.3.2",
     "postcss": "^8.2.15",
-    "typescript": "~5.9.3",
+    "typescript": "~6.0.3",
     "zod": "^3.22.4"
   }
 }
