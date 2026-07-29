@@ -1,0 +1,35 @@
+stages:
+  - check
+  - build
+
+jira-ticket-check:
+  stage: check
+  image: alpine:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - |
+      echo "Check the content of the Merge Request title"
+      title="$CI_MERGE_REQUEST_TITLE"
+      echo "Content is: $title"
+      if echo "$title" | grep -qiE '[A-Za-z]{2,6}-[0-9]+[[:space:]]+#done'; then
+        echo "The Merge Request Title contains a Jira ticket with a '#done'"
+      elif echo "$title" | grep -qi '#noJiraCheck'; then
+        echo "Check is disabled by #noJiraCheck"
+      else
+        echo "The Merge Request Title does NOT contain a Jira ticket with a '#done'"
+        echo "You can disable this check by adding #noJiraCheck in the Merge Request Title"
+        exit 1
+      fi
+
+node-ci:
+  stage: build
+  image: node:${NODE_VERSION}
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  parallel:
+    matrix:
+      - NODE_VERSION: ["18", "20"]
+  script:
+    - npm ci
