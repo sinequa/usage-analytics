@@ -25,15 +25,3 @@ jira-ticket-check:
         echo "You can disable this check by adding #noJiraCheck in the Merge Request Title"
         exit 1
       fi
-
-node-ci:
-  stage: build
-  image: node:${NODE_VERSION}
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  parallel:
-    matrix:
-      - NODE_VERSION: ["18", "20"]
-  script:
-    - npm ci
