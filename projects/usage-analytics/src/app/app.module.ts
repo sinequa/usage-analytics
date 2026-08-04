@@ -57,8 +57,8 @@ import { environment } from "../environments/environment";
 // Locales
 import {LocalesConfig, Locale} from "@sinequa/core/intl";
 import enLocale from "../locales/en";
-// import frLocale from "../locales/fr";
-// import deLocale from "../locales/de";
+import frLocale from "../locales/fr";
+import deLocale from "../locales/de";
 
 // Initialization of @sinequa/core
 export const startConfig: StartConfig = {
@@ -94,8 +94,8 @@ export class SesameLocalesConfig implements LocalesConfig {
     constructor(){
         this.locales = [
             { name: "en", display: "msg#locale.en", data: enLocale},
-            // { name: "fr", display: "msg#locale.fr", data: frLocale},
-            // { name: "de", display: "msg#locale.de", data: deLocale},
+            { name: "fr", display: "msg#locale.fr", data: frLocale},
+            { name: "de", display: "msg#locale.de", data: deLocale},
         ];
         this.defaultLocale = this.locales[0];
     }
